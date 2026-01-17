@@ -21,6 +21,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - Fixed circular import between `pipeline_builder` and `pipeline_validator` triggered during `semantica.pipeline` import
     - Lazy-loaded `PipelineValidator` inside `PipelineBuilder.__init__` and guarded type hints with `TYPE_CHECKING`
     - Ensured `from semantica.deduplication import DuplicateDetector` no longer fails even when pipeline module is imported
+- **JupyterLab Progress Output (Issue #181)**:
+    - Added `SEMANTICA_DISABLE_JUPYTER_PROGRESS` environment variable to disable rich Jupyter/Colab progress tables
+    - When enabled, progress falls back to console-style output, preventing infinite scrolling and JupyterLab out-of-memory errors
 
 ### Added
 - **Comprehensive Test Suite**:
