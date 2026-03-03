@@ -219,6 +219,67 @@ class TestPipelineComprehensive(unittest.TestCase):
         self.assertTrue(result.success)
         self.assertEqual(result.output, "Success")
         self.assertEqual(mock_handler.call_count, 3)
+    
+    def test_execution_engine_delta_mode(self):
+        """
+        Test pipeline execution intercepting and computing delta mode.
+        """
+        
+        mock_version_manager = MagicMock()
+        mock_version_manager.get_version.side_effect = lambda v: {
+            "v1": {"version_id": "v1", "graph_uri": "urn:graph:v1"},
+            "v2": {"version_id": "v2", "graph_uri": "urn:graph:v2"}
+        }.get(v)
+        
+        mock_triplet_store = MagicMock()
+        expected_delta_payload = {
+            "old_graph_uri": "urn:graph:v1",
+            "new_graph_uri": "urn:graph:v2",
+            "added_triples": ["<urn:s> <urn:p> <urn:o>"],
+            "removed_triples": [],
+            "added_count": 1,
+            "removed_count": 0, 
+        }
+        mock_triplet_store.compute_delta.return_value = expected_delta_payload
+        def delta_aware_handler(data, **kwargs):
+            return data
+
+        builder = PipelineBuilder()
+        builder.add_step(
+            step_name="incremental_validation",
+            step_type="validation",
+            handler=delta_aware_handler,
+            delta_mode=True,
+            base_version_id="v1",
+            target_version_id="v2",
+        )
+        
+        pipeline = builder.build("delta_pipeline")
+        engine = ExecutionEngine()
+        
+        initial_data = {"full_graph": "huge_amount_of_data"}
+        
+        result = engine.execute_pipeline(
+            pipeline,
+            data=initial_data,
+            version_manager=mock_version_manager,
+            triplet_store=mock_triplet_store
+        )
+        
+        self.assertTrue(result.success)
+        
+        mock_version_manager.get_version.assert_any_call("v1")
+        mock_version_manager.get_version.assert_any_call("v2")
+
+        mock_triplet_store.compute_delta.assert_called_once_with(
+            "urn:graph:v1",
+            "urn:graph:v2",
+            version_manager=mock_version_manager,
+            triplet_store=mock_triplet_store
+        )
+        
+        self.assertEqual(result.output, expected_delta_payload)
+        self.assertNotEqual(result.output, initial_data)
 
 if __name__ == '__main__':
     unittest.main()

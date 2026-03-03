@@ -245,6 +245,49 @@ print(f"Axioms modified: {diff['axioms_modified']}")
 
 ---
 
+## Incremental / Delta processing
+
+For large-scale knowledge graphs, reprocessing the entire dataset on every update is computationally expensive.
+Semantica supports **Delta-Aware Pipelines**, allowing you to compute the exact differences (added and removed triples)
+between the two graph snapshots and run validation, enrichment, or export jobs *only* on the changes.
+
+### Delta Pipeline Example
+
+```python
+from semantica.change_management import TemporalVersionManager
+from semantica.pipeline import PipelineBuilder, ExecutionEngine
+
+# a. Initialize your managers
+version_manager = TemporalVersionManager(store_graph="kg_version.db")
+triplet_store = get_my_triplet_store()
+
+# b. Build a delta-aware pipeline
+builder = PipelineBuilder()
+builder.add_step(
+    step_name="validate_changes",
+    step_type="validation",
+    handler=my_validation_handler,
+    delta_mode=True, # Enables incremental processing
+    base_version_id="v1.0",
+    target_version_id="v1.1",
+)
+
+pipeline = builder.build("incremental_nightly_job")
+
+# c. Execute the pipeline
+engine = ExecutionEngine()
+
+# The engine dynamically intercepts the flow, computes the delta on the
+# database backend, and passes ONLY the changed triples to the handler.
+result = engine.execute_pipeline(
+    pipeline,
+    data={}, # Is ignored in delta mode
+    version_manager=version_manager,
+    triplet_store=triplet_store
+)
+```
+---
+
 ## Data Integrity
 
 ### compute_checksum

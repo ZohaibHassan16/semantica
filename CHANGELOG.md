@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- **Incremental/Delta Processing Feature** (PR #349 by @ZohaibHassan16, reviewed and fixed by @KaifAhmad1):
+  - Native delta computation between graph snapshots using SPARQL queries
+  - Delta-aware pipeline execution with `delta_mode` configuration for processing only changed data
+  - Version snapshot management with graph URI tracking and metadata storage
+  - Snapshot retention policies with automatic cleanup via `prune_versions()` method
+  - Integration with pipeline execution engine for incremental workflows
+  - Significant performance improvements: processes only changes instead of full datasets
+  - Cost optimization: dramatically reduces compute and storage requirements for large-scale operations
+  - Production-ready for near real-time pipelines and frequent deployment scenarios
+  - Bug fixes: corrected SPARQL variable order, fixed class references, resolved duplicate dictionary keys
+  - Comprehensive test coverage including delta mode integration tests
+  - Complete documentation with usage examples and API references
+  - Essential for enterprise-grade, large-scale semantic infrastructure
 - **Deduplication v2 Migration Guide** (PR #344 by @ZohaibHassan16, fixes by @KaifAhmad1):
   - Added comprehensive MIGRATION_V2.md documentation for Deduplication v2 Epic #333
   - Documented Candidate Generation V2 with multi-key blocking and phonetic matching

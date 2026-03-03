@@ -141,26 +141,37 @@ class ExecutionEngine:
             # Register pipeline modules for progress tracking
             module_list = []
             module_order = {}
-            if hasattr(pipeline, 'steps') and pipeline.steps:
+            if hasattr(pipeline, "steps") and pipeline.steps:
                 for idx, step in enumerate(pipeline.steps):
                     # Extract module name from step
-                    module_name = getattr(step, 'module', None) or getattr(step, 'name', None) or str(step)
+                    module_name = (
+                        getattr(step, "module", None)
+                        or getattr(step, "name", None)
+                        or str(step)
+                    )
                     if module_name and module_name not in module_list:
                         module_list.append(module_name)
                         module_order[module_name] = idx
-            
+
             # If no steps found, try to infer from pipeline structure
             if not module_list:
                 # Common pipeline modules
-                module_list = ["ingest", "parse", "normalize", "semantic_extract", "kg", "embeddings"]
+                module_list = [
+                    "ingest",
+                    "parse",
+                    "normalize",
+                    "semantic_extract",
+                    "kg",
+                    "embeddings",
+                ]
                 module_order = {module: idx for idx, module in enumerate(module_list)}
-            
+
             # Register pipeline modules
             if module_list:
                 self.progress_tracker.register_pipeline_modules(
                     pipeline_id=pipeline_id,
                     module_list=module_list,
-                    module_order=module_order
+                    module_order=module_order,
                 )
 
             # Set status
@@ -200,7 +211,7 @@ class ExecutionEngine:
                     status="completed" if metrics["steps_failed"] == 0 else "failed",
                     message=f"Executed {metrics['steps_executed']} steps in {execution_time:.2f}s",
                 )
-                
+
                 # Clear pipeline context when pipeline completes
                 self.progress_tracker.clear_pipeline_context(pipeline_id)
 
@@ -300,11 +311,58 @@ class ExecutionEngine:
         return current_data
 
     def _execute_step(self, step: PipelineStep, data: Any, **options) -> Any:
-        """Execute a single step."""
+        """
+        Execute a single step.
+        
+        If delta_mode is enabled for the step, this intercepts the execution to compute
+        the delta between the base and target versions, passing only the changes
+        (added/removed triples) to the handler.
+        """
+
+        if getattr(step, "delta_mode", False):
+            self.logger.info(f"Executing step '{step.name}' in incremental delta mode.")
+            
+            version_manager = options.get("version_manager") or self.config.get("version_manager")
+            triplet_store = options.get("triplet_store") or self.config.get("triplet_store")
+            
+            if not version_manager or not triplet_store:
+                raise ProcessingError(
+                    f"Step '{step.name}' requires 'version_manager' and 'triplet_store' "
+                    f"in execution options for delta processing."
+                )
+            
+            if not step.base_version_id or not step.target_version_id:
+                raise ValidationError(
+                    f"Step '{step.name}' in delta_mode requires 'base_version_id' "
+                    f"and 'target_version_id' to be set."
+                )
+            
+
+            base_snap = version_manager.get_version(step.base_version_id)
+            target_snap = version_manager.get_version(step.target_version_id)
+            
+            if not base_snap:
+                raise ValidationError(f"Base version '{step.base_version_id}' not found in storage.")
+            if not target_snap:
+                raise ValidationError(f"Target version '{step.target_version_id}' not found in storage.")
+                
+            base_uri = base_snap.get("graph_uri")
+            target_uri = target_snap.get("graph_uri")
+            
+            if not base_uri or not target_uri:
+                raise ValidationError(
+                    "Both base and target snapshots must contain a 'graph_uri' "
+                    "to compute native store deltas."
+                )
+ 
+            self.logger.debug(f"Computing delta between {base_uri} and {target_uri}")
+            delta_result = triplet_store.compute_delta(base_uri, target_uri, **options)
+   
+            data = delta_result
+        
         if step.handler:
             return step.handler(data, **step.config, **options)
         else:
-            # Default: pass data through
             return data
 
     def _topological_sort(self, steps: List[PipelineStep]) -> List[PipelineStep]:
@@ -406,9 +464,9 @@ class ExecutionEngine:
         return {
             "total_steps": total_steps,
             "completed_steps": completed_steps,
-            "progress_percentage": (completed_steps / total_steps * 100)
-            if total_steps > 0
-            else 0.0,
+            "progress_percentage": (
+                (completed_steps / total_steps * 100) if total_steps > 0 else 0.0
+            ),
             "status": self.pipeline_status.get(
                 pipeline_id, PipelineStatus.PENDING
             ).value,

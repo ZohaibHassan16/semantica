@@ -64,6 +64,9 @@ class PipelineStep:
     status: StepStatus = StepStatus.PENDING
     result: Any = None
     error: Optional[Exception] = None
+    delta_mode: bool = False
+    base_version_id: Optional[str] = None
+    target_version_id: Optional[str] = None
 
 
 @dataclass
@@ -125,16 +128,23 @@ class PipelineBuilder:
         Returns:
             Self for method chaining
         """
+        delta_mode = config.pop("delta_mode", False)
+        base_version_id = config.pop("base_version_id", None)
+        target_version_id = config.pop("target_version_id", None)
+
         step = PipelineStep(
             name=step_name,
             step_type=step_type,
             config=config,
             dependencies=config.get("dependencies", []),
             handler=config.get("handler"),
+            delta_mode = delta_mode,
+            base_version_id=base_version_id,
+            target_version_id=target_version_id,
         )
 
         self.steps.append(step)
-        self.logger.debug(f"Added step: {step_name} ({step_type})")
+        self.logger.debug(f"Added step: {step_name} ({step_type}) | Delta Mode: {delta_mode}")
 
         return self
 
@@ -397,6 +407,9 @@ class PipelineSerializer:
                     "type": step.step_type,
                     "config": step.config,
                     "dependencies": step.dependencies,
+                    "delta_mode": getattr(step, "delta_mode", False),
+                    "base_version_id": getattr(step, "base_version_id", None),
+                    "target_version_id": getattr(step, "target_version_id", None),
                 }
                 for step in pipeline.steps
             ],
