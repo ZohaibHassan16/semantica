@@ -110,7 +110,10 @@ class ConflictAnalyzer:
         self.logger = get_logger("conflict_analyzer")
         self.config = config or {}
         self.config.update(kwargs)
+        # Initialize progress tracker and ensure it's enabled
         self.progress_tracker = get_progress_tracker()
+        if not self.progress_tracker.enabled:
+            self.progress_tracker.enabled = True
 
     def analyze_conflicts(self, conflicts: List[Conflict]) -> Dict[str, Any]:
         """
@@ -131,18 +134,85 @@ class ConflictAnalyzer:
         )
 
         try:
-            self.progress_tracker.update_tracking(
-                tracking_id, message="Analyzing conflict patterns..."
+            total_steps = 6  # by_type, by_severity, by_source, by_entity, by_property, patterns, recommendations
+            current_step = 0
+            
+            # Step 1: Analyze by type
+            current_step += 1
+            remaining_steps = total_steps - current_step
+            self.progress_tracker.update_progress(
+                tracking_id,
+                processed=current_step,
+                total=total_steps,
+                message=f"Analyzing by type... ({current_step}/{total_steps}, remaining: {remaining_steps} steps)"
             )
+            by_type = self._analyze_by_type(conflicts)
+            
+            # Step 2: Analyze by severity
+            current_step += 1
+            remaining_steps = total_steps - current_step
+            self.progress_tracker.update_progress(
+                tracking_id,
+                processed=current_step,
+                total=total_steps,
+                message=f"Analyzing by severity... ({current_step}/{total_steps}, remaining: {remaining_steps} steps)"
+            )
+            by_severity = self._analyze_by_severity(conflicts)
+            
+            # Step 3: Analyze by source
+            current_step += 1
+            remaining_steps = total_steps - current_step
+            self.progress_tracker.update_progress(
+                tracking_id,
+                processed=current_step,
+                total=total_steps,
+                message=f"Analyzing by source... ({current_step}/{total_steps}, remaining: {remaining_steps} steps)"
+            )
+            by_source = self._analyze_by_source(conflicts)
+            
+            # Step 4: Analyze by entity
+            current_step += 1
+            remaining_steps = total_steps - current_step
+            self.progress_tracker.update_progress(
+                tracking_id,
+                processed=current_step,
+                total=total_steps,
+                message=f"Analyzing by entity... ({current_step}/{total_steps}, remaining: {remaining_steps} steps)"
+            )
+            by_entity = self._analyze_by_entity(conflicts)
+            
+            # Step 5: Analyze by property
+            current_step += 1
+            remaining_steps = total_steps - current_step
+            self.progress_tracker.update_progress(
+                tracking_id,
+                processed=current_step,
+                total=total_steps,
+                message=f"Analyzing by property... ({current_step}/{total_steps}, remaining: {remaining_steps} steps)"
+            )
+            by_property = self._analyze_by_property(conflicts)
+            
+            # Step 6: Identify patterns and generate recommendations
+            current_step += 1
+            remaining_steps = total_steps - current_step
+            self.progress_tracker.update_progress(
+                tracking_id,
+                processed=current_step,
+                total=total_steps,
+                message=f"Identifying patterns and generating recommendations... ({current_step}/{total_steps}, remaining: {remaining_steps} steps)"
+            )
+            patterns = self._identify_patterns(conflicts)
+            recommendations = self._generate_recommendations(conflicts)
+            
             analysis = {
                 "total_conflicts": len(conflicts),
-                "by_type": self._analyze_by_type(conflicts),
-                "by_severity": self._analyze_by_severity(conflicts),
-                "by_source": self._analyze_by_source(conflicts),
-                "by_entity": self._analyze_by_entity(conflicts),
-                "by_property": self._analyze_by_property(conflicts),
-                "patterns": self._identify_patterns(conflicts),
-                "recommendations": self._generate_recommendations(conflicts),
+                "by_type": by_type,
+                "by_severity": by_severity,
+                "by_source": by_source,
+                "by_entity": by_entity,
+                "by_property": by_property,
+                "patterns": patterns,
+                "recommendations": recommendations,
             }
 
             self.progress_tracker.stop_tracking(

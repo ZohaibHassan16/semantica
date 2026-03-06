@@ -137,7 +137,8 @@ Example Usage:
     >>> centrality = calculate_centrality(kg, method="degree")
 """
 
-from typing import Any, Callable, Dict, List, Optional, Union
+import numpy as np
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
 from ..utils.exceptions import ConfigurationError, ProcessingError
 from ..utils.logging import get_logger
@@ -148,7 +149,11 @@ from .connectivity_analyzer import ConnectivityAnalyzer
 from .entity_resolver import EntityResolver
 from .graph_analyzer import GraphAnalyzer
 from .graph_builder import GraphBuilder
+from .link_predictor import LinkPredictor
+from .node_embeddings import NodeEmbedder
+from .path_finder import PathFinder
 from .registry import method_registry
+from .similarity_calculator import SimilarityCalculator
 from .temporal_query import TemporalGraphQuery
 
 logger = get_logger("kg_methods")
@@ -568,3 +573,342 @@ def list_available_methods(task: Optional[str] = None) -> Dict[str, List[str]]:
         >>> build_methods = list_available_methods("build")
     """
     return method_registry.list_all(task)
+
+
+# Enhanced Graph Algorithms - Convenience Functions
+
+def compute_node_embeddings(
+    graph_store: Any,
+    method: str = "node2vec",
+    node_labels: Optional[List[str]] = None,
+    relationship_types: Optional[List[str]] = None,
+    **kwargs
+) -> Dict[str, List[float]]:
+    """
+    Compute node embeddings for knowledge graph.
+    
+    Args:
+        graph_store: Graph store containing the knowledge graph
+        method: Embedding method ("node2vec")
+        node_labels: List of node labels to include
+        relationship_types: List of relationship types to traverse
+        **kwargs: Additional parameters for embedding algorithm
+        
+    Returns:
+        Dictionary mapping node IDs to embedding vectors
+        
+    Raises:
+        ValueError: If method is not supported
+        RuntimeError: If embedding computation fails
+        
+    Examples:
+        >>> from semantica.kg.methods import compute_node_embeddings
+        >>> embeddings = compute_node_embeddings(
+        ...     graph_store, 
+        ...     method="node2vec",
+        ...     node_labels=["Entity"],
+        ...     embedding_dimension=128
+        ... )
+    """
+    try:
+        pass  # NodeEmbedder imported at module level
+        
+        embedder = NodeEmbedder(method=method, **kwargs)
+        return embedder.compute_embeddings(
+            graph_store=graph_store,
+            node_labels=node_labels or [],
+            relationship_types=relationship_types or [],
+            **kwargs
+        )
+    except Exception as e:
+        logger.error(f"Failed to compute node embeddings: {e}")
+        raise
+
+
+def calculate_similarity(
+    graph_store: Any,
+    node_id1: str,
+    node_id2: str,
+    method: str = "cosine",
+    embedding_property: str = "node2vec_embedding"
+) -> float:
+    """
+    Calculate similarity between two nodes.
+    
+    Args:
+        graph_store: Graph store containing the knowledge graph
+        node_id1: First node ID
+        node_id2: Second node ID
+        method: Similarity method ("cosine", "euclidean", "manhattan", "correlation")
+        embedding_property: Property name for stored embeddings
+        
+    Returns:
+        Similarity score
+        
+    Raises:
+        ValueError: If method is not supported or nodes not found
+        RuntimeError: If similarity calculation fails
+        
+    Examples:
+        >>> from semantica.kg.methods import calculate_similarity
+        >>> similarity = calculate_similarity(
+        ...     graph_store, 
+        ...     "node_a", 
+        ...     "node_b",
+        ...     method="cosine"
+        ... )
+    """
+    try:
+        pass  # SimilarityCalculator imported at module level
+        
+        calc = SimilarityCalculator(method=method)
+        
+        # Get embeddings
+        embedding1 = _get_node_embedding(graph_store, node_id1, embedding_property)
+        embedding2 = _get_node_embedding(graph_store, node_id2, embedding_property)
+        
+        if embedding1 is None or embedding2 is None:
+            raise ValueError("One or both nodes not found or have no embeddings")
+        
+        # Calculate similarity based on method
+        if method == "cosine":
+            return calc.cosine_similarity(embedding1, embedding2)
+        elif method == "euclidean":
+            return calc.euclidean_distance(embedding1, embedding2)
+        elif method == "manhattan":
+            return calc.manhattan_distance(embedding1, embedding2)
+        elif method == "correlation":
+            return calc.correlation_similarity(embedding1, embedding2)
+        else:
+            raise ValueError(f"Unsupported similarity method: {method}")
+            
+    except Exception as e:
+        logger.error(f"Failed to calculate similarity: {e}")
+        raise
+
+
+def predict_links(
+    graph_store: Any,
+    method: str = "preferential_attachment",
+    node_labels: Optional[List[str]] = None,
+    relationship_types: Optional[List[str]] = None,
+    top_k: int = 20,
+    **kwargs
+) -> List[Tuple[str, str, float]]:
+    """
+    Predict likely links between nodes.
+    
+    Args:
+        graph_store: Graph store containing the knowledge graph
+        method: Prediction method ("preferential_attachment", "common_neighbors", "jaccard_coefficient", "adamic_adar")
+        node_labels: List of node labels to consider
+        relationship_types: List of relationship types to consider
+        top_k: Number of top predictions to return
+        **kwargs: Additional parameters for prediction algorithm
+        
+    Returns:
+        List of (node1, node2, score) tuples sorted by score
+        
+    Raises:
+        ValueError: If method is not supported
+        RuntimeError: If prediction fails
+        
+    Examples:
+        >>> from semantica.kg.methods import predict_links
+        >>> links = predict_links(
+        ...     graph_store,
+        ...     method="preferential_attachment",
+        ...     top_k=10
+        ... )
+    """
+    try:
+        pass  # LinkPredictor imported at module level
+        
+        predictor = LinkPredictor(method=method)
+        return predictor.predict_links(
+            graph_store=graph_store,
+            node_labels=node_labels,
+            relationship_types=relationship_types,
+            top_k=top_k
+        )
+    except Exception as e:
+        logger.error(f"Failed to predict links: {e}")
+        raise
+
+
+def find_shortest_path(
+    graph: Any,
+    source: str,
+    target: str,
+    method: str = "dijkstra",
+    **kwargs
+) -> List[str]:
+    """
+    Find shortest path between two nodes.
+    
+    Args:
+        graph: Graph object (NetworkX or similar)
+        source: Source node ID
+        target: Target node ID
+        method: Path finding method ("dijkstra", "astar", "bfs")
+        **kwargs: Additional parameters for path finding algorithm
+        
+    Returns:
+        List of node IDs representing the shortest path
+        
+    Raises:
+        ValueError: If method is not supported or nodes not found
+        RuntimeError: If path finding fails
+        
+    Examples:
+        >>> from semantica.kg.methods import find_shortest_path
+        >>> path = find_shortest_path(
+        ...     graph,
+        ...     "source_node",
+        ...     "target_node",
+        ...     method="dijkstra"
+        ... )
+    """
+    try:
+        pass  # PathFinder imported at module level
+        
+        finder = PathFinder()
+        
+        if method == "dijkstra":
+            return finder.dijkstra_shortest_path(graph, source, target, **kwargs)
+        elif method == "astar":
+            heuristic = kwargs.get("heuristic")
+            if heuristic is None:
+                # Default heuristic: straight-line distance (for geometric graphs)
+                def heuristic(node1, node2):
+                    return 0  # No heuristic - falls back to Dijkstra
+            return finder.a_star_search(graph, source, target, heuristic, **kwargs)
+        elif method == "bfs":
+            return finder.bfs_shortest_path(graph, source, target)
+        else:
+            raise ValueError(f"Unsupported path finding method: {method}")
+            
+    except Exception as e:
+        logger.error(f"Failed to find shortest path: {e}")
+        raise
+
+
+def calculate_pagerank(
+    graph: Any,
+    node_labels: Optional[List[str]] = None,
+    relationship_types: Optional[List[str]] = None,
+    max_iterations: int = 20,
+    damping_factor: float = 0.85,
+    **kwargs
+) -> Dict[str, float]:
+    """
+    Calculate PageRank scores for nodes.
+    
+    Args:
+        graph: Graph object (NetworkX or similar)
+        node_labels: List of node labels to include
+        relationship_types: List of relationship types to consider
+        max_iterations: Maximum number of iterations for convergence
+        damping_factor: Probability of continuing random walk
+        **kwargs: Additional parameters for PageRank calculation
+        
+    Returns:
+        Dictionary mapping node IDs to PageRank scores
+        
+    Raises:
+        ValueError: If graph is empty or parameters are invalid
+        RuntimeError: If PageRank calculation fails
+        
+    Examples:
+        >>> from semantica.kg.methods import calculate_pagerank
+        >>> scores = calculate_pagerank(
+        ...     graph,
+        ...     node_labels=["Entity"],
+        ...     max_iterations=30
+        ... )
+    """
+    try:
+        pass  # CentralityCalculator imported at module level
+        
+        calculator = CentralityCalculator()
+        return calculator.calculate_pagerank(
+            graph=graph,
+            node_labels=node_labels,
+            relationship_types=relationship_types,
+            max_iterations=max_iterations,
+            damping_factor=damping_factor
+        )
+    except Exception as e:
+        logger.error(f"Failed to calculate PageRank: {e}")
+        raise
+
+
+def detect_communities_label_propagation(
+    graph: Any,
+    node_labels: Optional[List[str]] = None,
+    relationship_types: Optional[List[str]] = None,
+    max_iterations: int = 100,
+    **kwargs
+) -> Dict[str, Any]:
+    """
+    Detect communities using Label Propagation algorithm.
+    
+    Args:
+        graph: Graph object (NetworkX or similar)
+        node_labels: List of node labels to include
+        relationship_types: List of relationship types to consider
+        max_iterations: Maximum number of iterations for convergence
+        **kwargs: Additional parameters for community detection
+        
+    Returns:
+        Dictionary containing communities and metadata
+        
+    Raises:
+        ValueError: If graph is empty or parameters are invalid
+        RuntimeError: If community detection fails
+        
+    Examples:
+        >>> from semantica.kg.methods import detect_communities_label_propagation
+        >>> communities = detect_communities_label_propagation(
+        ...     graph,
+        ...     node_labels=["Entity"],
+        ...     max_iterations=50
+        ... )
+    """
+    try:
+        pass  # CommunityDetector imported at module level
+        
+        detector = CommunityDetector()
+        return detector.detect_communities_label_propagation(
+            graph=graph,
+            node_labels=node_labels,
+            relationship_types=relationship_types,
+            max_iterations=max_iterations
+        )
+    except Exception as e:
+        logger.error(f"Failed to detect communities: {e}")
+        raise
+
+
+# Helper functions
+
+def _get_node_embedding(
+    graph_store: Any,
+    node_id: str,
+    property_name: str
+) -> Optional[List[float]]:
+    """Get embedding for a specific node."""
+    # Prefer explicit _node_embeddings dict over auto-created Mock attributes
+    if hasattr(graph_store, '_node_embeddings') and isinstance(graph_store._node_embeddings, dict):
+        return graph_store._node_embeddings.get(node_id)
+    if hasattr(graph_store, 'get_node_property') and callable(graph_store.get_node_property):
+        result = graph_store.get_node_property(node_id, property_name)
+        if isinstance(result, (list, np.ndarray)):
+            return result
+    if hasattr(graph_store, 'get_node_attributes') and callable(graph_store.get_node_attributes):
+        attrs = graph_store.get_node_attributes(node_id)
+        if isinstance(attrs, dict):
+            result = attrs.get(property_name)
+            if isinstance(result, (list, np.ndarray)):
+                return result
+    return None

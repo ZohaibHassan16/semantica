@@ -12,6 +12,7 @@ from semantica.vector_store import (
     VectorStore, FAISSStore, HybridSearch, MetadataFilter, 
     SearchRanker, NamespaceManager
 )
+from semantica.reasoning import Reasoner
 
 pytestmark = pytest.mark.integration
 
@@ -163,6 +164,25 @@ class TestSemanticaFeatures(unittest.TestCase):
         self.assertTrue(ns_a.has_permission("user1", "read"))
         self.assertFalse(ns_a.has_permission("user1", "write"))
         print("Namespace Manager: OK")
+
+    def test_09_reasoning_core(self):
+        """Test Reasoner core functionality"""
+        print("\nTesting Reasoner...")
+        reasoner = Reasoner()
+        
+        # Test rule parsing and forward chaining
+        reasoner.add_rule("IF Person(?x) AND Parent(?x, ?y) THEN Child(?y, ?x)")
+        reasoner.add_fact("Person(John)")
+        reasoner.add_fact("Parent(John, Jane)")
+        
+        results = reasoner.forward_chain()
+        self.assertTrue(any(r.conclusion == "Child(Jane, John)" for r in results))
+        
+        # Test backward chaining
+        proof = reasoner.backward_chain("Child(Jane, John)")
+        self.assertIsNotNone(proof)
+        self.assertEqual(proof.conclusion, "Child(Jane, John)")
+        print("Reasoner: OK")
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)

@@ -15,6 +15,8 @@ Key Features:
     - Semantic network construction
     - LLM-based extraction enhancement
     - Extraction validation and quality assessment
+    - Batch processing with provenance tracking (batch_index, document_id)
+    - Robust fallback mechanisms (ML -> Pattern -> Last Resort)
 
 Main Classes:
     - NamedEntityRecognizer: Main NER coordinator (confidence_threshold, merge_overlapping)

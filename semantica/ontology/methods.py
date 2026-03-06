@@ -111,15 +111,19 @@ Main Functions:
     - create_associative_class: Associative class creation wrapper
     - get_ontology_method: Get ontology method by name
     - list_available_methods: List registered methods
+    - ingest_ontology: Ingest ontology from file or directory (via semantica.ingest)
 
 Example Usage:
-    >>> from semantica.ontology.methods import generate_ontology, infer_classes
+    >>> from semantica.ontology.methods import generate_ontology, infer_classes, ingest_ontology
     >>> ontology = generate_ontology({"entities": [...], "relationships": [...]}, method="default")
     >>> classes = infer_classes(entities, method="default")
+    >>> data = ingest_ontology("ontology.ttl")
 """
 
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any, Callable, Dict, List, Optional, Union
+from pathlib import Path
 
+from semantica.ingest import ingest_ontology as _ingest_ontology, OntologyData
 from .registry import method_registry
 
 
@@ -172,4 +176,23 @@ def list_available_methods(task: Optional[str] = None) -> Dict[str, List[str]]:
     return method_registry.list_all(task)
 
 
-pass
+def ingest_ontology(
+    source: Union[str, Path, List[Union[str, Path]]], 
+    method: str = "file", 
+    **kwargs
+) -> Union[OntologyData, List[OntologyData]]:
+    """
+    Ingest ontology from source.
+    
+    This is a convenience wrapper around semantica.ingest.ingest_ontology.
+    
+    Args:
+        source: Ontology file path, directory path, or list of paths
+        method: Ingestion method (default: "file")
+        **kwargs: Additional options
+        
+    Returns:
+        OntologyData or List[OntologyData]
+    """
+    return _ingest_ontology(source, method=method, **kwargs)
+

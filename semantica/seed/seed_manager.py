@@ -126,6 +126,9 @@ class SeedDataManager:
         self.config = config or {}
         self.config.update(kwargs)
         self.progress_tracker = get_progress_tracker()
+        # Ensure progress tracker is enabled
+        if not self.progress_tracker.enabled:
+            self.progress_tracker.enabled = True
 
         self.sources: Dict[str, SeedDataSource] = {}
         self.seed_data: SeedData = SeedData()
@@ -425,7 +428,7 @@ class SeedDataManager:
             self.logger.info(f"Loaded {len(records)} records from database")
             return records
 
-        except ImportError:
+        except (ImportError, OSError):
             raise ProcessingError(
                 "Database ingestion module not available. Install required dependencies."
             )
@@ -527,7 +530,7 @@ class SeedDataManager:
             self.logger.info(f"Loaded {len(records)} records from API: {full_url}")
             return records
 
-        except ImportError:
+        except (ImportError, OSError):
             raise ProcessingError(
                 "requests library not available. Install with: pip install requests"
             )

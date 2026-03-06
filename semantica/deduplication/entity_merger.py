@@ -14,7 +14,7 @@ Algorithms Used:
     - Merge Quality Validation: Validation of merged entities for completeness and consistency
 
 Key Features:
-    - Merge duplicate entities using configurable strategies
+    - Merge duplicate entities using configurable strategies with group-level progress tracking
     - Preserve provenance information during merges (tracks merged entity sources)
     - Incremental merging of new entities with existing ones
     - Conflict resolution for property and relationship merging
@@ -122,8 +122,10 @@ class EntityMerger:
         self.merge_history: List[MergeOperation] = []
         self.preserve_provenance = preserve_provenance
 
-        # Initialize progress tracker
+        # Initialize progress tracker and ensure it's enabled
         self.progress_tracker = get_progress_tracker()
+        if not self.progress_tracker.enabled:
+            self.progress_tracker.enabled = True
 
         self.logger.debug(
             f"Entity merger initialized (preserve_provenance: {preserve_provenance})"
@@ -190,6 +192,13 @@ class EntityMerger:
         try:
             self.logger.info(f"Merging duplicates from {len(entities)} entities")
 
+            # Initial progress update
+            self.progress_tracker.update_tracking(
+                tracking_id, 
+                status="running",
+                message=f"Starting merge process for {len(entities)} entities..."
+            )
+            
             self.progress_tracker.update_tracking(
                 tracking_id, message="Detecting duplicate groups..."
             )
@@ -204,13 +213,27 @@ class EntityMerger:
                 tracking_id, message=f"Merging {len(duplicate_groups)} groups..."
             )
             merge_operations = []
+            
+            # Filter groups with 2+ entities (actual duplicates)
+            mergeable_groups = [g for g in duplicate_groups if len(g.entities) >= 2]
+            total_groups = len(mergeable_groups)
+            # Update more frequently: every item if small, or every 1% if large
+            if total_groups <= 10:
+                update_interval = 1  # Update every item for small datasets
+            else:
+                update_interval = max(1, min(5, total_groups // 100))
+            
+            # Initial progress update - ALWAYS show this
+            remaining = total_groups
+            self.progress_tracker.update_progress(
+                tracking_id,
+                processed=0,
+                total=total_groups,
+                message=f"Starting merge operations... 0/{total_groups} (remaining: {remaining})"
+            )
 
             # Merge each duplicate group
-            for group in duplicate_groups:
-                # Skip groups with less than 2 entities (not duplicates)
-                if len(group.entities) < 2:
-                    continue
-
+            for i, group in enumerate(mergeable_groups):
                 self.logger.debug(
                     f"Merging group of {len(group.entities)} entities "
                     f"(confidence: {group.confidence:.2f})"
@@ -241,6 +264,22 @@ class EntityMerger:
 
                 merge_operations.append(operation)
                 self.merge_history.append(operation)
+                
+                remaining = total_groups - (i + 1)
+                # Update progress: always update for small datasets, or at intervals for large ones
+                should_update = (
+                    (i + 1) % update_interval == 0 or 
+                    (i + 1) == total_groups or 
+                    i == 0 or
+                    total_groups <= 10  # Always update for small datasets
+                )
+                if should_update:
+                    self.progress_tracker.update_progress(
+                        tracking_id,
+                        processed=i + 1,
+                        total=total_groups,
+                        message=f"Merging groups... {i + 1}/{total_groups} (remaining: {remaining})"
+                    )
 
             self.logger.info(
                 f"Completed merging: {len(merge_operations)} merge operation(s) performed"
@@ -465,9 +504,9 @@ class EntityMerger:
         # Record source entities
         provenance["merged_from"] = [
             {
-                "id": e.get("id"),
-                "name": e.get("name"),
-                "source": e.get("metadata", {}).get("source"),
+                "id": self._get_entity_value(e, "id"),
+                "name": self._get_entity_value(e, "name"),
+                "source": self._get_entity_value(e, "metadata", {}).get("source") if hasattr(e, "metadata") or isinstance(e, dict) else None,
             }
             for e in source_entities
         ]
@@ -522,3 +561,20 @@ class EntityMerger:
             ...     print(f"Issues: {validation['issues']}")
         """
         return self.merge_strategy_manager.validate_merge(merge_operation.merge_result)
+
+    def _get_entity_value(self, entity: Any, key: str, default: Any = None) -> Any:
+        """Get value from entity dictionary or object safely."""
+        if hasattr(entity, "__dict__"):
+            # For Entity objects, map 'name' to 'text' and 'type' to 'label'
+            if key == "name":
+                return getattr(entity, "text", default)
+            if key == "type":
+                return getattr(entity, "label", default)
+            if key == "properties":
+                # Check metadata for properties
+                metadata = getattr(entity, "metadata", {})
+                return metadata.get("properties", {})
+            return getattr(entity, key, default)
+        elif isinstance(entity, dict):
+            return entity.get(key, default)
+        return default

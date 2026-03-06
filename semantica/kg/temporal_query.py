@@ -89,6 +89,9 @@ class TemporalGraphQuery:
 
         # Initialize progress tracker
         self.progress_tracker = get_progress_tracker()
+        # Ensure progress tracker is enabled
+        if not self.progress_tracker.enabled:
+            self.progress_tracker.enabled = True
 
         # Initialize pattern detector
         self.pattern_detector = TemporalPatternDetector(
@@ -300,7 +303,7 @@ class TemporalGraphQuery:
         relationship: Optional[str] = None,
         start_time: Optional[Any] = None,
         end_time: Optional[Any] = None,
-        metrics: List[str] = None,
+        metrics: Optional[List[str]] = None,
         **options,
     ) -> Dict[str, Any]:
         """
@@ -332,6 +335,10 @@ class TemporalGraphQuery:
                 - stability: Stability measure (if "stability" in metrics)
         """
         self.logger.info("Analyzing graph evolution")
+
+        # Set default metrics if None
+        if metrics is None:
+            metrics = ["count", "diversity", "stability"]
 
         # Filter relationships
         relationships = graph.get("relationships", [])
@@ -624,39 +631,47 @@ class TemporalPatternDetector:
 
 class TemporalVersionManager:
     """
-    Temporal version management engine.
+    Enhanced temporal version management engine with persistent storage.
 
-    This class provides version/snapshot management capabilities for knowledge
-    graphs, enabling creation of temporal versions, version comparison, and
-    version history tracking.
+    This class provides comprehensive version/snapshot management capabilities for knowledge
+    graphs, including persistent storage, detailed change tracking, and audit trails.
 
     Features:
-        - Version snapshot creation
-        - Version comparison
-        - Version history tracking
-        - Automatic snapshotting (planned)
-        - Version rollback (planned)
+        - Persistent snapshot storage (SQLite or in-memory)
+        - Detailed change tracking with entity-level diffs
+        - SHA-256 checksums for data integrity
+        - Standardized metadata with author attribution
+        - Version comparison with backward compatibility
+        - Input validation and security features
 
     Example Usage:
+        >>> # In-memory storage
         >>> manager = TemporalVersionManager()
-        >>> version = manager.create_version(graph, version_label="v1.0")
-        >>> comparison = manager.compare_versions(version1, version2)
+        >>> # Persistent storage
+        >>> manager = TemporalVersionManager(storage_path="versions.db")
+        >>> snapshot = manager.create_snapshot(graph, "v1.0", 
+        ...     author="alice@company.com", description="Initial release")
+        >>> versions = manager.list_versions()
+        >>> diff = manager.compare_versions("v1.0", "v1.1")
     """
 
     def __init__(
         self,
+        storage_path: Optional[str] = None,
         snapshot_interval: Optional[int] = None,
         auto_snapshot: bool = False,
         version_strategy: str = "timestamp",
         **config,
     ):
         """
-        Initialize temporal version manager.
+        Initialize enhanced temporal version manager.
 
-        Sets up the version manager with snapshot configuration and versioning
-        strategy.
+        Sets up the version manager with storage backend, snapshot configuration,
+        and versioning strategy.
 
         Args:
+            storage_path: Path to SQLite database file for persistent storage.
+                         If None, uses in-memory storage (default: None)
             snapshot_interval: Interval for automatic snapshots in seconds
                              (optional, auto_snapshot must be True)
             auto_snapshot: Enable automatic snapshots (default: False)
@@ -664,11 +679,23 @@ class TemporalVersionManager:
                 - "timestamp": Use timestamps for version labels (default)
                 - "incremental": Use incremental version numbers (planned)
                 - "semantic": Use semantic versioning (planned)
-            **config: Additional configuration options (unused)
+            **config: Additional configuration options
         """
+        from semantica.change_management import ChangeLogEntry, VersionStorage, InMemoryVersionStorage, SQLiteVersionStorage
+        from ..utils.logging import get_logger
+        
         self.snapshot_interval = snapshot_interval
         self.auto_snapshot = auto_snapshot
         self.version_strategy = version_strategy
+        self.logger = get_logger("temporal_version_manager")
+        
+        # Initialize storage backend
+        if storage_path:
+            self.storage = SQLiteVersionStorage(storage_path)
+            self.logger.info(f"Initialized with SQLite storage: {storage_path}")
+        else:
+            self.storage = InMemoryVersionStorage()
+            self.logger.info("Initialized with in-memory storage")
 
     def create_version(
         self,
@@ -715,37 +742,282 @@ class TemporalVersionManager:
 
     def compare_versions(
         self,
-        version1: Dict[str, Any],
-        version2: Dict[str, Any],
+        v1_label_or_dict,
+        v2_label_or_dict,
         comparison_metrics: Optional[List[str]] = None,
         **options,
     ) -> Dict[str, Any]:
         """
-        Compare two graph versions.
+        Compare two graph versions with detailed entity-level differences.
 
-        This method compares two version snapshots and calculates differences
-        in entities and relationships.
+        This method compares two version snapshots and calculates detailed differences
+        in entities and relationships, maintaining backward compatibility.
 
         Args:
-            version1: First version snapshot dictionary
-            version2: Second version snapshot dictionary
+            v1_label_or_dict: First version (label string or snapshot dict)
+            v2_label_or_dict: Second version (label string or snapshot dict)
             comparison_metrics: List of metrics to calculate (optional, unused)
             **options: Additional comparison options (unused)
 
         Returns:
-            dict: Version comparison results containing:
-                - version1: Label of first version
-                - version2: Label of second version
-                - entities_added: Change in entity count (version2 - version1)
-                - relationships_added: Change in relationship count (version2 - version1)
+            dict: Detailed version comparison results containing:
+                - summary: Backward-compatible summary counts
+                - entities_added: List of added entities
+                - entities_removed: List of removed entities  
+                - entities_modified: List of modified entities with changes
+                - relationships_added: List of added relationships
+                - relationships_removed: List of removed relationships
+                - relationships_modified: List of modified relationships
         """
-        comparison = {
+        from ..utils.exceptions import ValidationError
+        
+        # Handle both label strings and snapshot dictionaries
+        if isinstance(v1_label_or_dict, str):
+            version1 = self.storage.get(v1_label_or_dict)
+            if not version1:
+                raise ValidationError(f"Version not found: {v1_label_or_dict}")
+        else:
+            version1 = v1_label_or_dict
+            
+        if isinstance(v2_label_or_dict, str):
+            version2 = self.storage.get(v2_label_or_dict)
+            if not version2:
+                raise ValidationError(f"Version not found: {v2_label_or_dict}")
+        else:
+            version2 = v2_label_or_dict
+        
+        # Compute detailed diff
+        detailed_diff = self._compute_detailed_diff(version1, version2)
+        
+        # Maintain backward compatibility with summary
+        summary = {
+            "entities_added": len(detailed_diff["entities_added"]),
+            "entities_removed": len(detailed_diff["entities_removed"]),
+            "entities_modified": len(detailed_diff["entities_modified"]),
+            "relationships_added": len(detailed_diff["relationships_added"]),
+            "relationships_removed": len(detailed_diff["relationships_removed"]),
+            "relationships_modified": len(detailed_diff["relationships_modified"])
+        }
+        
+        return {
             "version1": version1.get("label", "unknown"),
             "version2": version2.get("label", "unknown"),
-            "entities_added": len(version2.get("entities", []))
-            - len(version1.get("entities", [])),
-            "relationships_added": len(version2.get("relationships", []))
-            - len(version1.get("relationships", [])),
+            "summary": summary,
+            **detailed_diff
         }
 
-        return comparison
+    def create_snapshot(
+        self, 
+        graph: Dict[str, Any], 
+        version_label: str, 
+        author: str, 
+        description: str,
+        **options
+    ) -> Dict[str, Any]:
+        """
+        Create and store snapshot with checksum and metadata.
+        
+        Args:
+            graph: Knowledge graph dict with "entities" and "relationships"
+            version_label: Version string (e.g., "v1.0")
+            author: Email address of the change author
+            description: Change description (max 500 chars)
+            **options: Additional options
+            
+        Returns:
+            dict: Snapshot with metadata and checksum
+            
+        Raises:
+            ValidationError: If input validation fails
+            ProcessingError: If storage operation fails
+        """
+        from ..change_management import ChangeLogEntry, compute_checksum
+        from datetime import datetime
+        
+        # Validate inputs
+        change_entry = ChangeLogEntry(
+            timestamp=datetime.now().isoformat(),
+            author=author,
+            description=description
+        )
+        
+        # Create snapshot
+        snapshot = {
+            "label": version_label,
+            "timestamp": change_entry.timestamp,
+            "author": change_entry.author,
+            "description": change_entry.description,
+            "entities": graph.get("entities", []).copy(),
+            "relationships": graph.get("relationships", []).copy(),
+            "metadata": options.get("metadata", {})
+        }
+        
+        # Compute and add checksum
+        snapshot["checksum"] = compute_checksum(snapshot)
+        
+        # Store snapshot
+        self.storage.save(snapshot)
+        
+        self.logger.info(f"Created snapshot '{version_label}' by {author}")
+        return snapshot
+    
+    def list_versions(self) -> List[Dict[str, Any]]:
+        """
+        List all version snapshots.
+        
+        Returns:
+            List of version metadata dictionaries
+        """
+        return self.storage.list_all()
+    
+    def get_version(self, label: str) -> Optional[Dict[str, Any]]:
+        """
+        Retrieve specific version by label.
+        
+        Args:
+            label: Version label to retrieve
+            
+        Returns:
+            Snapshot dictionary or None if not found
+        """
+        return self.storage.get(label)
+    
+    def verify_checksum(self, snapshot: Dict[str, Any]) -> bool:
+        """
+        Verify the integrity of a snapshot using its checksum.
+        
+        Args:
+            snapshot: Snapshot dictionary with checksum field
+            
+        Returns:
+            True if checksum is valid, False otherwise
+        """
+        from ..change_management import verify_checksum
+        return verify_checksum(snapshot)
+    
+    def _compute_detailed_diff(self, version1: Dict[str, Any], version2: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Compute detailed entity and relationship differences between versions.
+        
+        Args:
+            version1: First version snapshot
+            version2: Second version snapshot
+            
+        Returns:
+            Dict with detailed diff information
+        """
+        entities1 = {e.get("id", str(i)): e for i, e in enumerate(version1.get("entities", []))}
+        entities2 = {e.get("id", str(i)): e for i, e in enumerate(version2.get("entities", []))}
+        
+        relationships1 = {self._relationship_key(r): r for r in version1.get("relationships", [])}
+        relationships2 = {self._relationship_key(r): r for r in version2.get("relationships", [])}
+        
+        # Entity differences
+        entity_ids1 = set(entities1.keys())
+        entity_ids2 = set(entities2.keys())
+        
+        entities_added = [entities2[eid] for eid in entity_ids2 - entity_ids1]
+        entities_removed = [entities1[eid] for eid in entity_ids1 - entity_ids2]
+        
+        entities_modified = []
+        for eid in entity_ids1 & entity_ids2:
+            if entities1[eid] != entities2[eid]:
+                changes = self._compute_entity_changes(entities1[eid], entities2[eid])
+                entities_modified.append({
+                    "id": eid,
+                    "before": entities1[eid],
+                    "after": entities2[eid],
+                    "changes": changes
+                })
+        
+        # Relationship differences
+        rel_keys1 = set(relationships1.keys())
+        rel_keys2 = set(relationships2.keys())
+        
+        relationships_added = [relationships2[key] for key in rel_keys2 - rel_keys1]
+        relationships_removed = [relationships1[key] for key in rel_keys1 - rel_keys2]
+        
+        relationships_modified = []
+        for key in rel_keys1 & rel_keys2:
+            if relationships1[key] != relationships2[key]:
+                changes = self._compute_relationship_changes(relationships1[key], relationships2[key])
+                relationships_modified.append({
+                    "key": key,
+                    "before": relationships1[key],
+                    "after": relationships2[key],
+                    "changes": changes
+                })
+        
+        return {
+            "entities_added": entities_added,
+            "entities_removed": entities_removed,
+            "entities_modified": entities_modified,
+            "relationships_added": relationships_added,
+            "relationships_removed": relationships_removed,
+            "relationships_modified": relationships_modified
+        }
+    
+    def _relationship_key(self, relationship: Dict[str, Any]) -> str:
+        """
+        Generate a unique key for a relationship.
+        
+        Args:
+            relationship: Relationship dictionary
+            
+        Returns:
+            Unique string key for the relationship
+        """
+        source = relationship.get("source", "")
+        target = relationship.get("target", "")
+        rel_type = relationship.get("type", relationship.get("relationship", ""))
+        return f"{source}|{rel_type}|{target}"
+    
+    def _compute_entity_changes(self, entity1: Dict[str, Any], entity2: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Compute changes between two entity versions.
+        
+        Args:
+            entity1: Original entity
+            entity2: Modified entity
+            
+        Returns:
+            Dictionary of changes
+        """
+        changes = {}
+        
+        # Check all keys from both entities
+        all_keys = set(entity1.keys()) | set(entity2.keys())
+        
+        for key in all_keys:
+            val1 = entity1.get(key)
+            val2 = entity2.get(key)
+            
+            if val1 != val2:
+                changes[key] = {"from": val1, "to": val2}
+        
+        return changes
+    
+    def _compute_relationship_changes(self, rel1: Dict[str, Any], rel2: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Compute changes between two relationship versions.
+        
+        Args:
+            rel1: Original relationship
+            rel2: Modified relationship
+            
+        Returns:
+            Dictionary of changes
+        """
+        changes = {}
+        
+        # Check all keys from both relationships
+        all_keys = set(rel1.keys()) | set(rel2.keys())
+        
+        for key in all_keys:
+            val1 = rel1.get(key)
+            val2 = rel2.get(key)
+            
+            if val1 != val2:
+                changes[key] = {"from": val1, "to": val2}
+        
+        return changes

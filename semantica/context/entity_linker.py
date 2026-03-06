@@ -133,6 +133,9 @@ class EntityLinker:
 
         # Initialize progress tracker
         self.progress_tracker = get_progress_tracker()
+        # Ensure progress tracker is enabled
+        if not self.progress_tracker.enabled:
+            self.progress_tracker.enabled = True
 
         # Entity registry: entity_id -> URI
         self.entity_registry: Dict[str, str] = {}

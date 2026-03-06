@@ -106,6 +106,9 @@ class ExecutionEngine:
 
         # Initialize progress tracker
         self.progress_tracker = get_progress_tracker()
+        # Ensure progress tracker is enabled
+        if not self.progress_tracker.enabled:
+            self.progress_tracker.enabled = True
 
     def execute_pipeline(
         self, pipeline: Pipeline, data: Any = None, **options
@@ -129,10 +132,47 @@ class ExecutionEngine:
             module="pipeline",
             submodule="ExecutionEngine",
             message=f"Executing pipeline: {pipeline_id}",
+            pipeline_id=pipeline_id,
         )
 
         try:
             self.logger.info(f"Executing pipeline: {pipeline_id}")
+
+            # Register pipeline modules for progress tracking
+            module_list = []
+            module_order = {}
+            if hasattr(pipeline, "steps") and pipeline.steps:
+                for idx, step in enumerate(pipeline.steps):
+                    # Extract module name from step
+                    module_name = (
+                        getattr(step, "module", None)
+                        or getattr(step, "name", None)
+                        or str(step)
+                    )
+                    if module_name and module_name not in module_list:
+                        module_list.append(module_name)
+                        module_order[module_name] = idx
+
+            # If no steps found, try to infer from pipeline structure
+            if not module_list:
+                # Common pipeline modules
+                module_list = [
+                    "ingest",
+                    "parse",
+                    "normalize",
+                    "semantic_extract",
+                    "kg",
+                    "embeddings",
+                ]
+                module_order = {module: idx for idx, module in enumerate(module_list)}
+
+            # Register pipeline modules
+            if module_list:
+                self.progress_tracker.register_pipeline_modules(
+                    pipeline_id=pipeline_id,
+                    module_list=module_list,
+                    module_order=module_order,
+                )
 
             # Set status
             with self.pipeline_lock:
@@ -172,6 +212,9 @@ class ExecutionEngine:
                     message=f"Executed {metrics['steps_executed']} steps in {execution_time:.2f}s",
                 )
 
+                # Clear pipeline context when pipeline completes
+                self.progress_tracker.clear_pipeline_context(pipeline_id)
+
                 return ExecutionResult(
                     success=metrics["steps_failed"] == 0,
                     output=result,
@@ -190,6 +233,8 @@ class ExecutionEngine:
             self.progress_tracker.stop_tracking(
                 pipeline_tracking_id, status="failed", message=str(e)
             )
+            # Clear pipeline context on failure
+            self.progress_tracker.clear_pipeline_context(pipeline_id)
             self.logger.error(f"Pipeline execution failed: {e}")
             with self.pipeline_lock:
                 self.pipeline_status[pipeline_id] = PipelineStatus.FAILED
@@ -238,39 +283,105 @@ class ExecutionEngine:
                 step.status = StepStatus.FAILED
                 step.error = e
 
-                # Handle failure
-                recovery_result = self.failure_handler.handle_step_failure(step, e)
-                if not recovery_result.get("retry", False):
-                    self.progress_tracker.stop_tracking(
-                        step_tracking_id, status="failed", message=str(e)
-                    )
-                    raise
-                else:
-                    # Retry step
+                # Retry loop respecting max_retries from the policy
+                retry_policy = self.failure_handler.get_retry_policy(step.step_type)
+                max_retries = retry_policy.max_retries if retry_policy else 0
+                retry_count = 0
+                success = False
+
+                while retry_count < max_retries:
+                    recovery_result = self.failure_handler.handle_step_failure(step, e)
+                    if not recovery_result.get("retry", False):
+                        break
+                    retry_delay = recovery_result.get("retry_delay", 0.0)
+                    if retry_delay > 0:
+                        time.sleep(retry_delay)
                     self.progress_tracker.update_tracking(
                         step_tracking_id,
                         status="running",
-                        message=f"Retrying step: {step.name}",
+                        message=f"Retrying step: {step.name} (attempt {retry_count + 1})",
                     )
                     step.status = StepStatus.RUNNING
-                    step_result = self._execute_step(step, current_data, **options)
-                    step.status = StepStatus.COMPLETED
-                    step.result = step_result
-                    current_data = step_result
+                    try:
+                        step_result = self._execute_step(step, current_data, **options)
+                        step.status = StepStatus.COMPLETED
+                        step.result = step_result
+                        current_data = step_result
+                        success = True
+                        break
+                    except Exception as retry_e:
+                        step.status = StepStatus.FAILED
+                        step.error = retry_e
+                        e = retry_e
+                        retry_count += 1
+
+                if success:
                     self.progress_tracker.stop_tracking(
                         step_tracking_id,
                         status="completed",
                         message=f"Retry successful: {step.name}",
                     )
+                else:
+                    self.progress_tracker.stop_tracking(
+                        step_tracking_id, status="failed", message=str(e)
+                    )
+                    raise e
 
         return current_data
 
     def _execute_step(self, step: PipelineStep, data: Any, **options) -> Any:
-        """Execute a single step."""
+        """
+        Execute a single step.
+        
+        If delta_mode is enabled for the step, this intercepts the execution to compute
+        the delta between the base and target versions, passing only the changes
+        (added/removed triples) to the handler.
+        """
+
+        if getattr(step, "delta_mode", False):
+            self.logger.info(f"Executing step '{step.name}' in incremental delta mode.")
+            
+            version_manager = options.get("version_manager") or self.config.get("version_manager")
+            triplet_store = options.get("triplet_store") or self.config.get("triplet_store")
+            
+            if not version_manager or not triplet_store:
+                raise ProcessingError(
+                    f"Step '{step.name}' requires 'version_manager' and 'triplet_store' "
+                    f"in execution options for delta processing."
+                )
+            
+            if not step.base_version_id or not step.target_version_id:
+                raise ValidationError(
+                    f"Step '{step.name}' in delta_mode requires 'base_version_id' "
+                    f"and 'target_version_id' to be set."
+                )
+            
+
+            base_snap = version_manager.get_version(step.base_version_id)
+            target_snap = version_manager.get_version(step.target_version_id)
+            
+            if not base_snap:
+                raise ValidationError(f"Base version '{step.base_version_id}' not found in storage.")
+            if not target_snap:
+                raise ValidationError(f"Target version '{step.target_version_id}' not found in storage.")
+                
+            base_uri = base_snap.get("graph_uri")
+            target_uri = target_snap.get("graph_uri")
+            
+            if not base_uri or not target_uri:
+                raise ValidationError(
+                    "Both base and target snapshots must contain a 'graph_uri' "
+                    "to compute native store deltas."
+                )
+ 
+            self.logger.debug(f"Computing delta between {base_uri} and {target_uri}")
+            delta_result = triplet_store.compute_delta(base_uri, target_uri, **options)
+   
+            data = delta_result
+        
         if step.handler:
             return step.handler(data, **step.config, **options)
         else:
-            # Default: pass data through
             return data
 
     def _topological_sort(self, steps: List[PipelineStep]) -> List[PipelineStep]:
@@ -372,9 +483,9 @@ class ExecutionEngine:
         return {
             "total_steps": total_steps,
             "completed_steps": completed_steps,
-            "progress_percentage": (completed_steps / total_steps * 100)
-            if total_steps > 0
-            else 0.0,
+            "progress_percentage": (
+                (completed_steps / total_steps * 100) if total_steps > 0 else 0.0
+            ),
             "status": self.pipeline_status.get(
                 pipeline_id, PipelineStatus.PENDING
             ).value,

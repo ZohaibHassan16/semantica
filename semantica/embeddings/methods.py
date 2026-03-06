@@ -349,21 +349,21 @@ def check_available_providers() -> Dict[str, bool]:
     try:
         import sentence_transformers
         providers["sentence_transformers"] = True
-    except ImportError:
+    except (ImportError, OSError):
         providers["sentence_transformers"] = False
 
     # Check FastEmbed
     try:
         import fastembed
         providers["fastembed"] = True
-    except ImportError:
+    except (ImportError, OSError):
         providers["fastembed"] = False
 
     # Check OpenAI
     try:
         import openai
         providers["openai"] = True
-    except ImportError:
+    except (ImportError, OSError):
         providers["openai"] = False
 
     return providers

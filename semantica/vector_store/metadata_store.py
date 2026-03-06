@@ -183,6 +183,9 @@ class MetadataStore:
         self.logger = get_logger("metadata_store")
         self.config = config
         self.progress_tracker = get_progress_tracker()
+        # Ensure progress tracker is enabled
+        if not self.progress_tracker.enabled:
+            self.progress_tracker.enabled = True
         self.schema = MetadataSchema(schema)
         self.index = MetadataIndex()
         self.metadata: Dict[str, Dict[str, Any]] = {}

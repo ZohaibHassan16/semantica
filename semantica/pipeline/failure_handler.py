@@ -113,6 +113,9 @@ class FailureHandler:
 
         # Initialize progress tracker
         self.progress_tracker = get_progress_tracker()
+        # Ensure progress tracker is enabled
+        if not self.progress_tracker.enabled:
+            self.progress_tracker.enabled = True
 
         self.default_max_retries = self.config.get("default_max_retries", 3)
         self.default_backoff_factor = self.config.get("default_backoff_factor", 2.0)
@@ -407,6 +410,44 @@ class FailureHandler:
     def clear_error_history(self) -> None:
         """Clear error history."""
         self.error_history.clear()
+
+    def handle_failure(
+        self, error: Exception, policy: "RetryPolicy", retry_count: int = 0
+    ) -> "RecoveryAction":
+        """
+        Handle failure using the given policy and retry count.
+
+        Args:
+            error: Exception that occurred
+            policy: Retry policy to apply
+            retry_count: Current retry count (0-based)
+
+        Returns:
+            RecoveryAction with should_retry and retry_delay attributes
+        """
+        should_retry = retry_count < policy.max_retries and self._should_retry(error, policy)
+
+        if should_retry:
+            attempt = retry_count + 1
+            if policy.strategy == RetryStrategy.LINEAR:
+                delay = policy.initial_delay * attempt
+            elif policy.strategy == RetryStrategy.EXPONENTIAL:
+                delay = policy.initial_delay * (policy.backoff_factor ** retry_count)
+            else:  # FIXED
+                delay = policy.initial_delay
+            retry_delay = min(delay, policy.max_delay)
+        else:
+            retry_delay = 0.0
+
+        return RecoveryAction(should_retry=should_retry, retry_delay=retry_delay)
+
+
+class RecoveryAction:
+    """Recovery action result from handle_failure."""
+
+    def __init__(self, should_retry: bool, retry_delay: float = 0.0):
+        self.should_retry = should_retry
+        self.retry_delay = retry_delay
 
 
 class RetryHandler:

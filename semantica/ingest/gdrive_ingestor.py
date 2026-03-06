@@ -41,7 +41,7 @@ try:
     from googleapiclient.errors import HttpError
     from googleapiclient.http import MediaIoBaseDownload
     import io
-except ImportError:
+except (ImportError, OSError):
     Credentials = None
     InstalledAppFlow = None
     Request = None

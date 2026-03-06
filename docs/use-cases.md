@@ -9,21 +9,17 @@ Semantica is designed to solve complex data challenges across various domains. T
 
 ## Use Case Comparison
 
-| Use Case                          | Difficulty    | Time        | Domain      | Key Features                                    |
-| :-------------------------------- | :------------ | :---------- | :---------- | :---------------------------------------------- |
-| **Research Paper Analysis**       | Beginner      | 30 min      | Research    | Citation networks, concept extraction           |
-| **Biomedical Knowledge Graphs**  | Intermediate  | 1-2 hours   | Healthcare  | Gene-protein-disease relationships              |
-| **Financial Market Intelligence** | Intermediate  | 1 hour      | Finance     | Sentiment analysis, trend detection             |
-| **Algorithmic Trading**          | Advanced      | 2-3 hours   | Finance     | Multi-source integration, signal generation    |
-| **Blockchain Analytics**         | Intermediate  | 1-2 hours   | Finance     | Transaction tracing, fraud detection             |
-| **Medical Record Analysis**      | Intermediate  | 1 hour      | Healthcare  | Patient history, temporal tracking              |
-| **Cybersecurity Threat Intelligence**| Advanced   | 2-3 hours   | Security    | Threat mapping, pattern detection              |
-| **OSINT**                         | Intermediate  | 1-2 hours   | Security    | Multi-source intelligence                       |
-| **Supply Chain Optimization**    | Intermediate  | 1-2 hours   | Industry    | Route optimization, risk management            |
-| **GraphRAG**                      | Intermediate  | 1 hour      | AI          | Enhanced RAG with knowledge graphs              |
-| **Legal Document Analysis**      | Intermediate  | 1-2 hours   | Legal       | Contract analysis, clause extraction            |
-| **Social Media Analysis**        | Beginner      | 30 min      | Social      | Sentiment, trend analysis                       |
-| **Customer Support KB**          | Beginner      | 30 min      | Support     | FAQ generation, knowledge base                 |
+| Use Case                          | Difficulty    | Time        | Domain      | Key Features                                    | Cookbook                                    |
+| :-------------------------------- | :------------ | :---------- | :---------- | :---------------------------------------------- | :------------------------------------------ |
+| **Biomedical Knowledge Graphs**  | Intermediate  | 1-2 hours   | Healthcare  | Gene-protein-disease relationships              | Drug Discovery, Genomic Variant Analysis   |
+| **Financial Data Integration**   | Intermediate  | 1-2 hours   | Finance     | MCP integration, real-time data                 | Financial Data Integration MCP             |
+| **Fraud Detection**              | Advanced      | 2-3 hours   | Finance     | Temporal graphs, pattern detection              | Fraud Detection                            |
+| **Blockchain Analytics**         | Intermediate  | 1-2 hours   | Finance     | Transaction tracing, DeFi intelligence         | DeFi Protocol Intelligence, Transaction Network |
+| **Cybersecurity Threat Intelligence**| Advanced   | 2-3 hours   | Security    | Threat mapping, anomaly detection               | Real-Time Anomaly Detection, Threat Intelligence |
+| **Intelligence Analysis**        | Intermediate  | 1-2 hours   | Security    | Criminal networks, OSINT analysis               | Criminal Network Analysis, Intelligence Orchestrator |
+| **Supply Chain Optimization**    | Intermediate  | 1-2 hours   | Industry    | Data integration, route optimization            | Supply Chain Data Integration               |
+| **Renewable Energy Management**  | Intermediate  | 1-2 hours   | Energy      | Energy market analysis, optimization             | Energy Market Analysis                     |
+| **GraphRAG**                      | Advanced      | 1-2 hours   | AI          | Enhanced RAG with knowledge graphs              | GraphRAG Complete, RAG vs GraphRAG         |
 
 **Difficulty Levels**:
 - **Beginner**: Basic Semantica knowledge required
@@ -36,14 +32,6 @@ Semantica is designed to solve complex data challenges across various domains. T
 
 <div class="grid cards" markdown>
 
--   :material-school: **Research Paper Analysis**
-    ---
-    Extract structured knowledge from academic papers to discover trends, relationships, and key concepts.
-    
-    **Goal**: Ingest PDFs, extract entities (Authors, Concepts, Methods), and build a citation network.
-    
-    **Difficulty**: Beginner
-
 -   :material-dna: **Biomedical Knowledge Graphs**
     ---
     Accelerate drug discovery and understand disease pathways by connecting genes, proteins, drugs, and diseases.
@@ -51,40 +39,12 @@ Semantica is designed to solve complex data challenges across various domains. T
     **Goal**: Connect genes, proteins, drugs, and diseases from scientific literature and databases.
     
     **Difficulty**: Intermediate
+    
+    [:material-arrow-right: Drug Discovery Pipeline](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/use_cases/biomedical/01_Drug_Discovery_Pipeline.ipynb)
+    
+    [:material-arrow-right: Genomic Variant Analysis](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/use_cases/biomedical/02_Genomic_Variant_Analysis.ipynb)
 
 </div>
-
-### Research Paper Analysis Implementation
-
-**Prerequisites**:
-- Semantica installed
-- Sample research papers (PDF format)
-
-**Code Example**:
-
-```python
-from semantica.core import Semantica
-from semantica.visualization import KGVisualizer
-
-# Initialize
-semantica = Semantica()
-
-# Build knowledge graph from research papers
-result = semantica.build_knowledge_base(
-    sources=[
-        "papers/machine_learning_survey.pdf",
-        "papers/deep_learning_review.pdf"
-    ],
-    embeddings=True,
-    graph=True,
-    normalize=True
-)
-
-# Visualize citation network
-kg = result["knowledge_graph"]
-visualizer = KGVisualizer()
-visualizer.visualize(kg, output_path="citation_network.html")
-```
 
 ### Biomedical Knowledge Graphs Implementation
 
@@ -92,28 +52,19 @@ visualizer.visualize(kg, output_path="citation_network.html")
 - Domain knowledge of biomedical concepts
 - Access to biomedical literature/databases
 
-**Code Example**:
+**Implementation Guides:**
 
-```python
-from semantica.core import Semantica
-from semantica.ontology import OntologyGenerator
+- **[Drug Discovery Pipeline Cookbook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/use_cases/biomedical/01_Drug_Discovery_Pipeline.ipynb)**: Build knowledge graphs from PubMed RSS feeds
+  - **Topics**: PubMed RSS ingestion, entity-aware chunking, GraphRAG, vector similarity search
+  - **Difficulty**: Intermediate
+  - **Time**: 1-2 hours
+  - **Use Cases**: Drug discovery, biomedical research
 
-semantica = Semantica()
-custom_entities = ["Gene", "Protein", "Drug", "Disease", "Pathway"]
-
-# Build knowledge graph
-result = semantica.build_knowledge_base(
-    sources=["literature/cancer_research.pdf"],
-    embeddings=True,
-    graph=True,
-    custom_entity_types=custom_entities
-)
-
-# Generate ontology
-kg = result["knowledge_graph"]
-ontology_gen = OntologyGenerator(base_uri="https://biomed.example.org/ontology/")
-ontology = ontology_gen.generate_from_graph(kg)
-```
+- **[Genomic Variant Analysis Cookbook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/use_cases/biomedical/02_Genomic_Variant_Analysis.ipynb)**: Analyze genomic variants using temporal knowledge graphs
+  - **Topics**: bioRxiv RSS, temporal KGs, deduplication, pathway analysis
+  - **Difficulty**: Intermediate
+  - **Time**: 1-2 hours
+  - **Use Cases**: Genomic research, variant analysis
 
 ---
 
@@ -121,53 +72,36 @@ ontology = ontology_gen.generate_from_graph(kg)
 
 <div class="grid cards" markdown>
 
--   :material-finance: **Financial Market Intelligence**
+-   :material-finance: **Financial Data Integration**
     ---
-    Analyze market trends and sentiment from news and reports.
+    Integrate financial data from multiple sources using MCP servers and real-time ingestion.
     
-    **Goal**: Ingest earnings call transcripts, news articles, and analyst reports to gauge market sentiment.
+    **Goal**: Connect Alpha Vantage API, MCP servers, seed data, and real-time ingestion for comprehensive financial analysis.
     
-    [:material-arrow-right: View Cookbook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/use_cases/finance/01_Financial_Data_Integration.ipynb)
+    [:material-arrow-right: View Cookbook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/use_cases/finance/01_Financial_Data_Integration_MCP.ipynb)
 
--   :material-chart-line: **Algorithmic Trading Signals**
+-   :material-shield-alert: **Fraud Detection**
     ---
-    Generate alpha by connecting disparate data points.
+    Detect complex fraud rings using temporal knowledge graphs and pattern detection.
     
-    **Goal**: Build a graph of companies, supply chains, and global events to identify non-obvious trading signals.
+    **Goal**: Build a graph of Users, Devices, IP Addresses, and Transactions to find cycles and detect fraud patterns.
     
-    [:material-arrow-right: View Cookbook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/use_cases/trading/01_Market_Data_Analysis.ipynb)
+    [:material-arrow-right: View Cookbook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/use_cases/finance/02_Fraud_Detection.ipynb)
 
 -   :material-bitcoin: **Blockchain Analytics**
     ---
-    Trace funds and identify illicit activity.
+    Analyze DeFi protocols and transaction networks for intelligence and fraud detection.
     
-    **Goal**: Map transaction flows between wallets and exchanges to detect money laundering or fraud.
+    **Goal**: Map transaction flows between wallets and exchanges, analyze DeFi protocols, and detect illicit activity.
     
-    [:material-arrow-right: View Cookbook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/use_cases/blockchain/01_DeFi_Protocol_Intelligence.ipynb)
+    [:material-arrow-right: DeFi Protocol Intelligence](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/use_cases/blockchain/01_DeFi_Protocol_Intelligence.ipynb)
+    
+    [:material-arrow-right: Transaction Network Analysis](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/use_cases/blockchain/02_Transaction_Network_Analysis.ipynb)
 
 </div>
 
 ---
 
-## Healthcare & Life Sciences
-
-<div class="grid cards" markdown>
-
--   :material-hospital-box: **Medical Record Analysis**
-    ---
-    Transform unstructured patient notes into structured medical histories.
-    
-    **Goal**: Extract Symptoms, Diagnoses, Medications, and Procedures, linking them temporally.
-    
-    [:material-arrow-right: View Cookbook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/use_cases/healthcare/01_Clinical_Reports_Processing.ipynb)
-
--   :material-account-heart: **Patient Journey Mapping**
-    ---
-    Visualize and analyze the complete patient experience.
-    
-    **Goal**: Connect clinical encounters, lab results, and patient feedback to improve care delivery.
-
-</div>
 
 ---
 
@@ -177,41 +111,29 @@ ontology = ontology_gen.generate_from_graph(kg)
 
 -   :material-shield-lock: **Cybersecurity Threat Intelligence**
     ---
-    Proactively identify and mitigate cyber threats.
+    Proactively identify and mitigate cyber threats using real-time anomaly detection and threat intelligence.
     
-    **Goal**: Ingest threat feeds (STIX/TAXII), CVE databases, and system logs to map attack vectors.
+    **Goal**: Ingest threat feeds (CVE databases, security RSS), detect anomalies in streaming data, and build threat intelligence knowledge graphs.
     
-    [:material-arrow-right: View Cookbook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/use_cases/cybersecurity/01_Anomaly_Detection_Real_Time.ipynb)
-
--   :material-eye: **Open Source Intelligence (OSINT)**
-    ---
-    Gather and analyze public information for intelligence purposes.
+    [:material-arrow-right: Real-Time Anomaly Detection](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/use_cases/cybersecurity/01_Real_Time_Anomaly_Detection.ipynb)
     
-    **Goal**: Connect data from social media, news, and public records to build profiles.
-    
-    [:material-arrow-right: View Cookbook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/use_cases/intelligence/01_Criminal_Network_Analysis.ipynb)
+    [:material-arrow-right: Threat Intelligence Hybrid RAG](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/use_cases/cybersecurity/02_Threat_Intelligence_Hybrid_RAG.ipynb)
 
 -   :material-account-network: **Criminal Network Analysis**
     ---
-    Analyze criminal networks to identify key players, communities, and suspicious patterns.
+    Analyze criminal networks to identify key players, communities, and suspicious patterns using OSINT RSS feeds, deduplication, and network centrality analysis.
     
     **Goal**: Build knowledge graphs from police reports, court records, and surveillance data.
     
     [:material-arrow-right: View Cookbook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/use_cases/intelligence/01_Criminal_Network_Analysis.ipynb)
 
--   :material-shield-search: **Law Enforcement and Forensics**
+-   :material-file-search: **Intelligence Analysis Orchestrator Worker**
     ---
-    Process forensic evidence and correlate cases using temporal knowledge graphs.
+    Comprehensive intelligence analysis using pipeline orchestrator with multiple RSS feeds, conflict detection, and multi-source integration.
     
-    **Goal**: Extract entities from case files to build temporal case timelines.
+    **Goal**: Process multiple intelligence sources in parallel using orchestrator-worker pattern.
     
-    [:material-arrow-right: View Cookbook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/use_cases/intelligence/03_Law_Enforcement_Forensics.ipynb)
-
--   :material-incognito: **Fraud Detection**
-    ---
-    Detect complex fraud rings.
-    
-    **Goal**: Build a graph of Users, Devices, IP Addresses, and Transactions to find cycles.
+    [:material-arrow-right: View Cookbook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/use_cases/intelligence/02_Intelligence_Analysis_Orchestrator_Worker.ipynb)
 
 </div>
 
@@ -247,141 +169,30 @@ ontology = ontology_gen.generate_from_graph(kg)
 
 -   :material-robot: **Graph-Augmented Generation (GraphRAG)**
     ---
-    Enhance LLM responses with structured ground truth.
+    Enhance LLM responses with structured ground truth using knowledge graphs.
     
-    **Goal**: Use the knowledge graph to retrieve precise context for RAG applications.
+    **Goal**: Use the knowledge graph to retrieve precise context for RAG applications with hybrid retrieval and logical inference.
     
-    [:material-arrow-right: View Cookbook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/use_cases/advanced_rag/01_GraphRAG_Complete.ipynb)
-    [:material-scale-balance: RAG vs GraphRAG Benchmark](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/use_cases/advanced_rag/02_RAG_vs_GraphRAG_Comparison.ipynb)
-
--   :material-domain: **Corporate Intelligence**
-    ---
-    Unify internal documents into a single semantic layer.
+    [:material-arrow-right: GraphRAG Complete](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/use_cases/advanced_rag/01_GraphRAG_Complete.ipynb)
     
-    **Goal**: Connect People, Projects, and Decisions across the organization.
-
--   :material-gavel: **Legal Document Review**
-    ---
-    Analyze contracts and legal texts.
-    
-    **Goal**: Parse contracts, extract clauses, and identify relationships like "supersedes".
+    [:material-scale-balance: RAG vs GraphRAG Comparison](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/use_cases/advanced_rag/02_RAG_vs_GraphRAG_Comparison.ipynb)
 
 </div>
 
 ---
 
-## New Use Cases
-
-### Legal Document Analysis
-
-!!! abstract "Use Case"
-    Analyze contracts and legal texts to extract clauses, identify relationships, and understand document structure.
-
-**Difficulty**: Intermediate| **Domain**: Legal
-
-**Prerequisites**:
-- Legal document samples (contracts, agreements)
-- LLM API access (recommended)
-
-**Code Example**:
-
-```python
-from semantica.core import Semantica
-
-semantica = Semantica()
-legal_entities = ["Party", "Clause", "Section", "Contract", "Term"]
-
-# Build knowledge graph from contracts
-result = semantica.build_knowledge_base(
-    sources=["contracts/agreement1.pdf"],
-    custom_entity_types=legal_entities,
-    graph=True,
-    temporal=True
-)
-
-kg = result["knowledge_graph"]
-clause_rels = [r for r in kg['relationships'] 
-               if r.get('predicate') in ['supersedes', 'amends']]
-print(f"Found {len(clause_rels)} clause relationships")
-```
-
-### Social Media Analysis
-
-!!! abstract "Use Case"
-    Analyze social media content to extract sentiment, trends, and relationships between users and topics.
-
-**Difficulty**: Beginner| **Domain**: Social Media
-
-**Prerequisites**:
-- Social media data (JSON, CSV)
-
-**Code Example**:
-
-```python
-from semantica.core import Semantica
-from semantica.ingest import FileIngestor
-
-semantica = Semantica()
-ingestor = FileIngestor()
-posts = ingestor.ingest("social_media/posts.json")
-
-# Build knowledge graph
-result = semantica.build_knowledge_base(
-    sources=posts,
-    embeddings=True,
-    graph=True
-)
-
-kg = result["knowledge_graph"]
-hashtags = [e for e in kg['entities'] if e.get('text', '').startswith('#')]
-print(f"Hashtags: {len(hashtags)}")
-```
-
-### Customer Support Knowledge Base
-
-!!! abstract "Use Case"
-    Build a knowledge base from support tickets, documentation, and FAQs to improve customer service.
-
-**Difficulty**: Beginner| **Domain**: Customer Support
-
-**Prerequisites**:
-- Support tickets or documentation
-
-**Code Example**:
-
-```python
-from semantica.core import Semantica
-from semantica.vector_store import VectorStore, HybridSearch
-
-semantica = Semantica()
-
-# Build knowledge base
-result = semantica.build_knowledge_base(
-    sources=["support/tickets/", "support/faqs/"],
-    embeddings=True,
-    graph=True
-)
-
-# Search
-vector_store = VectorStore()
-vector_store.store(result["embeddings"], result["documents"])
-hybrid_search = HybridSearch(vector_store)
-results = hybrid_search.search(query="How do I reset my password?", top_k=5)
-```
 
 ---
 
 ## Summary
 
-This guide covered use cases across multiple domains:
+This guide covered use cases across multiple domains with corresponding cookbooks:
 
-- **Research & Science**: Academic paper analysis, biomedical knowledge graphs
-- **Finance & Trading**: Market intelligence, trading signals, blockchain analytics
-- **Healthcare**: Medical records, patient journey mapping
-- **Security**: Threat intelligence, OSINT, fraud detection
-- **Industry**: Supply chain, energy management
-- **AI Applications**: GraphRAG, corporate intelligence
-- **New Use Cases**: Legal analysis, social media, customer support
+- **Research & Science**: Biomedical knowledge graphs (Drug Discovery, Genomic Variant Analysis)
+- **Finance & Trading**: Financial data integration, fraud detection, blockchain analytics
+- **Security & Intelligence**: Cybersecurity threat intelligence, criminal network analysis, intelligence orchestration
+- **Industry**: Supply chain optimization, renewable energy management
+- **AI Applications**: GraphRAG (Complete implementation and comparison)
 
 ---
 
@@ -397,4 +208,3 @@ This guide covered use cases across multiple domains:
 !!! info "Contribute"
     Have a use case to add? [Contribute on GitHub](https://github.com/Hawksight-AI/semantica)
 
-**Last Updated**: 2024

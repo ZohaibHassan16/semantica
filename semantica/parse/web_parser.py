@@ -304,7 +304,7 @@ class JavaScriptRenderer:
 
                 self.driver = None  # Initialize on first use
                 self.logger.info("Selenium WebDriver configured")
-            except ImportError:
+            except (ImportError, OSError):
                 self.logger.warning(
                     "Selenium not available, JavaScript rendering disabled"
                 )

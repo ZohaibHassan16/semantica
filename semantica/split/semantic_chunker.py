@@ -32,15 +32,11 @@ from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Tuple
 
 from ..utils.exceptions import ProcessingError
+from ..utils.helpers import safe_import
 from ..utils.logging import get_logger
 from ..utils.progress_tracker import get_progress_tracker
 
-try:
-    import spacy
-
-    SPACY_AVAILABLE = True
-except ImportError:
-    SPACY_AVAILABLE = False
+spacy, SPACY_AVAILABLE = safe_import("spacy")
 
 
 @dataclass
@@ -74,6 +70,9 @@ class SemanticChunker:
         self.chunk_overlap = config.get("chunk_overlap", 200)
         self.language = config.get("language", "en")
         self.progress_tracker = get_progress_tracker()
+        # Ensure progress tracker is enabled
+        if not self.progress_tracker.enabled:
+            self.progress_tracker.enabled = True
 
         # Initialize spaCy model if available
         self.nlp = None

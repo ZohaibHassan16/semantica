@@ -28,7 +28,7 @@ graph TB
 ### Three-Layer Architecture
 
 **1. Data Ingestion Layer**
-- 50+ file formats (PDF, DOCX, JSON, CSV, etc.)
+- Multiple file formats (PDF, DOCX, JSON, CSV, etc.)
 - Web scraping and APIs
 - Real-time streams (Kafka, RabbitMQ)
 - Database connectors (SQL, NoSQL)

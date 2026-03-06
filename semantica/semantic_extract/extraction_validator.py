@@ -12,8 +12,8 @@ Supported Methods (for future extensibility):
 
 Algorithms Used:
     - Confidence Thresholding: Statistical threshold-based filtering
-    - Duplicate Detection: Set-based and similarity-based deduplication
-    - Consistency Checking: Rule-based and graph-based consistency validation
+    - Duplicate Detection: (Removed - handled by external module)
+    - Consistency Checking: (Removed - handled by external module)
     - Quality Scoring: Weighted scoring algorithms for extraction quality
     - Validation Metrics: Precision, recall, F1-score calculations
     - Boundary Validation: Character position and text boundary checking
@@ -22,7 +22,6 @@ Key Features:
     - Entity validation with confidence checking
     - Relation validation and consistency checking
     - Quality scoring and metrics calculation
-    - Duplicate detection
     - Confidence-based filtering
     - Validation result reporting
     - Method parameter support for future method-specific validation
@@ -47,8 +46,10 @@ Author: Semantica Contributors
 License: MIT
 """
 
+from typing import List, Dict, Any, Optional, Set, Tuple, Union
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional
+from datetime import datetime
+import re
 
 from ..utils.exceptions import ProcessingError
 from ..utils.logging import get_logger
@@ -66,6 +67,7 @@ class ValidationResult:
     errors: List[str] = field(default_factory=list)
     warnings: List[str] = field(default_factory=list)
     metrics: Dict[str, Any] = field(default_factory=dict)
+    metadata: Dict[str, Any] = field(default_factory=dict)
 
 
 class ExtractionValidator:
@@ -79,27 +81,40 @@ class ExtractionValidator:
             method: Validation method (for future extensibility, currently unused)
             **config: Configuration options:
                 - min_confidence: Minimum confidence threshold (default: 0.5)
-                - validate_consistency: Check consistency (default: True)
         """
         self.logger = get_logger("extraction_validator")
         self.config = config
         self.progress_tracker = get_progress_tracker()
+        # Ensure progress tracker is enabled
+        if not self.progress_tracker.enabled:
+            self.progress_tracker.enabled = True
 
         self.method = method  # Reserved for future method-based validation
         self.min_confidence = config.get("min_confidence", 0.5)
-        self.validate_consistency = config.get("validate_consistency", True)
 
-    def validate_entities(self, entities: List[Entity], **options) -> ValidationResult:
+    def validate_entities(self, entities: Union[List[Entity], List[List[Entity]]], **options) -> Union[ValidationResult, List[ValidationResult]]:
         """
         Validate extracted entities.
+        Handles both single list and batch list of entities.
 
         Args:
-            entities: List of entities
+            entities: List of entities or list of list of entities
             **options: Validation options
 
         Returns:
-            ValidationResult: Validation result
+            ValidationResult or List[ValidationResult]: Validation result(s)
         """
+        # Handle batch validation
+        if entities and isinstance(entities, list) and len(entities) > 0 and isinstance(entities[0], list):
+            results = []
+            for idx, batch_entities in enumerate(entities):
+                res = self.validate_entities(batch_entities, **options)
+                # Ensure metadata has batch index
+                if "batch_index" not in res.metadata:
+                    res.metadata["batch_index"] = idx
+                results.append(res)
+            return results
+
         tracking_id = self.progress_tracker.start_tracking(
             module="semantic_extract",
             submodule="ExtractionValidator",
@@ -123,14 +138,6 @@ class ExtractionValidator:
                     f"{len(low_confidence)} entities below confidence threshold"
                 )
 
-            # Check for duplicates
-            self.progress_tracker.update_tracking(
-                tracking_id, message="Checking for duplicates..."
-            )
-            entity_texts = [e.text.lower() for e in entities]
-            duplicates = len(entity_texts) - len(set(entity_texts))
-            if duplicates > 0:
-                warnings.append(f"{duplicates} duplicate entities found")
 
             # Check for empty entities
             empty_entities = [e for e in entities if not e.text.strip()]
@@ -145,8 +152,7 @@ class ExtractionValidator:
                     [e for e in entities if min_confidence <= e.confidence < 0.8]
                 ),
                 "low_confidence": len(low_confidence),
-                "unique_entities": len(set(entity_texts)),
-                "duplicates": duplicates,
+                "unique_entities": len(set(e.text for e in entities)),
                 "entity_types": len(set(e.label for e in entities)),
                 "average_confidence": sum(e.confidence for e in entities)
                 / len(entities)
@@ -159,12 +165,23 @@ class ExtractionValidator:
 
             valid = len(errors) == 0
 
+            # Collect metadata from entities
+            metadata = {}
+            if entities:
+                first = entities[0]
+                if hasattr(first, "metadata") and first.metadata:
+                    if "batch_index" in first.metadata:
+                        metadata["batch_index"] = first.metadata["batch_index"]
+                    if "document_id" in first.metadata:
+                        metadata["document_id"] = first.metadata["document_id"]
+
             result = ValidationResult(
                 valid=valid,
                 score=score,
                 errors=errors,
                 warnings=warnings,
                 metrics=metrics,
+                metadata=metadata,
             )
 
             self.progress_tracker.stop_tracking(
@@ -181,18 +198,30 @@ class ExtractionValidator:
             raise
 
     def validate_relations(
-        self, relations: List[Relation], **options
-    ) -> ValidationResult:
+        self, relations: Union[List[Relation], List[List[Relation]]], **options
+    ) -> Union[ValidationResult, List[ValidationResult]]:
         """
         Validate extracted relations.
+        Handles both single list and batch list of relations.
 
         Args:
-            relations: List of relations
+            relations: List of relations or list of list of relations
             **options: Validation options
 
         Returns:
-            ValidationResult: Validation result
+            ValidationResult or List[ValidationResult]: Validation result(s)
         """
+        # Handle batch validation
+        if relations and isinstance(relations, list) and len(relations) > 0 and isinstance(relations[0], list):
+            results = []
+            for idx, batch_relations in enumerate(relations):
+                res = self.validate_relations(batch_relations, **options)
+                # Ensure metadata has batch index
+                if "batch_index" not in res.metadata:
+                    res.metadata["batch_index"] = idx
+                results.append(res)
+            return results
+
         errors = []
         warnings = []
         metrics = {}
@@ -215,12 +244,6 @@ class ExtractionValidator:
         if invalid_relations:
             errors.append(f"{len(invalid_relations)} invalid relations found")
 
-        # Check consistency
-        if self.validate_consistency:
-            consistency_issues = self._check_consistency(relations)
-            if consistency_issues:
-                warnings.append(f"{len(consistency_issues)} consistency issues found")
-
         # Calculate metrics
         metrics = {
             "total_relations": len(relations),
@@ -241,30 +264,24 @@ class ExtractionValidator:
 
         valid = len(errors) == 0
 
+        # Collect metadata from relations
+        metadata = {}
+        if relations:
+            first = relations[0]
+            if hasattr(first, "metadata") and first.metadata:
+                if "batch_index" in first.metadata:
+                    metadata["batch_index"] = first.metadata["batch_index"]
+                if "document_id" in first.metadata:
+                    metadata["document_id"] = first.metadata["document_id"]
+
         return ValidationResult(
-            valid=valid, score=score, errors=errors, warnings=warnings, metrics=metrics
+            valid=valid, 
+            score=score, 
+            errors=errors, 
+            warnings=warnings, 
+            metrics=metrics,
+            metadata=metadata
         )
-
-    def _check_consistency(self, relations: List[Relation]) -> List[str]:
-        """Check consistency of relations."""
-        issues = []
-
-        # Check for contradictory relations
-        relation_pairs = {}
-        for relation in relations:
-            key = (relation.subject.text, relation.object.text)
-            if key not in relation_pairs:
-                relation_pairs[key] = []
-            relation_pairs[key].append(relation.predicate)
-
-        # Find contradictions (e.g., "founded_by" and "founded" for same pair)
-        for key, predicates in relation_pairs.items():
-            if len(set(predicates)) > 1:
-                # Check for obvious contradictions
-                if "founded_by" in predicates and "founded" in predicates:
-                    issues.append(f"Contradictory relations for {key}")
-
-        return issues
 
     def _calculate_entity_score(
         self, entities: List[Entity], metrics: Dict[str, Any]

@@ -54,6 +54,30 @@ class FileObject:
     metadata: Dict[str, Any] = field(default_factory=dict)
     ingested_at: datetime = field(default_factory=datetime.now)
 
+    @property
+    def text(self) -> str:
+        """
+        Get the file content as text.
+
+        Returns:
+            str: Decoded file content or empty string if no content
+        """
+        if self.content is None:
+            return ""
+
+        if isinstance(self.content, str):
+            return self.content
+
+        try:
+            # Try to decode as UTF-8
+            return self.content.decode("utf-8")
+        except UnicodeDecodeError:
+            try:
+                # Fallback to latin-1
+                return self.content.decode("latin-1")
+            except Exception:
+                return ""
+
 
 class FileTypeDetector:
     """
@@ -487,7 +511,15 @@ class FileIngestor:
                     file_obj = self.ingest_file(file_info["path"], **file_info)
                     file_objects.append(file_obj)
 
-                    # Track progress
+                    # Track progress with ETA
+                    self.progress_tracker.update_progress(
+                        tracking_id,
+                        processed=idx,
+                        total=total_files,
+                        message=f"Processing file {idx}/{total_files}: {Path(file_info['path']).name}"
+                    )
+
+                    # Track progress via callback if provided
                     if self._progress_callback:
                         self._progress_callback(idx, total_files, file_obj)
 

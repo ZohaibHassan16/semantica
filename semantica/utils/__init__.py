@@ -83,6 +83,7 @@ from .helpers import (
     read_json_file,
     retry_on_error,
     safe_filename,
+    safe_import,
     set_nested_value,
     write_json_file,
 )
@@ -194,6 +195,7 @@ __all__ = [
     "get_nested_value",
     "set_nested_value",
     "retry_on_error",
+    "safe_import",
     # Constants
     "SUPPORTED_DOCUMENT_FORMATS",
     "SUPPORTED_IMAGE_FORMATS",

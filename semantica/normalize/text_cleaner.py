@@ -34,7 +34,7 @@ try:
     from bs4 import BeautifulSoup
 
     BEAUTIFULSOUP_AVAILABLE = True
-except ImportError:
+except (ImportError, OSError):
     BEAUTIFULSOUP_AVAILABLE = False
     BeautifulSoup = None
 
@@ -85,6 +85,9 @@ class TextCleaner:
 
         # Initialize progress tracker
         self.progress_tracker = get_progress_tracker()
+        # Ensure progress tracker is enabled
+        if not self.progress_tracker.enabled:
+            self.progress_tracker.enabled = True
 
         self.logger.debug("Text cleaner initialized")
 

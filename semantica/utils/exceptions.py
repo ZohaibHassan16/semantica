@@ -39,9 +39,11 @@ Author: Semantica Contributors
 License: MIT
 """
 
+from __future__ import annotations
+
 import sys
 import traceback
-from typing import Any, Dict, Optional, Type
+from typing import Any, Dict, Optional
 
 
 class SemanticaError(Exception):
@@ -307,7 +309,7 @@ def handle_exception(
             from .logging import log_error as log_err
 
             log_err(exception, context=context, **options)
-        except ImportError:
+        except (ImportError, OSError):
             # Fallback to print if logging not available
             print(f"Error: {error_info}")
 

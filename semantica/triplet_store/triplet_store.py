@@ -63,6 +63,9 @@ class TripletStore:
         """
         self.logger = get_logger("triplet_store")
         self.progress_tracker = get_progress_tracker()
+        # Ensure progress tracker is enabled
+        if not self.progress_tracker.enabled:
+            self.progress_tracker.enabled = True
 
         # Validate backend
         if backend.lower() not in self.SUPPORTED_BACKENDS:
@@ -88,47 +91,44 @@ class TripletStore:
         try:
             if self.backend_type == "blazegraph":
                 from .blazegraph_store import BlazegraphStore
-                
+
                 # Merge config with defaults
                 backend_config = self.config.copy()
                 if self.endpoint:
                     backend_config["endpoint"] = self.endpoint
                 else:
                     backend_config["endpoint"] = triplet_store_config.get(
-                        "blazegraph_endpoint", 
-                        "http://localhost:9999/blazegraph"
+                        "blazegraph_endpoint", "http://localhost:9999/blazegraph"
                     )
-                
+
                 self._store_backend = BlazegraphStore(**backend_config)
 
             elif self.backend_type == "jena":
                 from .jena_store import JenaStore
-                
+
                 backend_config = self.config.copy()
                 if self.endpoint:
                     backend_config["endpoint"] = self.endpoint
                 else:
                     backend_config["endpoint"] = triplet_store_config.get(
-                        "jena_endpoint",
-                        "http://localhost:3030/ds"
+                        "jena_endpoint", "http://localhost:3030/ds"
                     )
-                
+
                 self._store_backend = JenaStore(**backend_config)
 
             elif self.backend_type == "rdf4j":
                 from .rdf4j_store import RDF4JStore
-                
+
                 backend_config = self.config.copy()
                 if self.endpoint:
                     backend_config["endpoint"] = self.endpoint
                 else:
                     backend_config["endpoint"] = triplet_store_config.get(
-                        "rdf4j_endpoint",
-                        "http://localhost:8080/rdf4j-server"
+                        "rdf4j_endpoint", "http://localhost:8080/rdf4j-server"
                     )
-                
+
                 self._store_backend = RDF4JStore(**backend_config)
-                
+
             self.logger.info(f"Initialized {self.backend_type} backend")
 
         except Exception as e:
@@ -136,19 +136,19 @@ class TripletStore:
             raise ProcessingError(f"Failed to initialize backend: {e}")
 
     def store(
-        self, 
-        knowledge_graph: Union[Dict[str, Any], Any], 
-        ontology: Union[Dict[str, Any], Any], 
-        **options
+        self,
+        knowledge_graph: Union[Dict[str, Any], Any],
+        ontology: Union[Dict[str, Any], Any],
+        **options,
     ) -> Dict[str, Any]:
         """
         Store knowledge graph and ontology in the triplet store.
-        
+
         Args:
             knowledge_graph: Knowledge graph dictionary or object
             ontology: Ontology dictionary or object
             **options: Additional options
-        
+
         Returns:
             Operation status
         """
@@ -157,9 +157,9 @@ class TripletStore:
             knowledge_graph = knowledge_graph.to_dict()
         if hasattr(ontology, "to_dict"):
             ontology = ontology.to_dict()
-            
+
         triplets = []
-        
+
         # Standard Namespaces
         RDF_TYPE = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
         RDFS_SUBCLASS = "http://www.w3.org/2000/01/rdf-schema#subClassOf"
@@ -168,23 +168,23 @@ class TripletStore:
         OWL_DATATYPE_PROPERTY = "http://www.w3.org/2002/07/owl#DatatypeProperty"
         RDFS_DOMAIN = "http://www.w3.org/2000/01/rdf-schema#domain"
         RDFS_RANGE = "http://www.w3.org/2000/01/rdf-schema#range"
-        
+
         # 1. Process Ontology
         classes = ontology.get("classes", [])
         properties = ontology.get("properties", [])
-        
+
         for cls in classes:
             # Class definition
             cls_uri = cls.get("uri") or cls.get("id") or cls.get("name")
             if not cls_uri:
                 continue
-                
+
             if not cls_uri.startswith("http") and not cls_uri.startswith("urn:"):
-                 # Fallback if no URI provided
-                 cls_uri = f"urn:class:{cls_uri}"
-                 
+                # Fallback if no URI provided
+                cls_uri = f"urn:class:{cls_uri}"
+
             triplets.append(Triplet(cls_uri, RDF_TYPE, OWL_CLASS))
-            
+
             # Hierarchy
             parent = cls.get("parent") or cls.get("subClassOf")
             if parent:
@@ -192,15 +192,15 @@ class TripletStore:
                 if not parent.startswith("http") and not parent.startswith("urn:"):
                     parent_uri = f"urn:class:{parent}"
                 triplets.append(Triplet(cls_uri, RDFS_SUBCLASS, parent_uri))
-                
+
         for prop in properties:
             prop_uri = prop.get("uri") or prop.get("id") or prop.get("name")
             if not prop_uri:
                 continue
-                
+
             if not prop_uri.startswith("http") and not prop_uri.startswith("urn:"):
-                 prop_uri = f"urn:property:{prop_uri}"
-                 
+                prop_uri = f"urn:property:{prop_uri}"
+
             # Determine property type (Object or Datatype)
             # Default to ObjectProperty if not specified
             prop_type = prop.get("type", OWL_OBJECT_PROPERTY)
@@ -208,25 +208,25 @@ class TripletStore:
                 prop_type = OWL_DATATYPE_PROPERTY
             elif prop_type == "object":
                 prop_type = OWL_OBJECT_PROPERTY
-            
+
             triplets.append(Triplet(prop_uri, RDF_TYPE, prop_type))
-            
+
             if "domain" in prop:
                 domains = prop["domain"]
                 if isinstance(domains, str):
                     domains = [domains]
-                
+
                 for domain in domains:
                     domain_uri = domain
                     if not domain.startswith("http") and not domain.startswith("urn:"):
                         domain_uri = f"urn:class:{domain}"
                     triplets.append(Triplet(prop_uri, RDFS_DOMAIN, domain_uri))
-                
+
             if "range" in prop:
                 ranges = prop["range"]
                 if isinstance(ranges, str):
                     ranges = [ranges]
-                
+
                 for range_ in ranges:
                     range_uri = range_
                     if not range_.startswith("http") and not range_.startswith("urn:"):
@@ -236,28 +236,30 @@ class TripletStore:
         # 2. Process Knowledge Graph
         entities = knowledge_graph.get("entities", [])
         relationships = knowledge_graph.get("relationships", [])
-        
-        entity_map = {} # Map IDs to URIs
-        
+
+        entity_map = {}  # Map IDs to URIs
+
         for entity in entities:
             entity_id = entity.get("id")
             if not entity_id:
                 continue
-                
+
             entity_uri = entity.get("uri")
             if not entity_uri:
                 entity_uri = f"urn:entity:{entity_id}"
-            
+
             entity_map[entity_id] = entity_uri
-            
+
             # Entity Type
             entity_type = entity.get("type")
             if entity_type:
                 type_uri = entity_type
-                if not entity_type.startswith("http") and not entity_type.startswith("urn:"):
+                if not entity_type.startswith("http") and not entity_type.startswith(
+                    "urn:"
+                ):
                     type_uri = f"urn:class:{entity_type}"
                 triplets.append(Triplet(entity_uri, RDF_TYPE, type_uri))
-                
+
             # Entity Properties
             props = entity.get("properties", {})
             for k, v in props.items():
@@ -265,23 +267,23 @@ class TripletStore:
                 if not k.startswith("http") and not k.startswith("urn:"):
                     prop_uri = f"urn:property:{k}"
                 triplets.append(Triplet(entity_uri, prop_uri, str(v)))
-                
+
         for rel in relationships:
             source_id = rel.get("source")
             target_id = rel.get("target")
             rel_type = rel.get("type") or rel.get("label")
-            
+
             if not source_id or not target_id or not rel_type:
                 continue
-            
+
             source_uri = entity_map.get(source_id, f"urn:entity:{source_id}")
             target_uri = entity_map.get(target_id, f"urn:entity:{target_id}")
             rel_uri = rel_type
             if not rel_type.startswith("http") and not rel_type.startswith("urn:"):
                 rel_uri = f"urn:property:{rel_type}"
-            
+
             triplets.append(Triplet(source_uri, rel_uri, target_uri))
-            
+
         # Bulk load all triplets
         return self.add_triplets(triplets, **options)
 
@@ -302,10 +304,7 @@ class TripletStore:
         return self._store_backend.add_triplet(triplet, **options)
 
     def add_triplets(
-        self, 
-        triplets: List[Triplet], 
-        batch_size: int = 1000, 
-        **options
+        self, triplets: List[Triplet], batch_size: int = 1000, **options
     ) -> Dict[str, Any]:
         """
         Add multiple triplets to the store (bulk load).
@@ -327,18 +326,15 @@ class TripletStore:
 
         # Use bulk loader for efficient processing
         progress = self.bulk_loader.load_triplets(
-            valid_triplets, 
-            self._store_backend, 
-            batch_size=batch_size, 
-            **options
+            valid_triplets, self._store_backend, batch_size=batch_size, **options
         )
 
         return {
-            "success": progress.failed_batches == 0,
+            "success": progress.metadata.get("success", progress.failed_triplets == 0),
             "total": progress.total_triplets,
-            "processed": progress.processed_triplets,
+            "processed": progress.loaded_triplets,
             "failed": progress.failed_triplets,
-            "batches": progress.total_batches
+            "batches": progress.total_batches,
         }
 
     def get_triplets(
@@ -361,10 +357,7 @@ class TripletStore:
             List of matching Triplet objects
         """
         return self._store_backend.get_triplets(
-            subject=subject, 
-            predicate=predicate, 
-            object=object, 
-            **options
+            subject=subject, predicate=predicate, object=object, **options
         )
 
     def delete_triplet(self, triplet: Triplet, **options) -> Dict[str, Any]:
@@ -381,10 +374,7 @@ class TripletStore:
         return self._store_backend.delete_triplet(triplet, **options)
 
     def update_triplet(
-        self, 
-        old_triplet: Triplet, 
-        new_triplet: Triplet, 
-        **options
+        self, old_triplet: Triplet, new_triplet: Triplet, **options
     ) -> Dict[str, Any]:
         """
         Update a triplet (atomic delete + add).
@@ -403,10 +393,7 @@ class TripletStore:
         return self.add_triplet(new_triplet, **options)
 
     def execute_query(
-        self, 
-        query: str, 
-        parameters: Optional[Dict[str, Any]] = None,
-        **options
+        self, query: str, parameters: Optional[Dict[str, Any]] = None, **options
     ) -> Any:
         """
         Execute a SPARQL query.
@@ -425,12 +412,14 @@ class TripletStore:
         """Validate triplet structure."""
         if not triplet.subject or not triplet.predicate or not triplet.object:
             return False
-        
+
         # Check confidence score if present
-        if hasattr(triplet, 'confidence'):
-            if triplet.confidence is not None and (triplet.confidence < 0 or triplet.confidence > 1):
+        if hasattr(triplet, "confidence"):
+            if triplet.confidence is not None and (
+                triplet.confidence < 0 or triplet.confidence > 1
+            ):
                 return False
-                
+
         return True
 
     def get_stats(self) -> Dict[str, Any]:
@@ -438,3 +427,84 @@ class TripletStore:
         if hasattr(self._store_backend, "get_stats"):
             return self._store_backend.get_stats()
         return {}
+    
+    def compute_delta(
+        self, old_graph_uri: str, new_graph_uri: str, **options
+    ) -> Dict[str, Any]:
+        """
+        Compute the delta (added and removed triples) between two graph snapshots.
+        
+        Args:
+            old_graph_uri: URI of the baseline graph snapshot.
+            new_graph_uri: URI of the target graph snapshot
+            **options: Additional query execution options
+        
+        Returns:
+            Dictionary containing added_triples, removed_triples, and counts.
+        """
+        
+        tracking_id = self.progress_tracker.start_tracking(
+            module="triplet_store",
+            submodule="ComputeDelta",
+            message=f"Computing delta: {old_graph_uri} -> {new_graph_uri}",
+        )
+        
+        # SPARQL: Triples in the new graph that do not exist in the old graph
+        added_query = f"""
+        SELECT ?s ?p ?o WHERE {{
+            GRAPH <{new_graph_uri} > {{ ?s ?p ?o }}
+            FILTER NOT EXISTS {{ GRAPH <{old_graph_uri}> {{ ?s ?p ?o}} }}
+        }}
+        """
+        
+        # // : Triples in the old graph that do not exist in the new graph
+        removed_query = f"""
+        SELECT ?s ?p ?o WHERE {{
+            GRAPH <{old_graph_uri}> {{ ?s ?p ?o }}
+            FILTER NOT EXISTS {{ GRAPH <{new_graph_uri}> {{ ?s ?p ?o }} }}
+        }}
+        """
+        
+        try:
+            self.progress_tracker.update_tracking(tracking_id, message="Executing added triples query...")
+            added_res = self.execute_query(added_query, **options)
+            
+            self.progress_tracker.update_tracking(tracking_id, message="Executing removed triples query...")
+            removed_res = self.execute_query(removed_query, **options)
+            
+            def extract_triplets(bindings):
+                triplets = []
+                for b in bindings:
+                    s = b.get("s", {}).get("value") if isinstance(b.get("s"), dict) else b.get("s")
+                    p = b.get("p", {}).get("value") if isinstance(b.get("p"), dict) else b.get("p")
+                    o = b.get("o", {}).get("value") if isinstance(b.get("o"), dict) else b.get("o")
+
+                    if s and p and o:
+                        triplets.append(Triplet(s, p, o))
+
+                return triplets
+            
+            added_triples = extract_triplets(added_res.bindings)
+            removed_triples = extract_triplets(removed_res.bindings)
+            
+            self.progress_tracker.stop_tracking(
+                tracking_id,
+                status="completed",
+                message=f"Delta computed: +{len(added_triples)} / -{len(removed_triples)}"
+            )
+            
+            return {
+                "old_graph_uri": old_graph_uri,
+                "new_graph_uri": new_graph_uri,
+                "added_triples": added_triples,
+                "removed_triples": removed_triples,
+                "added_count": len(added_triples),
+                "removed_count": len(removed_triples),
+            }
+            
+        except Exception as e:
+            self.logger.error(f"Failed to compute delta: {e}")
+            self.progress_tracker.stop_tracking(tracking_id, status="failed", message=str(e))
+            raise ProcessingError(f"Delta computation failed: {e}")
+        
+            

@@ -56,7 +56,7 @@ try:
     )
 
     MILVUS_AVAILABLE = True
-except ImportError:
+except (ImportError, OSError):
     MILVUS_AVAILABLE = False
     connections = None
     Collection = None
@@ -264,6 +264,9 @@ class MilvusStore:
         self.logger = get_logger("milvus_store")
         self.config = config
         self.progress_tracker = get_progress_tracker()
+        # Ensure progress tracker is enabled
+        if not self.progress_tracker.enabled:
+            self.progress_tracker.enabled = True
         self.host = host or config.get("host", "localhost")
         self.port = port or config.get("port", 19530)
         self.user = user or config.get("user")

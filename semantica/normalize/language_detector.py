@@ -33,7 +33,7 @@ try:
     from langdetect.lang_detect_exception import LangDetectException
 
     LANGDETECT_AVAILABLE = True
-except ImportError:
+except (ImportError, OSError):
     LANGDETECT_AVAILABLE = False
     LangDetectException = Exception
 
@@ -86,6 +86,9 @@ class LanguageDetector:
 
         # Initialize progress tracker
         self.progress_tracker = get_progress_tracker()
+        # Ensure progress tracker is enabled
+        if not self.progress_tracker.enabled:
+            self.progress_tracker.enabled = True
 
         self.logger.debug(
             f"Language detector initialized (default={self.default_language})"

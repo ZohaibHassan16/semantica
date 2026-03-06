@@ -90,64 +90,48 @@ from dataclasses import dataclass
 from typing import Any, Callable, Dict, List, Optional, Union
 
 from ..utils.exceptions import ProcessingError
+from ..utils.helpers import safe_import
 from ..utils.logging import get_logger
 from .semantic_chunker import Chunk
 
 logger = get_logger("split_methods")
 
 # Try to import optional dependencies
-try:
-    import spacy
+spacy, SPACY_AVAILABLE = safe_import("spacy")
 
-    SPACY_AVAILABLE = True
-except ImportError:
-    SPACY_AVAILABLE = False
-
-try:
-    import nltk
-
-    NLTK_AVAILABLE = True
-except ImportError:
-    NLTK_AVAILABLE = False
-
-try:
-    import tiktoken
-
-    TIKTOKEN_AVAILABLE = True
-except ImportError:
-    TIKTOKEN_AVAILABLE = False
-
-try:
+nltk, NLTK_AVAILABLE = safe_import("nltk")
+tiktoken, TIKTOKEN_AVAILABLE = safe_import("tiktoken")
+_sentence_transformers, SENTENCE_TRANSFORMER_AVAILABLE = safe_import("sentence_transformers")
+if SENTENCE_TRANSFORMER_AVAILABLE:
     from sentence_transformers import SentenceTransformer
-
-    SENTENCE_TRANSFORMER_AVAILABLE = True
-except ImportError:
-    SENTENCE_TRANSFORMER_AVAILABLE = False
-
-try:
+else:
+    SentenceTransformer = None
+_transformers, TRANSFORMERS_AVAILABLE = safe_import("transformers")
+if TRANSFORMERS_AVAILABLE:
     from transformers import AutoTokenizer
+else:
+    AutoTokenizer = None
 
-    TRANSFORMERS_AVAILABLE = True
-except ImportError:
-    TRANSFORMERS_AVAILABLE = False
+networkx, NETWORKX_AVAILABLE = safe_import("networkx")
+if NETWORKX_AVAILABLE:
+    nx = networkx
+else:
+    nx = None
 
-try:
-    import networkx as nx
-
-    NETWORKX_AVAILABLE = True
-except ImportError:
-    NETWORKX_AVAILABLE = False
-
-try:
+# Try community package with fallback
+_community1, _avail1 = safe_import("community.community_louvain")
+if _avail1:
     import community.community_louvain as community_louvain
-
     COMMUNITY_AVAILABLE = True
-except ImportError:
-    try:
-        from community import community_louvain
-
-        COMMUNITY_AVAILABLE = True
-    except ImportError:
+else:
+    _community2, _avail2 = safe_import("community")
+    if _avail2:
+        try:
+            from community import community_louvain
+            COMMUNITY_AVAILABLE = True
+        except (ImportError, OSError):
+            COMMUNITY_AVAILABLE = False
+    else:
         COMMUNITY_AVAILABLE = False
 
 # Import from semantic_extract for entity/relation extraction
@@ -157,7 +141,7 @@ try:
     from ..semantic_extract.relation_extractor import RelationExtractor
 
     SEMANTIC_EXTRACT_AVAILABLE = True
-except ImportError:
+except (ImportError, OSError):
     SEMANTIC_EXTRACT_AVAILABLE = False
 
 # Import specialized chunkers
@@ -166,7 +150,7 @@ try:
     from .sliding_window_chunker import SlidingWindowChunker
     
     SPECIALIZED_CHUNKERS_AVAILABLE = True
-except ImportError:
+except (ImportError, OSError):
     SPECIALIZED_CHUNKERS_AVAILABLE = False
 
 
@@ -1702,7 +1686,7 @@ def get_split_method(method: str) -> Optional[Callable]:
         registered = method_registry.get("split", method)
         if registered:
             return registered
-    except ImportError:
+    except (ImportError, OSError):
         pass
 
     # Check built-in methods
@@ -1725,7 +1709,7 @@ def list_available_methods() -> List[str]:
         registered = method_registry.list_all("split")
         if registered and "split" in registered:
             methods.extend(registered["split"])
-    except ImportError:
+    except (ImportError, OSError):
         pass
 
     return sorted(set(methods))  # Remove duplicates and sort

@@ -109,12 +109,14 @@ Convenience Functions:
     - create_associative_class: Associative class creation wrapper
     - get_ontology_method: Get ontology method by name
     - list_available_methods: List registered methods
+    - ingest_ontology: Ingest ontology from file or directory
 
 Example Usage:
-    >>> from semantica.ontology import generate_ontology, infer_classes, OntologyGenerator
+    >>> from semantica.ontology import generate_ontology, infer_classes, OntologyGenerator, ingest_ontology
     >>> # Using convenience functions
     >>> ontology = generate_ontology({"entities": [...], "relationships": [...]}, method="default")
     >>> classes = infer_classes(entities, method="default")
+    >>> data = ingest_ontology("ontology.ttl")
     >>> # Using classes directly
     >>> from semantica.ontology import OntologyGenerator, ClassInferrer, PropertyGenerator
     >>> generator = OntologyGenerator(base_uri="https://example.org/ontology/")
@@ -154,7 +156,10 @@ from .property_generator import PropertyGenerator
 from .registry import MethodRegistry, method_registry
 from .requirements_spec import RequirementsSpec, RequirementsSpecManager
 from .reuse_manager import ReuseDecision, ReuseManager
-from .version_manager import OntologyVersion, VersionManager
+# VersionManager and OntologyVersion moved to change_management module
+# Import them directly from there: from semantica.change_management import VersionManager, OntologyVersion
+from semantica.ingest import OntologyData, OntologyIngestor
+from .methods import ingest_ontology
 
 __all__ = [
     # Main generators
@@ -180,8 +185,7 @@ __all__ = [
     # Management
     "ReuseManager",
     "ReuseDecision",
-    "VersionManager",
-    "OntologyVersion",
+    # VersionManager and OntologyVersion moved to change_management module
     "NamespaceManager",
     "NamingConventions",
     "ModuleManager",
@@ -200,4 +204,7 @@ __all__ = [
     # Configuration
     "OntologyConfig",
     "ontology_config",
+    "ingest_ontology",
+    "OntologyData",
+    "OntologyIngestor",
 ]

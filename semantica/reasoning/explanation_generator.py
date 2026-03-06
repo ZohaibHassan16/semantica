@@ -36,10 +36,9 @@ from typing import Any, Dict, List, Optional
 from ..utils.exceptions import ProcessingError, ValidationError
 from ..utils.logging import get_logger
 from ..utils.progress_tracker import get_progress_tracker
+from .reasoner import InferenceResult, Rule
+from .deductive_reasoner import Proof
 from .abductive_reasoner import Explanation as AbductiveExplanation
-from .deductive_reasoner import Conclusion, Proof
-from .inference_engine import InferenceResult
-from .rule_manager import Rule
 
 
 @dataclass
@@ -121,6 +120,9 @@ class ExplanationGenerator:
 
         # Initialize progress tracker
         self.progress_tracker = get_progress_tracker()
+        # Ensure progress tracker is enabled
+        if not self.progress_tracker.enabled:
+            self.progress_tracker.enabled = True
 
         self.generate_nl = self.config.get("generate_nl", True)
         self.detail_level = self.config.get("detail_level", "detailed")

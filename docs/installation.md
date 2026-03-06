@@ -28,6 +28,14 @@ pip install semantica
 
 This installs Semantica with all core dependencies.
 
+### GitHub Workaround
+
+If you encounter issues with the PyPI version, you can install directly from the main branch:
+
+```bash
+pip install git+https://github.com/Hawksight-AI/semantica.git@main
+```
+
 !!! tip "Virtual Environment"
     We recommend installing Semantica in a virtual environment to avoid dependency conflicts. Use `python -m venv venv` to create one, then activate it before installing.
 
@@ -36,12 +44,15 @@ This installs Semantica with all core dependencies.
 Verify that Semantica is installed correctly:
 
 ```bash
-python -c "import semantica; print(semantica.__version__)"
+python -c "from semantica.parse import DoclingParser; DoclingParser(); print('✓ Semantica ready')"
 ```
+
+!!! info "Windows PyTorch Note"
+    If you encounter PyTorch DLL errors on Windows, ensure you have the [Microsoft Visual C++ Redistributable](https://aka.ms/vs/17/release/vc_redist.x64.exe) installed. This is a common environment-specific issue with PyTorch on Windows and not a bug in Semantica.
 
 Expected output:
 ```
-0.0.1
+✓ Semantica ready
 ```
 
 You can also check the installation:
@@ -225,14 +236,49 @@ It's recommended to use a virtual environment:
 | Disk Space | Sufficient for data | Generous storage |
 | OS | Windows/Linux/Mac | Linux/Mac |
 
+## After Installation
+
+Once Semantica is installed, verify your setup and get started:
+
+### Verify Your Installation
+
+Test that everything works correctly:
+
+```bash
+python -c "import semantica; print(semantica.__version__)"
+```
+
+**For detailed setup verification and first steps, see:**
+- **[Welcome to Semantica Cookbook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/introduction/01_Welcome_to_Semantica.ipynb)**: Verify installation and explore all modules
+  - **Topics**: Framework overview, installation verification, module exploration
+  - **Difficulty**: Beginner
+  - **Time**: 30-45 minutes
+  - **Use Cases**: First-time setup, understanding the framework
+
 ## Next Steps
 
 Now that Semantica is installed:
 
-1. **[Quick Start Guide](quickstart.md)** - Build your first knowledge graph
-2. **[Examples](examples.md)** - See real-world use cases
-3. **[API Reference](reference/core.md) - Explore the full API
-4. **[Cookbook](cookbook.md)** - Interactive tutorials
+1. **[Quick Start Guide](quickstart.md)** - Build your first knowledge graph in 5 minutes
+2. **[Getting Started Guide](getting-started.md)** - Learn the fundamentals
+3. **[Examples](examples.md)** - See real-world use cases
+4. **[Cookbook](cookbook.md)** - Interactive Jupyter notebook tutorials
+
+### 🍳 Recommended First Cookbooks
+
+Start with these interactive tutorials:
+
+- **[Welcome to Semantica](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/introduction/01_Welcome_to_Semantica.ipynb)**: Comprehensive introduction
+  - **Topics**: Framework overview, all modules, architecture, configuration
+  - **Difficulty**: Beginner
+  - **Time**: 30-45 minutes
+  - **Use Cases**: First-time users, understanding the framework
+
+- **[Your First Knowledge Graph](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/introduction/08_Your_First_Knowledge_Graph.ipynb)**: Build your first graph
+  - **Topics**: Entity extraction, relationship extraction, graph construction
+  - **Difficulty**: Beginner
+  - **Time**: 20-30 minutes
+  - **Use Cases**: Hands-on practice, quick start
 
 ## Getting Help
 
@@ -240,4 +286,8 @@ If you encounter issues:
 
 - Check the [troubleshooting section](#troubleshooting) above
 - Review [GitHub Issues](https://github.com/Hawksight-AI/semantica/issues)
-- Ask questions in discussions
+- Ask questions in [GitHub Discussions](https://github.com/Hawksight-AI/semantica/discussions)
+
+**For installation and setup help:**
+- **[Welcome to Semantica Cookbook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/introduction/01_Welcome_to_Semantica.ipynb)**: Includes setup verification steps
+- **[Installation Troubleshooting Guide](getting-started.md#installation--setup)**: Additional troubleshooting tips

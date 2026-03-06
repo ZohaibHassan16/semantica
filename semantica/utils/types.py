@@ -174,6 +174,18 @@ class Entity:
     metadata: Dict[str, Any] = field(default_factory=dict)
     relations: List[RelationshipDict] = field(default_factory=list)
 
+    def __hash__(self):
+        """Hash based on entity ID."""
+        return hash(self.id)
+
+    def __eq__(self, other):
+        """Equality based on entity ID."""
+        if not isinstance(other, Entity):
+            if isinstance(other, dict):
+                return self.id == (other.get("id") or other.get("entity_id"))
+            return False
+        return self.id == other.id
+
 
 @dataclass
 class Relationship:

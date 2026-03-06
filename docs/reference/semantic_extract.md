@@ -6,6 +6,36 @@
 
 ## 🎯 Overview
 
+The **Semantic Extract Module** extracts structured information from unstructured text. It identifies entities, relationships, events, and semantic structures that form the foundation of knowledge graphs.
+
+### What is Semantic Extraction?
+
+**Semantic extraction** is the process of identifying meaningful information from text:
+- **Named Entities**: People, organizations, locations, dates, etc.
+- **Relationships**: Connections between entities (e.g., "founded_by", "located_in")
+- **Events**: Actions with temporal information and participants
+- **Triplets**: Subject-Predicate-Object structures for knowledge graphs
+- **Semantic Networks**: Structured networks of nodes and edges
+
+### Why Use the Semantic Extract Module?
+
+- **Multiple Methods**: Support for ML models, LLMs, and rule-based extraction
+- **High Accuracy**: LLM-based extraction for complex schemas
+- **Flexible Configuration**: Customize extraction for your domain
+- **Confidence Scores**: Get confidence scores for all extractions
+- **Batch Processing**: Efficient parallel batch processing for large datasets
+- **Coreference Resolution**: Resolve pronouns to their entity references
+
+### How It Works
+
+1. **Text Input**: Receive parsed text from the parse module
+2. **Entity Extraction**: Identify named entities using NER
+3. **Coreference Resolution**: Resolve pronouns to entities (optional)
+4. **Relationship Extraction**: Identify relationships between entities
+5. **Event Detection**: Detect events with temporal information
+6. **Triplet Generation**: Generate RDF triplets for knowledge graphs
+7. **Output**: Return structured entities, relationships, and triplets
+
 <div class="grid cards" markdown>
 
 -   :material-account-search:{ .lg .middle } **NER**
@@ -39,7 +69,7 @@
     Extract Subject-Predicate-Object triplets for Knowledge Graphs
 
 -   :material-robot:{ .lg .middle } **LLM Extraction**
-    
+
     ---
 
     Use LLMs to improve extraction quality and handle complex schemas
@@ -63,23 +93,43 @@
 ## ⚙️ Algorithms Used
 
 ### Named Entity Recognition (NER)
-- **Transformer Models**: BERT/RoBERTa for token classification.
-- **Regex Patterns**: Pattern matching for specific formats (Emails, IDs).
-- **LLM Prompting**: Zero-shot extraction for custom entity types.
+
+**Purpose**: Identify and classify named entities in text.
+
+**How it works**:
+
+- **Transformer Models**: BERT/RoBERTa for token classification
+- **Regex Patterns**: Pattern matching for specific formats (Emails, IDs)
+- **LLM Prompting**: Zero-shot extraction for custom entity types
 
 ### Relation Extraction
-- **Dependency Parsing**: Analyzing grammatical structure to find subject-verb-object paths.
-- **Joint Extraction**: Extracting entities and relations simultaneously.
-- **Semantic Role Labeling**: Identifying "Who did What to Whom".
+
+**Purpose**: Identify relationships between entities.
+
+**How it works**:
+
+- **Dependency Parsing**: Analyzing grammatical structure to find subject-verb-object paths
+- **Joint Extraction**: Extracting entities and relations simultaneously
+- **Semantic Role Labeling**: Identifying "Who did What to Whom"
 
 ### Coreference Resolution
-- **Mention Detection**: Finding all potential references (nouns, pronouns).
-- **Clustering**: Grouping mentions that refer to the same real-world entity.
-- **Pronoun Resolution**: Mapping pronouns to the most likely antecedent.
+
+**Purpose**: Resolve pronouns and references to their entity references.
+
+**How it works**:
+
+- **Mention Detection**: Finding all potential references (nouns, pronouns)
+- **Clustering**: Grouping mentions that refer to the same real-world entity
+- **Pronoun Resolution**: Mapping pronouns to the most likely antecedent
 
 ### Triplet Extraction
-- **OpenIE**: Open Information Extraction for arbitrary relation strings.
-- **Schema-Based**: Mapping extracted relations to a predefined ontology.
+
+**Purpose**: Extract Subject-Predicate-Object triplets for Knowledge Graphs.
+
+**How it works**:
+
+- **OpenIE**: Open Information Extraction for arbitrary relation strings
+- **Schema-Based**: Mapping extracted relations to a predefined ontology
 - **Reification**: Handling complex relations (time, location) by creating event nodes.
 
 ---
@@ -134,14 +184,15 @@ Core entity extraction implementation used by notebooks and lower-level integrat
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
 | `method` | str or list | `"ml"` | Method(s): "ml", "llm", "pattern", "regex", "huggingface" |
-| `**config` | dict | `{}` | Method-specific config (e.g., `model`, `provider`) |
+| `entity_types` | list | `None` | Filter for specific entity types |
+| `**config` | dict | `{}` | Method-specific config (e.g., `model`, `aggregation_strategy`, `device`) |
 
 **Methods:**
 
 | Method | Description |
 |--------|-------------|
-| `extract(text)` | Alias for `extract_entities`. Get list of entities. |
-| `extract_entities(text)` | Get list of entities |
+| `extract(text, pipeline_id=None, **kwargs)` | Alias for `extract_entities`. Supports `max_workers`. |
+| `extract_entities(text, pipeline_id=None, **kwargs)` | Get list of entities. Supports `max_workers`. |
 
 **Example:**
 
@@ -152,11 +203,12 @@ from semantica.semantic_extract import NERExtractor
 extractor = NERExtractor(method="ml", model="en_core_web_trf")
 entities = extractor.extract("Elon Musk leads SpaceX.")
 
-# 2. LLM (OpenAI/Gemini/etc)
+# 2. LLM (OpenAI/Gemini/Groq/etc)
 extractor = NERExtractor(
     method="llm", 
-    provider="openai", 
-    model="gpt-4",
+    provider="groq", 
+    model="llama-3.3-70b-versatile",
+    max_tokens=2048, # Increased output limit
     temperature=0.0
 )
 
@@ -176,17 +228,19 @@ Extracts relationships between entities.
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
+| `method` | str | `"dependency"` | Method: "dependency", "pattern", "cooccurrence", "huggingface", "llm" |
 | `relation_types` | list | `None` | Specific relation types to extract |
 | `bidirectional` | bool | `False` | Extract bidirectional relations |
 | `confidence_threshold` | float | `0.6` | Minimum confidence score |
 | `max_distance` | int | `50` | Max token distance between entities |
+| `**config` | dict | `{}` | Method-specific config (e.g., `model`, `device` for HuggingFace) |
 
 **Methods:**
 
 | Method | Description |
 |--------|-------------|
-| `extract(text, entities)` | Alias for `extract_relations`. Find links. |
-| `extract_relations(text, entities)` | Find links |
+| `extract(text, entities, pipeline_id=None, **kwargs)` | Alias for `extract_relations`. Supports `max_workers`. |
+| `extract_relations(text, entities, pipeline_id=None, **kwargs)` | Find links. Supports `max_workers`. |
 
 **Example:**
 
@@ -201,7 +255,7 @@ entities = ner.extract_entities(text)
 # Basic relation extraction
 rel_extractor = RelationExtractor()
 relations = rel_extractor.extract(text, entities=entities)
-# [Relation(source="Elon Musk", target="SpaceX", type="founded")]
+# [Relation(subject="Elon Musk", predicate="founded", object="SpaceX")]
 
 # With configuration
 rel_extractor = RelationExtractor(
@@ -256,6 +310,7 @@ Identifies events with temporal information and participants.
 | `extract_participants` | bool | `True` | Extract event participants |
 | `extract_location` | bool | `True` | Extract event locations |
 | `extract_time` | bool | `True` | Extract temporal information |
+| `max_workers` | int | `1` | Threads for parallel batch processing |
 
 **Methods:**
 
@@ -284,15 +339,18 @@ Extracts RDF triplets (Subject-Predicate-Object).
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
+| `method` | str | `"pattern"` | Extraction method ("pattern", "rules", "huggingface", "llm") |
+| `triplet_types` | list | `None` | Specific triplet types/predicates to extract |
 | `include_temporal` | bool | `False` | Include time information |
 | `include_provenance` | bool | `False` | Track source sentences |
-| `method` | str | `"pattern"` | Extraction method ("pattern", "rules", "huggingface", "llm") |
+| `**kwargs` | dict | `{}` | Configuration options (e.g., `model`, `device`) |
 
 **Methods:**
 
 | Method | Description |
 |--------|-------------|
-| `extract_triplets(text)` | Get (S, P, O) tuples |
+| `extract(text, entities=None, relations=None, pipeline_id=None, **kwargs)` | Alias for `extract_triplets`. Supports `max_workers`. |
+| `extract_triplets(text, entities=None, relations=None, pipeline_id=None, **kwargs)` | Get (S, P, O) tuples. Supports `max_workers`. |
 
 **Example:**
 
@@ -317,6 +375,7 @@ Extracts structured semantic networks with nodes and edges.
 |-----------|------|---------|-------------|
 | `ner_method` | str | `None` | Method for node extraction |
 | `relation_method` | str | `None` | Method for edge extraction |
+| `max_workers` | int | `1` | Threads for parallel batch processing |
 | `**config` | dict | `{}` | Configuration for underlying extractors |
 
 **Methods:**
@@ -367,6 +426,44 @@ from semantica.semantic_extract import LLMExtraction
 extractor = LLMExtraction(provider="openai", model="gpt-4")
 enhanced_entities = extractor.enhance_entities(text, entities)
 ```
+
+---
+
+## Batch Processing & Provenance
+
+All extractors support batch processing for high-throughput extraction. You can pass a list of strings or a list of dictionaries (with `content` and `id` keys).
+
+**Features:**
+- **Progress Tracking**: Automatically shows a progress bar for large batches.
+- **Provenance Metadata**: Each extracted item includes `batch_index` and `document_id` in its `metadata`.
+
+```python
+from semantica.semantic_extract import NERExtractor
+
+documents = [
+    {"id": "doc_1", "content": "Apple Inc. was founded by Steve Jobs."},
+    {"id": "doc_2", "content": "Microsoft Corporation was founded by Bill Gates."}
+]
+
+extractor = NERExtractor()
+batch_results = extractor.extract(documents)
+
+for i, doc_entities in enumerate(batch_results):
+    print(f"Document {i} entities:")
+    for entity in doc_entities:
+        print(f"  - {entity.text} ({entity.label})")
+        print(f"    Provenance: Batch Index {entity.metadata['batch_index']}, Doc ID {entity.metadata.get('document_id')}")
+```
+
+## Robust Extraction Fallbacks
+
+The framework implements robust fallback chains to prevent empty results when primary methods fail (e.g., due to model unavailability or obscure text).
+
+- **NER**: `ML/LLM` -> `Pattern` -> `Last Resort` (Capitalized Words)
+- **Relation**: `Primary` -> `Pattern` -> `Last Resort` (Adjacency)
+- **Triplet**: `Primary` -> `Relation-to-Triplet` -> `Pattern`
+
+This ensures that you almost always get *some* structured data, even if it requires falling back to simpler heuristics.
 
 ---
 
@@ -487,6 +584,19 @@ kg = builder.build(sources)
 
 ## Cookbook
 
-- [Entity Extraction](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/introduction/05_Entity_Extraction.ipynb)
-- [Relation Extraction](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/introduction/06_Relation_Extraction.ipynb)
-- [Advanced Extraction](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/advanced/01_Advanced_Extraction.ipynb)
+Interactive tutorials to learn semantic extraction:
+
+- **[Entity Extraction](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/introduction/05_Entity_Extraction.ipynb)**: Extract named entities from text using NER
+  - **Topics**: NER, Spacy, LLM extraction, entity types, confidence scores
+  - **Difficulty**: Beginner
+  - **Use Cases**: Identifying entities in text, building entity lists
+
+- **[Relation Extraction](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/introduction/06_Relation_Extraction.ipynb)**: Discover and classify relationships between entities
+  - **Topics**: Relation classification, dependency parsing, relationship types
+  - **Difficulty**: Beginner
+  - **Use Cases**: Finding relationships, building knowledge graphs
+
+- **[Advanced Extraction](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/advanced/01_Advanced_Extraction.ipynb)**: Custom extractors, LLM-based extraction, and complex pattern matching
+  - **Topics**: Custom models, regex, LLMs, ensemble methods, domain-specific extraction
+  - **Difficulty**: Advanced
+  - **Use Cases**: Custom extraction schemas, domain-specific entities

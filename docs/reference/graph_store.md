@@ -57,18 +57,27 @@
 ## ⚙️ Algorithms Used
 
 ### Query Execution
-- **Cypher Translation**: Adapting queries for specific backend nuances (though most support OpenCypher).
-- **Query Optimization**: Index utilization and execution plan analysis.
+
+The module provides efficient query execution:
+
+- **Cypher Translation**: Adapting queries for specific backend nuances (though most support OpenCypher)
+- **Query Optimization**: Index utilization and execution plan analysis
 
 ### Graph Analytics
-- **PageRank**: Measuring node importance based on incoming links.
-- **Louvain Modularity**: Detecting communities by optimizing modularity.
-- **Shortest Path**: Dijkstra/A* for finding optimal routes.
-- **Jaccard Similarity**: Measuring node similarity based on shared neighbors.
+
+Built-in graph analytics algorithms include:
+
+- **PageRank**: Measuring node importance based on incoming links
+- **Louvain Modularity**: Detecting communities by optimizing modularity
+- **Shortest Path**: Dijkstra/A* for finding optimal routes
+- **Jaccard Similarity**: Measuring node similarity based on shared neighbors
 
 ### Bulk Operations
-- **Chunking**: Splitting large datasets into optimal batch sizes (e.g., 5000 records) to prevent memory overflow.
-- **Parallel Loading**: Concurrent batch insertion (backend dependent).
+
+Efficient bulk loading capabilities:
+
+- **Chunking**: Splitting large datasets into optimal batch sizes (e.g., `` `5000` `` records) to prevent memory overflow
+- **Parallel Loading**: Concurrent batch insertion (backend dependent)
 
 ---
 
@@ -419,4 +428,9 @@ subgraph = graph_store.execute_query(query, parameters={"ids": node_ids})
 
 ## Cookbook
 
-- [Graph Store](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/introduction/09_Graph_Store.ipynb)
+Interactive tutorials to learn graph storage:
+
+- **[Graph Store](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/introduction/09_Graph_Store.ipynb)**: Persist knowledge graphs in Neo4j or FalkorDB
+  - **Topics**: Neo4j, FalkorDB, Cypher, persistence, graph databases
+  - **Difficulty**: Intermediate
+  - **Use Cases**: Persistent storage, production deployments, graph database integration

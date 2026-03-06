@@ -42,7 +42,7 @@ try:
     from rdflib.namespace import NamespaceManager as RDFNamespaceManager
 
     HAS_RDFLIB = True
-except ImportError:
+except (ImportError, OSError):
     HAS_RDFLIB = False
     Graph = None
     RDF = None
@@ -78,6 +78,9 @@ class OWLGenerator:
 
         # Initialize progress tracker
         self.progress_tracker = get_progress_tracker()
+        # Ensure progress tracker is enabled
+        if not self.progress_tracker.enabled:
+            self.progress_tracker.enabled = True
 
         self.namespace_manager = self.config.get(
             "namespace_manager"

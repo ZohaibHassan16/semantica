@@ -4,43 +4,30 @@ Thank you to all the people who have contributed to Semantica! 🎉
 
 This project follows the [all-contributors](https://allcontributors.org) specification. Contributions of any kind are welcome!
 
-## How to Contribute
+⭐ **Give us a Star** • 🍴 **Fork us** • 💬 **Join our [Discord](https://discord.gg/N7WmAuDH)**
 
-We welcome contributions of all kinds! Whether you're:
-- Writing code
-- Improving documentation
-- Reporting bugs
-- Suggesting features
-- Answering questions
-- Reviewing pull requests
-- Sharing use cases
-- Creating examples
-
-All contributions are valuable and appreciated!
+---
 
 ## Contribution Types
 
+We recognize all types of contributions:
+
 - 💻 **Code**: Writing code, fixing bugs, implementing features
 - 📝 **Documentation**: Writing docs, tutorials, examples
+- 🧪 **Testing**: Writing tests, improving test coverage
 - 🐛 **Bug Reports**: Finding and reporting bugs
 - 💡 **Ideas**: Suggesting new features or improvements
 - 🎨 **Design**: UI/UX improvements, graphics, branding
-- 📖 **Examples**: Creating code examples and tutorials
-- 🔍 **Testing**: Writing tests, improving test coverage
-- 💬 **Answering Questions**: Helping others in discussions
-- 📢 **Talks**: Giving talks, presentations, workshops
-- 🌍 **Translation**: Translating documentation
+- 🎨 **Cookbook**: Creating tutorials and examples
+- 💬 **Community**: Answering questions, reviewing PRs
+- 🎓 **Education**: Blog posts, video tutorials, talks, workshops
 - 🔧 **Tools**: Creating tools, scripts, integrations
 - 📦 **Packaging**: Improving build, release, distribution
 - ⚠️ **Security**: Reporting security vulnerabilities
-- 🎓 **Education**: Teaching, mentoring, tutorials
-- 📹 **Video**: Creating video content, tutorials
-- 🎵 **Audio**: Podcasts, audio content
-- 📸 **Photography**: Screenshots, images
-- 🔬 **Research**: Research, analysis, studies
-- 💰 **Financial**: Sponsoring, funding
 - 🏗️ **Infrastructure**: CI/CD, hosting, infrastructure
 - 🚇 **Maintenance**: Maintenance, triage, project management
+
+---
 
 ## Contributors
 
@@ -50,48 +37,78 @@ All contributions are valuable and appreciated!
 
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
+---
+
 ## Recognition
 
-### Top Contributors
+All contributors are recognized in:
 
-Contributors are recognized based on their contributions to the project. Recognition includes:
+- This contributors list
+- [GitHub contributors page](https://github.com/Hawksight-AI/semantica/graphs/contributors)
+- Release notes for significant contributions
+- Community appreciation
 
-- Listing in this file
-- GitHub contributor statistics
-- Special mentions in release notes
-- Featured showcases for significant contributions
-
-### Hall of Fame
-
-Special recognition for exceptional contributions:
-
-- **Coming soon** - We'll feature outstanding contributors here!
+---
 
 ## How to Add Yourself
 
-If you've contributed to Semantica and want to be added to this list:
+### Automatic Recognition
 
-1. **Automatic**: If you've made a commit, you'll appear in [GitHub's contributors graph](https://github.com/Hawksight-AI/semantica/graphs/contributors)
-2. **Manual**: Open a PR adding yourself to this file, or use the [@all-contributors bot](https://allcontributors.org/docs/en/bot/usage)
+If you've made a commit, you'll automatically appear in [GitHub's contributors graph](https://github.com/Hawksight-AI/semantica/graphs/contributors).
 
-Example:
-```markdown
-- [Your Name](https://github.com/yourusername) - 💻 📝 🐛
-```
+### Using All-Contributors Bot
 
-## All Contributors Bot
-
-We use the [all-contributors](https://allcontributors.org) bot to automatically recognize contributors. To add a contributor, comment on an issue or PR:
+Comment on any issue or PR with:
 
 ```
 @all-contributors please add @username for code, docs, bug
 ```
 
-## Thank You!
+**Examples:**
 
-Every contribution, no matter how small, helps make Semantica better. Thank you for being part of our community!
+```
+@all-contributors please add @johndoe for code
+@all-contributors please add @janedoe for docs, bug
+@all-contributors please add @devuser for code, test, maintenance
+```
+
+### Manual Addition
+
+Open a PR adding yourself to this file:
+
+```markdown
+- [Your Name](https://github.com/yourusername) - 💻 📝 🐛
+```
 
 ---
 
-**Want to contribute?** Check out our [Contributing Guide](CONTRIBUTING.md) to get started!
+## Contribution Type Codes
 
+When using the all-contributors bot, use these codes:
+
+- `code` - Code contributions
+- `doc` - Documentation
+- `test` - Testing
+- `bug` - Bug reports
+- `ideas` - Feature requests/ideas
+- `design` - Design work
+- `example` - Cookbook/examples
+- `question` - Answering questions
+- `talk` - Talks/presentations
+- `tool` - Tools/integrations
+- `packaging` - Packaging/distribution
+- `security` - Security reports
+- `infra` - Infrastructure
+- `maintenance` - Maintenance
+
+See [all-contributors specification](https://allcontributors.org/docs/en/emoji-key) for complete list.
+
+---
+
+## Thank You!
+
+Every contribution, no matter how small, helps make Semantica better. Thank you for being part of our community! 🙏
+
+**Want to contribute?** 
+
+⭐ Give us a Star • 🍴 [Fork us](https://github.com/Hawksight-AI/semantica/fork) • Check out our [Contributing Guide](CONTRIBUTING.md) to get started!

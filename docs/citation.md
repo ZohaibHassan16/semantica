@@ -7,31 +7,27 @@ How to cite Semantica in academic papers and research.
 ## BibTeX
 
 ```bibtex
-@software{semantica2025,
+@software{semantica2026,
   title = {Semantica: An Open Source Framework for Semantic Layers and Knowledge Engineering},
   author = {Hawksight AI},
-  year = {2025},
+  year = {2026},
   url = {https://github.com/Hawksight-AI/semantica},
-  version = {0.0.5},
-  license = {MIT}
+  version = {0.2.7},
+  doi = {10.5281/zenodo.XXXXXXX}
 }
 ```
 
----
-
-## Citation Formats
-
 ### APA
-Hawksight AI. (2025). *Semantica: An Open Source Framework for Semantic Layers and Knowledge Engineering* (Version 0.0.5) [Computer software]. https://github.com/Hawksight-AI/semantica
+Hawksight AI. (2026). *Semantica: An Open Source Framework for Semantic Layers and Knowledge Engineering* (Version 0.2.7) [Computer software]. https://github.com/Hawksight-AI/semantica
 
 ### MLA
-Hawksight AI. *Semantica: An Open Source Framework for Semantic Layers and Knowledge Engineering*. Version 0.0.5, GitHub, 2025, https://github.com/Hawksight-AI/semantica.
+Hawksight AI. *Semantica: An Open Source Framework for Semantic Layers and Knowledge Engineering*. Version 0.2.7, GitHub, 2026, https://github.com/Hawksight-AI/semantica.
 
 ### Chicago
-Hawksight AI. *Semantica: An Open Source Framework for Semantic Layers and Knowledge Engineering*. Version 0.0.5. GitHub, 2025. https://github.com/Hawksight-AI/semantica.
+Hawksight AI. *Semantica: An Open Source Framework for Semantic Layers and Knowledge Engineering*. Version 0.2.7. GitHub, 2026. https://github.com/Hawksight-AI/semantica.
 
 ### IEEE
-Hawksight AI, "Semantica: An Open Source Framework for Semantic Layers and Knowledge Engineering," Version 0.0.5, GitHub, 2025. [Online]. Available: https://github.com/Hawksight-AI/semantica
+Hawksight AI, "Semantica: An Open Source Framework for Semantic Layers and Knowledge Engineering," Version 0.2.7, GitHub, 2026. [Online]. Available: https://github.com/Hawksight-AI/semantica
 
 ---
 
@@ -39,7 +35,7 @@ Hawksight AI, "Semantica: An Open Source Framework for Semantic Layers and Knowl
 
 If you use Semantica in your work:
 
-> "This work uses Semantica (Hawksight AI, 2025), an open-source framework for semantic layer construction and knowledge engineering."
+> "This work uses Semantica (Hawksight AI, 2026), an open-source framework for semantic layer construction and knowledge engineering."
 
 ---
 

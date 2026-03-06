@@ -56,6 +56,9 @@
 ## ⚙️ Algorithms Used
 
 ### Conflict Detection
+
+The conflict detection system identifies discrepancies using:
+
 - **Value Comparison**: Equality checking with type normalization
 - **Type Mismatch**: Entity type hierarchy validation
 - **Temporal Analysis**: Timestamp comparison for time-based conflicts
@@ -66,11 +69,14 @@
     - Number of conflicting sources
 
 ### Conflict Resolution
-- **Voting (Majority Rule)**: `max(frequency(values))` using Counter
-- **Credibility Weighted**: `Σ(value_i * source_credibility_i) / Σ(source_credibility)`
-- **Temporal Selection**: Select value with latest timestamp (`max(timestamp)`)
+
+The module provides multiple resolution strategies:
+
+- **Voting (Majority Rule)**: `` `max(frequency(values))` `` using Counter
+- **Credibility Weighted**: `` `Σ(value_i * source_credibility_i) / Σ(source_credibility)` ``
+- **Temporal Selection**: Select value with latest timestamp (`` `max(timestamp)` ``)
 - **Confidence Selection**: Select value with highest extraction confidence
-- **Hybrid Resolution**: Waterfall approach (e.g., Voting -> Credibility -> Recency)
+- **Hybrid Resolution**: Waterfall approach (e.g., Voting → Credibility → Recency)
 
 ### Analysis & Tracking
 - **Pattern Identification**: Frequency analysis of conflict types
@@ -255,13 +261,27 @@ conflicts:
 
 ```python
 from semantica.conflicts import ConflictDetector, ConflictResolver
-from semantica.core import Semantica
+from semantica.ingest import FileIngestor
+from semantica.parse import DocumentParser
+from semantica.semantic_extract import NERExtractor
+from semantica.kg import GraphBuilder
 
-# 1. Build knowledge base from multiple sources
-semantica = Semantica()
-result = semantica.build_knowledge_base(["source1.pdf", "source2.html"])
-kg = result["knowledge_graph"]
-entities = kg.get("entities", [])
+# 1. Build knowledge base from multiple sources using individual modules
+ingestor = FileIngestor()
+parser = DocumentParser()
+ner = NERExtractor()
+builder = GraphBuilder()
+
+all_entities = []
+for source in ["source1.pdf", "source2.html"]:
+    doc = ingestor.ingest_file(source)
+    parsed = parser.parse_document(source)
+    text = parsed.get("full_text", "")
+    entities = ner.extract_entities(text)
+    all_entities.extend(entities)
+
+kg = builder.build_graph(entities=all_entities, relationships=[])
+entities = all_entities
 
 # 3. Detect conflicts
 detector = ConflictDetector()
@@ -320,4 +340,9 @@ tracker.set_source_credibility("bad_source", 0.1)
 
 ## Cookbook
 
-- [Conflict Detection & Resolution](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/introduction/17_Conflict_Detection_and_Resolution.ipynb)
+Interactive tutorials to learn conflict detection and resolution:
+
+- **[Conflict Detection & Resolution](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/introduction/17_Conflict_Detection_and_Resolution.ipynb)**: Strategies for handling contradictory information from multiple sources
+  - **Topics**: Truth discovery, voting, confidence scoring, conflict resolution strategies
+  - **Difficulty**: Advanced
+  - **Use Cases**: Multi-source data integration, quality assurance

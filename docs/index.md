@@ -1,189 +1,229 @@
 <div align="center">
-  <img src="assets/img/semantica_logo.png" alt="Semantica Logo" width="450" height="auto">
-</div>
-
-<p align="center">
-  <h1 align="center">🧠 Semantica</h1>
-</p>
-
-<p align="center">
+  <img src="assets/img/Semantica Logo.png" alt="Semantica Logo" width="450" height="auto">
+  
+  <h1>🧠 Semantica</h1>
+  
   <a href="https://www.python.org/downloads/"><img src="https://img.shields.io/badge/python-3.8+-blue.svg" alt="Python 3.8+"></a>
   <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"></a>
-  <a href="https://badge.fury.io/py/semantica"><img src="https://badge.fury.io/py/semantica.svg" alt="PyPI version"></a>
-  <a href="https://pepy.tech/project/semantica"><img src="https://pepy.tech/badge/semantica" alt="Downloads"></a>
+  <a href="https://badge.fury.io/py/semantica"><img src="https://img.shields.io/badge/pypi-v0.2.3-blue.svg" alt="PyPI version"></a>
+  <a href="https://pypi.org/project/semantica/"><img src="https://img.shields.io/pypi/dm/semantica" alt="Monthly Downloads"></a>
+  <a href="https://pepy.tech/project/semantica"><img src="https://static.pepy.tech/badge/semantica" alt="Total Downloads"></a>
   <a href="https://semantica.readthedocs.io/"><img src="https://img.shields.io/badge/docs-latest-brightgreen.svg" alt="Documentation"></a>
-  <a href="https://discord.gg/semantica"><img src="https://img.shields.io/discord/semantica?color=7289da&label=discord" alt="Discord"></a>
-</p>
-
-<p align="center">
-  <strong>Open Source Framework for building Semantic Layers and Knowledge Engineering</strong>
-</p>
-
-<p align="center">
-  <strong>Transform chaotic data into intelligent knowledge.</strong>
-</p>
-
-<p align="center">
-  <em>The missing fabric between raw data and AI engineering. A comprehensive open-source framework for building semantic layers and knowledge engineering systems that transform unstructured data into AI-ready knowledge — powering Knowledge Graph-Powered RAG (GraphRAG), AI Agents, Multi-Agent Systems, and AI applications with structured semantic knowledge.</em>
-</p>
-
-<p align="center">
-  🆓 <strong>100% Open Source</strong> • 📜 <strong>MIT Licensed</strong> • 🚀 <strong>Production Ready</strong> • 🌍 <strong>Community Driven</strong>
-</p>
-
-<p align="center">
-  <a href="getting-started/" class="md-button md-button--primary">Get Started</a>
-  <a href="https://github.com/Hawksight-AI/semantica" class="md-button">View on GitHub</a>
-</p>
-
----
-
-## 🎯 The Problem We Solve
-
-### The Data-to-AI Gap
-
-Modern organizations face a fundamental challenge: **the semantic gap between raw data and AI systems**.
-
-You have mountains of data—PDFs, emails, documents, databases—but AI systems need structured, validated knowledge with semantic relationships. This gap is the #1 blocker for production AI.
-
-```mermaid
-flowchart TD
-    subgraph RawData ["📦 RAW DATA CHAOS"]
-        direction TB
-        A["📄 PDFs & Documents"]
-        B["📧 Emails & Chat"]
-        C["💾 Databases"]
-        D["🌐 Web Content"]
-    end
-
-    subgraph Gap ["❌ THE SEMANTIC GAP"]
-        direction TB
-        X["MISSING LAYER"]
-        X1["No Context"]
-        X2["No Relationships"]
-        X3["No Validation"]
-        X --> X1
-        X --> X2
-        X --> X3
-    end
-
-    subgraph AI ["🤖 AI SYSTEMS NEEDS"]
-        direction TB
-        F["AI Agents"]
-        G["GraphRAG"]
-        H["Reasoning"]
-        I["Multi-Agent"]
-    end
-
-    RawData ==>|"Unstructured Noise"| Gap
-    Gap ==>|"Hallucinations & Errors"| AI
-    
-    style Gap fill:#ffebee,stroke:#c62828,stroke-width:3px,stroke-dasharray: 5 5
-    style RawData fill:#f5f5f5,stroke:#616161,stroke-width:2px
-    style AI fill:#e3f2fd,stroke:#1565c0,stroke-width:2px
-```
-
-### Real-World Consequences
-
-**Without a semantic layer, your AI systems fail:**
-
-<div class="grid cards" markdown>
-
--   **🔴 RAG Systems Fail**
-    ---
-    - Vector search alone misses crucial relationships
-    - No graph traversal for context expansion
-    - Significantly lower accuracy than hybrid approaches
-    - Can't answer multi-hop questions
-
--   **🔴 AI Agents Hallucinate**
-    ---
-    - No ontological constraints to validate actions
-    - Missing semantic routing for intent understanding
-    - No persistent memory across conversations
-    - Can't reason about domain rules
-
--   **🔴 Multi-Agent Coordination Fails**
-    ---
-    - No shared semantic models for collaboration
-    - Unable to validate actions against domain rules
-    - Conflicting knowledge representations
-    - Agents work in silos, not as a team
-
--   **🔴 Knowledge Is Untrusted**
-    ---
-    - Duplicate entities pollute graphs
-    - Conflicting facts from different sources
-    - No provenance tracking or validation
-    - Can't explain where knowledge came from
-
+  <a href="https://discord.gg/N7WmAuDH"><img src="https://img.shields.io/badge/Discord-Join%20Us-7289da?style=flat&logo=discord&logoColor=white" alt="Discord"></a>
+  
+  <p><strong>Open-Source Semantic Layer & Knowledge Engineering Framework</strong></p>
+  
+  <p><strong>Transform Chaos into Intelligence. Build AI systems that are explainable, traceable, and trustworthy — not black boxes.</strong></p>
+  
+  <p><em>The semantic intelligence layer that makes your AI agents auditable, explainable, and trustworthy. Perfect for high-stakes domains where mistakes have real consequences.</em></p>
+  
+  <p>🆓 <strong>Open Source</strong> • 📜 <strong>MIT Licensed</strong> • 🚀 <strong>Production Ready</strong> • 🌍 <strong>Community Driven</strong></p>
+  
+  <p>
+    <a href="getting-started/" class="md-button md-button--primary">Get Started</a>
+    <a href="https://github.com/Hawksight-AI/semantica" class="md-button">View on GitHub</a>
+  </p>
 </div>
 
 ---
 
-## 🌟 What is Semantica?
+## 🚀 Why Semantica?
 
-Semantica is the **first comprehensive open-source framework** that bridges the critical gap between raw data chaos and AI-ready knowledge. It's not just another data processing library—it's a complete **semantic intelligence platform** that transforms unstructured information into structured, queryable knowledge graphs.
+**Semantica** bridges the **semantic gap** between text similarity and true meaning. It's the **semantic intelligence layer** that makes your AI agents auditable, explainable, and trustworthy.
 
-### The Vision
-
-In the era of AI agents and autonomous systems, **data alone isn't enough. Context is king.** Semantica provides the semantic infrastructure that enables AI systems to truly understand, reason about, and act upon information with human-like comprehension.
-
-### What Makes Semantica Different?
-
-| Traditional Approaches | Semantica's Approach |
-|------------------------|---------------------|
-| Process data as isolated documents | **Understands semantic relationships across all content** |
-| Extract text and store vectors | **Builds knowledge graphs with meaningful connections** |
-| Generic entity recognition | **General-purpose ontology generation and validation** |
-| Manual schema definition | **Automatic semantic modeling from content patterns** |
-| Disconnected data silos | **Unified semantic layer across all data sources** |
-| Basic quality checks | **Production-grade QA with conflict detection & resolution** |
+Perfect for **high-stakes domains** where mistakes have real consequences.
 
 ---
 
-## ✅ The Semantica Solution
+### ⚡ Get Started in 30 Seconds
 
-Semantica fills the semantic gap with a **complete intelligence framework**:
-
-```mermaid
-flowchart TD
-    subgraph Input ["📥 INPUT LAYER"]
-        direction TB
-        I1["Files & Documents"]
-        I2["API Streams"]
-        I3["Databases"]
-    end
-
-    subgraph Engine ["🧠 SEMANTICA ENGINE"]
-        direction TB
-        S1["Entity Extraction"]
-        S2["Relation Mapping"]
-        S3["Ontology Generation"]
-        S4["Conflict Resolution"]
-    end
-
-    subgraph Output ["📤 KNOWLEDGE OUTPUT"]
-        direction TB
-        O1["Knowledge Graph"]
-        O2["Vector Store"]
-        O3["Reasoning API"]
-    end
-
-    Input ====>|"<b>Ingest & Parse</b>"| Engine
-    Engine ====>|"<b>Synthesize & Validate</b>"| Output
-
-    style Engine fill:#e8f5e9,stroke:#2e7d32,stroke-width:3px
-    style Input fill:#f5f5f5,stroke:#616161,stroke-width:2px
-    style Output fill:#e3f2fd,stroke:#1565c0,stroke-width:2px
+```bash
+pip install semantica
 ```
 
-### Powers Next-Gen AI Applications
+```python
+from semantica.semantic_extract import NERExtractor
+from semantica.kg import GraphBuilder
 
-- **GraphRAG**: Hybrid retrieval combining vector search + graph traversal for improved accuracy
-- **AI Agents**: Ontology-constrained actions with semantic routing and persistent memory
-- **Multi-Agent Systems**: Shared semantic models for coordinated decision-making
-- **Knowledge Engineering**: Production-grade knowledge graphs with provenance and validation
+# Extract entities and build knowledge graph
+ner = NERExtractor(method="ml", model="en_core_web_sm")
+entities = ner.extract("Apple Inc. was founded by Steve Jobs in 1976.")
+kg = GraphBuilder().build({"entities": entities, "relationships": []})
+
+print(f"Built KG with {len(kg.get('entities', []))} entities")
+```
+
+**[📖 Full Quick Start](getting-started.md)** • **[🍳 Cookbook Examples](cookbook.md)** • **[💬 Join Discord](https://discord.gg/N7WmAuDH)** • **[⭐ Star Us](https://github.com/Hawksight-AI/semantica)**
+
+---
+
+## Core Value Proposition
+
+| **Trustworthy** | **Explainable** | **Auditable** |
+|:------------------:|:------------------:|:-----------------:|
+| Conflict detection & validation | Transparent reasoning paths | Complete provenance tracking |
+| Rule-based governance | Entity relationships & ontologies | W3C PROV-O compliant lineage |
+| Production-grade QA | Multi-hop graph reasoning | Source tracking & integrity verification |
+
+---
+
+## Key Features & Benefits
+
+### Not Just Another Agentic Framework
+
+**Semantica complements** LangChain, LlamaIndex, AutoGen, CrewAI, Google ADK, Agno, and other frameworks to enhance your agents with:
+
+| Feature | Benefit |
+|:--------|:--------|
+| **Auditable** | Complete provenance tracking with W3C PROV-O compliance |
+| **Explainable** | Transparent reasoning paths with entity relationships |
+| **Provenance-Aware** | End-to-end lineage from documents to responses |
+| **Validated** | Built-in conflict detection, deduplication, QA |
+| **Governed** | Rule-based validation and semantic consistency |
+| **Version Control** | Enterprise-grade change management with integrity verification |
+
+### Perfect For High-Stakes Use Cases
+
+| 🏥 **Healthcare** | 💰 **Finance** | ⚖️ **Legal** |
+|:-----------------:|:--------------:|:------------:|
+| Clinical decisions | Fraud detection | Evidence-backed research |
+| Drug interactions | Regulatory support | Contract analysis |
+| Patient safety | Risk assessment | Case law reasoning |
+
+| 🔒 **Cybersecurity** | 🏛️ **Government** | 🏭 **Infrastructure** | 🚗 **Autonomous** |
+|:-------------------:|:----------------:|:-------------------:|:-----------------:|
+| Threat attribution | Policy decisions | Power grids | Decision logs |
+| Incident response | Classified info | Transportation | Safety validation |
+
+### Powers Your AI Stack
+
+- **GraphRAG Systems** — Retrieval with graph reasoning and hybrid search
+- **AI Agents** — Trustworthy, accountable multi-agent systems with semantic memory
+- **Reasoning Models** — Explainable AI decisions with reasoning paths
+- **Enterprise AI** — Governed, auditable platforms that support compliance
+
+### Integrations
+
+- **Docling Support** — Document parsing with table extraction (PDF, DOCX, PPTX, XLSX)
+- **AWS Neptune** — Amazon Neptune graph database support with IAM authentication
+- **Custom Ontology Import** — Import existing ontologies (OWL, RDF, Turtle, JSON-LD)
+
+> **Built for environments where every answer must be explainable and governed.**
+
+---
+
+## 🚨 The Problem: The Semantic Gap
+
+### Most AI systems fail in high-stakes domains because they operate on **text similarity**, not **meaning**.
+
+### Understanding the Semantic Gap
+
+The **semantic gap** is the fundamental disconnect between what AI systems can process (text patterns, vector similarities) and what high-stakes applications require (semantic understanding, meaning, context, and relationships).
+
+**Traditional AI approaches:**
+- Rely on statistical patterns and text similarity
+- Cannot understand relationships between entities
+- Cannot reason about domain-specific rules
+- Cannot explain why decisions were made
+- Cannot trace back to original sources with confidence
+
+**High-stakes AI requires:**
+- Semantic understanding of entities and their relationships
+- Domain knowledge encoded as formal rules (ontologies)
+- Explainable reasoning paths
+- Source-level provenance
+- Conflict detection and resolution
+
+**Semantica bridges this gap** by providing a semantic intelligence layer that transforms unstructured data into validated, explainable, and auditable knowledge.
+
+### What Organizations Have vs What They Need
+
+| **Current State** | **Required for High-Stakes AI** |
+|:---------------------|:-----------------------------------|
+| PDFs, DOCX, emails, logs | Formal domain rules (ontologies) |
+| APIs, databases, streams | Structured and validated entities |
+| Conflicting facts and duplicates | Explicit semantic relationships |
+| Siloed systems with no lineage | **Explainable reasoning paths** |
+| | **Source-level provenance** |
+| | **Audit-ready compliance** |
+
+### The Cost of Missing Semantics
+
+- **Decisions cannot be explained** — No transparency in AI reasoning
+- **Errors cannot be traced** — No way to debug or improve
+- **Conflicts go undetected** — Contradictory information causes failures
+- **Compliance becomes impossible** — No audit trails for regulations
+
+**Trustworthy AI requires semantic accountability.**
+
+---
+
+## 🆚 Semantica vs Traditional RAG
+
+| Feature | Traditional RAG | Semantica |
+|:--------|:----------------|:----------|
+| **Reasoning** | ❌ Black-box answers | ✅ Explainable reasoning paths |
+| **Provenance** | ❌ No provenance | ✅ W3C PROV-O compliant lineage tracking |
+| **Search** | ⚠️ Vector similarity only | ✅ Semantic + graph reasoning |
+| **Quality** | ❌ No conflict handling | ✅ Explicit contradiction detection |
+| **Safety** | ⚠️ Unsafe for high-stakes | ✅ Designed for governed environments |
+| **Compliance** | ❌ No audit trails | ✅ Complete audit trails with integrity verification |
+
+---
+
+## 🧩 Semantica Architecture
+
+### 1️⃣ Input Layer — Governed Ingestion
+- 📄 **Multiple Formats** — PDFs, DOCX, HTML, JSON, CSV, Excel, PPTX
+- 🔧 **Docling Support** — Docling parser for table extraction
+- 💾 **Data Sources** — Databases, APIs, streams, archives, web content
+- 🎨 **Media Support** — Image parsing with OCR, audio/video metadata extraction
+- � **Single Pipeline** — Unified ingestion with metadata and source tracking
+
+### 2️⃣ Semantic Layer — Trust & Reasoning Engine
+- 🔍 **Entity Extraction** — NER, normalization, classification
+- 🔗 **Relationship Discovery** — Triplet generation, semantic links
+- 📐 **Ontology Induction** — Automated domain rule generation
+- 🔄 **Deduplication** — Jaro-Winkler similarity, conflict resolution
+- ✅ **Quality Assurance** — Conflict detection, validation
+- 📊 **Provenance Tracking** — W3C PROV-O compliant lineage tracking across all modules
+- 🧠 **Reasoning Traces** — Explainable inference paths
+- 🔐 **Change Management** — Version control with audit trails, checksums, compliance support
+
+### 3️⃣ Output Layer — Auditable Knowledge Assets
+- � **Knowledge Graphs** — Queryable, temporal, explainable
+- 📐 **OWL Ontologies** — HermiT/Pellet validated, custom ontology import support
+- 🔢 **Vector Embeddings** — FastEmbed by default
+- ☁️ **AWS Neptune** — Amazon Neptune graph database support
+- 🔍 **Provenance** — Every AI response links back to:
+  - 📄 Source documents
+  - 🏷️ Extracted entities & relations
+  - 📐 Ontology rules applied
+  - 🧠 Reasoning steps used
+
+---
+
+## 🏥 Built for High-Stakes Domains
+
+Designed for domains where **mistakes have real consequences** and **every decision must be accountable**:
+
+- **🏥 Healthcare & Life Sciences** — Clinical decision support, drug interaction analysis, medical literature reasoning, patient safety tracking
+- **💰 Finance & Risk** — Fraud detection, regulatory support (SOX, GDPR, MiFID II), credit risk assessment, algorithmic trading validation
+- **⚖️ Legal & Compliance** — Evidence-backed legal research, contract analysis, regulatory change tracking, case law reasoning
+- **🔒 Cybersecurity & Intelligence** — Threat attribution, incident response, security audit trails, intelligence analysis
+- **🏛️ Government & Defense** — Governed AI systems, policy decisions, classified information handling, defense intelligence
+- **🏭 Critical Infrastructure** — Power grid management, transportation safety, water treatment, emergency response
+- **🚗 Autonomous Systems** — Self-driving vehicles, drone navigation, robotics safety, industrial automation  
+
+---
+
+## � Who Uses Semantica?
+
+- **🤖 AI / ML Engineers** — Building explainable GraphRAG & agents
+- **⚙️ Data Engineers** — Creating governed semantic pipelines
+- **📊 Knowledge Engineers** — Managing ontologies & KGs at scale
+- **🏢 Enterprise Teams** — Requiring trustworthy AI infrastructure
+- **🛡️ Risk & Compliance Teams** — Needing audit-ready systems  
 
 ---
 
@@ -211,7 +251,7 @@ flowchart TD
 
 -   :material-chef-hat: **Cookbook**
     ---
-    Interactive tutorials, real-world examples, and copy-paste recipes.
+    Interactive tutorials, real-world examples, and **14 domain-specific cookbooks**.
     
     [:arrow_right: Explore Cookbook](cookbook.md)
 
@@ -276,96 +316,46 @@ flowchart TD
 
 ---
 
-## ✨ Core Capabilities
+## 🚦 Quick Example
 
-### 1. 📊 Universal Data Ingestion
+Semantica uses a modular architecture. You can use individual modules directly for maximum flexibility:
 
-Process **50+ file formats** with intelligent semantic extraction:
+```python
+from semantica.ingest import FileIngestor
+from semantica.parse import DocumentParser
+from semantica.semantic_extract import NERExtractor, RelationExtractor
+from semantica.kg import GraphBuilder
 
-<div class="grid cards" markdown>
+# 1. Ingest documents
+ingestor = FileIngestor()
+documents = ingestor.ingest_directory("documents/", recursive=True)
 
--   __📄 Documents__
-    ---
-    - PDF (with OCR)
-    - DOCX, XLSX, PPTX
-    - TXT, RTF, ODT
-    - EPUB, LaTeX, Markdown
+# 2. Parse documents
+parser = DocumentParser()
+parsed_docs = [parser.parse_document(doc) for doc in documents]
 
--   __🌐 Web & Feeds__
-    ---
-    - HTML, XHTML, XML
-    - RSS, Atom feeds
-    - JSON-LD, RDFa
-    - Web scraping
+# 3. Extract entities and relationships
+ner = NERExtractor()
+rel_extractor = RelationExtractor()
 
--   __💾 Structured Data__
-    ---
-    - JSON, YAML, TOML
-    - CSV, TSV, Excel
-    - Parquet, Avro, ORC
-    - SQL/NoSQL databases
+entities = []
+relationships = []
+for doc in parsed_docs:
+    text = doc.get("full_text", "")
+    doc_entities = ner.extract_entities(text)
+    doc_rels = rel_extractor.extract_relations(text, entities=doc_entities)
+    entities.extend(doc_entities)
+    relationships.extend(doc_rels)
 
--   __📧 Communication__
-    ---
-    - EML, MSG, MBOX
-    - PST archives
-    - Email threads
-    - Attachment extraction
+# 4. Build knowledge graph
+builder = GraphBuilder(merge_entities=True)
+kg = builder.build_graph(entities=entities, relationships=relationships)
 
--   __🗜️ Archives__
-    ---
-    - ZIP, TAR, RAR, 7Z
-    - Recursive processing
-    - Multi-level extraction
+print(f"Created graph with {len(kg.nodes)} nodes and {len(kg.edges)} edges")
+```
 
--   __🔬 Scientific__
-    ---
-    - BibTeX, EndNote, RIS
-    - JATS XML
-    - PubMed formats
-    - Citation networks
-
-</div>
-
-### 2. 🧠 Semantic Intelligence Engine
-
-Transform raw text into structured semantic knowledge with state-of-the-art NLP and AI models:
-
-- **Named Entity Recognition (NER)**: Extract people, organizations, locations, dates, and custom entities
-- **Relationship Extraction**: Identify semantic, temporal, and causal relationships
-- **Event Detection**: Detect and classify events (acquisitions, partnerships, announcements)
-- **Coreference Resolution**: Resolve pronouns and entity mentions across documents
-- **Triplet Extraction**: Generate RDF triplets for knowledge graph construction
-
-### 3. 🕸️ Knowledge Graph Construction
-
-Build production-ready knowledge graphs with:
-
-- **Automatic Entity Resolution**: Merge duplicate entities with fuzzy matching
-- **Conflict Detection & Resolution**: Handle contradictory information from multiple sources
-- **Temporal Knowledge Graphs**: Track changes over time with version history
-- **Graph Analytics**: Centrality, community detection, path finding
-- **Multi-Format Export**: Neo4j, RDF, JSON-LD, GraphML
-
-### 4. 📚 Ontology Generation & Management
-
-Generate formal ontologies automatically using a **6-stage LLM-based pipeline**:
-
-1. **Semantic Network Parsing** → Extract domain concepts
-2. **YAML-to-Definition** → Transform into class definitions
-3. **Definition-to-Types** → Map to OWL types
-4. **Hierarchy Generation** → Build taxonomic structures
-5. **TTL Generation** → Generate OWL/Turtle syntax
-6. **Symbolic Validation** → HermiT/Pellet reasoning (F1 up to 0.99)
-
-### 5. 🔍 Hybrid Search & Retrieval
-
-Power GraphRAG applications with:
-
-- **Vector Search**: Semantic similarity using embeddings
-- **Graph Traversal**: Multi-hop reasoning for context expansion
-- **Hybrid Retrieval**: Combine vector + graph for improved accuracy
-- **Temporal Queries**: Query knowledge at specific time points
+!!! tip "Orchestration Option"
+    For complex workflows, you can also use the `Semantica` class for orchestration. See the [Core Module](reference/core.md) documentation for details.
 
 ---
 
@@ -373,7 +363,7 @@ Power GraphRAG applications with:
 
 <div class="grid cards" markdown>
 
--   **🆓 100% Open Source**
+-   **🆓 Open Source**
     ---
     MIT licensed. No vendor lock-in. Full transparency.
 
@@ -414,42 +404,29 @@ Power GraphRAG applications with:
 
 ---
 
-## 🚦 Quick Example
-
-```python
-from semantica.core import Semantica
-
-# Initialize
-core = Semantica()
-
-# Ingest documents
-docs = core.ingest.load("documents/", recursive=True)
-
-# Build knowledge graph
-kg = core.kg.build_graph(docs, merge_entities=True)
-
-# Query
-result = kg.query("Who founded Apple Inc.?")
-print(result.answer)  # Steve Jobs, Steve Wozniak, Ronald Wayne
-print(result.confidence)  # 0.98
-```
-
----
-
-## � Learn More
+## 📚 Learn More
 
 - [Getting Started Guide](getting-started.md) - Your first knowledge graph in 5 minutes
 - [Core Concepts](concepts.md) - Deep dive into knowledge graphs and ontologies
-- [Cookbook](cookbook.md) - Real-world examples and tutorials
+- [Cookbook](cookbook.md) - Real-world examples and **14 domain-specific cookbooks**
 - [API Reference](reference/core.md) - Complete technical documentation
 
----
+### 🍳 Recommended Cookbook Tutorials
 
-<div align="center">
+Get hands-on with interactive Jupyter notebooks:
 
-**Ready to transform your data into knowledge?**
+- **[Welcome to Semantica](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/introduction/01_Welcome_to_Semantica.ipynb)**: Comprehensive introduction to all Semantica modules
+  - **Topics**: Framework overview, all modules, architecture
+  - **Difficulty**: Beginner
+  - **Use Cases**: First-time users, understanding the framework
 
-[Get Started Now](getting-started.md){ .md-button .md-button--primary }
-[Join Discord](https://discord.gg/semantica){ .md-button }
+- **[Your First Knowledge Graph](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/introduction/08_Your_First_Knowledge_Graph.ipynb)**: Build your first knowledge graph from scratch
+  - **Topics**: Entity extraction, relationship extraction, graph construction
+  - **Difficulty**: Beginner
+  - **Use Cases**: Learning the basics, quick start
 
-</div>
+- **[GraphRAG Complete](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/use_cases/advanced_rag/01_GraphRAG_Complete.ipynb)**: Production-ready Graph Retrieval Augmented Generation
+  - **Topics**: GraphRAG, hybrid retrieval, vector search, graph traversal
+  - **Difficulty**: Advanced
+  - **Use Cases**: Building AI applications with knowledge graphs
+

@@ -26,6 +26,9 @@ class GraphReasoner:
         """
         self.logger = get_logger("graph_reasoner")
         self.progress_tracker = get_progress_tracker()
+        # Ensure progress tracker is enabled
+        if not self.progress_tracker.enabled:
+            self.progress_tracker.enabled = True
         
         self.core = core
         # Priority: config arg -> core.config -> kwargs

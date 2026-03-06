@@ -84,12 +84,13 @@ class DOCXParser:
         self.config = config
         self.progress_tracker = get_progress_tracker()
 
-    def parse(self, file_path: Union[str, Path], **options) -> Dict[str, Any]:
+    def parse(self, file_path: Union[str, Path], pipeline_id: Optional[str] = None, **options) -> Dict[str, Any]:
         """
         Parse DOCX document.
 
         Args:
             file_path: Path to DOCX file
+            pipeline_id: Optional pipeline ID for progress tracking
             **options: Parsing options:
                 - extract_formatting: Whether to extract formatting (default: False)
                 - extract_tables: Whether to extract tables (default: True)
@@ -106,6 +107,7 @@ class DOCXParser:
             module="parse",
             submodule="DOCXParser",
             message=f"DOCX: {file_path.name}",
+            pipeline_id=pipeline_id,
         )
 
         try:

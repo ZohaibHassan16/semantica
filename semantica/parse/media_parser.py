@@ -215,7 +215,7 @@ class MediaParser:
                         else None,
                     }
                 )
-        except ImportError:
+        except (ImportError, OSError):
             self.logger.warning("mutagen not available for audio metadata extraction")
         except Exception as e:
             self.logger.warning(f"Failed to extract audio metadata: {e}")

@@ -18,6 +18,12 @@ Algorithms Used:
     - Large Language Models: GPT, Claude, Gemini for structured triplet extraction
     - RDF Serialization: Graph serialization algorithms (Turtle, N-Triples, JSON-LD)
     - URI Normalization: String normalization and URI formatting algorithms
+    - Weighted Confidence Scoring:
+        * Formula: Score = (0.5 * Method_Confidence) + (0.5 * Type_Similarity_Score)
+        * Method_Confidence: Confidence score from the extraction algorithm
+        * Type_Similarity_Score: Semantic match with user-provided triplet types (Exact=1.0, Synonym=0.95, Embedding=Cosine_Sim)
+    - Hybrid Similarity Matching: Exact -> Synonym -> Substring -> Semantic Embedding (Batch Optimized)
+    - Last Resort Fallback: Relation-to-Triplet conversion when all other methods fail
 
 Key Features:
     - Multiple extraction methods:
@@ -26,6 +32,7 @@ Key Features:
         * HuggingFace: Custom HuggingFace triplet models
         * LLM-based: LLM-powered triplet extraction
     - Fallback chain support: Try methods in order until one succeeds
+    - Robust Fallbacks: Prevents empty results via Primary -> Relation-to-Triplet -> Pattern chain
     - RDF triplet generation from entities and relations
     - Subject-predicate-object extraction
     - Triplet validation and quality checking
@@ -99,6 +106,7 @@ class TripletExtractor:
     def __init__(
         self,
         method: Union[str, List[str]] = "pattern",
+        triplet_types: Optional[List[str]] = None,
         include_temporal: bool = False,
         include_provenance: bool = False,
         config=None,
@@ -114,6 +122,7 @@ class TripletExtractor:
                 - "huggingface": HuggingFace model
                 - "llm": LLM-based extraction
                 - List of methods for fallback chain
+            triplet_types: Specific triplet types/predicates to extract (e.g., ["foundedBy", "locatedIn"])
             include_temporal: Whether to include temporal information in triplets
             include_provenance: Whether to track source sentences for provenance
             config: Legacy config dict (deprecated, use kwargs)
@@ -130,15 +139,26 @@ class TripletExtractor:
         self.config = config or {}
         self.config.update(kwargs)
         self.progress_tracker = get_progress_tracker()
+        # Ensure progress tracker is enabled
+        if not self.progress_tracker.enabled:
+            self.progress_tracker.enabled = True
+
+        if method is not None:
+            self.config["ner_method"] = method
+            self.config["relation_method"] = method
+
+        self._ner_extractor = None
+        self._relation_extractor = None
 
         # Store parameters
+        self.triplet_types = triplet_types
         self.include_temporal = include_temporal
         self.include_provenance = include_provenance
 
         # Method configuration
         self.method = method if isinstance(method, list) else [method]
         self.min_confidence = self.config.get("min_confidence", 0.5)
-        self.validate_triplets = self.config.get("validate", True)
+        self._should_validate = self.config.get("validate", True)
 
         self.triplet_validator = TripletValidator(**self.config.get("validator", {}))
         self.rdf_serializer = RDFSerializer(**self.config.get("serializer", {}))
@@ -146,13 +166,164 @@ class TripletExtractor:
 
         self.supported_formats = ["turtle", "ntriples", "jsonld", "xml"]
 
+    def extract(
+        self,
+        text: Union[str, List[str], List[Dict[str, Any]]],
+        entities: Optional[Union[List[Entity], List[List[Entity]]]] = None,
+        relations: Optional[Union[List[Relation], List[List[Relation]]]] = None,
+        pipeline_id: Optional[str] = None,
+        **kwargs
+    ) -> Union[List[Triplet], List[List[Triplet]]]:
+        """
+        Extract triplets from text or list of documents.
+        Handles batch processing with progress tracking.
+
+        Args:
+            text: Input text or list of documents
+            entities: Optional pre-extracted entities (single list or list of lists)
+            relations: Optional pre-extracted relations (single list or list of lists)
+            pipeline_id: Optional pipeline ID for progress tracking
+            **kwargs: Extraction options
+
+        Returns:
+            Union[List[Triplet], List[List[Triplet]]]: Extracted triplets
+        """
+        if isinstance(text, list):
+            # Handle batch extraction with progress tracking
+            tracking_id = self.progress_tracker.start_tracking(
+                module="semantic_extract",
+                submodule="TripletExtractor",
+                message=f"Batch extracting triplets from {len(text)} documents",
+                pipeline_id=pipeline_id,
+            )
+
+            try:
+                results = [None] * len(text)
+                total_items = len(text)
+                total_triplets_count = 0
+                processed_count = 0
+                
+                # Determine update interval
+                if total_items <= 10:
+                    update_interval = 1
+                else:
+                    update_interval = max(1, min(10, total_items // 100))
+                
+                # Initial progress update
+                self.progress_tracker.update_progress(
+                    tracking_id,
+                    processed=0,
+                    total=total_items,
+                    message=f"Starting batch extraction... 0/{total_items}"
+                )
+
+                from .config import resolve_max_workers
+                max_workers = resolve_max_workers(
+                    explicit=kwargs.get("max_workers"),
+                    local_config=self.config,
+                    methods=self.method,
+                )
+
+                def process_item(idx, item):
+                    try:
+                        # Prepare arguments for single item
+                        doc_text = item["content"] if isinstance(item, dict) and "content" in item else str(item)
+                        
+                        doc_entities = None
+                        if entities and isinstance(entities, list) and idx < len(entities):
+                            doc_entities = entities[idx]
+                        
+                        doc_relations = None
+                        if relations and isinstance(relations, list) and idx < len(relations):
+                            doc_relations = relations[idx]
+
+                        # Extract
+                        current_triplets = self.extract_triplets(
+                            doc_text, 
+                            entities=doc_entities, 
+                            relations=doc_relations, 
+                            **kwargs
+                        )
+
+                        # Add provenance metadata
+                        for triplet in current_triplets:
+                            if triplet.metadata is None:
+                                triplet.metadata = {}
+                            triplet.metadata["batch_index"] = idx
+                            if isinstance(item, dict) and "id" in item:
+                                triplet.metadata["document_id"] = item["id"]
+                        
+                        return idx, current_triplets
+                    except Exception as e:
+                        self.logger.warning(f"Failed to process item {idx}: {e}")
+                        return idx, []
+
+                if max_workers > 1:
+                    import concurrent.futures
+                    
+                    with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
+                        # Submit tasks
+                        future_to_idx = {
+                            executor.submit(process_item, idx, item): idx 
+                            for idx, item in enumerate(text)
+                        }
+                        
+                        for future in concurrent.futures.as_completed(future_to_idx):
+                            idx, triplets = future.result()
+                            results[idx] = triplets
+                            total_triplets_count += len(triplets)
+                            processed_count += 1
+                            
+                            if processed_count % update_interval == 0 or processed_count == total_items:
+                                remaining = total_items - processed_count
+                                self.progress_tracker.update_progress(
+                                    tracking_id,
+                                    processed=processed_count,
+                                    total=total_items,
+                                    message=f"Processing... {processed_count}/{total_items} (remaining: {remaining}) - Extracted {total_triplets_count} triplets"
+                                )
+                else:
+                    # Sequential processing
+                    for idx, item in enumerate(text):
+                        _, triplets = process_item(idx, item)
+                        results[idx] = triplets
+                        total_triplets_count += len(triplets)
+                        processed_count += 1
+                        
+                        if processed_count % update_interval == 0 or processed_count == total_items:
+                            remaining = total_items - processed_count
+                            self.progress_tracker.update_progress(
+                                tracking_id,
+                                processed=processed_count,
+                                total=total_items,
+                                message=f"Processing... {processed_count}/{total_items} (remaining: {remaining}) - Extracted {total_triplets_count} triplets"
+                            )
+
+                self.progress_tracker.stop_tracking(
+                    tracking_id,
+                    status="completed",
+                    message=f"Batch extraction completed. Processed {len(results)} documents, extracted {total_triplets_count} triplets.",
+                )
+                return results
+
+            except Exception as e:
+                self.progress_tracker.stop_tracking(
+                    tracking_id, status="failed", message=str(e)
+                )
+                raise
+
+        else:
+            # Single item
+            return self.extract_triplets(text, entities=entities, relations=relations, **kwargs)
+
     def extract_triplets(
         self,
-        text: str,
-        entities: Optional[List[Entity]] = None,
-        relations: Optional[List[Relation]] = None,
+        text: Union[str, List[str], List[Dict[str, Any]]],
+        entities: Optional[Union[List[Entity], List[List[Entity]]]] = None,
+        relations: Optional[Union[List[Relation], List[List[Relation]]]] = None,
+        pipeline_id: Optional[str] = None,
         **options,
-    ) -> List[Triplet]:
+    ) -> Union[List[Triplet], List[List[Triplet]]]:
         """
         Extract RDF triplets from text.
 
@@ -160,11 +331,29 @@ class TripletExtractor:
             text: Input text
             entities: Pre-extracted entities (optional)
             relations: Pre-extracted relations (optional)
+            pipeline_id: Optional pipeline ID for progress tracking (batch mode)
             **options: Extraction options
 
         Returns:
             list: List of extracted triplets
         """
+        if isinstance(text, list):
+            entities_batch = entities
+            if entities is not None and isinstance(entities, list) and (not entities or all(isinstance(e, Entity) for e in entities)):
+                entities_batch = [entities for _ in range(len(text))] if entities else [[] for _ in range(len(text))]
+
+            relations_batch = relations
+            if relations is not None and isinstance(relations, list) and (not relations or all(isinstance(r, Relation) for r in relations)):
+                relations_batch = [relations for _ in range(len(text))] if relations else [[] for _ in range(len(text))]
+
+            return self.extract(
+                text,
+                entities=entities_batch,
+                relations=relations_batch,
+                pipeline_id=pipeline_id,
+                **options,
+            )
+
         from .methods import get_triplet_method
 
         tracking_id = self.progress_tracker.start_tracking(
@@ -177,45 +366,109 @@ class TripletExtractor:
             from .ner_extractor import NERExtractor
             from .relation_extractor import RelationExtractor
 
-            # Extract entities if not provided
-            if entities is None:
-                self.progress_tracker.update_tracking(
-                    tracking_id, message="Extracting entities..."
-                )
-                ner = NERExtractor(**self.config.get("ner", {}))
-                entities = ner.extract_entities(text)
-
-            # Extract relations if not provided
-            if relations is None:
-                self.progress_tracker.update_tracking(
-                    tracking_id, message="Extracting relations..."
-                )
-                rel_extractor = RelationExtractor(**self.config.get("relation", {}))
-                relations = rel_extractor.extract_relations(text, entities)
-
             # Use method-based extraction
             methods = options.get("method", self.method)
             if isinstance(methods, str):
                 methods = [methods]
 
+            # Determine if we need to extract entities/relations based on method
+            # HuggingFace (Seq2Seq) does not need pre-extracted entities/relations
+            needs_entities_relations = any(m not in ["huggingface"] for m in methods)
+
+            # Extract entities if not provided
+            if entities is None and needs_entities_relations:
+                self.progress_tracker.update_tracking(
+                    tracking_id, message="Extracting entities..."
+                )
+                if self._ner_extractor is None:
+                    ner_config = self.config.get("ner", {})
+                    if "ner_method" in self.config:
+                        ner_config = {**ner_config, "method": self.config["ner_method"]}
+                    
+                    # Filter out 'model' and 'huggingface_model' from shared config
+                    # to prevent passing triplet model to NER extractor
+                    shared_config = {
+                        k: v
+                        for k, v in self.config.items()
+                        if k not in ["ner", "relation", "validator", "serializer", "quality", "model", "huggingface_model"]
+                    }
+
+                    self._ner_extractor = NERExtractor(
+                        **ner_config,
+                        **shared_config,
+                    )
+                entities = self._ner_extractor.extract_entities(text)
+
+            # Extract relations if not provided
+            if relations is None and needs_entities_relations:
+                self.progress_tracker.update_tracking(
+                    tracking_id, message="Extracting relations..."
+                )
+                if self._relation_extractor is None:
+                    rel_config = self.config.get("relation", {})
+                    if "relation_method" in self.config:
+                        rel_config = {**rel_config, "method": self.config["relation_method"]}
+                    
+                    # Filter out 'model' and 'huggingface_model' from shared config
+                    shared_config = {
+                        k: v
+                        for k, v in self.config.items()
+                        if k not in ["ner", "relation", "validator", "serializer", "quality", "model", "huggingface_model"]
+                    }
+
+                    self._relation_extractor = RelationExtractor(
+                        **rel_config,
+                        **shared_config,
+                    )
+                relations = self._relation_extractor.extract_relations(text, entities)
+
+            triplet_types = options.get("triplet_types", self.triplet_types)
+            
             # Merge config with options
             all_options = {**self.config, **options}
 
             # Try each method in order (fallback chain)
             all_triplets = []
-            for method_name in methods:
+            total_methods = len(methods)
+            if total_methods <= 10:
+                method_update_interval = 1  # Update every method for small datasets
+            else:
+                method_update_interval = max(1, min(5, total_methods // 20))
+            
+            # Initial progress update for methods
+            remaining_methods = total_methods
+            self.progress_tracker.update_progress(
+                tracking_id,
+                processed=0,
+                total=total_methods,
+                message=f"Starting triplet extraction... 0/{total_methods} methods (remaining: {remaining_methods})"
+            )
+            
+            for method_idx, method_name in enumerate(methods, 1):
                 try:
-                    self.progress_tracker.update_tracking(
+                    remaining_methods = total_methods - method_idx
+                    self.progress_tracker.update_progress(
                         tracking_id,
-                        message=f"Extracting triplets using {method_name}...",
+                        processed=method_idx,
+                        total=total_methods,
+                        message=f"Extracting triplets using {method_name}... ({method_idx}/{total_methods}, remaining: {remaining_methods} methods)"
                     )
                     method_func = get_triplet_method(method_name)
 
                     # Prepare method-specific options
                     method_options = all_options.copy()
+                    
+                    # Pass triplet_types to all methods
+                    if triplet_types:
+                        method_options["triplet_types"] = triplet_types
+
                     if method_name == "huggingface":
-                        method_options["model"] = all_options.get(
-                            "huggingface_model", all_options.get("model")
+                        # Prioritize runtime options over config/defaults
+                        method_options["model"] = (
+                            options.get("huggingface_model") 
+                            or options.get("model")
+                            or self.config.get("huggingface_model") 
+                            or self.config.get("model")
                         )
                         method_options["device"] = all_options.get("device")
                     elif method_name == "llm":
@@ -225,6 +478,27 @@ class TripletExtractor:
                         method_options["model"] = all_options.get(
                             "llm_model", all_options.get("model")
                         )
+                        # Ensure api_key is populated: check explicitly provided or fallback to env
+                        current_key = method_options.get("api_key")
+                        if not current_key:
+                            # Not found or empty/None, try environment
+                            import os
+                            provider_name = method_options.get("provider", "openai")
+                            env_key = f"{provider_name.upper()}_API_KEY"
+                            api_key = os.getenv(env_key)
+                            if api_key:
+                                method_options["api_key"] = api_key
+
+                    # Print progress if verbose mode is enabled (only for LLM method to avoid spam)
+                    verbose_mode = options.get("verbose", False) or self.config.get("verbose", False)
+                    if verbose_mode and method_name == "llm":
+                        import sys
+                        print(f"    [TripletExtractor] Processing with {method_name}...", flush=True, file=sys.stdout)
+                        if "api_key" in method_options:
+                             masked = method_options["api_key"][:4] + "..." if method_options["api_key"] else "None"
+                             print(f"    [TripletExtractor Debug] api_key present: {masked}", flush=True, file=sys.stdout)
+                        else:
+                             print(f"    [TripletExtractor Debug] api_key NOT present", flush=True, file=sys.stdout)
 
                     triplets = method_func(
                         text,
@@ -232,6 +506,25 @@ class TripletExtractor:
                         relations=relations,
                         **method_options,
                     )
+
+                    # Print result count if verbose (only for LLM method)
+                    if verbose_mode and method_name == "llm" and len(triplets) > 0:
+                        import sys
+                        print(f"    [TripletExtractor] Extracted {len(triplets)} triplets", flush=True, file=sys.stdout)
+
+                    # Apply weighted scoring if triplet_types are provided
+                    if triplet_types:
+                        try:
+                            from .methods import calculate_weighted_confidence
+                            for t in triplets:
+                                t.confidence = calculate_weighted_confidence(
+                                    item_type=t.predicate,
+                                    original_confidence=t.confidence,
+                                    valid_types=triplet_types,
+                                    item_text=t.predicate # For triplets, predicate is the key text
+                                )
+                        except ImportError:
+                            pass
 
                     # Filter by confidence
                     min_conf = options.get("min_confidence", self.min_confidence)
@@ -243,7 +536,7 @@ class TripletExtractor:
                         # If not using ensemble, return first successful result
                         if len(methods) == 1:
                             result = filtered
-                            if options.get("validate", self.validate_triplets):
+                            if options.get("validate", self._should_validate):
                                 result = self.triplet_validator.validate_triplets(result)
                             self.progress_tracker.stop_tracking(
                                 tracking_id,
@@ -254,6 +547,12 @@ class TripletExtractor:
 
                 except Exception as e:
                     self.logger.warning(f"Method {method_name} failed: {e}")
+                    verbose_mode = options.get("verbose", False) or self.config.get("verbose", False)
+                    if verbose_mode:
+                        import sys
+                        print(f"    [TripletExtractor] ERROR: Method {method_name} failed: {e}", flush=True, file=sys.stderr)
+                        import traceback
+                        traceback.print_exc(file=sys.stderr)
                     continue
 
             # Use first successful method or fallback to relation conversion
@@ -261,23 +560,32 @@ class TripletExtractor:
                 triplets = all_triplets[0][1]
             else:
                 # Fallback: Convert relations to triplets
-                self.progress_tracker.update_tracking(
-                    tracking_id,
-                    message=f"Converting {len(relations)} relations to triplets...",
-                )
-                triplets = []
-                for relation in relations:
-                    triplet = Triplet(
-                        subject=self._format_uri(relation.subject.text),
-                        predicate=self._format_uri(relation.predicate),
-                        object=self._format_uri(relation.object.text),
-                        confidence=relation.confidence,
-                        metadata={"context": relation.context, **relation.metadata},
+                if relations:
+                    self.progress_tracker.update_tracking(
+                        tracking_id,
+                        message=f"Converting {len(relations)} relations to triplets...",
                     )
-                    triplets.append(triplet)
+                    triplets = []
+                    for relation in relations:
+                        triplet = Triplet(
+                            subject=self._format_uri(relation.subject.text),
+                            predicate=self._format_uri(relation.predicate),
+                            object=self._format_uri(relation.object.text),
+                            confidence=relation.confidence,
+                            metadata={"context": relation.context, **relation.metadata},
+                        )
+                        triplets.append(triplet)
+                else:
+                    # Last resort: Try rule-based extraction if no relations exist
+                    self.progress_tracker.update_tracking(
+                        tracking_id,
+                        message="No relations found. Trying rule-based triplet extraction...",
+                    )
+                    method_func = get_triplet_method("rules")
+                    triplets = method_func(text, entities=entities, relations=[], **all_options)
 
             # Validate triplets
-            if options.get("validate", self.validate_triplets):
+            if options.get("validate", self._should_validate):
                 self.progress_tracker.update_tracking(
                     tracking_id, message="Validating triplets..."
                 )
@@ -308,14 +616,18 @@ class TripletExtractor:
 
     def validate_triplets(self, triplets: List[Triplet], **criteria) -> List[Triplet]:
         """
-        Validate triplet quality and consistency.
+        Validate triplet quality and consistency using the internal validator.
 
         Args:
-            triplets: List of triplets
-            **criteria: Validation criteria
+            triplets: List of triplets to validate
+            **criteria: Validation criteria (e.g., min_confidence=0.5)
 
         Returns:
-            list: Validated triplets
+            List[Triplet]: List of validated triplets that meet the criteria
+            
+        Example:
+            >>> extractor = TripletExtractor()
+            >>> validated = extractor.validate_triplets(triplets, min_confidence=0.8)
         """
         return self.triplet_validator.validate_triplets(triplets, **criteria)
 
@@ -346,7 +658,65 @@ class TripletExtractor:
         Returns:
             list: List of triplet lists for each text
         """
-        return [self.extract_triplets(text, **options) for text in texts]
+        tracking_id = self.progress_tracker.start_tracking(
+            module="semantic_extract",
+            submodule="TripletExtractor",
+            message=f"Batch extracting triplets from {len(texts)} documents",
+        )
+        
+        results = []
+        total_triplets_count = 0
+        total_items = len(texts)
+        
+        try:
+            # Determine update interval
+            if total_items <= 10:
+                update_interval = 1
+            else:
+                update_interval = max(1, min(10, total_items // 100))
+                
+            for idx, text in enumerate(texts, 1):
+                # Extract triplets
+                triplets = self.extract_triplets(text, **options)
+                
+                # Add provenance metadata
+                for triplet in triplets:
+                    if triplet.metadata is None:
+                        triplet.metadata = {}
+                    triplet.metadata["batch_index"] = idx - 1
+
+                results.append(triplets)
+                total_triplets_count += len(triplets)
+                
+                # Update progress
+                should_update = (
+                    idx % update_interval == 0 or 
+                    idx == total_items or 
+                    idx == 1 or
+                    total_items <= 10
+                )
+                
+                if should_update:
+                    remaining = total_items - idx
+                    self.progress_tracker.update_progress(
+                        tracking_id,
+                        processed=idx,
+                        total=total_items,
+                        message=f"Processing documents... {idx}/{total_items} (remaining: {remaining}) - Extracted {total_triplets_count} triplets so far"
+                    )
+            
+            self.progress_tracker.stop_tracking(
+                tracking_id,
+                status="completed",
+                message=f"Batch extraction completed. Processed {len(results)} documents, extracted {total_triplets_count} triplets.",
+            )
+            return results
+            
+        except Exception as e:
+            self.progress_tracker.stop_tracking(
+                tracking_id, status="failed", message=str(e)
+            )
+            raise
 
 
 class TripletValidator:
@@ -391,27 +761,6 @@ class TripletValidator:
             list: Valid triplets
         """
         return [t for t in triplets if self.validate_triplet(t, **criteria)]
-
-    def check_triplet_consistency(self, triplets: List[Triplet]) -> Dict[str, Any]:
-        """
-        Check consistency among triplets.
-
-        Args:
-            triplets: List of triplets
-
-        Returns:
-            dict: Consistency report
-        """
-        issues = []
-
-        # Check for contradictory triplets
-        # (simplified - would need domain knowledge for full implementation)
-
-        return {
-            "total_triplets": len(triplets),
-            "issues": issues,
-            "consistent": len(issues) == 0,
-        }
 
 
 class RDFSerializer:

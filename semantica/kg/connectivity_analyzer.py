@@ -5,24 +5,44 @@ This module provides comprehensive connectivity analysis capabilities for the
 Semantica framework, enabling analysis of graph connectivity, path finding,
 and structural properties.
 
+Supported Algorithms:
+    - Connectivity analysis: Determine if graph is connected or disconnected
+    - Connected components detection: Find all connected components using DFS
+    - Shortest path calculation: BFS-based shortest path finding
+    - Bridge edge identification: Find critical edges whose removal disconnects graph
+    - Graph density calculation: Measure graph connectivity and sparsity
+    - Degree statistics: Analyze node degree distributions
+
 Key Features:
-    - Graph connectivity analysis (connected/disconnected)
-    - Connected components detection (DFS-based)
-    - Shortest path calculation (BFS-based)
-    - Bridge edge identification (edges whose removal disconnects graph)
-    - Connectivity metrics (density, degree statistics)
-    - Graph structure classification
+    - Comprehensive connectivity analysis with multiple metrics
+    - Connected components detection and analysis
+    - Bridge edge identification for network robustness
+    - Shortest path calculation with source/target options
+    - Graph density and degree statistics
+    - Graph structure classification and properties
     - NetworkX integration with fallback implementations
+    - Scalable algorithms for large graphs
 
 Main Classes:
-    - ConnectivityAnalyzer: Main connectivity analysis engine
+    - ConnectivityAnalyzer: Comprehensive connectivity analysis engine
+
+Methods:
+    - analyze_connectivity(): Main interface for connectivity analysis
+    - find_connected_components(): Detect and analyze connected components
+    - calculate_shortest_paths(): Find shortest paths between nodes
+    - identify_bridges(): Find critical bridge edges
+    - calculate_graph_density(): Compute graph density metrics
+    - analyze_degree_statistics(): Analyze node degree distributions
+    - classify_graph_structure(): Classify graph by structural properties
 
 Example Usage:
     >>> from semantica.kg import ConnectivityAnalyzer
     >>> analyzer = ConnectivityAnalyzer()
     >>> connectivity = analyzer.analyze_connectivity(graph)
+    >>> components = analyzer.find_connected_components(graph)
     >>> paths = analyzer.calculate_shortest_paths(graph, source="A", target="B")
     >>> bridges = analyzer.identify_bridges(graph)
+    >>> density = analyzer.calculate_graph_density(graph)
 
 Author: Semantica Contributors
 License: MIT
@@ -75,17 +95,20 @@ class ConnectivityAnalyzer:
 
         # Initialize progress tracker
         self.progress_tracker = get_progress_tracker()
+        # Ensure progress tracker is enabled
+        if not self.progress_tracker.enabled:
+            self.progress_tracker.enabled = True
         self.analysis_config = config.get("analysis_config", {})
         self.config = config
 
         # Try to use networkx if available (optional dependency)
-        try:
-            import networkx as nx
-
-            self.nx = nx
+        from ..utils.helpers import safe_import
+        networkx, nx_available = safe_import("networkx")
+        if nx_available:
+            self.nx = networkx
             self.use_networkx = True
             self.logger.debug("NetworkX available, using optimized implementations")
-        except ImportError:
+        else:
             self.nx = None
             self.use_networkx = False
             self.logger.warning("NetworkX not available, using basic implementations")
@@ -371,12 +394,34 @@ class ConnectivityAnalyzer:
         elif hasattr(graph, "get_relationships"):
             relationships = graph.get_relationships()
         elif isinstance(graph, dict):
-            relationships = graph.get("relationships", [])
+            relationships = graph.get("relationships", graph.get("edges", []))
 
         # Build adjacency
         for rel in relationships:
+            # Handle tuple/list edges (e.g., from NetworkX)
+            if isinstance(rel, (tuple, list)) and len(rel) >= 2:
+                source, target = str(rel[0]), str(rel[1])
+                if source and target:
+                    if target not in adjacency[source]:
+                        adjacency[source].append(target)
+                    if source not in adjacency[target]:
+                        adjacency[target].append(source)
+                continue
             source = rel.get("source") or rel.get("subject")
             target = rel.get("target") or rel.get("object")
+
+            # Extract IDs if objects are passed
+            if source and not isinstance(source, (str, int, float)):
+                if isinstance(source, dict):
+                    source = source.get("id") or source.get("entity_id") or source.get("text") or str(source)
+                else:
+                    source = getattr(source, "id", getattr(source, "text", str(source)))
+            
+            if target and not isinstance(target, (str, int, float)):
+                if isinstance(target, dict):
+                    target = target.get("id") or target.get("entity_id") or target.get("text") or str(target)
+                else:
+                    target = getattr(target, "id", getattr(target, "text", str(target)))
 
             if source and target:
                 if target not in adjacency[source]:

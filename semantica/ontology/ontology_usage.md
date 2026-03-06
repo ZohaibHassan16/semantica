@@ -42,6 +42,18 @@ classes = inferrer.infer_classes(entities, build_hierarchy=True)
 properties = prop_gen.infer_properties(entities, relationships, classes)
 ```
 
+### Ingesting Ontologies
+
+```python
+from semantica.ingest import OntologyIngestor
+
+# Create ingestor
+ingestor = OntologyIngestor()
+
+# Ingest ontology
+ontology_data = ingestor.ingest_ontology("ontology.ttl")
+```
+
 ## Ontology Generation
 
 ### Basic Ontology Generation
@@ -113,6 +125,49 @@ ontology = engine.from_data(
     name="CustomOntology",
     build_hierarchy=True,
 )
+```
+
+## Ontology Ingestion
+
+### Basic Ingestion
+
+Ingest existing ontologies from files (Turtle, RDF/XML, JSON-LD, etc.) into `OntologyData` objects.
+
+```python
+from semantica.ontology import ingest_ontology
+
+# Ingest a single file
+ontology_data = ingest_ontology("path/to/ontology.ttl")
+
+print(f"Source: {ontology_data.source_path}")
+print(f"Format: {ontology_data.format}")
+print(f"Data keys: {ontology_data.data.keys()}")
+```
+
+### Ingesting Directories
+
+Ingest all ontology files in a directory recursively.
+
+```python
+from semantica.ontology import ingest_ontology
+
+# Ingest a directory
+ontologies = ingest_ontology("path/to/ontologies_dir/")
+
+for ont in ontologies:
+    print(f"Ingested: {ont.source_path} ({ont.format})")
+```
+
+### Unified Ingestion Interface
+
+You can also use the unified `semantica.ingest` interface.
+
+```python
+from semantica.ingest import ingest
+
+# Ingest as "ontology" source type
+result = ingest("path/to/ontology.ttl", source_type="ontology")
+ontology_data = result["ontology"]
 ```
 
 ## Class Inference

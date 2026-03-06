@@ -6,7 +6,8 @@ supporting multiple configuration sources including environment variables, confi
 and programmatic configuration.
 
 Supported Configuration Sources:
-    - Environment variables: GRAPH_STORE_DEFAULT_BACKEND, GRAPH_STORE_NEO4J_URI, GRAPH_STORE_FALKORDB_HOST, etc.
+    - Environment variables: GRAPH_STORE_DEFAULT_BACKEND,
+      GRAPH_STORE_NEO4J_URI, GRAPH_STORE_FALKORDB_HOST, etc.
     - Config files: YAML, JSON, TOML formats
     - Programmatic: Python API for setting graph store configurations
 
@@ -44,7 +45,11 @@ from ..utils.logging import get_logger
 
 
 class GraphStoreConfig:
-    """Configuration manager for graph store module - supports .env files, environment variables, and programmatic config."""
+    """
+    Configuration manager for graph store module.
+
+    Supports .env files, environment variables, and programmatic config.
+    """
 
     def __init__(self, config_file: Optional[str] = None):
         """
@@ -124,6 +129,18 @@ class GraphStoreConfig:
             "GRAPH_STORE_FALKORDB_PORT": "falkordb_port",
             "GRAPH_STORE_FALKORDB_PASSWORD": "falkordb_password",
             "GRAPH_STORE_FALKORDB_GRAPH_NAME": "falkordb_graph_name",
+            # Amazon Neptune settings
+            "GRAPH_STORE_NEPTUNE_ENDPOINT": "neptune_endpoint",
+            "GRAPH_STORE_NEPTUNE_PORT": "neptune_port",
+            "GRAPH_STORE_NEPTUNE_REGION": "neptune_region",
+            "GRAPH_STORE_NEPTUNE_IAM_AUTH": "neptune_iam_auth",
+            "GRAPH_STORE_NEPTUNE_USE_SSL": "neptune_use_ssl",
+            "AWS_ACCESS_KEY_ID": "neptune_access_key",
+            "AWS_SECRET_ACCESS_KEY": "neptune_secret_key",
+            "AWS_SESSION_TOKEN": "neptune_session_token",
+            # Apache AGE settings
+            "GRAPH_STORE_AGE_CONNECTION_STRING": "age_connection_string",
+            "GRAPH_STORE_AGE_GRAPH_NAME": "age_graph_name",
         }
 
         for env_var, config_key in env_mappings.items():
@@ -135,6 +152,7 @@ class GraphStoreConfig:
                     "timeout",
                     "max_retries",
                     "falkordb_port",
+                    "neptune_port",
                 ]:
                     try:
                         self._config[config_key] = int(value)
@@ -142,7 +160,11 @@ class GraphStoreConfig:
                         self.logger.warning(
                             f"Invalid integer value for {env_var}: {value}"
                         )
-                elif config_key in ["neo4j_encrypted"]:
+                elif config_key in [
+                    "neo4j_encrypted",
+                    "neptune_iam_auth",
+                    "neptune_use_ssl",
+                ]:
                     self._config[config_key] = value.lower() in [
                         "true",
                         "1",
@@ -171,6 +193,18 @@ class GraphStoreConfig:
             "falkordb_port": 6379,
             "falkordb_password": None,
             "falkordb_graph_name": "default",
+            # Amazon Neptune defaults
+            "neptune_endpoint": None,
+            "neptune_port": 8182,
+            "neptune_region": None,
+            "neptune_iam_auth": True,
+            "neptune_use_ssl": True,
+            "neptune_access_key": None,
+            "neptune_secret_key": None,
+            "neptune_session_token": None,
+            # Apache AGE defaults
+            "age_connection_string": "host=localhost dbname=agedb user=postgres password=postgres",
+            "age_graph_name": "semantica",
         }
 
         for key, default_value in defaults.items():
@@ -269,6 +303,36 @@ class GraphStoreConfig:
             "graph_name": self._config.get("falkordb_graph_name"),
         }
 
+    def get_neptune_config(self) -> Dict[str, Any]:
+        """
+        Get Amazon Neptune-specific configuration.
+
+        Returns:
+            Neptune configuration dictionary
+        """
+        return {
+            "endpoint": self._config.get("neptune_endpoint"),
+            "port": self._config.get("neptune_port"),
+            "region": self._config.get("neptune_region"),
+            "iam_auth": self._config.get("neptune_iam_auth"),
+            "use_ssl": self._config.get("neptune_use_ssl"),
+            "access_key": self._config.get("neptune_access_key"),
+            "secret_key": self._config.get("neptune_secret_key"),
+            "session_token": self._config.get("neptune_session_token"),
+        }
+
+    def get_age_config(self) -> Dict[str, Any]:
+        """
+        Get Apache AGE-specific configuration.
+
+        Returns:
+            Apache AGE configuration dictionary
+        """
+        return {
+            "connection_string": self._config.get("age_connection_string"),
+            "graph_name": self._config.get("age_graph_name"),
+        }
+
     def reset(self) -> None:
         """Reset configuration to defaults."""
         self._config.clear()
@@ -278,4 +342,3 @@ class GraphStoreConfig:
 
 # Global configuration instance
 graph_store_config = GraphStoreConfig()
-

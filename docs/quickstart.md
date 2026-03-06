@@ -34,214 +34,201 @@ See the [Installation Guide](installation.md) for detailed instructions.
 
 ## Step 2: Your First Knowledge Graph
 
-Let's build a knowledge graph from a document:
+Building a knowledge graph involves these key steps:
 
+1. **Ingest** your documents using `FileIngestor`
+2. **Parse** documents to extract text using `DocumentParser` or `DoclingParser` (for enhanced layout support)
+3. **Extract** entities and relationships using `NERExtractor` and `RelationExtractor`
+4. **Build** the graph using `GraphBuilder`
+5. **Generate** embeddings (optional) using `TextEmbedder`
+
+**Quick Example:**
 ```python
-from semantica.core import Semantica
+from semantica.ingest import FileIngestor
+from semantica.parse import DocumentParser, DoclingParser
+from semantica.semantic_extract import NERExtractor, RelationExtractor
+from semantica.kg import GraphBuilder
 
-# Initialize Semantica
-semantica = Semantica()
+# 1. Ingest document
+ingestor = FileIngestor()
+sources = ingestor.ingest("data/sample.pdf")
 
-# Build knowledge graph from a document
-result = semantica.build_knowledge_base(
-    sources=["document.pdf"],
-    embeddings=True,
-    graph=True
-)
+# 2. Parse (choose your parser)
+# Option A: Standard parser
+parser = DocumentParser()
+parsed_content = parser.parse(sources[0])
 
-# Access results
-kg = result["knowledge_graph"]
-embeddings = result["embeddings"]
-statistics = result["statistics"]
+# Option B: Enhanced Docling parser (recommended for complex tables)
+# docling_parser = DoclingParser()
+# parsed_content = docling_parser.parse(sources[0])
 
-print(f"Extracted {len(kg['entities'])} entities")
-print(f"Created {len(kg['relationships'])} relationships")
-print(f"Generated {len(embeddings)} embeddings")
+# 3. Extract entities and relations
+ner = NERExtractor()
+entities = ner.extract(parsed_content)
+
+relations = RelationExtractor()
+relationships = relations.extract(parsed_content, entities=entities)
+
+# 4. Build graph
+builder = GraphBuilder()
+graph = builder.build(entities=entities, relationships=relationships)
+
+print(f"Built knowledge graph with {len(graph.nodes)} nodes and {len(graph.edges)} edges")
 ```
 
-**Expected Output:**
-```
-Extracted 45 entities
-Created 32 relationships
-Generated 45 embeddings
-```
+**For complete step-by-step examples with detailed explanations, see:**
+- **[Your First Knowledge Graph Cookbook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/introduction/08_Your_First_Knowledge_Graph.ipynb)**: Full tutorial with detailed explanations and expected outputs
+  - **Topics**: Entity extraction, relationship extraction, graph construction, visualization
+  - **Difficulty**: Beginner
+  - **Time**: 20-30 minutes
+  - **Use Cases**: Learning the basics, quick start
 
 ## Step 3: Extract Entities and Relationships
 
-Extract structured information from text:
+The semantic extraction step identifies named entities (people, organizations, locations) and relationships between them from your text.
 
-```python
-from semantica.semantic_extract import NamedEntityRecognizer, RelationExtractor
+**What gets extracted:**
+- **Entities**: People, organizations, locations, dates, and other named entities
+- **Relationships**: Connections between entities (e.g., `founded_by`, `located_in`, `has_ceo`)
 
-# Sample text
-text = """
-Apple Inc. was founded by Steve Jobs in Cupertino, California in 1976.
-The company designs and manufactures consumer electronics and software.
-Tim Cook is the current CEO of Apple.
-"""
+**For detailed examples and different extraction methods, see:**
+- **[Entity Extraction Cookbook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/introduction/05_Entity_Extraction.ipynb)**: Learn different NER methods and configurations
+  - **Topics**: Named entity recognition, entity types, confidence scores
+  - **Difficulty**: Beginner
+  - **Time**: 15-20 minutes
+  - **Use Cases**: Understanding entity extraction options
 
-# Extract entities
-ner = NamedEntityRecognizer()
-entities = ner.extract_entities(text)
-
-print("Extracted Entities:")
-for entity in entities:
-    print(f"  - {entity.text} ({entity.label})")
-
-# Extract relationships
-rel_extractor = RelationExtractor()
-relationships = rel_extractor.extract_relations(text, entities=entities)
-
-print("\nExtracted Relationships:")
-for rel in relationships:
-    print(f"  - {rel.subject.text} --[{rel.predicate}]--> {rel.object.text}")
-```
-
-**Expected Output:**
-```
-Extracted Entities:
-  - Apple Inc. (ORGANIZATION)
-  - Steve Jobs (PERSON)
-  - Cupertino (LOCATION)
-  - California (LOCATION)
-  - Tim Cook (PERSON)
-
-Extracted Relationships:
-  - Apple Inc. --[founded_by]--> Steve Jobs
-  - Apple Inc. --[located_in]--> Cupertino
-  - Apple Inc. --[has_ceo]--> Tim Cook
-```
+- **[Relation Extraction Cookbook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/introduction/06_Relation_Extraction.ipynb)**: Learn to extract relationships between entities
+  - **Topics**: Relationship extraction, dependency parsing, semantic role labeling
+  - **Difficulty**: Beginner
+  - **Time**: 15-20 minutes
+  - **Use Cases**: Building rich knowledge graphs with relationships
 
 ## Step 4: Build Knowledge Graph from Multiple Sources
 
-Combine data from multiple sources:
+You can combine data from multiple sources (files, web, databases) to build a unified knowledge graph. The process involves:
 
-```python
-from semantica.core import Semantica
+1. **Ingest** from multiple sources using different ingestors
+2. **Parse** all documents to extract text
+3. **Extract** entities and relationships from each source
+4. **Build** a unified graph with entity merging enabled
 
-semantica = Semantica()
+**For complete examples with multiple sources, see:**
+- **[Data Ingestion Cookbook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/introduction/02_Data_Ingestion.ipynb)**: Learn to ingest from files, web, feeds, streams, and databases
+  - **Topics**: File, web, feed, stream, database ingestion
+  - **Difficulty**: Beginner
+  - **Time**: 15-20 minutes
+  - **Use Cases**: Loading data from various sources
 
-# Multiple data sources
-sources = [
-    "documents/research_paper.pdf",
-    "documents/company_report.docx",
-    "https://example.com/news-article"
-]
-
-# Build unified knowledge graph
-result = semantica.build_knowledge_base(
-    sources=sources,
-    embeddings=True,
-    graph=True,
-    normalize=True
-)
-
-kg = result["knowledge_graph"]
-
-# Analyze the graph
-print(f"Total entities: {len(kg['entities'])}")
-print(f"Total relationships: {len(kg['relationships'])}")
-print(f"Sources processed: {len(result['metadata']['sources'])}")
-```
+- **[Multi-Source Data Integration Cookbook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/advanced/06_Multi_Source_Data_Integration.ipynb)**: Advanced patterns for integrating multiple data sources
+  - **Topics**: Multi-source integration, entity resolution, conflict handling
+  - **Difficulty**: Intermediate
+  - **Time**: 30-45 minutes
+  - **Use Cases**: Building knowledge graphs from diverse data sources
 
 ## Step 5: Visualize Your Knowledge Graph
 
-Visualize the knowledge graph you created:
+Visualization helps you understand and explore your knowledge graph structure. Semantica supports multiple visualization formats including interactive HTML, static images, and export formats.
 
-```python
-from semantica.core import Semantica
-from semantica.visualization import KGVisualizer
+**For detailed visualization examples, see:**
+- **[Visualization Cookbook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/introduction/16_Visualization.ipynb)**: Learn to create interactive and static visualizations
+  - **Topics**: Network graphs, interactive HTML, static images, export formats
+  - **Difficulty**: Beginner
+  - **Time**: 15-20 minutes
+  - **Use Cases**: Exploring graph structure, presentations, analysis
 
-semantica = Semantica()
-
-# Build graph
-result = semantica.build_knowledge_base(["document.pdf"])
-kg = result["knowledge_graph"]
-
-# Visualize
-visualizer = KGVisualizer()
-visualizer.visualize_network(kg, output="html", file_path="graph.html")
-print("Graph visualization saved to graph.html")
-```
-
-Open `graph.html` in your browser to see an interactive visualization.
+- **[Complete Visualization Suite Cookbook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/advanced/03_Complete_Visualization_Suite.ipynb)**: Advanced visualization techniques
+  - **Topics**: Custom layouts, filtering, styling, multiple graph types
+  - **Difficulty**: Intermediate
+  - **Time**: 30-45 minutes
+  - **Use Cases**: Production visualizations, custom dashboards
 
 ## Step 6: Export Your Knowledge Graph
 
-Export your knowledge graph in various formats:
+Export your knowledge graph to various formats for integration with other systems or tools. Semantica supports RDF, JSON, CSV, OWL, GraphML, and more.
 
-```python
-from semantica.core import Semantica
-from semantica.export import export_rdf, export_json, export_csv, export_owl
+**Supported export formats:**
+- **RDF**: Turtle, RDF/XML, JSON-LD, N-Triples
+- **JSON**: Standard JSON, JSON-LD, Cytoscape.js format
+- **CSV**: Node and edge lists for spreadsheet tools
+- **OWL**: OWL/XML and Turtle for ontologies
+- **Graph Formats**: GraphML, GEXF, DOT for visualization tools
 
-semantica = Semantica()
+**For detailed export examples, see:**
+- **[Export Cookbook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/introduction/15_Export.ipynb)**: Learn to export to all supported formats
+  - **Topics**: RDF, JSON, CSV, OWL, GraphML export
+  - **Difficulty**: Beginner
+  - **Time**: 15-20 minutes
+  - **Use Cases**: Data integration, sharing knowledge graphs
 
-# Build graph
-result = semantica.build_knowledge_base(["data.pdf"])
-kg = result["knowledge_graph"]
-
-# Export to different formats
-export_rdf(kg, "output.rdf")      # RDF/XML format
-export_json(kg, "output.json")    # JSON format
-export_csv(kg, "output.csv")      # CSV format
-export_owl(kg, "output.owl")       # OWL ontology format
-
-print("Exported knowledge graph to multiple formats")
-```
+- **[Multi-Format Export Cookbook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/advanced/05_Multi_Format_Export.ipynb)**: Advanced export patterns
+  - **Topics**: Batch export, custom formats, format conversion
+  - **Difficulty**: Intermediate
+  - **Time**: 30-45 minutes
+  - **Use Cases**: Production exports, format migration
 
 ## Common Patterns
 
 ### Pattern 1: Process Text Directly
 
-```python
-from semantica.core import Semantica
+You can process text directly without file ingestion. This is useful when you already have text content in memory.
 
-semantica = Semantica()
+**For examples, see:**
+- **[Entity Extraction Cookbook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/introduction/05_Entity_Extraction.ipynb)**: Processing text directly
+- **[Building Knowledge Graphs Cookbook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/introduction/07_Building_Knowledge_Graphs.ipynb)**: Graph construction from text
 
-text = "Your text content here..."
-result = semantica.process_document(text)
-```
+### Pattern 2: Custom Entity Extraction
 
-### Pattern 2: Custom Configuration
+Configure entity extraction with different methods (ML models, LLMs) and parameters for your specific needs.
 
-```python
-from semantica.core import Semantica, Config
-
-# Create custom configuration
-config = Config(
-    embeddings=True,
-    graph=True,
-    normalize=True,
-    conflict_resolution="voting"
-)
-
-semantica = Semantica(config=config)
-result = semantica.build_knowledge_base(["document.pdf"])
-```
+**For examples, see:**
+- **[Entity Extraction Cookbook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/introduction/05_Entity_Extraction.ipynb)**: Different extraction methods and configurations
+- **[Advanced Extraction Cookbook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/advanced/01_Advanced_Extraction.ipynb)**: Advanced extraction patterns
 
 ### Pattern 3: Incremental Building
 
-```python
-from semantica.core import Semantica
+Build knowledge graphs incrementally from multiple sources and merge them together.
 
-semantica = Semantica()
-
-# Build incrementally
-kg1 = semantica.kg.build_graph(["source1.pdf"])
-kg2 = semantica.kg.build_graph(["source2.pdf"])
-
-# Merge knowledge graphs
-merged_kg = semantica.kg.merge([kg1, kg2])
-```
+**For examples, see:**
+- **[Building Knowledge Graphs Cookbook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/introduction/07_Building_Knowledge_Graphs.ipynb)**: Graph construction and merging
+- **[Multi-Source Data Integration Cookbook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/advanced/06_Multi_Source_Data_Integration.ipynb)**: Advanced integration patterns
 
 ## Next Steps
 
 Now that you've built your first knowledge graph:
 
 1. **[Explore Examples](examples.md)** - See more advanced use cases
-2. **[API Reference](reference/core.md) - Learn about all available methods
+2. **[API Reference](reference/core.md)** - Learn about all available methods
 3. **[Cookbook](cookbook.md)** - Interactive Jupyter notebooks
 4. **[Full Documentation](https://github.com/Hawksight-AI/semantica/blob/main/README.md)** - Comprehensive guide
+
+### 🍳 Recommended Cookbook Tutorials
+
+Continue learning with these interactive tutorials:
+
+- **[Welcome to Semantica](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/introduction/01_Welcome_to_Semantica.ipynb)**: Comprehensive introduction to all modules
+  - **Topics**: Framework overview, all modules, architecture, configuration
+  - **Difficulty**: Beginner
+  - **Time**: 30-45 minutes
+  - **Use Cases**: Understanding the complete framework
+
+- **[Your First Knowledge Graph](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/introduction/08_Your_First_Knowledge_Graph.ipynb)**: Build your first knowledge graph
+  - **Topics**: Entity extraction, relationship extraction, graph construction, visualization
+  - **Difficulty**: Beginner
+  - **Time**: 20-30 minutes
+  - **Use Cases**: Hands-on practice with complete workflow
+
+- **[Data Ingestion](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/introduction/02_Data_Ingestion.ipynb)**: Learn to ingest from multiple sources
+  - **Topics**: File, web, feed, stream, database ingestion
+  - **Difficulty**: Beginner
+  - **Time**: 15-20 minutes
+  - **Use Cases**: Loading data from various sources
+
+- **[Document Parsing](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/introduction/03_Document_Parsing.ipynb)**: Parse various document formats
+  - **Topics**: PDF, DOCX, HTML, JSON parsing
+  - **Difficulty**: Beginner
+  - **Time**: 15-20 minutes
+  - **Use Cases**: Extracting text from different file formats
 
 ## Troubleshooting
 

@@ -36,7 +36,7 @@ from typing import Any, Dict, List, Optional, Set
 from ..utils.exceptions import ProcessingError, ValidationError
 from ..utils.logging import get_logger
 from ..utils.progress_tracker import get_progress_tracker
-from .rule_manager import Rule, RuleManager
+from .reasoner import Rule, Reasoner
 
 
 @dataclass
@@ -76,8 +76,11 @@ class SPARQLReasoner:
 
         # Initialize progress tracker
         self.progress_tracker = get_progress_tracker()
+        # Ensure progress tracker is enabled
+        if not self.progress_tracker.enabled:
+            self.progress_tracker.enabled = True
 
-        self.rule_manager = RuleManager(**self.config)
+        self.reasoner = Reasoner(**self.config)
         self.triplet_store = self.config.get("triplet_store")
         self.enable_inference = self.config.get("enable_inference", True)
 
@@ -119,7 +122,7 @@ class SPARQLReasoner:
             self.progress_tracker.update_tracking(
                 tracking_id, message="Getting inference rules..."
             )
-            rules = self.rule_manager.get_all_rules()
+            rules = self.reasoner.rules
 
             # Add inferred patterns based on rules
             self.progress_tracker.update_tracking(
@@ -158,6 +161,8 @@ class SPARQLReasoner:
                     parts = condition.split(" is_a ")
                     if len(parts) == 2:
                         var = parts[0].strip()
+                        if var.startswith("?"):
+                            var = var[1:]
                         class_type = parts[1].strip()
                         patterns.append(f"?{var} a :{class_type} .")
 
@@ -166,6 +171,8 @@ class SPARQLReasoner:
                 parts = rule.conclusion.split(" is_a ")
                 if len(parts) == 2:
                     var = parts[0].strip()
+                    if var.startswith("?"):
+                        var = var[1:]
                     class_type = parts[1].strip()
                     conclusion_pattern = f"?{var} a :{class_type} ."
 
@@ -205,7 +212,7 @@ class SPARQLReasoner:
                 self.progress_tracker.update_tracking(
                     tracking_id, message="Applying inference rules..."
                 )
-                rules = self.rule_manager.get_all_rules()
+                rules = self.reasoner.rules
 
                 for rule in rules:
                     # Check if rule can be applied to results
@@ -400,4 +407,4 @@ class SPARQLReasoner:
 
     def add_inference_rule(self, rule_definition: str, **options) -> Rule:
         """Add inference rule."""
-        return self.rule_manager.define_rule(rule_definition, **options)
+        return self.reasoner.add_rule(rule_definition)

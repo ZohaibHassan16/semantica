@@ -6,7 +6,9 @@ for file, module, and submodule processing across console, log files, and Jupyte
 
 Key Features:
     - Automatic module/submodule detection via introspection
-    - Real-time progress updates with emojis
+    - Real-time progress updates with percentages and item counts
+    - Dynamic update intervals based on dataset size for performance
+    - Consolidated display for concurrent tasks to prevent scrolling
     - Console, Jupyter notebook, and log file support
     - Zero configuration required - works automatically
     - Final summary display
@@ -32,6 +34,7 @@ License: MIT
 """
 
 import inspect
+import os
 import sys
 import threading
 import time
@@ -44,14 +47,25 @@ from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
 from .logging import get_logger
 
+DISABLE_JUPYTER_PROGRESS = os.getenv("SEMANTICA_DISABLE_JUPYTER_PROGRESS", "").strip().lower() in (
+    "1",
+    "true",
+    "yes",
+    "on",
+)
+
 # Try to import IPython for Jupyter support
 try:
     from IPython import get_ipython
     from IPython.display import HTML, clear_output, display
 
     IPYTHON_AVAILABLE = True
-except ImportError:
+except (ImportError, OSError):
     IPYTHON_AVAILABLE = False
+    get_ipython = None
+    HTML = None
+    clear_output = None
+    display = None
 
 
 @dataclass
@@ -67,6 +81,12 @@ class ProgressItem:
     message: str = ""
     emoji: str = "⏳"
     metadata: Dict[str, Any] = field(default_factory=dict)
+    progress_percentage: Optional[float] = None  # Progress percentage (0-100)
+    total_items: Optional[int] = None  # Total items to process
+    processed_items: Optional[int] = None  # Items processed so far
+    estimated_remaining: Optional[float] = None  # Estimated remaining time in seconds
+    pipeline_id: Optional[str] = None  # Pipeline ID this item belongs to
+    pipeline_order: Optional[int] = None  # Order of this module in the pipeline
 
 
 class ProgressDisplay(ABC):
@@ -112,7 +132,8 @@ class ConsoleProgressDisplay(ProgressDisplay):
     def _should_update(self) -> bool:
         """Check if enough time has passed for update."""
         now = time.time()
-        if now - self.last_update >= self.update_interval:
+        # If last_update is 0.0 or very old, always update (forced update)
+        if self.last_update <= 0.0 or (now - self.last_update) >= self.update_interval:
             self.last_update = now
             return True
         return False
@@ -167,15 +188,6 @@ class ConsoleProgressDisplay(ProgressDisplay):
 
     def _get_action_message(self, module: Optional[str], message: str) -> str:
         """Get action message based on module."""
-        # Extract action from message if it contains "Semantica:"
-        if message and "Semantica:" in message:
-            # Use the message as-is if it already has Semantica format
-            return (
-                message.split("Semantica:")[-1].strip()
-                if "Semantica:" in message
-                else message
-            )
-
         # Map modules to actions
         action_map = {
             "ingest": "is ingesting",
@@ -201,7 +213,17 @@ class ConsoleProgressDisplay(ProgressDisplay):
         }
 
         action = action_map.get(module or "", "is processing")
-        return f"Semantica {action}"
+        base_msg = f"Semantica {action}"
+
+        if not message:
+            return base_msg
+            
+        # If message already contains Semantica format, use it
+        if "Semantica:" in message:
+            return message.split("Semantica:")[-1].strip()
+            
+        # Otherwise combine them
+        return f"{base_msg}: {message}"
 
     def _safe_write(self, text: str) -> None:
         """Safely write text to stdout handling encoding errors."""
@@ -220,59 +242,130 @@ class ConsoleProgressDisplay(ProgressDisplay):
             return
 
         with self.lock:
-            key = f"{item.module}:{item.submodule}"
-            if item.file:
-                key = f"{item.file}:{key}"
-
-            # Build progress line
-            parts = []
-
-            # Semantica branding with action
-            if self.use_emoji:
-                parts.append("🧠")
-
-            # Create action message based on module
-            action_msg = self._get_action_message(item.module, item.message)
-            parts.append(action_msg)
-
-            # Status emoji
-            if self.use_emoji:
-                parts.append(self._get_status_emoji(item.status))
-
-            # Module emoji
-            if item.module and self.use_emoji:
-                parts.append(self._get_emoji_for_module(item.module))
-
-            # Module name
-            if item.module:
-                parts.append(f"[{item.module}]")
-
-            # Submodule
-            if item.submodule:
-                parts.append(f"{item.submodule}")
-
-            # File
-            if item.file:
-                file_name = Path(item.file).name if item.file else ""
-                parts.append(f"📄 {file_name}")
-
-            # Time elapsed
-            if item.start_time:
-                elapsed = time.time() - item.start_time
-                parts.append(f"({elapsed:.1f}s)")
-
-            line = " ".join(parts)
-            self.current_lines[key] = line
-
-            # Print all current lines (overwrite previous)
-            self._safe_write("\r" + " " * 100 + "\r")  # Clear line
-            if len(self.current_lines) == 1:
-                self._safe_write(line)
+            # If item is part of a pipeline, get all pipeline items for display
+            pipeline_items = []
+            if item.pipeline_id:
+                # Get tracker instance to access pipeline items
+                # Use the singleton instance directly
+                tracker = ProgressTracker.get_instance()
+                pipeline_items = tracker.get_pipeline_items(item.pipeline_id)
+            
+            # If we have pipeline items, show all of them
+            if pipeline_items:
+                # Clear and show all pipeline items
+                sys.stdout.write("\r" + " " * 150 + "\r")
+                
+                # Show header if first time
+                if not hasattr(self, '_pipeline_header_shown'):
+                    if self.use_emoji:
+                        sys.stdout.write("🧠 Semantica - 📊 Current Progress\n")
+                    else:
+                        sys.stdout.write("Semantica - Current Progress\n")
+                    sys.stdout.write("=" * 150 + "\n")
+                    self._pipeline_header_shown = True
+                
+                # Display all pipeline items
+                for pipeline_item in pipeline_items:
+                    self._display_item_line(pipeline_item)
+                    sys.stdout.write("\n")
+                
+                sys.stdout.flush()
             else:
-                # Multiple items - show all
-                lines_list = list(self.current_lines.values())
-                self._safe_write("\n".join(lines_list[-3:]))  # Show last 3
-            sys.stdout.flush()
+                # Original single-item display
+                self._display_item_line(item)
+                sys.stdout.flush()
+    
+    def _display_item_line(self, item: ProgressItem) -> None:
+        """Display a single progress item line."""
+        # Create unique key for this item
+        key = f"{item.module}:{item.submodule}"
+        if item.file:
+            key = f"{item.file}:{key}"
+
+        # Build progress line
+        parts = []
+
+        # Status emoji
+        if self.use_emoji:
+            status_emoji = self._get_status_emoji(item.status)
+            parts.append(status_emoji)
+
+        # Create action message based on module
+        action_msg = self._get_action_message(item.module, item.message)
+        parts.append(action_msg)
+
+        # Module and Submodule
+        if self.use_emoji:
+            module_emoji = self._get_emoji_for_module(item.module or "")
+            parts.append(f"{module_emoji} {item.module or 'N/A'}")
+        else:
+            parts.append(f"{item.module or 'N/A'}")
+        parts.append(f"{item.submodule or 'N/A'}")
+
+        # Progress bar and percentage
+        if item.progress_percentage is not None:
+            pct = item.progress_percentage
+            bar_width = 15
+            filled = int(bar_width * pct / 100)
+            bar = "█" * filled + "░" * (bar_width - filled)
+            parts.append(f"|{bar}| {pct:.1f}%")
+        else:
+            parts.append("|" + "░" * 15 + "| 0.0%")
+
+        # ETA
+        if item.estimated_remaining is not None and item.estimated_remaining > 0:
+            if item.estimated_remaining < 60:
+                parts.append(f"ETA: {item.estimated_remaining:.1f}s")
+            elif item.estimated_remaining < 3600:
+                parts.append(f"ETA: {item.estimated_remaining/60:.1f}m")
+            else:
+                parts.append(f"ETA: {item.estimated_remaining/3600:.1f}h")
+        else:
+            parts.append("ETA: -")
+
+        # Rate
+        if item.start_time and item.processed_items is not None and item.processed_items > 0:
+            elapsed = time.time() - item.start_time
+            if elapsed > 0:
+                rate = item.processed_items / elapsed
+                parts.append(f"Rate: {rate:.1f}/s")
+        else:
+            parts.append("Rate: -")
+
+        # Time
+        if item.start_time:
+            if item.end_time:
+                elapsed = item.end_time - item.start_time
+                parts.append(f"Time: {elapsed:.2f}s")
+            else:
+                elapsed = time.time() - item.start_time
+                parts.append(f"Time: {elapsed:.2f}s")
+        else:
+            parts.append("Time: -")
+
+        # Extraction counts (if available)
+        if item.metadata.get('extraction_counts'):
+            counts = item.metadata['extraction_counts']
+            count_parts = []
+            if 'tables' in counts:
+                count_parts.append(f"{counts['tables']} tables")
+            if 'images' in counts:
+                count_parts.append(f"{counts['images']} images")
+            if 'pages' in counts:
+                count_parts.append(f"{counts['pages']} pages")
+            if count_parts:
+                extracted = ", ".join(count_parts)
+                # Add Docling indicator if core dependency is docling
+                if item.metadata.get('core_dependency') == 'docling':
+                    parts.append(f"Extracted (Docling): {extracted}")
+                else:
+                    parts.append(f"Extracted: {extracted}")
+        else:
+            parts.append("Extracted: -")
+
+        line = " ".join(parts)
+        self.current_lines[key] = line
+        self._safe_write(line)
 
     def show_summary(self, items: List[ProgressItem]) -> None:
         """Show final summary."""
@@ -451,15 +544,80 @@ class JupyterProgressDisplay(ProgressDisplay):
         # Current status
         html_parts.append("<h4>🧠 Semantica - 📊 Current Progress</h4>")
         html_parts.append("<table style='width: 100%; border-collapse: collapse;'>")
+        
+        # Check if any item is part of a pipeline
+        pipeline_id = None
+        pipeline_items = []
+        for item in items:
+            if item.pipeline_id:
+                pipeline_id = item.pipeline_id
+                break
+        
+        # If pipeline context exists, get all pipeline items
+        if pipeline_id:
+            tracker = ProgressTracker.get_instance()
+            pipeline_items = tracker.get_pipeline_items(pipeline_id)
+            # Also include expected modules that haven't started yet
+            if pipeline_id in tracker.pipeline_contexts:
+                expected_modules = tracker.pipeline_contexts[pipeline_id]
+                module_order = tracker.pipeline_module_order.get(pipeline_id, {})
+                # Create pending items for modules not yet started
+                existing_modules = {item.module for item in pipeline_items if item.module}
+                for module in expected_modules:
+                    if module not in existing_modules:
+                        pending_item = ProgressItem(
+                            module=module,
+                            submodule="Pending",
+                            status="pending",
+                            progress_percentage=0.0,
+                            pipeline_id=pipeline_id,
+                            pipeline_order=module_order.get(module, 999)
+                        )
+                        pipeline_items.append(pending_item)
+                # Sort by pipeline order
+                pipeline_items.sort(key=lambda x: (x.pipeline_order if x.pipeline_order is not None else 999, x.module or ""))
+        
+        # Use pipeline items if available, otherwise use regular items
+        display_items = pipeline_items if pipeline_items else items[-10:]
+        
+        # Determine column header based on whether we have Docling items
+        has_docling = any(item.metadata.get('core_dependency') == 'docling' for item in display_items)
+        extracted_header = "Extracted (Docling)" if has_docling else "Extracted"
+        
         html_parts.append(
-            "<tr><th>Status</th><th>Action</th><th>Module</th><th>Submodule</th><th>File</th><th>Time</th></tr>"
+            f"<tr><th>Status</th><th>Action</th><th>Module</th><th>Submodule</th><th>Progress</th><th>ETA</th><th>Rate</th><th>Time</th><th>{extracted_header}</th></tr>"
         )
 
-        # Show last 10 items
-        for item in items[-10:]:
+        # Show pipeline items or last 10 items
+        for item in display_items:
             status_emoji = self._get_status_emoji(item.status)
             module_emoji = self._get_emoji_for_module(item.module or "")
             action_msg = self._get_action_message(item.module, item.message)
+
+            # Progress information
+            progress_str = "-"
+            if item.progress_percentage is not None:
+                progress_str = f"{item.progress_percentage:.1f}%"
+                if item.processed_items is not None and item.total_items is not None:
+                    progress_str += f" ({item.processed_items}/{item.total_items})"
+            
+            # ETA information
+            eta_str = "-"
+            if item.estimated_remaining is not None and item.estimated_remaining > 0:
+                if item.estimated_remaining < 60:
+                    eta_str = f"{item.estimated_remaining:.1f}s"
+                elif item.estimated_remaining < 3600:
+                    eta_str = f"{item.estimated_remaining/60:.1f}m"
+                else:
+                    eta_str = f"{item.estimated_remaining/3600:.1f}h"
+            
+            # Processing rate
+            rate_str = "-"
+            if item.start_time and item.processed_items is not None and item.processed_items > 0:
+                elapsed = time.time() - item.start_time
+                if elapsed > 0:
+                    rate = item.processed_items / elapsed
+                    rate_str = f"{rate:.1f}/s"
 
             elapsed = ""
             if item.start_time:
@@ -467,8 +625,32 @@ class JupyterProgressDisplay(ProgressDisplay):
                     elapsed = f"{(item.end_time - item.start_time):.2f}s"
                 else:
                     elapsed = f"{(time.time() - item.start_time):.2f}s"
+            else:
+                elapsed = "-"
 
             file_name = Path(item.file).name if item.file else "-"
+            
+            # Extraction counts
+            extracted_str = "-"
+            if item.metadata.get('extraction_counts'):
+                counts = item.metadata['extraction_counts']
+                count_parts = []
+                if 'tables' in counts:
+                    count_parts.append(f"{counts['tables']} tables")
+                if 'images' in counts:
+                    count_parts.append(f"{counts['images']} images")
+                if 'pages' in counts:
+                    count_parts.append(f"{counts['pages']} pages")
+                if count_parts:
+                    extracted_str = ", ".join(count_parts)
+            elif item.status == "pending":
+                extracted_str = "-"
+            elif item.status == "running" and item.module == "parse":
+                # Show progress message for running parse operations
+                if "Docling" in item.message or item.metadata.get('core_dependency') == 'docling':
+                    extracted_str = "Converting with Docling..."
+                else:
+                    extracted_str = "-"
 
             html_parts.append(
                 f"<tr>"
@@ -476,8 +658,11 @@ class JupyterProgressDisplay(ProgressDisplay):
                 f"<td>{action_msg}</td>"
                 f"<td>{module_emoji} {item.module or 'N/A'}</td>"
                 f"<td>{item.submodule or 'N/A'}</td>"
-                f"<td>{file_name}</td>"
+                f"<td>{progress_str}</td>"
+                f"<td>{eta_str}</td>"
+                f"<td>{rate_str}</td>"
                 f"<td>{elapsed}</td>"
+                f"<td>{extracted_str}</td>"
                 f"</tr>"
             )
 
@@ -487,7 +672,7 @@ class JupyterProgressDisplay(ProgressDisplay):
         return "".join(html_parts)
 
     def update(self, item: ProgressItem) -> None:
-        """Update Jupyter progress display."""
+        """Update Jupyter progress display (works in Jupyter and Google Colab)."""
         # Add or update item
         existing = None
         for i, existing_item in enumerate(self.items):
@@ -504,13 +689,77 @@ class JupyterProgressDisplay(ProgressDisplay):
         else:
             self.items.append(item)
 
-        # Update display
+        # If item is part of a pipeline, get all pipeline items for display
+        display_items = self.items
+        if item.pipeline_id:
+            tracker = ProgressTracker.get_instance()
+            pipeline_items = tracker.get_pipeline_items(item.pipeline_id)
+            # Also include expected modules that haven't started yet
+            if item.pipeline_id in tracker.pipeline_contexts:
+                expected_modules = tracker.pipeline_contexts[item.pipeline_id]
+                module_order = tracker.pipeline_module_order.get(item.pipeline_id, {})
+                # Create pending items for modules not yet started
+                existing_modules = {item.module for item in pipeline_items if item.module}
+                for module in expected_modules:
+                    if module not in existing_modules:
+                        pending_item = ProgressItem(
+                            module=module,
+                            submodule="Pending",
+                            status="pending",
+                            progress_percentage=0.0,
+                            pipeline_id=item.pipeline_id,
+                            pipeline_order=module_order.get(module, 999)
+                        )
+                        pipeline_items.append(pending_item)
+                # Sort by pipeline order
+                pipeline_items.sort(key=lambda x: (x.pipeline_order if x.pipeline_order is not None else 999, x.module or ""))
+                display_items = pipeline_items
+
+        # Update display - always update immediately in Jupyter/Colab
         if IPYTHON_AVAILABLE:
-            html = self._build_html(self.items)
-            if self.display_handle is None:
+            html = self._build_html(display_items)
+            try:
+                # Check if we're in Google Colab (Colab sometimes needs fresh displays)
+                is_colab = False
+                try:
+                    import sys
+                    import os
+                    is_colab = ('google.colab' in sys.modules or 
+                               os.environ.get("COLAB_GPU") is not None)
+                except Exception:
+                    pass
+                
+                if self.display_handle is None:
+                    # First time - create display
+                    self.display_handle = display(HTML(html), display_id=True)
+                else:
+                    # Try to update existing display
+                    try:
+                        # In Colab, sometimes update() doesn't work, so we recreate
+                        if is_colab:
+                            # Clear and recreate for Colab compatibility
+                            try:
+                                clear_output(wait=False)
+                            except Exception:
+                                pass
+                            self.display_handle = display(HTML(html), display_id=True)
+                        else:
+                            # Regular Jupyter - try update first
+                            self.display_handle.update(HTML(html))
+                    except (AttributeError, TypeError, Exception):
+                        # If update fails, create new display (works in both Jupyter and Colab)
+                        try:
+                            clear_output(wait=False)
+                        except Exception:
+                            pass
+                        self.display_handle = display(HTML(html), display_id=True)
+            except Exception:
+                # Fallback: always create new display if update fails
+                try:
+                    clear_output(wait=False)
+                except Exception:
+                    pass
                 self.display_handle = display(HTML(html), display_id=True)
-            else:
-                self.display_handle.update(HTML(html))
 
     def show_summary(self, items: List[ProgressItem]) -> None:
         """Show final summary in Jupyter."""
@@ -764,22 +1013,34 @@ class ProgressTracker:
         Initialize progress tracker.
 
         Args:
-            enabled: Enable progress tracking
+            enabled: Enable progress tracking (default: True, always enabled)
             use_emoji: Use emoji indicators
             update_interval: Minimum time between updates (seconds)
         """
-        self.enabled = enabled
+        # Always enable progress tracking by default - cannot be disabled via constructor
+        # This ensures progress is always shown automatically
+        self.enabled = True  # Force enabled, ignore parameter
         self.use_emoji = use_emoji
         self.update_interval = update_interval
 
-        # Detect environment
+        # Detect environment - will be checked dynamically
         self.is_jupyter = self._detect_jupyter()
+        self.disable_jupyter_progress = DISABLE_JUPYTER_PROGRESS
 
         # Create displays
         self.displays: List[ProgressDisplay] = []
 
-        if self.is_jupyter and IPYTHON_AVAILABLE:
-            self.displays.append(JupyterProgressDisplay(use_emoji=use_emoji))
+        # Always try Jupyter first if available, fallback to console
+        if IPYTHON_AVAILABLE:
+            # Try to detect Jupyter - if available, use it
+            if self.is_jupyter and not self.disable_jupyter_progress:
+                self.displays.append(JupyterProgressDisplay(use_emoji=use_emoji))
+            # Also add console as fallback for immediate feedback
+            self.displays.append(
+                ConsoleProgressDisplay(
+                    use_emoji=use_emoji, update_interval=update_interval
+                )
+            )
         else:
             self.displays.append(
                 ConsoleProgressDisplay(
@@ -794,14 +1055,55 @@ class ProgressTracker:
         self.items: List[ProgressItem] = []
         self.active_items: Dict[str, ProgressItem] = {}
         self.lock = threading.Lock()
+        
+        # Pipeline context tracking
+        self.pipeline_contexts: Dict[str, List[str]] = {}  # pipeline_id -> list of module names
+        self.pipeline_items: Dict[str, Dict[str, ProgressItem]] = {}  # pipeline_id -> {tracking_id: item}
+        self.pipeline_module_order: Dict[str, Dict[str, int]] = {}  # pipeline_id -> {module: order}
 
     def _detect_jupyter(self) -> bool:
-        """Detect if running in Jupyter notebook."""
+        """Detect if running in Jupyter notebook or Google Colab."""
         if not IPYTHON_AVAILABLE:
             return False
         try:
             ipython = get_ipython()
-            return ipython is not None and hasattr(ipython, "kernel")
+            if ipython is None:
+                return False
+            
+            # Method 1: Check for Google Colab
+            # Colab has 'google.colab' in sys.modules or environment variables
+            try:
+                import sys
+                import os
+                if 'google.colab' in sys.modules:
+                    return True
+                # Check environment variables (Colab sets these)
+                if os.environ.get("COLAB_GPU") is not None or os.environ.get("COLAB_JUPYTER_TRANSPORT") is not None:
+                    return True
+                # Check IPython config for Colab
+                if hasattr(ipython, 'config') and hasattr(ipython.config, 'IPKernelApp'):
+                    config_str = str(ipython.config.IPKernelApp)
+                    if 'google.colab' in config_str or 'colab' in config_str.lower():
+                        return True
+            except Exception:
+                pass
+            
+            # Method 2: Check for kernel attribute (Jupyter/Colab)
+            if hasattr(ipython, "kernel"):
+                return True
+            
+            # Method 3: Check for IPython shell class name
+            if hasattr(ipython, "__class__"):
+                class_name = ipython.__class__.__name__
+                # Check for Jupyter, Colab, or ZMQ shell types
+                if any(name in class_name for name in ["ZMQInteractiveShell", "Jupyter", "Colab", "InteractiveShell"]):
+                    return True
+            
+            # Method 4: Check for IPython display capability
+            if hasattr(ipython, "display_pub"):
+                return True
+            
+            return False
         except Exception:
             return False
 
@@ -812,7 +1114,85 @@ class ProgressTracker:
             with cls._lock:
                 if cls._instance is None:
                     cls._instance = cls()
+                    # Ensure it's always enabled
+                    cls._instance.enabled = True
+        else:
+            # Always ensure enabled when getting instance
+            cls._instance.enabled = True
         return cls._instance
+
+    def register_pipeline_modules(
+        self, pipeline_id: str, module_list: List[str], module_order: Optional[Dict[str, int]] = None
+    ) -> None:
+        """
+        Register modules that belong to a pipeline.
+
+        Args:
+            pipeline_id: Unique pipeline identifier
+            module_list: List of module names in the pipeline
+            module_order: Optional dict mapping module names to their order in pipeline
+        """
+        if not self.enabled:
+            return
+
+        with self.lock:
+            self.pipeline_contexts[pipeline_id] = module_list
+            if module_order:
+                self.pipeline_module_order[pipeline_id] = module_order
+            else:
+                # Auto-generate order if not provided
+                self.pipeline_module_order[pipeline_id] = {
+                    module: idx for idx, module in enumerate(module_list)
+                }
+            # Initialize pipeline items dict
+            if pipeline_id not in self.pipeline_items:
+                self.pipeline_items[pipeline_id] = {}
+
+    def get_pipeline_items(self, pipeline_id: str) -> List[ProgressItem]:
+        """
+        Get all items for a pipeline (completed + active).
+
+        Args:
+            pipeline_id: Pipeline identifier
+
+        Returns:
+            List of ProgressItem objects for the pipeline, ordered by pipeline_order
+        """
+        if not self.enabled or pipeline_id not in self.pipeline_contexts:
+            return []
+
+        with self.lock:
+            items = []
+            # Get items from pipeline_items (completed)
+            if pipeline_id in self.pipeline_items:
+                items.extend(self.pipeline_items[pipeline_id].values())
+            
+            # Get active items that belong to this pipeline
+            for tracking_id, item in self.active_items.items():
+                if item.pipeline_id == pipeline_id:
+                    items.append(item)
+            
+            # Sort by pipeline_order
+            items.sort(key=lambda x: (x.pipeline_order if x.pipeline_order is not None else 999, x.module or ""))
+            return items
+
+    def clear_pipeline_context(self, pipeline_id: str) -> None:
+        """
+        Clear pipeline context when pipeline completes.
+
+        Args:
+            pipeline_id: Pipeline identifier to clear
+        """
+        if not self.enabled:
+            return
+
+        with self.lock:
+            if pipeline_id in self.pipeline_contexts:
+                del self.pipeline_contexts[pipeline_id]
+            if pipeline_id in self.pipeline_items:
+                del self.pipeline_items[pipeline_id]
+            if pipeline_id in self.pipeline_module_order:
+                del self.pipeline_module_order[pipeline_id]
 
     def start_tracking(
         self,
@@ -820,6 +1200,7 @@ class ProgressTracker:
         module: Optional[str] = None,
         submodule: Optional[str] = None,
         message: str = "",
+        pipeline_id: Optional[str] = None,
     ) -> str:
         """
         Start tracking a progress item.
@@ -836,6 +1217,19 @@ class ProgressTracker:
         if not self.enabled:
             return ""
 
+        # Re-detect Jupyter environment in case it wasn't detected at init
+        # This helps if the tracker was created before Jupyter was fully initialized
+        if IPYTHON_AVAILABLE and not self.is_jupyter:
+            self.is_jupyter = self._detect_jupyter()
+            # If Jupyter is now detected and we don't have a Jupyter display, add it
+            if (
+                self.is_jupyter
+                and not self.disable_jupyter_progress
+                and not any(isinstance(d, JupyterProgressDisplay) for d in self.displays)
+            ):
+                # Insert Jupyter display at the beginning for priority
+                self.displays.insert(0, JupyterProgressDisplay(use_emoji=self.use_emoji))
+
         # Auto-detect if not provided
         if not module or not submodule:
             detected_module, detected_submodule = ModuleDetector.detect_from_call_stack(
@@ -847,6 +1241,17 @@ class ProgressTracker:
         # Create tracking ID
         tracking_id = f"{module}:{submodule}:{file or ''}"
 
+        # Determine pipeline_id and pipeline_order if module is part of a pipeline
+        pipeline_order = None
+        if pipeline_id is None and module:
+            # Try to find pipeline_id from existing contexts
+            for pid, modules in self.pipeline_contexts.items():
+                if module in modules:
+                    pipeline_id = pid
+                    if pid in self.pipeline_module_order:
+                        pipeline_order = self.pipeline_module_order[pid].get(module)
+                    break
+
         with self.lock:
             item = ProgressItem(
                 file=file,
@@ -856,9 +1261,17 @@ class ProgressTracker:
                 start_time=time.time(),
                 message=message,
                 emoji=self._get_emoji_for_module(module or ""),
+                pipeline_id=pipeline_id,
+                pipeline_order=pipeline_order,
             )
 
             self.active_items[tracking_id] = item
+            
+            # If part of pipeline, also store in pipeline_items
+            if pipeline_id:
+                if pipeline_id not in self.pipeline_items:
+                    self.pipeline_items[pipeline_id] = {}
+                self.pipeline_items[pipeline_id][tracking_id] = item
 
             # Update displays
             for display in self.displays:
@@ -886,18 +1299,135 @@ class ProgressTracker:
                 item.status = status
                 item.message = message
 
+                # Calculate ETA if progress information is available
+                if item.processed_items is not None and item.total_items is not None:
+                    item.progress_percentage = (
+                        (item.processed_items / item.total_items * 100)
+                        if item.total_items > 0
+                        else 0.0
+                    )
+                    item.estimated_remaining = self._calculate_eta(item)
+
                 if status in ("completed", "failed"):
                     item.end_time = time.time()
-                    # Move to completed items
-                    self.items.append(item)
-                    del self.active_items[tracking_id]
+                    # Reset progress fields on completion
+                    item.progress_percentage = 100.0 if status == "completed" else None
+                    item.estimated_remaining = 0.0 if status == "completed" else None
+                    
+                    # If part of an active pipeline, keep it in pipeline_items instead of removing
+                    if item.pipeline_id and item.pipeline_id in self.pipeline_contexts:
+                        # Keep in pipeline_items for visibility
+                        if item.pipeline_id not in self.pipeline_items:
+                            self.pipeline_items[item.pipeline_id] = {}
+                        self.pipeline_items[item.pipeline_id][tracking_id] = item
+                        # Remove from active_items but keep in pipeline_items
+                        del self.active_items[tracking_id]
+                    else:
+                        # Not part of pipeline, move to completed items as before
+                        self.items.append(item)
+                        del self.active_items[tracking_id]
 
                 # Update displays
                 for display in self.displays:
                     display.update(item)
 
+    def update_progress(
+        self,
+        tracking_id: str,
+        processed: int,
+        total: int,
+        message: str = "",
+    ) -> None:
+        """
+        Update progress with item counts and calculate ETA.
+
+        Args:
+            tracking_id: Tracking ID from start_tracking
+            processed: Number of items processed so far
+            total: Total number of items to process
+            message: Optional progress message
+        """
+        if not self.enabled or not tracking_id:
+            return
+
+        # Re-detect Jupyter environment in case it wasn't detected at init
+        if IPYTHON_AVAILABLE and not self.is_jupyter:
+            self.is_jupyter = self._detect_jupyter()
+            # If Jupyter is now detected and we don't have a Jupyter display, add it
+            if (
+                self.is_jupyter
+                and not self.disable_jupyter_progress
+                and not any(isinstance(d, JupyterProgressDisplay) for d in self.displays)
+            ):
+                # Insert Jupyter display at the beginning for priority
+                self.displays.insert(0, JupyterProgressDisplay(use_emoji=self.use_emoji))
+
+        with self.lock:
+            if tracking_id in self.active_items:
+                item = self.active_items[tracking_id]
+                item.processed_items = processed
+                item.total_items = total
+                item.progress_percentage = (
+                    (processed / total * 100) if total > 0 else 0.0
+                )
+                item.estimated_remaining = self._calculate_eta(item)
+                if message:
+                    item.message = message
+
+                # Update displays - force immediate update for progress
+                for display in self.displays:
+                    # For Jupyter, always update immediately
+                    if isinstance(display, JupyterProgressDisplay):
+                        display.update(item)
+                    # For console, force update by temporarily bypassing interval check
+                    elif isinstance(display, ConsoleProgressDisplay):
+                        # Force update by setting last_update far in the past
+                        original_last_update = display.last_update
+                        display.last_update = 0.0  # This will make _should_update return True
+                        display.update(item)
+                        # Restore original value (update() will set it to current time anyway)
+                        display.last_update = original_last_update
+                    else:
+                        display.update(item)
+
+    def _calculate_eta(self, item: ProgressItem) -> Optional[float]:
+        """
+        Calculate estimated time remaining based on progress.
+
+        Args:
+            item: ProgressItem with progress information
+
+        Returns:
+            Estimated remaining time in seconds, or None if cannot calculate
+        """
+        if (
+            item.start_time is None
+            or item.processed_items is None
+            or item.total_items is None
+            or item.processed_items <= 0
+        ):
+            return None
+
+        elapsed = time.time() - item.start_time
+        if elapsed <= 0:
+            return None
+
+        # Calculate processing rate (items per second)
+        rate = item.processed_items / elapsed
+        if rate <= 0:
+            return None
+
+        # Calculate remaining items
+        remaining_items = item.total_items - item.processed_items
+        if remaining_items <= 0:
+            return 0.0
+
+        # Calculate ETA
+        eta_seconds = remaining_items / rate
+        return max(0.0, eta_seconds)
+
     def stop_tracking(
-        self, tracking_id: str, status: str = "completed", message: str = ""
+        self, tracking_id: str, status: str = "completed", message: str = "", metadata: Optional[Dict[str, Any]] = None
     ) -> None:
         """
         Stop tracking an item.
@@ -906,7 +1436,22 @@ class ProgressTracker:
             tracking_id: Tracking ID from start_tracking
             status: Final status (completed, failed)
             message: Final message
+            metadata: Optional metadata to store (e.g., extraction_counts, core_dependency)
         """
+        with self.lock:
+            # Update metadata if provided
+            if tracking_id in self.active_items:
+                item = self.active_items[tracking_id]
+                if metadata:
+                    item.metadata.update(metadata)
+            # Also check pipeline_items
+            for pipeline_id, items in self.pipeline_items.items():
+                if tracking_id in items:
+                    item = items[tracking_id]
+                    if metadata:
+                        item.metadata.update(metadata)
+                    break
+        
         self.update_tracking(tracking_id, status=status, message=message)
 
     def _get_emoji_for_module(self, module: str) -> str:
@@ -990,6 +1535,22 @@ def get_progress_tracker() -> ProgressTracker:
     global _global_tracker
     if _global_tracker is None:
         _global_tracker = ProgressTracker.get_instance()
+    
+    # Always ensure progress tracker is enabled automatically
+    _global_tracker.enabled = True
+    
+    # Re-detect Jupyter environment dynamically (in case it wasn't ready at init)
+    if IPYTHON_AVAILABLE and not _global_tracker.is_jupyter:
+        _global_tracker.is_jupyter = _global_tracker._detect_jupyter()
+        # If Jupyter is now detected and we don't have a Jupyter display, add it
+        if (
+            _global_tracker.is_jupyter
+            and not _global_tracker.disable_jupyter_progress
+            and not any(isinstance(d, JupyterProgressDisplay) for d in _global_tracker.displays)
+        ):
+            # Insert Jupyter display at the beginning for priority
+            _global_tracker.displays.insert(0, JupyterProgressDisplay(use_emoji=_global_tracker.use_emoji))
+    
     return _global_tracker
 
 

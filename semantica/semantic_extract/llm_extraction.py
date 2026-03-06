@@ -93,19 +93,27 @@ class LLMExtraction:
             **config: Configuration options:
                 - model: Model name (default depends on provider)
                 - api_key: API key (from environment if not provided)
-                - temperature: Temperature for generation
+                - temperature: Temperature for generation (None = use model's default)
         """
         self.logger = get_logger("llm_extraction")
         self.config = config
         self.progress_tracker = get_progress_tracker()
+        # Ensure progress tracker is enabled
+        if not self.progress_tracker.enabled:
+            self.progress_tracker.enabled = True
 
         self.provider_name = provider
         self.model = config.get("model")
-        self.temperature = config.get("temperature", 0.3)
+        self.temperature = config.get("temperature")  # None = use model default
 
         # Initialize provider using new system
         try:
-            self.provider = create_provider(provider, **config)
+            # Sanitize config: remove api_key if it's None/empty to allow fallback
+            provider_config = config.copy()
+            if "api_key" in provider_config and not provider_config["api_key"]:
+                del provider_config["api_key"]
+                
+            self.provider = create_provider(provider, **provider_config)
         except Exception as e:
             self.logger.warning(f"Failed to initialize {provider} provider: {e}")
             self.provider = None
@@ -286,7 +294,14 @@ Return the enhanced relation list in JSON format."""
     ) -> List[Entity]:
         """Parse LLM response for entities."""
         # Simplified parsing - in practice would parse JSON
-        # For now, return original entities
+        # For now, return original entities with updated metadata
+        for entity in original_entities:
+            if entity.metadata is None:
+                entity.metadata = {}
+            entity.metadata.update({
+                "enhanced_by": self.provider_name,
+                "model": self.model
+            })
         return original_entities
 
     def _parse_relation_response(
@@ -294,7 +309,14 @@ Return the enhanced relation list in JSON format."""
     ) -> List[Relation]:
         """Parse LLM response for relations."""
         # Simplified parsing - in practice would parse JSON
-        # For now, return original relations
+        # For now, return original relations with updated metadata
+        for relation in original_relations:
+            if relation.metadata is None:
+                relation.metadata = {}
+            relation.metadata.update({
+                "enhanced_by": self.provider_name,
+                "model": self.model
+            })
         return original_relations
 
 

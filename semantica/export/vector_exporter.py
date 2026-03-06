@@ -287,7 +287,7 @@ class VectorExporter:
         """
         try:
             import numpy as np
-        except ImportError:
+        except (ImportError, OSError):
             raise ImportError("NumPy not installed. Install with: pip install numpy")
 
         # Extract vectors and associated data
@@ -358,7 +358,7 @@ class VectorExporter:
         """Export to binary format."""
         try:
             import numpy as np
-        except ImportError:
+        except (ImportError, OSError):
             raise ImportError("NumPy not installed. Install with: pip install numpy")
 
         # Extract vectors
@@ -419,7 +419,7 @@ class VectorExporter:
         try:
             import faiss
             import numpy as np
-        except ImportError:
+        except (ImportError, OSError):
             raise ImportError(
                 "FAISS not installed. Install with: pip install faiss-cpu or faiss-gpu"
             )

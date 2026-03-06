@@ -24,6 +24,7 @@ License: MIT
 
 from datetime import datetime
 from typing import Any, Dict, List, Optional, Union
+import time
 
 
 class GraphBuilder:
@@ -55,7 +56,7 @@ class GraphBuilder:
 
     def __init__(
         self,
-        merge_entities=True,
+        merge_entities=False,
         entity_resolution_strategy="fuzzy",
         resolve_conflicts=True,
         enable_temporal=False,
@@ -69,7 +70,8 @@ class GraphBuilder:
         Initialize graph builder.
 
         Args:
-            merge_entities: Whether to merge duplicate entities
+            merge_entities: Whether to merge duplicate entities (default: False, set to True to enable)
+                          Note: Entity resolution is typically done in conflict resolution step
             entity_resolution_strategy: Strategy for entity resolution ("fuzzy", "exact", "ml-based")
             resolve_conflicts: Whether to resolve conflicts
             enable_temporal: Enable temporal knowledge graph features
@@ -87,6 +89,7 @@ class GraphBuilder:
         self.track_history = track_history
         self.version_snapshots = version_snapshots
         self.graph_store = graph_store
+        self.config = kwargs  # Store additional config for extractors
 
         # Initialize logging
         from ..utils.logging import get_logger
@@ -94,6 +97,9 @@ class GraphBuilder:
 
         self.logger = get_logger("graph_builder")
         self.progress_tracker = get_progress_tracker()
+        # Ensure progress tracker is enabled
+        if not self.progress_tracker.enabled:
+            self.progress_tracker.enabled = True
 
         # Initialize entity resolver if entity merging is enabled
         # This helps deduplicate and merge similar entities
@@ -125,12 +131,17 @@ class GraphBuilder:
 
     def _process_item(self, item: Any, all_entities: List[Any], all_relationships: List[Any], **options):
         """Helper to process a single item and add to entities or relationships list."""
-        if hasattr(item, "text") and hasattr(item, "label"):
+        if isinstance(item, str):
+            # Treat string as text for extraction
+            self._extract_from_text(item, all_entities, all_relationships, **options)
+            return
+
+        if hasattr(item, "text") and (hasattr(item, "label") or hasattr(item, "type")):
             # It's likely an Entity object
             entity_dict = {
-                "id": getattr(item, "id", item.text),
+                "id": getattr(item, "id", getattr(item, "entity_id", item.text)),
                 "name": item.text,
-                "type": item.label,
+                "type": getattr(item, "label", getattr(item, "type", "UNKNOWN")),
                 "confidence": getattr(item, "confidence", 1.0),
                 "metadata": getattr(item, "metadata", {})
             }
@@ -150,7 +161,14 @@ class GraphBuilder:
             }
             all_relationships.append(rel_dict)
         elif isinstance(item, dict):
-            # Detect and normalize Entity objects inside dict
+            if "source_id" in item and "source" not in item:
+                item["source"] = item["source_id"]
+            if "target_id" in item and "target" not in item:
+                item["target"] = item["target_id"]
+            if "subject" in item and "source" not in item:
+                item["source"] = item["subject"]
+            if "object" in item and "target" not in item:
+                item["target"] = item["object"]
             if "source" in item and not isinstance(item["source"], str):
                 src = item["source"]
                 item["source"] = getattr(src, "id", getattr(src, "text", str(src)))
@@ -190,38 +208,87 @@ class GraphBuilder:
                 elif "id" in item or "entity_id" in item or "name" in item:
                     all_entities.append(item)
                     found_something = True
+                elif "text" in item and "type" in item:
+                    # Entity with text and type fields (common format)
+                    # Normalize to standard format
+                    entity_dict = item.copy()
+                    if "name" not in entity_dict:
+                        entity_dict["name"] = entity_dict["text"]
+                    if "id" not in entity_dict and "entity_id" not in entity_dict:
+                        entity_dict["id"] = entity_dict.get("name") or entity_dict.get("text")
+                    all_entities.append(entity_dict)
+                    found_something = True
                 
                 # If still nothing found and has 'text', try extraction
                 if not found_something and "text" in item:
                     text = item["text"]
-                    # Perform extraction if requested or if it's the only way
-                    if options.get("extract", True):
-                        from ..semantic_extract.ner_extractor import NERExtractor
-                        from ..semantic_extract.triplet_extractor import TripletExtractor
-                        
-                        ner_method = options.get("ner_method", "ml")
-                        triplet_method = options.get("triplet_method", "pattern")
-                        
-                        ner = NERExtractor(method=ner_method)
-                        entities = ner.extract_entities(text)
-                        for ent in entities:
-                            self._process_item(ent, all_entities, all_relationships, **options)
-                        
-                        # Only try triplets if specifically requested or if method provided
-                        if "triplet_method" in options or options.get("extract_relations", False):
-                            triplet = TripletExtractor(method=triplet_method)
-                            relations = triplet.extract_triplets(text)
-                            for rel in relations:
-                                self._process_item(rel, all_entities, all_relationships, **options)
-                        found_something = True
+                    self._extract_from_text(text, all_entities, all_relationships, **options)
+                    found_something = True
         else:
             # Unknown type
             pass
+
+    def _extract_from_text(self, text: str, all_entities: List[Any], all_relationships: List[Any], **options):
+        """Helper to extract knowledge from text using configured methods."""
+        if not options.get("extract", True):
+            return
+
+        from ..semantic_extract.ner_extractor import NERExtractor
+        from ..semantic_extract.relation_extractor import RelationExtractor
+        from ..semantic_extract.triplet_extractor import TripletExtractor
+        
+        # Default to LLM methods as per requirement
+        ner_method = options.get("ner_method", "llm")
+        relation_method = options.get("relation_method", "llm")
+        triplet_method = options.get("triplet_method", "llm")
+        
+        self.logger.info(f"Extracting knowledge from text ({len(text)} chars) using {ner_method}...")
+        
+        # 1. Extract Entities
+        ner = NERExtractor(method=ner_method, **self.config)
+        try:
+            entities = ner.extract_entities(text, **options)
+            extracted_count = len(entities)
+            self._extraction_stats["extracted_entities"] += extracted_count
+            self.logger.info(f"Extracted {extracted_count} entities")
+            for ent in entities:
+                self._process_item(ent, all_entities, all_relationships, **options)
+        except Exception as e:
+            self.logger.error(f"Entity extraction failed: {e}")
+            entities = []
+        
+        # 2. Extract Relations (if requested)
+        if options.get("extract_relations", True):
+            rel_extractor = RelationExtractor(method=relation_method, **self.config)
+            try:
+                # Pass entities if available to help relation extraction
+                relations = rel_extractor.extract_relations(text, entities=entities, **options)
+                extracted_count = len(relations)
+                self._extraction_stats["extracted_relations"] += extracted_count
+                self.logger.info(f"Extracted {extracted_count} relationships")
+                for rel in relations:
+                    self._process_item(rel, all_entities, all_relationships, **options)
+            except Exception as e:
+                self.logger.error(f"Relation extraction failed: {e}")
+
+        # 3. Extract Triplets (if requested)
+        if options.get("extract_triplets", True):
+            trip_extractor = TripletExtractor(method=triplet_method, **self.config)
+            try:
+                triplets = trip_extractor.extract_triplets(text, entities=entities, **options)
+                extracted_count = len(triplets)
+                self._extraction_stats["extracted_triplets"] += extracted_count
+                self.logger.info(f"Extracted {extracted_count} triplets")
+                for trip in triplets:
+                    self._process_item(trip, all_entities, all_relationships, **options)
+            except Exception as e:
+                self.logger.error(f"Triplet extraction failed: {e}")
 
     def build(
         self,
         sources: Union[List[Any], Any],
         second_arg: Optional[Any] = None,
+        pipeline_id: Optional[str] = None,
         **options,
     ) -> Dict[str, Any]:
         """
@@ -230,6 +297,7 @@ class GraphBuilder:
         Args:
             sources: Entities or sources list
             second_arg: Optional relationships list or entity_resolver (for backward compatibility)
+            pipeline_id: Optional pipeline ID for progress tracking
             **options: Additional build options
                 - extract: Whether to extract entities from text (default: True)
                 - extract_relations: Whether to extract relations from text (default: False)
@@ -256,15 +324,66 @@ class GraphBuilder:
         if "relationships" in options:
             explicit_relationships = options.pop("relationships")
 
-        # Normalize sources to list
-        if not isinstance(sources, list):
+        # Check if sources is a dict with entities/relationships (common pattern)
+        source_dict = None
+        if isinstance(sources, dict) and ("entities" in sources or "relationships" in sources):
+            source_dict = sources
+            sources = [sources]  # Normalize for tracking
+        elif isinstance(sources, list) and len(sources) > 0:
+            # Check if first item is a dict with entities/relationships
+            first_item = sources[0]
+            if isinstance(first_item, dict) and ("entities" in first_item or "relationships" in first_item):
+                # If all items are dicts with entities/relationships, merge them
+                if all(isinstance(item, dict) and ("entities" in item or "relationships" in item) for item in sources):
+                    # Merge all sources into one dict
+                    source_dict = {
+                        "entities": [],
+                        "relationships": []
+                    }
+                    for item in sources:
+                        if "entities" in item:
+                            if isinstance(item["entities"], list):
+                                source_dict["entities"].extend(item["entities"])
+                            else:
+                                source_dict["entities"].append(item["entities"])
+                        if "relationships" in item:
+                            if isinstance(item["relationships"], list):
+                                source_dict["relationships"].extend(item["relationships"])
+                            else:
+                                source_dict["relationships"].append(item["relationships"])
+        elif not isinstance(sources, list):
             sources = [sources]
 
+        # Count input relationships for warning if all are dropped
+        input_relationships_count = 0
+        if isinstance(source_dict, dict):
+            rels = source_dict.get("relationships", [])
+            if isinstance(rels, list):
+                input_relationships_count += len(rels)
+            elif rels is not None:
+                input_relationships_count += 1
+        if explicit_relationships:
+            for rel_item in explicit_relationships:
+                if isinstance(rel_item, list):
+                    input_relationships_count += len(rel_item)
+                else:
+                    input_relationships_count += 1
+
         # Track graph building
+        build_start_time = time.time()
+        
+        # Initialize extraction statistics for traceability
+        self._extraction_stats = {
+            "extracted_entities": 0,
+            "extracted_relations": 0,
+            "extracted_triplets": 0
+        }
+        
         tracking_id = self.progress_tracker.start_tracking(
             module="kg",
             submodule="GraphBuilder",
             message=f"Knowledge graph from {len(sources)} source(s)",
+            pipeline_id=pipeline_id,
         )
 
         try:
@@ -277,14 +396,174 @@ class GraphBuilder:
             all_entities = []
             all_relationships = []
 
-            # Process sources (which might be entities)
-            for source in sources:
-                if isinstance(source, list):
-                     # List of items (could be entities, relations, or mixed)
-                    for item in source:
-                        self._process_item(item, all_entities, all_relationships, **options)
-                else:
-                    self._process_item(source, all_entities, all_relationships, **options)
+            # Handle dict source with entities/relationships
+            if source_dict:
+                entities_list = source_dict.get("entities", [])
+                relationships_list = source_dict.get("relationships", [])
+                
+                if entities_list or relationships_list:
+                    total_items = len(entities_list) + len(relationships_list)
+                    self.progress_tracker.update_tracking(
+                        tracking_id,
+                        message=f"Processing {len(entities_list)} entities, {len(relationships_list)} relationships ({total_items} total)..."
+                    )
+                
+                # Process entities with progress and ETA
+                # Optimize: directly append dictionaries instead of processing each item
+                if entities_list:
+                    # Track entity processing
+                    entity_tracking_id = self.progress_tracker.start_tracking(
+                        file=None,
+                        module="kg",
+                        submodule="GraphBuilder",
+                        message=f"Processing {len(entities_list)} entities",
+                        pipeline_id=pipeline_id,
+                    )
+                    
+                    # Check if entities are already in dictionary format
+                    sample_entity = entities_list[0] if entities_list else None
+                    is_dict_format = isinstance(sample_entity, dict) and (
+                        "id" in sample_entity or "entity_id" in sample_entity or 
+                        "name" in sample_entity or "text" in sample_entity
+                    ) and not hasattr(sample_entity, "__dict__") # Ensure it's not a class instance
+                    
+                    if is_dict_format:
+                        # Fast path: directly append dictionaries after normalizing
+                        batch_size = max(100, len(entities_list) // 20)
+                        for i in range(0, len(entities_list), batch_size):
+                            batch = entities_list[i:i + batch_size]
+                            for item in batch:
+                                # Normalize entity dict format
+                                if isinstance(item, dict):
+                                    # Ensure required fields exist
+                                    entity_dict = item.copy()
+                                    if "text" in entity_dict and "name" not in entity_dict:
+                                        entity_dict["name"] = entity_dict["text"]
+                                    if "id" not in entity_dict and "entity_id" not in entity_dict:
+                                        entity_dict["id"] = entity_dict.get("name") or entity_dict.get("text") or str(hash(str(item)))
+                                    all_entities.append(entity_dict)
+                                else:
+                                    # Fallback to _process_item for non-dict items
+                                    self._process_item(item, all_entities, all_relationships, **options)
+                            
+                            processed = min(i + batch_size, len(entities_list))
+                            
+                            # Update progress with ETA
+                            self.progress_tracker.update_progress(
+                                entity_tracking_id,
+                                processed=processed,
+                                total=len(entities_list),
+                                message=f"Processing entities... {processed}/{len(entities_list)}"
+                            )
+                    else:
+                        # Slow path: use _process_item for complex objects
+                        batch_size = max(100, len(entities_list) // 20)
+                        for i in range(0, len(entities_list), batch_size):
+                            batch = entities_list[i:i + batch_size]
+                            for item in batch:
+                                self._process_item(item, all_entities, all_relationships, **options)
+                            processed = min(i + batch_size, len(entities_list))
+                            
+                            # Update progress with ETA
+                            self.progress_tracker.update_progress(
+                                entity_tracking_id,
+                                processed=processed,
+                                total=len(entities_list),
+                                message=f"Processing entities... {processed}/{len(entities_list)}"
+                            )
+                    
+                    self.progress_tracker.stop_tracking(
+                        entity_tracking_id,
+                        status="completed",
+                        message=f"Processed {len(entities_list)} entities",
+                    )
+                
+                # Process relationships with progress and ETA
+                # Optimize: directly append dictionaries instead of processing each item
+                if relationships_list:
+                    # Track relationship processing
+                    rel_tracking_id = self.progress_tracker.start_tracking(
+                        file=None,
+                        module="kg",
+                        submodule="GraphBuilder",
+                        message=f"Processing {len(relationships_list)} relationships",
+                        pipeline_id=pipeline_id,
+                    )
+                    
+                    sample_rel = relationships_list[0] if relationships_list else None
+                    is_dict_format = isinstance(sample_rel, dict) and (
+                        ("source" in sample_rel and "target" in sample_rel)
+                        or ("source_id" in sample_rel and "target_id" in sample_rel)
+                        or ("subject" in sample_rel and "object" in sample_rel)
+                    ) and not hasattr(sample_rel, "__dict__")
+                    
+                    if is_dict_format:
+                        # Fast path: directly append dictionaries after normalizing source/target
+                        batch_size = max(100, len(relationships_list) // 20)
+                        for i in range(0, len(relationships_list), batch_size):
+                            batch = relationships_list[i:i + batch_size]
+                            for item in batch:
+                                if isinstance(item, dict):
+                                    rel_dict = item.copy()
+                                    if "source_id" in rel_dict and "source" not in rel_dict:
+                                        rel_dict["source"] = rel_dict["source_id"]
+                                    if "target_id" in rel_dict and "target" not in rel_dict:
+                                        rel_dict["target"] = rel_dict["target_id"]
+                                    if "subject" in rel_dict and "source" not in rel_dict:
+                                        rel_dict["source"] = rel_dict["subject"]
+                                    if "object" in rel_dict and "target" not in rel_dict:
+                                        rel_dict["target"] = rel_dict["object"]
+                                    if "source" in rel_dict and not isinstance(rel_dict["source"], str):
+                                        src = rel_dict["source"]
+                                        rel_dict["source"] = getattr(src, "id", getattr(src, "text", str(src)))
+                                    if "target" in rel_dict and not isinstance(rel_dict["target"], str):
+                                        tgt = rel_dict["target"]
+                                        rel_dict["target"] = getattr(tgt, "id", getattr(tgt, "text", str(tgt)))
+                                    all_relationships.append(rel_dict)
+                                else:
+                                    # Fallback to _process_item for non-dict items
+                                    self._process_item(item, all_entities, all_relationships, **options)
+                            
+                            processed = min(i + batch_size, len(relationships_list))
+                            
+                            # Update progress with ETA
+                            self.progress_tracker.update_progress(
+                                rel_tracking_id,
+                                processed=processed,
+                                total=len(relationships_list),
+                                message=f"Processing relationships... {processed}/{len(relationships_list)}"
+                            )
+                    else:
+                        # Slow path: use _process_item for complex objects
+                        batch_size = max(100, len(relationships_list) // 20)
+                        for i in range(0, len(relationships_list), batch_size):
+                            batch = relationships_list[i:i + batch_size]
+                            for item in batch:
+                                self._process_item(item, all_entities, all_relationships, **options)
+                            processed = min(i + batch_size, len(relationships_list))
+                            
+                            # Update progress with ETA
+                            self.progress_tracker.update_progress(
+                                rel_tracking_id,
+                                processed=processed,
+                                total=len(relationships_list),
+                                message=f"Processing relationships... {processed}/{len(relationships_list)}"
+                            )
+                    
+                    self.progress_tracker.stop_tracking(
+                        rel_tracking_id,
+                        status="completed",
+                        message=f"Processed {len(relationships_list)} relationships",
+                    )
+            else:
+                # Process sources (which might be entities)
+                for source in sources:
+                    if isinstance(source, list):
+                         # List of items (could be entities, relations, or mixed)
+                        for item in source:
+                            self._process_item(item, all_entities, all_relationships, **options)
+                    else:
+                        self._process_item(source, all_entities, all_relationships, **options)
 
             # Process explicit relationships if provided
             if explicit_relationships:
@@ -303,15 +582,36 @@ class GraphBuilder:
             # Resolve entities (deduplicate and merge) if resolver is available
             resolved_entities = all_entities
             if resolver_to_use and all_entities:
+                # For large entity sets, entity resolution can be slow
+                # Show progress and allow skipping if too slow
+                if len(all_entities) > 1000:
+                    print(f"Resolving {len(all_entities)} entities (this may take a while for large sets)...")
+                    print("  Detecting duplicates and merging entities...")
+                else:
+                    print(f"Resolving {len(all_entities)} entities...")
+                
                 self.logger.info(
                     f"Resolving {len(all_entities)} entities using {self.entity_resolution_strategy} strategy"
                 )
+                resolution_start = time.time()
                 resolved_entities = resolver_to_use.resolve_entities(all_entities)
+                resolution_time = time.time() - resolution_start
+                print(f"[DONE] Resolved to {len(resolved_entities)} unique entities ({resolution_time:.2f}s)")
                 self.logger.info(
                     f"Entity resolution complete: {len(all_entities)} -> {len(resolved_entities)} unique entities"
                 )
 
+            if input_relationships_count > 0 and len(all_relationships) == 0:
+                warning_msg = (
+                    f"All relationships were dropped during graph building: "
+                    f"{input_relationships_count} input relationships, 0 in final graph"
+                )
+                self.logger.warning(warning_msg)
+                print(f"Warning: {warning_msg}")
+
             # Build graph structure
+            print("Building graph structure...")
+            structure_start = time.time()
             graph = {
                 "entities": resolved_entities,
                 "relationships": all_relationships,
@@ -323,18 +623,25 @@ class GraphBuilder:
                     "entity_resolution_applied": resolver_to_use is not None,
                 },
             }
+            structure_time = time.time() - structure_start
+            print(f"[DONE] Graph structure built ({structure_time:.2f}s)")
 
             # Persist to GraphStore if available
             if self.graph_store:
+                print("Persisting knowledge graph to GraphStore...")
                 self.logger.info("Persisting knowledge graph to GraphStore")
                 self.progress_tracker.update_tracking(
                     tracking_id, message="Persisting to GraphStore..."
                 )
                 
+                store_start = time.time()
                 # Add nodes
                 node_count = self.graph_store.add_nodes(resolved_entities)
+                node_time = time.time() - store_start
+                print(f"  Added {node_count} nodes ({node_time:.2f}s)")
                 
                 # Prepare edges for add_edges (expects source_id, target_id, type)
+                edge_prep_start = time.time()
                 formatted_edges = []
                 for rel in all_relationships:
                     formatted_edges.append({
@@ -343,8 +650,14 @@ class GraphBuilder:
                         "type": rel.get("type", "RELATED_TO"),
                         "properties": rel.get("metadata", {})
                     })
+                edge_prep_time = time.time() - edge_prep_start
                 
+                edge_start = time.time()
                 edge_count = self.graph_store.add_edges(formatted_edges)
+                edge_time = time.time() - edge_start
+                total_store_time = time.time() - store_start
+                print(f"  Added {edge_count} edges ({edge_time:.2f}s)")
+                print(f"[DONE] GraphStore persistence complete ({total_store_time:.2f}s total)")
                 self.logger.info(f"Persisted {node_count} nodes and {edge_count} edges")
 
             # Detect and resolve conflicts if conflict detector is available
@@ -373,10 +686,26 @@ class GraphBuilder:
                         self.logger.warning("No conflicts were automatically resolved")
 
             # Log final graph statistics
+            total_build_time = time.time() - build_start_time
             self.logger.info(
                 f"Knowledge graph built successfully: "
                 f"{len(resolved_entities)} entities, {len(all_relationships)} relationships"
             )
+            
+            # Print final summary with timing
+            print(f"\n{'='*60}")
+            print(f"[INFO] Extraction Statistics")
+            print(f"   Extracted Entities: {self._extraction_stats['extracted_entities']}")
+            print(f"   Extracted Relationships: {self._extraction_stats['extracted_relations']}")
+            print(f"   Extracted Triplets: {self._extraction_stats['extracted_triplets']}")
+            print(f"{'='*60}")
+
+            print(f"\n{'='*60}")
+            print(f"[DONE] Knowledge Graph Build Complete")
+            print(f"   Entities: {len(resolved_entities)}")
+            print(f"   Relationships: {len(all_relationships)}")
+            print(f"   Total time: {total_build_time:.2f}s")
+            print(f"{'='*60}")
 
             self.progress_tracker.stop_tracking(
                 tracking_id,
@@ -390,6 +719,14 @@ class GraphBuilder:
                 tracking_id, status="failed", message=str(e)
             )
             raise
+
+    def build_single_source(
+        self,
+        kg_data: Dict[str, Any],
+        pipeline_id: Optional[str] = None,
+        **options,
+    ) -> Dict[str, Any]:
+        return self.build(kg_data, pipeline_id=pipeline_id, **options)
 
     def add_temporal_edge(
         self,
@@ -725,7 +1062,7 @@ class GraphBuilder:
             )
             return graph
 
-        except ImportError:
+        except (ImportError, OSError):
             self.progress_tracker.stop_tracking(
                 tracking_id, status="failed", message="neo4j library not available"
             )

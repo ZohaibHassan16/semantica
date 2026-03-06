@@ -44,7 +44,7 @@ try:
     from dateutil.relativedelta import relativedelta
 
     HAS_DATEUTIL = True
-except ImportError:
+except (ImportError, OSError):
     HAS_DATEUTIL = False
     date_parser = None
     relativedelta = None
@@ -93,6 +93,9 @@ class DateNormalizer:
 
         # Initialize progress tracker
         self.progress_tracker = get_progress_tracker()
+        # Ensure progress tracker is enabled
+        if not self.progress_tracker.enabled:
+            self.progress_tracker.enabled = True
 
         self.logger.debug("Date normalizer initialized")
 

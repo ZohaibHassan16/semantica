@@ -56,27 +56,37 @@
 ## ⚙️ Algorithms Used
 
 ### Similarity Calculation
+
+The deduplication system uses multiple similarity metrics:
+
 - **Levenshtein Distance**: Edit distance for string difference
 - **Jaro-Winkler**: String similarity with prefix weighting (Default for strings, optimized for entity names)
 - **Cosine Similarity**: Vector similarity for embeddings
 - **Jaccard Similarity**: Set overlap for properties/relationships
-- **Property Matching**: Handles disjoint properties with neutral scoring (0.5) to prevent false negatives
+- **Property Matching**: Handles disjoint properties with neutral scoring (`` `0.5` ``) to prevent false negatives
 - **Multi-factor Aggregation**: Weighted sum of multiple metrics
 
 ### Default Configuration
+
 The deduplication module uses the following default weights to prioritize name matching while considering other factors:
-- **String Similarity**: 0.6 (Primary factor, using Jaro-Winkler)
-- **Property Similarity**: 0.2 (Handles missing values neutrally)
-- **Relationship Similarity**: 0.2
-- **Embedding Similarity**: 0.0 (Optional, enabled if embeddings are present)
+
+- **String Similarity**: `` `0.6` `` (Primary factor, using Jaro-Winkler)
+- **Property Similarity**: `` `0.2` `` (Handles missing values neutrally)
+- **Relationship Similarity**: `` `0.2` ``
+- **Embedding Similarity**: `` `0.0` `` (Optional, enabled if embeddings are present)
 
 ### Duplicate Detection
-- **Pairwise Comparison**: O(n²) comparison (for small sets)
+
+The system uses efficient detection algorithms:
+
+- **Pairwise Comparison**: `` `O(n²)` `` comparison (for small sets)
 - **Blocking/Indexing**: Reduce search space for large sets
 - **Union-Find**: Disjoint set data structure for grouping duplicates
-- **Confidence Scoring**: `0.0 - 1.0` probability score for duplicates
+- **Confidence Scoring**: `` `0.0 - 1.0` `` probability score for duplicates
 
 ### Clustering
+
+The module provides clustering algorithms for grouping similar entities:
 - **Hierarchical Clustering**: Agglomerative bottom-up clustering
 - **Connected Components**: Graph-based cluster detection
 - **Cluster Quality**: Cohesion and separation metrics
@@ -686,13 +696,25 @@ Configuration is loaded in the following priority order:
 
 ```python
 from semantica.core import Semantica
+from semantica.ingest import FileIngestor
+from semantica.parse import DocumentParser
+from semantica.semantic_extract import NERExtractor
 from semantica.deduplication import DuplicateDetector, EntityMerger, MergeStrategy
 
-# 1. Build knowledge base
-semantica = Semantica()
-result = semantica.build_knowledge_base(files)
-kg = result["knowledge_graph"]
-raw_entities = kg.get("entities", [])
+# 1. Build knowledge base using individual modules
+ingestor = FileIngestor()
+parser = DocumentParser()
+ner = NERExtractor()
+
+all_entities = []
+for file_path in files:
+    doc = ingestor.ingest_file(file_path)
+    parsed = parser.parse_document(file_path)
+    text = parsed.get("full_text", "")
+    entities = ner.extract_entities(text)
+    all_entities.extend(entities)
+
+raw_entities = all_entities
 
 # 2. Deduplicate
 detector = DuplicateDetector(similarity_threshold=0.85)
@@ -744,4 +766,9 @@ detector = DuplicateDetector(
 
 ## Cookbook
 
-- [Deduplication](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/introduction/18_Deduplication.ipynb)
+Interactive tutorials to learn deduplication:
+
+- **[Deduplication](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/introduction/18_Deduplication.ipynb)**: Advanced deduplication techniques for entity resolution
+  - **Topics**: Entity deduplication, fuzzy matching, similarity thresholds, merge strategies
+  - **Difficulty**: Intermediate
+  - **Use Cases**: Entity resolution, data cleaning, multi-source integration

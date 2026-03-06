@@ -107,5 +107,25 @@ class TestPipelineModule(unittest.TestCase):
         
         self.assertEqual(execution_order, ["A", "B", "C"])
 
+    def test_imports_no_circular_dependencies(self):
+        import semantica
+
+        _ = semantica.pipeline
+
+        from semantica.pipeline import PipelineBuilder, PipelineValidator
+        from semantica.deduplication import DuplicateDetector
+
+        builder = PipelineBuilder()
+        builder.add_step("step1", "dummy")
+        pipeline = builder.build("import_test_pipeline")
+
+        validator = PipelineValidator()
+        result = validator.validate_pipeline(pipeline)
+
+        self.assertTrue(result.valid)
+
+        detector = DuplicateDetector()
+        self.assertIsNotNone(detector)
+
 if __name__ == "__main__":
     unittest.main()

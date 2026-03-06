@@ -265,6 +265,9 @@ class HybridSearch:
         self.config = config
         self.vector_store = vector_store
         self.progress_tracker = get_progress_tracker()
+        # Ensure progress tracker is enabled
+        if not self.progress_tracker.enabled:
+            self.progress_tracker.enabled = True
         self.ranker = SearchRanker(
             config.get("ranking_strategy", "reciprocal_rank_fusion")
         )
@@ -331,7 +334,7 @@ class HybridSearch:
                     try:
                         from ..embeddings import EmbeddingGenerator
                         self.embedding_generator = EmbeddingGenerator()
-                    except ImportError:
+                    except (ImportError, OSError):
                         raise ImportError("EmbeddingGenerator not available for string queries")
                 
                 query_vector = self.embedding_generator.generate_embeddings(query, data_type="text")

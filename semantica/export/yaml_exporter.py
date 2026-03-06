@@ -71,7 +71,7 @@ class SemanticNetworkYAMLExporter:
             import yaml
 
             self.yaml = yaml
-        except ImportError:
+        except (ImportError, OSError):
             raise ImportError("PyYAML not installed. Install with: pip install pyyaml")
 
         # Initialize progress tracker
@@ -297,7 +297,7 @@ class YAMLSchemaExporter:
             import yaml
 
             self.yaml = yaml
-        except ImportError:
+        except (ImportError, OSError):
             raise ImportError("PyYAML not installed. Install with: pip install pyyaml")
 
     def export_ontology_schema(self, ontology: Dict[str, Any], **options) -> str:

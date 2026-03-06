@@ -26,12 +26,19 @@ pip install -e ".[dev]"
 ### ⚡ 30-Second Demo: From Any Format to Knowledge
 
 ```python
-from semantica.core import Semantica
+from semantica.ingest import FileIngestor
+from semantica.parse import DocumentParser
+from semantica.semantic_extract import NERExtractor, RelationExtractor
+from semantica.kg import GraphBuilder
+from semantica.embeddings import TextEmbedder
 
-# Initialize with preferred providers
-core = Semantica(
-    llm_provider="openai",
-    embedding_model="text-embedding-3-large",
+# Use individual modules with preferred providers
+ingestor = FileIngestor()
+parser = DocumentParser()
+ner = NERExtractor(method="llm", provider="openai")
+rel_extractor = RelationExtractor()
+builder = GraphBuilder()
+embedder = TextEmbedder(method="openai", model="text-embedding-3-large")
     vector_store="weaviate",
     graph_db="neo4j"
 )
@@ -129,6 +136,39 @@ for feed_url in feeds:
 async for item in feed_processor.stream_items():
     semantics = core.extract_semantics(item.content)
     knowledge_graph.add_triplets(core.generate_triplets(semantics))
+```
+
+### 🦆 Docling Clear Code Example
+
+High-accuracy document parsing with structural understanding:
+
+```python
+from semantica.parse import DoclingParser
+
+# 1. Initialize DoclingParser
+# Docling provides superior table extraction and structure understanding
+# Requires: pip install docling
+parser = DoclingParser(
+    enable_ocr=True,          # Enable OCR for scanned documents
+    export_format="markdown"  # Options: "markdown", "html", "json"
+)
+
+# 2. Parse a complex document
+# Supports PDF, DOCX, PPTX, XLSX, HTML, and images
+result = parser.parse("complex_invoice.pdf")
+
+# 3. Access structured content
+print(f"Content (Markdown):\n{result['full_text']}")
+
+# 4. Extract and iterate over tables with high precision
+for i, table in enumerate(result['tables']):
+    print(f"\nTable {i+1}:")
+    print(f"Headers: {table.get('headers', [])}")
+    print(f"Data rows: {len(table.get('rows', []))}")
+
+# 5. Get document metadata
+metadata = result['metadata']
+print(f"\nMetadata: {metadata.get('title')} ({result.get('total_pages')} pages)")
 ```
 
 ### 📊 Structured Data Processing Module
@@ -978,7 +1018,7 @@ knowledge_graph.apply_resolutions(resolved_data)
 
 ### 💬 Community Support
 
-- **💬 [Discord Community](https://discord.gg/semantica)** - Real-time chat and support
+- **💬 [Discord Community](https://discord.gg/N7WmAuDH)** - Real-time chat and support
 - **🐙 [GitHub Discussions](https://github.com/semantica/semantica/discussions)** - Community Q&A
 - **📧 [Mailing List](https://groups.google.com/g/semantica)** - Announcements and updates
 - **🐦 [Twitter](https://twitter.com/semantica)** - Latest news and tips
@@ -1011,6 +1051,6 @@ This project is licensed under the MIT License - see the [LICENSE](https://githu
 
 **🚀 Ready to transform your data into intelligent knowledge?**
 
-[Get Started Now](https://semantica.readthedocs.io/quickstart/) • [View Examples](https://github.com/semantica/examples) • [Join Community](https://discord.gg/semantica)
+[Get Started Now](https://semantica.readthedocs.io/quickstart/) • [View Examples](https://github.com/semantica/examples) • [Join Community](https://discord.gg/N7WmAuDH)
 
 </div>

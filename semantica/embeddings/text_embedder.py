@@ -34,14 +34,14 @@ try:
     from sentence_transformers import SentenceTransformer
 
     SENTENCE_TRANSFORMERS_AVAILABLE = True
-except ImportError:
+except (ImportError, OSError):
     SENTENCE_TRANSFORMERS_AVAILABLE = False
 
 try:
     from fastembed import TextEmbedding
 
     FASTEMBED_AVAILABLE = True
-except ImportError:
+except (ImportError, OSError):
     FASTEMBED_AVAILABLE = False
 
 
@@ -107,6 +107,7 @@ class TextEmbedder:
         # Initialize models (will be None if unavailable)
         self.model = None
         self.fastembed_model = None
+        self.embedding_dimension = None
 
         # Initialize progress tracker
         self.progress_tracker = get_progress_tracker()
@@ -121,6 +122,11 @@ class TextEmbedder:
         If unavailable or loading fails, falls back to hash-based embedding method.
         Logs warnings but doesn't raise errors to allow graceful degradation.
         """
+        # Clear previous models to avoid conflicts when switching
+        self.model = None
+        self.fastembed_model = None
+        self.embedding_dimension = None
+
         if self.method == "fastembed":
             if FASTEMBED_AVAILABLE:
                 try:
@@ -129,8 +135,17 @@ class TextEmbedder:
                         "fastembed_model_name", self.model_name
                     )
                     self.fastembed_model = TextEmbedding(model_name=fastembed_model_name)
+                    
+                    # Detect dimension from model
+                    try:
+                        # FastEmbed doesn't expose dimension directly, so we generate a test embedding
+                        test_emb = list(self.fastembed_model.embed(["test"]))[0]
+                        self.embedding_dimension = len(test_emb)
+                    except Exception:
+                        self.embedding_dimension = 384
+                        
                     self.logger.info(
-                        f"Loaded FastEmbed model: {fastembed_model_name}"
+                        f"Loaded FastEmbed model: {fastembed_model_name} (dim: {self.embedding_dimension})"
                     )
                 except Exception as e:
                     self.logger.warning(
@@ -149,9 +164,10 @@ class TextEmbedder:
             if SENTENCE_TRANSFORMERS_AVAILABLE:
                 try:
                     self.model = SentenceTransformer(self.model_name, device=self.device)
+                    self.embedding_dimension = self.model.get_sentence_embedding_dimension()
                     self.logger.info(
                         f"Loaded sentence-transformers model: {self.model_name} "
-                        f"(device: {self.device})"
+                        f"(device: {self.device}, dim: {self.embedding_dimension})"
                     )
                 except Exception as e:
                     self.logger.warning(
@@ -165,19 +181,12 @@ class TextEmbedder:
                     "Install with: pip install sentence-transformers. "
                     "Using fallback embedding method."
                 )
-
-    def get_method(self) -> str:
-        """Get current embedding method."""
-        return self.method
-
-    def get_model_info(self) -> Dict[str, Any]:
-        """Get current model information."""
-        return {
-            "method": self.method,
-            "model_name": self.model_name,
-            "device": self.device,
-            "normalize": self.normalize
-        }
+        
+        # If no model loaded, use fallback dimension
+        if self.embedding_dimension is None:
+            self.embedding_dimension = self.config.get("dimension", 128)
+        
+        self.logger.debug(f"Initialized text embedder with dimension: {self.embedding_dimension}")
 
     def set_model(self, method: str, model_name: str, **config) -> None:
         """
@@ -190,6 +199,10 @@ class TextEmbedder:
         """
         self.method = method.lower()
         self.model_name = model_name
+        
+        # Update config with new values
+        self.config.update(config)
+        
         if "device" in config:
             self.device = config["device"]
         if "normalize" in config:
@@ -340,8 +353,8 @@ class TextEmbedder:
         hash_val = int(hashlib.sha256(text.encode("utf-8")).hexdigest(), 16)
         rng = np.random.RandomState(hash_val % (2**32))
         
-        # Determine dimension - use config or default
-        dim = self.config.get("dimension", 128)
+        # Determine dimension - use stored dimension or default
+        dim = self.embedding_dimension or 128
         embedding = rng.rand(dim).astype(np.float32)
 
         # Normalize if requested
@@ -470,18 +483,7 @@ class TextEmbedder:
             >>> dim = embedder.get_embedding_dimension()
             >>> print(f"Embedding dimension: {dim}")
         """
-        if self.fastembed_model:
-            # FastEmbed doesn't expose dimension directly, so we generate a test embedding
-            try:
-                test_emb = self._embed_with_fastembed("test")
-                return len(test_emb)
-            except Exception:
-                # Default FastEmbed dimension
-                return 384
-        elif self.model:
-            return self.model.get_sentence_embedding_dimension()
-        else:
-            return 128  # Fallback hash-based embedding dimension
+        return self.embedding_dimension or 128
 
     def get_method(self) -> str:
         """

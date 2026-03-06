@@ -38,7 +38,7 @@ import numpy as np
 try:
     import matplotlib.patches as mpatches
     import matplotlib.pyplot as plt
-except ImportError:
+except (ImportError, OSError):
     mpatches = None
     plt = None
 
@@ -46,7 +46,7 @@ try:
     import plotly.express as px
     import plotly.graph_objects as go
     from plotly.subplots import make_subplots
-except ImportError:
+except (ImportError, OSError):
     px = None
     go = None
     make_subplots = None
@@ -92,6 +92,9 @@ class KGVisualizer:
         self.logger = get_logger("kg_visualizer")
         self.config = config
         self.progress_tracker = get_progress_tracker()
+        # Ensure progress tracker is enabled
+        if not self.progress_tracker.enabled:
+            self.progress_tracker.enabled = True
 
         self.layout_type = config.get("layout", "force")
         color_scheme_name = config.get("color_scheme", "default")

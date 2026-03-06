@@ -3,7 +3,7 @@ Vector Store Management Module
 
 This module provides comprehensive vector storage and retrieval capabilities for the
 Semantica framework, including support for multiple vector store backends (FAISS,
-Weaviate, Qdrant, Milvus), hybrid search combining vector similarity and
+Weaviate, Qdrant, Pinecone, Milvus), hybrid search combining vector similarity and
 metadata filtering, metadata management, and namespace isolation.
 
 Algorithms Used:
@@ -58,6 +58,7 @@ Supported Backends:
     - FAISS: In-memory/local disk (Facebook AI Similarity Search)
     - Weaviate: Cloud/Self-hosted (Schema-aware vector database)
     - Qdrant: Cloud/Self-hosted (Vector database for the next generation of AI)
+    - Pinecone: Cloud-managed (Managed vector database service)
     - Milvus: Cloud/Self-hosted (Highly scalable vector database)
     - InMemory: Simple list-based storage for testing/small datasets
 
@@ -73,7 +74,7 @@ Dependencies:
     - pymilvus
 
 Key Features:
-    - Multi-backend vector store support (FAISS, Weaviate, Qdrant, Milvus)
+    - Multi-backend vector store support (FAISS, Weaviate, Qdrant, Pinecone, Milvus)
     - Vector indexing and similarity search
     - Metadata indexing and filtering
     - Hybrid search combining vector and metadata queries
@@ -82,6 +83,9 @@ Key Features:
     - Batch operations and performance optimization
     - Method registry for extensibility
     - Configuration management with environment variables and config files
+    - Enhanced decision tracking with hybrid similarity search
+    - Integration with KG algorithms for structural embeddings
+    - Advanced context expansion using path finding, community detection, and centrality
 
 Main Classes:
     - VectorStore: Main vector store interface
@@ -91,6 +95,7 @@ Main Classes:
     - FAISSStore: FAISS integration for local vector storage
     - WeaviateStore: Weaviate vector database integration
     - QdrantStore: Qdrant vector database integration
+    - PineconeStore: Pinecone vector database integration
     - MilvusStore: Milvus vector database integration
     - HybridSearch: Hybrid vector and metadata search
     - MetadataStore: Metadata indexing and management
@@ -130,6 +135,16 @@ License: MIT
 from .config import VectorStoreConfig, vector_store_config
 from .faiss_store import FAISSStore, FAISSIndex, FAISSIndexBuilder, FAISSSearch
 from .hybrid_search import HybridSearch, MetadataFilter, SearchRanker
+from .hybrid_similarity import HybridSimilarityCalculator
+from .decision_embedding_pipeline import DecisionEmbeddingPipeline
+from .decision_vector_methods import (
+    quick_decision, find_precedents, explain, similar_to, batch_decisions,
+    filter_decisions, get_decision_context, search_by_entities, get_decision_statistics,
+    update_similarity_weights, set_global_vector_store, get_global_vector_store,
+    # Aliases
+    record, precedents, explain_decision, similar, batch, filter, context,
+    by_entities, stats, weights
+)
 from .metadata_store import MetadataIndex, MetadataSchema, MetadataStore
 from .methods import (
     create_index,
@@ -145,6 +160,8 @@ from .methods import (
 )
 from .milvus_store import MilvusStore, MilvusClient, MilvusCollection, MilvusSearch
 from .namespace_manager import Namespace, NamespaceManager
+from .pgvector_store import PgVectorStore
+from .pinecone_store import PineconeStore, PineconeClient, PineconeIndex, PineconeSearch
 from .qdrant_store import QdrantStore, QdrantClient, QdrantCollection, QdrantSearch
 from .registry import MethodRegistry, method_registry
 from .vector_store import VectorIndexer, VectorManager, VectorRetriever, VectorStore
@@ -181,10 +198,44 @@ __all__ = [
     "MilvusClient",
     "MilvusCollection",
     "MilvusSearch",
+    # Pinecone
+    "PineconeStore",
+    "PineconeClient",
+    "PineconeIndex",
+    "PineconeSearch",
+    # PgVector
+    "PgVectorStore",
     # Hybrid search
     "HybridSearch",
     "MetadataFilter",
     "SearchRanker",
+    # Enhanced decision features
+    "HybridSimilarityCalculator",
+    "DecisionEmbeddingPipeline",
+    # Decision convenience functions
+    "quick_decision",
+    "find_precedents",
+    "explain",
+    "similar_to",
+    "batch_decisions",
+    "filter_decisions",
+    "get_decision_context",
+    "search_by_entities",
+    "get_decision_statistics",
+    "update_similarity_weights",
+    "set_global_vector_store",
+    "get_global_vector_store",
+    # Aliases for convenience
+    "record",
+    "precedents",
+    "explain_decision",
+    "similar",
+    "batch",
+    "filter",
+    "context",
+    "by_entities",
+    "stats",
+    "weights",
     # Metadata store
     "MetadataStore",
     "MetadataIndex",

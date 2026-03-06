@@ -5,6 +5,7 @@ repos:
       - id: trailing-whitespace
       - id: end-of-file-fixer
       - id: check-yaml
+        exclude: 'neptune-setup\.yaml$'
       - id: check-json
       - id: check-toml
       - id: check-added-large-files
@@ -49,9 +50,15 @@ repos:
     hooks:
       - id: yamllint
         args: ['-d', '{extends: default, rules: {line-length: {max: 120}}}']
+        exclude: 'neptune-setup\.yaml$'
+
+  - repo: https://github.com/aws-cloudformation/cfn-lint
+    rev: v1.43.3
+    hooks:
+      - id: cfn-lint
+        files: 'neptune-setup\.yaml$'
 
   # Removed slow hooks for faster development:
   # - mypy: Type checking (can be run manually or in CI)
   # - bandit: Security scanning (can be run separately)
   # - pytest: Testing (should be run manually, not on every commit)
-

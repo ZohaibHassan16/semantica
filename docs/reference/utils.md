@@ -6,6 +6,37 @@
 
 ## 🎯 Overview
 
+The **Utils Module** provides shared utilities used throughout all Semantica modules. It includes logging, error handling, validation, progress tracking, and common helper functions.
+
+### What is the Utils Module?
+
+The Utils module provides:
+
+- **Logging**: Structured logging with performance tracking
+- **Error Handling**: Custom exception hierarchy and error formatting
+- **Validation**: Data validation for entities, relationships, and configuration
+- **Progress Tracking**: Track long-running operations
+- **Helpers**: Common functions for text cleaning, hashing, file I/O
+- **Type Definitions**: Shared TypedDicts and Enums for type safety
+
+### Why Use the Utils Module?
+
+- **Consistency**: Shared utilities ensure consistent behavior across modules
+- **Error Handling**: Standardized error handling and reporting
+- **Logging**: Unified logging across all modules
+- **Validation**: Reusable validation functions
+- **Type Safety**: Shared type definitions for better IDE support
+
+### How It Works
+
+The Utils module is used internally by all Semantica modules. You typically don't use it directly, but it provides:
+
+- **Logging Functions**: `` `get_logger()` ``, `` `setup_logging()` ``
+- **Validation Functions**: `` `validate_entity()` ``, `` `validate_relationship()` ``
+- **Error Classes**: Custom exceptions for different error types
+- **Progress Tracking**: `` `ProgressTracker` `` for long operations
+- **Helper Functions**: Text cleaning, hashing, file operations
+
 <div class="grid cards" markdown>
 
 -   :material-console-line:{ .lg .middle } **Logging**
@@ -180,6 +211,15 @@ export SEMANTICA_PROGRESS_BAR=true
 4.  **Clean Text**: Use `clean_text` before embedding or extraction to improve quality.
 
 ---
+
+## Cookbook
+
+The Utils module is used throughout all Semantica modules. See any cookbook tutorial for examples of logging, validation, and error handling in practice.
+
+- **[Welcome to Semantica](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/introduction/01_Welcome_to_Semantica.ipynb)**: See utils in action across all modules
+  - **Topics**: Framework overview, all modules, utilities
+  - **Difficulty**: Beginner
+  - **Use Cases**: Understanding utility functions used throughout Semantica
 
 ## See Also
 

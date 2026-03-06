@@ -68,6 +68,9 @@ class EntityResolver:
 
         # Initialize progress tracker
         self.progress_tracker = get_progress_tracker()
+        # Ensure progress tracker is enabled
+        if not self.progress_tracker.enabled:
+            self.progress_tracker.enabled = True
         self.config = config
 
         # Resolution strategy and threshold
@@ -165,15 +168,29 @@ class EntityResolver:
 
                     # Mark all source entities as processed
                     for source_entity in operation.source_entities:
-                        entity_id = source_entity.get("id") or source_entity.get(
-                            "entity_id"
+                        entity_id = (
+                            source_entity.get("id")
+                            if isinstance(source_entity, dict)
+                            else getattr(source_entity, "id", None)
+                        ) or (
+                            source_entity.get("entity_id")
+                            if isinstance(source_entity, dict)
+                            else getattr(source_entity, "entity_id", None)
                         )
                         if entity_id:
                             processed_entity_ids.add(entity_id)
 
             # Step 3: Add non-duplicate entities (entities not in any duplicate group)
             for entity in entities:
-                entity_id = entity.get("id") or entity.get("entity_id")
+                entity_id = (
+                    entity.get("id")
+                    if isinstance(entity, dict)
+                    else getattr(entity, "id", None)
+                ) or (
+                    entity.get("entity_id")
+                    if isinstance(entity, dict)
+                    else getattr(entity, "entity_id", None)
+                )
                 if entity_id and entity_id not in processed_entity_ids:
                     # This entity was not merged, add it as-is
                     merged_entities.append(entity)

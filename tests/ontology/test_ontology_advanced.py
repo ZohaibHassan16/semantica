@@ -6,7 +6,7 @@ import os
 
 from semantica.ontology.ontology_evaluator import OntologyEvaluator, EvaluationResult
 from semantica.ontology.competency_questions import CompetencyQuestionsManager, CompetencyQuestion
-from semantica.ontology.version_manager import VersionManager, OntologyVersion
+from semantica.change_management import VersionManager, OntologyVersion
 from semantica.ontology.associative_class import AssociativeClassBuilder, AssociativeClass
 
 class TestOntologyAdvanced(unittest.TestCase):
@@ -22,8 +22,8 @@ class TestOntologyAdvanced(unittest.TestCase):
             patch('semantica.ontology.ontology_evaluator.get_progress_tracker', return_value=self.mock_tracker),
             patch('semantica.ontology.competency_questions.get_logger', return_value=self.mock_logger),
             patch('semantica.ontology.competency_questions.get_progress_tracker', return_value=self.mock_tracker),
-            patch('semantica.ontology.version_manager.get_logger', return_value=self.mock_logger),
-            patch('semantica.ontology.version_manager.get_progress_tracker', return_value=self.mock_tracker),
+            patch('semantica.change_management.ontology_version_manager.get_logger', return_value=self.mock_logger),
+            patch('semantica.change_management.ontology_version_manager.get_progress_tracker', return_value=self.mock_tracker),
             patch('semantica.ontology.associative_class.get_logger', return_value=self.mock_logger),
             patch('semantica.ontology.associative_class.get_progress_tracker', return_value=self.mock_tracker),
         ]
@@ -93,7 +93,7 @@ class TestOntologyAdvanced(unittest.TestCase):
             self.assertEqual(result.completeness_score, 0.9)
 
     # --- VersionManager Tests ---
-    @patch('semantica.ontology.version_manager.NamespaceManager')
+    @patch('semantica.change_management.ontology_version_manager.NamespaceManager')
     def test_version_manager_create(self, mock_ns_cls):
         manager = VersionManager(base_uri="http://example.org/")
         ontology = {"metadata": {}}

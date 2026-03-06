@@ -40,7 +40,7 @@ try:
     import plotly.express as px
     import plotly.graph_objects as go
     from plotly.subplots import make_subplots
-except ImportError:
+except (ImportError, OSError):
     px = None
     go = None
     make_subplots = None
@@ -50,7 +50,7 @@ from sklearn.manifold import TSNE
 
 try:
     import umap
-except ImportError:
+except (ImportError, OSError):
     umap = None
 
 from ..utils.exceptions import ProcessingError
@@ -83,6 +83,9 @@ class EmbeddingVisualizer:
         self.logger = get_logger("embedding_visualizer")
         self.config = config
         self.progress_tracker = get_progress_tracker()
+        # Ensure progress tracker is enabled
+        if not self.progress_tracker.enabled:
+            self.progress_tracker.enabled = True
 
         color_scheme_name = config.get("color_scheme", "default")
         try:

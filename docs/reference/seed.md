@@ -6,6 +6,33 @@
 
 ## 🎯 Overview
 
+The **Seed Module** provides a system for initializing Knowledge Graphs with verified, structured data from trusted sources. It enables bootstrapping knowledge graphs with reference data, taxonomies, and verified entities.
+
+### What is Seed Data?
+
+**Seed data** is verified, structured data used to bootstrap or enhance knowledge graphs. Examples include:
+
+- **Taxonomies**: Hierarchical classifications (product categories, organizational structures)
+- **Reference Data**: Immutable reference information (countries, codes, standards)
+- **Verified Entities**: Pre-validated entities from authoritative sources
+- **Foundation Graphs**: Initial graph structures to build upon
+
+### Why Use the Seed Module?
+
+- **Bootstrap KGs**: Start with verified data instead of empty graphs
+- **Quality Assurance**: Use trusted, validated data sources
+- **Faster Development**: Skip initial data extraction for known entities
+- **Data Integration**: Merge seed data with extracted data
+- **Versioning**: Manage different versions of seed data
+
+### How It Works
+
+1. **Load Seed Data**: Load from CSV, JSON, databases, or APIs
+2. **Validate**: Validate data quality and schema compliance
+3. **Transform**: Convert to knowledge graph format
+4. **Merge**: Integrate with extracted data using configurable strategies
+5. **Version**: Track versions of seed data sources
+
 <div class="grid cards" markdown>
 
 -   :material-database-import:{ .lg .middle } **Multi-Source Loading**
@@ -56,17 +83,32 @@
 ## ⚙️ Algorithms Used
 
 ### Data Loading
+
+**Purpose**: Load seed data from various formats efficiently.
+
+**How it works**:
+
 - **Format Detection**: Auto-detection of CSV delimiters, JSON structure
 - **Streaming**: Row-by-row processing for large files
 - **Normalization**: Type conversion and encoding handling
 
 ### Integration & Merging
+
+**Purpose**: Merge seed data with extracted data using configurable strategies.
+
+**How it works**:
+
 - **Seed-First Strategy**: Seed data overrides extracted data (Trust Seed)
 - **Extracted-First Strategy**: Extracted data overrides seed (Trust Extraction)
 - **Smart Merge**: Property-level merging with conflict resolution
 - **ID Matching**: Entity resolution between seed and extracted entities
 
 ### Validation
+
+**Purpose**: Validate seed data quality and schema compliance.
+
+**How it works**:
+
 - **Schema Validation**: Template-based structure checking
 - **Constraint Checking**: Required field and type validation
 - **Consistency Check**: Reference integrity (relationships point to existing entities)
@@ -147,7 +189,6 @@ seed:
 ```python
 from semantica.seed import SeedDataManager
 from semantica.ingest import Ingestor
-from semantica.kg import KnowledgeGraph
 
 # 1. Load Foundation (Seed)
 seed_manager = SeedDataManager()
@@ -176,6 +217,20 @@ final_kg = seed_manager.integrate_seed_extracted(
 4.  **Clean IDs**: Use consistent ID schemes in seed data to facilitate merging.
 
 ---
+
+## Cookbook
+
+Interactive tutorials that use seed data:
+
+- **[Financial Data Integration MCP](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/use_cases/finance/01_Financial_Data_Integration_MCP.ipynb)**: Merging financial data with seed data integration
+  - **Topics**: Finance, data fusion, MCP integration, seed data
+  - **Difficulty**: Intermediate
+  - **Use Cases**: Integrating structured seed data with extracted data
+
+- **[Energy Market Analysis](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/use_cases/renewable_energy/01_Energy_Market_Analysis.ipynb)**: Analyzing trends with seed data integration
+  - **Topics**: Energy, time series, temporal analysis, seed data
+  - **Difficulty**: Intermediate
+  - **Use Cases**: Bootstrapping knowledge graphs with verified data
 
 ## See Also
 

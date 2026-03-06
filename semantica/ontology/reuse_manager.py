@@ -78,6 +78,9 @@ class ReuseManager:
 
         # Initialize progress tracker
         self.progress_tracker = get_progress_tracker()
+        # Ensure progress tracker is enabled
+        if not self.progress_tracker.enabled:
+            self.progress_tracker.enabled = True
 
         self.reuse_decisions: List[ReuseDecision] = []
         self.known_ontologies: Dict[str, Dict[str, Any]] = {}
@@ -360,3 +363,90 @@ class ReuseManager:
     def list_known_ontologies(self) -> List[str]:
         """List known ontology URIs."""
         return list(self.known_ontologies.keys())
+
+    def merge_ontology_data(
+        self, target: Dict[str, Any], source: Dict[str, Any], **options
+    ) -> Dict[str, Any]:
+        """
+        Merge source ontology data into target ontology.
+
+        Merges classes, properties, and metadata from source to target.
+        Handles deduplication based on URI and name.
+
+        Args:
+            target: Target ontology dictionary (modified in-place)
+            source: Source ontology dictionary
+            **options: Merge options:
+                - overwrite: Whether to overwrite existing elements (default: False)
+                - merge_metadata: Whether to merge metadata (default: True)
+
+        Returns:
+            Merged target ontology
+        """
+        tracking_id = self.progress_tracker.start_tracking(
+            module="ontology",
+            submodule="ReuseManager",
+            message=f"Merging ontology {source.get('name', 'unknown')} into {target.get('name', 'unknown')}",
+        )
+
+        try:
+            overwrite = options.get("overwrite", False)
+            
+            # Helper to merge lists of dicts (classes/properties)
+            def merge_lists(target_list, source_list, key_field="uri"):
+                existing_keys = {item.get(key_field): i for i, item in enumerate(target_list) if item.get(key_field)}
+                
+                for item in source_list:
+                    key = item.get(key_field)
+                    if not key:
+                        # Fallback to name if URI missing
+                        key = item.get("name")
+                        
+                    if key in existing_keys:
+                        if overwrite:
+                            target_list[existing_keys[key]] = item
+                    else:
+                        target_list.append(item)
+                        if key:
+                            existing_keys[key] = len(target_list) - 1
+
+            # Merge Classes
+            if "classes" in source:
+                if "classes" not in target:
+                    target["classes"] = []
+                merge_lists(target["classes"], source["classes"])
+
+            # Merge Properties
+            if "properties" in source:
+                if "properties" not in target:
+                    target["properties"] = []
+                merge_lists(target["properties"], source["properties"])
+
+            # Merge Metadata
+            if options.get("merge_metadata", True) and "metadata" in source:
+                if "metadata" not in target:
+                    target["metadata"] = {}
+                # Update with source metadata, preserving target's specific fields if needed
+                # Here we just update
+                target["metadata"].update(source["metadata"])
+                
+            # Merge Imports
+            if "imports" in source:
+                if "imports" not in target:
+                    target["imports"] = []
+                for imp in source["imports"]:
+                    if imp not in target["imports"]:
+                        target["imports"].append(imp)
+
+            self.progress_tracker.stop_tracking(
+                tracking_id,
+                status="completed",
+                message=f"Merged ontology data successfully",
+            )
+            return target
+
+        except Exception as e:
+            self.progress_tracker.stop_tracking(
+                tracking_id, status="failed", message=str(e)
+            )
+            raise

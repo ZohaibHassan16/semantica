@@ -69,6 +69,9 @@ class NamespaceManager:
 
         # Initialize progress tracker
         self.progress_tracker = get_progress_tracker()
+        # Ensure progress tracker is enabled
+        if not self.progress_tracker.enabled:
+            self.progress_tracker.enabled = True
 
         self.base_uri = self.config.get("base_uri", "https://semantica.dev/ontology/")
         self.version = self.config.get("version", "1.0")

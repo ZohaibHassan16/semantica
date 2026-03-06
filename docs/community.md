@@ -1,86 +1,73 @@
-# Community
+﻿# Community
 
-Welcome to the Semantica community!
-
-!!! info "Join Us"
-    We're building an open, collaborative community around semantic AI and knowledge graphs.
+**Connect with the Semantica community for support, collaboration, and learning.**
 
 ---
 
-## 💬 Communication Channels
+## Get Help & Support
 
-### GitHub
-
-- **[Issues](https://github.com/Hawksight-AI/semantica/issues)** - Bug reports, feature requests, questions
+### GitHub Issues
+- **[Report Issues](https://github.com/Hawksight-AI/semantica/issues)** - Bug reports and feature requests
 - **[Pull Requests](https://github.com/Hawksight-AI/semantica/pulls)** - Code contributions
-- **[Releases](https://github.com/Hawksight-AI/semantica/releases)** - Release announcements
+- **[Discussions](https://github.com/Hawksight-AI/semantica/discussions)** - Questions and ideas
 
-### Contact
-
-- **GitHub Issues**: [Create an issue](https://github.com/Hawksight-AI/semantica/issues) for all communication
-- **GitHub Security Advisories**: [Report security issues](https://github.com/Hawksight-AI/semantica/security/advisories/new)
+### Security Issues
+- **[Report Security](https://github.com/Hawksight-AI/semantica/security/advisories/new)** - Security vulnerabilities
 
 ---
 
-## 🤝 Community Values
+## Community Guidelines
 
-- **Respect**: Treat everyone with respect and kindness
-- **Inclusion**: Welcome people of all backgrounds
-- **Collaboration**: Work together to build something great
-- **Learning**: Share knowledge and help others
-- **Openness**: Transparent communication
+### Our Values
+- **Respect** - Treat everyone with kindness
+- **Inclusion** - Welcome all backgrounds and experience levels
+- **Collaboration** - Work together to build great things
+- **Learning** - Share knowledge and help others grow
 
----
-
-## 📖 Code of Conduct
-
-We have a [Code of Conduct](https://github.com/Hawksight-AI/semantica/blob/main/CODE_OF_CONDUCT.md) that all community members must follow.
+### Code of Conduct
+We follow the [Contributor Covenant Code of Conduct](https://github.com/Hawksight-AI/semantica/blob/main/CODE_OF_CONDUCT.md).
 
 ### Reporting Issues
-
-If you experience unacceptable behavior:
+If you experience unacceptable behavior, please:
 1. Document what happened
-2. Contact maintainers through [GitHub Issues](https://github.com/Hawksight-AI/semantica/issues) with "[CoC]" prefix
+2. Create an issue with "[CoC]" prefix
 3. We'll investigate and respond appropriately
 
 ---
 
-## 🎯 Getting Help
+## Contributing
 
-### Before Asking
+### Ways to Contribute
+- **Code** - Fix bugs, add features, improve documentation
+- **Documentation** - Improve guides, fix typos, add examples
+- **Testing** - Report issues, write tests, validate fixes
+- **Community** - Help others, share knowledge, provide feedback
 
-1. Check the [documentation](index.md)
-2. Search [GitHub issues](https://github.com/Hawksight-AI/semantica/issues)
-3. Review the [FAQ](faq.md)
-4. Check the [cookbook](cookbook.md)
-
-### Asking Questions
-
-When asking for help:
-- Be specific about your problem
-- Include environment details
-- Share what you've tried
-- Provide code examples
-- Be patient
+### Getting Started
+1. **Fork** the repository
+2. **Create** a feature branch
+3. **Make** your changes
+4. **Test** your changes
+5. **Submit** a pull request
 
 ---
 
-## 🏆 Recognition
+## Stay Connected
 
-All contributors are recognized in:
-- [CONTRIBUTORS.md](https://github.com/Hawksight-AI/semantica/blob/main/CONTRIBUTORS.md)
-- GitHub contributors page
-- Release notes (for significant contributions)
+### Follow the Project
+- **[GitHub](https://github.com/Hawksight-AI/semantica)** - Source code and releases
+- **[PyPI](https://pypi.org/project/semantica/)** - Package information and downloads
+
+### Share Your Work
+- **Blog Posts** - Write about your Semantica projects
+- **Tutorials** - Create guides and examples
+- **Projects** - Share what you've built with Semantica
 
 ---
 
-## 📚 Resources
+## Need Help?
 
+- **[Getting Started](getting-started.md)** - Quick start guide
+- **[FAQ](faq.md)** - Frequently asked questions
 - **[Contributing Guide](contributing.md)** - How to contribute
-- **[Governance](governance.md)** - Project governance
-- **[Community Projects](community-projects.md)** - Community showcase
-
----
-
-!!! success "Thank You!"
-    Thank you for being part of the Semantica community! 🎉
+- **[GitHub Issues](https://github.com/Hawksight-AI/semantica/issues)** - Ask questions

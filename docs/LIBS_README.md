@@ -82,40 +82,82 @@ pip install -e ".[dev]"
 
 #### API Usage Patterns
 
-**Pattern 1: Using Semantica class (Recommended)**
+**Pattern 1: Using Individual Modules (Recommended)**
+```python
+from semantica.ingest import FileIngestor
+from semantica.parse import DocumentParser
+from semantica.semantic_extract import NERExtractor, RelationExtractor
+from semantica.kg import GraphBuilder
+from semantica.embeddings import TextEmbedder
+
+# Use individual modules for full control
+ingestor = FileIngestor()
+parser = DocumentParser()
+ner = NERExtractor()
+rel_extractor = RelationExtractor()
+builder = GraphBuilder(merge_entities=True)
+embedder = TextEmbedder()
+
+# Build knowledge base step by step
+docs = ingestor.ingest_file("doc1.pdf")
+parsed = parser.parse_document("doc1.pdf")
+text = parsed.get("full_text", "")
+entities = ner.extract_entities(text)
+relationships = rel_extractor.extract_relations(text, entities=entities)
+kg = builder.build_graph(entities=entities, relationships=relationships)
+embeddings = embedder.embed_batch([e.text for e in entities])
+```
+
+**Pattern 2: Using Semantica Class (Orchestration)**
 ```python
 from semantica.core import Semantica
 
-# Initialize and build knowledge base
-semantica = Semantica()
-result = semantica.build_knowledge_base(["doc1.pdf", "doc2.docx"], embeddings=True, graph=True)
+# Use Semantica class for orchestration of complex workflows
+# For orchestration, use Semantica class
+from semantica.core import Semantica
+framework = Semantica()
+framework.initialize()
+framework.initialize()
+result = framework.build_knowledge_base(["doc1.pdf", "doc2.docx"], embeddings=True, graph=True)
+framework.shutdown()
 ```
 
-**Pattern 2: Direct class usage (Fine-grained control)**
-```python
-from semantica.kg import GraphBuilder
-from semantica.embeddings import EmbeddingGenerator
-from semantica.ingest import FileIngestor
-
-# Use classes directly
-builder = GraphBuilder(merge_entities=True)
-generator = EmbeddingGenerator()
-ingestor = FileIngestor()
-```
+!!! tip "Which Pattern to Use?"
+    - **Use Individual Modules** (Pattern 1) for most use cases - gives you full control and transparency
+    - **Use Semantica Class** (Pattern 2) for complex workflows that need lifecycle management and orchestration
 
 ### 1. Basic Document Processing
 ```python
-from semantica.core import Semantica
+from semantica.ingest import FileIngestor
+from semantica.parse import DocumentParser
+from semantica.semantic_extract import NERExtractor, RelationExtractor
+from semantica.kg import GraphBuilder
+from semantica.embeddings import TextEmbedder
 
-# Build knowledge base from documents (auto-initializes)
-semantica = Semantica()
+# Use individual modules
 documents = ["document1.pdf", "document2.docx", "document3.txt"]
-result = semantica.build_knowledge_base(
-    documents,
-    embeddings=True,
-    graph=True,
-    normalize=True
-)
+ingestor = FileIngestor()
+parser = DocumentParser()
+ner = NERExtractor()
+rel_extractor = RelationExtractor()
+builder = GraphBuilder(merge_entities=True)
+embedder = TextEmbedder()
+
+# Process each document
+all_entities = []
+all_relationships = []
+for doc_path in documents:
+    doc = ingestor.ingest_file(doc_path)
+    parsed = parser.parse_document(doc_path)
+    text = parsed.get("full_text", "")
+    entities = ner.extract_entities(text)
+    relationships = rel_extractor.extract_relations(text, entities=entities)
+    all_entities.extend(entities)
+    all_relationships.extend(relationships)
+
+# Build knowledge graph and generate embeddings
+kg = builder.build_graph(entities=all_entities, relationships=all_relationships)
+embeddings = embedder.embed_batch([e.text for e in all_entities])
 
 # Access results
 knowledge_graph = result["knowledge_graph"]
@@ -159,21 +201,56 @@ sitemap_url = "https://example.com/sitemap.xml"
 pages = web_ingestor.crawl_sitemap(sitemap_url)
 
 # Build knowledge base from web content
-sources = [web_content.url for web_content in pages]
-semantica_instance = Semantica()
-result = semantica_instance.build_knowledge_base(sources)
+from semantica.parse import DocumentParser
+from semantica.semantic_extract import NERExtractor, RelationExtractor
+from semantica.kg import GraphBuilder
+
+parser = DocumentParser()
+ner = NERExtractor()
+rel_extractor = RelationExtractor()
+builder = GraphBuilder()
+
+all_entities = []
+all_relationships = []
+for web_content in pages:
+    parsed = parser.parse_document(web_content.url)
+    text = parsed.get("full_text", "")
+    entities = ner.extract_entities(text)
+    relationships = rel_extractor.extract_relations(text, entities=entities)
+    all_entities.extend(entities)
+    all_relationships.extend(relationships)
+
+kg = builder.build_graph(entities=all_entities, relationships=all_relationships)
 ```
 
 ### 3. Knowledge Graph Analytics
 ```python
-from semantica.core import Semantica
+from semantica.ingest import FileIngestor
+from semantica.parse import DocumentParser
+from semantica.semantic_extract import NERExtractor, RelationExtractor
 from semantica.kg import GraphBuilder, GraphAnalyzer, CentralityCalculator, CommunityDetector
 
-# Build knowledge graph using Semantica class
+# Build knowledge graph using individual modules
 sources = ["document1.pdf", "document2.pdf"]
-semantica = Semantica()
-result = semantica.build_knowledge_base(sources, graph=True)
-kg_data = result["knowledge_graph"]
+ingestor = FileIngestor()
+parser = DocumentParser()
+ner = NERExtractor()
+rel_extractor = RelationExtractor()
+builder = GraphBuilder(merge_entities=True, entity_resolution_strategy="fuzzy")
+
+# Process documents
+all_entities = []
+all_relationships = []
+for source in sources:
+    doc = ingestor.ingest_file(source)
+    parsed = parser.parse_document(source)
+    text = parsed.get("full_text", "")
+    entities = ner.extract_entities(text)
+    relationships = rel_extractor.extract_relations(text, entities=entities)
+    all_entities.extend(entities)
+    all_relationships.extend(relationships)
+
+kg = builder.build_graph(entities=all_entities, relationships=all_relationships)
 
 # Build graph object from extracted entities and relationships
 graph_builder = GraphBuilder(
@@ -1197,13 +1274,29 @@ temporal_viz.visualize_metrics_evolution(metrics_history, timestamps,
 #### Quick Visualization Example
 
 ```python
-from semantica.core import Semantica
+from semantica.ingest import FileIngestor
+from semantica.parse import DocumentParser
+from semantica.semantic_extract import NERExtractor, RelationExtractor
+from semantica.kg import GraphBuilder
+from semantica.embeddings import TextEmbedder
 from semantica.visualization import KGVisualizer, EmbeddingVisualizer
 import numpy as np
 
-# Build knowledge graph
-semantica = Semantica()
-result = semantica.build_knowledge_base(["document.pdf"], graph=True, embeddings=True)
+# Build knowledge graph using individual modules
+ingestor = FileIngestor()
+parser = DocumentParser()
+ner = NERExtractor()
+rel_extractor = RelationExtractor()
+builder = GraphBuilder()
+embedder = TextEmbedder()
+
+doc = ingestor.ingest_file("document.pdf")
+parsed = parser.parse_document("document.pdf")
+text = parsed.get("full_text", "")
+entities = ner.extract_entities(text)
+relationships = rel_extractor.extract_relations(text, entities=entities)
+kg = builder.build_graph(entities=entities, relationships=relationships)
+embeddings = embedder.embed_batch([e.text for e in entities])
 
 # Visualize knowledge graph
 kg_viz = KGVisualizer(layout="force", color_scheme="vibrant")
@@ -1229,39 +1322,39 @@ if "embeddings" in result:
 
 ### Basic Configuration
 ```python
-from semantica.core import Semantica, Config
+from semantica.semantic_extract import NERExtractor
+from semantica.kg import GraphBuilder
 
-# Create configuration
-config = Config({
-    "processing": {
-        "batch_size": 100,
-        "max_workers": 4
-    },
-    "quality": {
-        "min_confidence": 0.7,
-        "validation_enabled": True
-    },
-    "security": {
-        "encryption_enabled": True,
-        "access_control_enabled": True
-    }
-})
+# Configure modules individually
+ner = NERExtractor(
+    method="llm",
+    provider="openai",
+    model="gpt-4",
+    confidence_threshold=0.7
+)
 
-# Use configuration with Semantica
-semantica_instance = Semantica(config=config)
-result = semantica_instance.build_knowledge_base(["document.pdf"])
+builder = GraphBuilder(
+    merge_entities=True,
+    merge_threshold=0.9
+)
 ```
 
 ### Advanced Configuration
 ```python
-from semantica.core import Semantica, Config
+from semantica.core import Config, ConfigManager
+from semantica.semantic_extract import NERExtractor
+from semantica.kg import GraphBuilder
 
-# Advanced configuration
-config = Config({
-    "llm_provider": {
-        "name": "openai",
-        "api_key": "your-api-key",
-        "model": "gpt-4"
+# Load configuration from file
+config_manager = ConfigManager()
+config = config_manager.load_from_file("config.yaml")
+
+# Use configuration with modules
+ner = NERExtractor(
+    method="llm",
+    provider=config.get("llm_provider.name"),
+    model=config.get("llm_provider.model"),
+    api_key=config.get("llm_provider.api_key")
     },
     "embedding_model": {
         "name": "sentence-transformers",
@@ -1287,11 +1380,11 @@ result = semantica.build_knowledge_base(["document.pdf"])
 ## 🚀 Performance
 
 ### Benchmarks
-- **Processing Speed**: 1000+ documents per minute
+- **Processing Speed**: Optimized for high-throughput document processing
 - **Memory Usage**: Optimized for large-scale processing
-- **Accuracy**: 95%+ entity extraction accuracy
+- **Accuracy**: High accuracy entity extraction
 - **Scalability**: Horizontal scaling support
-- **Latency**: Sub-second query response times
+- **Latency**: Fast query response times
 
 ### Optimization
 - **Parallel Processing**: Multi-threaded and multi-process support

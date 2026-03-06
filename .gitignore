@@ -61,6 +61,7 @@ wheels/
 .installed.cfg
 *.egg
 MANIFEST
+.python-version
 
 # IDE
 .vscode/

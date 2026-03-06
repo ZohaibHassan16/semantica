@@ -84,6 +84,9 @@ class EmbeddingGenerator:
         from ..utils.progress_tracker import get_progress_tracker
 
         self.progress_tracker = get_progress_tracker()
+        # Ensure progress tracker is enabled
+        if not self.progress_tracker.enabled:
+            self.progress_tracker.enabled = True
 
         self.logger.info("Embedding generator initialized")
 
@@ -255,13 +258,14 @@ class EmbeddingGenerator:
         return max(0.0, min(1.0, similarity))
 
     def process_batch(
-        self, data_items: List[Union[str, Path]], **options
+        self, data_items: List[Union[str, Path]], pipeline_id: Optional[str] = None, **options
     ) -> Dict[str, Any]:
         """
         Process multiple data items for embedding generation.
 
         Args:
             data_items: List of data items
+            pipeline_id: Optional pipeline ID for progress tracking
             **options: Processing options
 
         Returns:
@@ -272,6 +276,7 @@ class EmbeddingGenerator:
             module="embeddings",
             submodule="EmbeddingGenerator",
             message=f"Batch of {len(data_items)} items",
+            pipeline_id=pipeline_id,
         )
 
         try:
@@ -279,8 +284,12 @@ class EmbeddingGenerator:
 
             for idx, item in enumerate(data_items, 1):
                 try:
-                    self.progress_tracker.update_tracking(
-                        tracking_id, message=f"Processing item {idx}/{len(data_items)}"
+                    # Use update_progress for ETA display
+                    self.progress_tracker.update_progress(
+                        tracking_id,
+                        processed=idx,
+                        total=len(data_items),
+                        message=f"Processing item {idx}/{len(data_items)}"
                     )
                     embedding = self.generate_embeddings(item, **options)
                     results["embeddings"].append(embedding)

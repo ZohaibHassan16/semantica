@@ -13,6 +13,7 @@ Document Parsing:
     - "pdf": PDF-focused parsing
     - "docx": DOCX-focused parsing
     - "html": HTML-focused parsing
+    - "docling": Docling-based parsing for enhanced table extraction (requires docling package)
 
 Web Content Parsing:
     - "default": Default web parsing using WebParser
@@ -161,6 +162,7 @@ def parse_document(
             - "pdf": PDF-focused parsing
             - "docx": DOCX-focused parsing
             - "html": HTML-focused parsing
+            - "docling": Docling-based parsing for enhanced table extraction (requires docling package)
         **kwargs: Additional options passed to DocumentParser
             - extract_text: Whether to extract text (default: True)
             - extract_tables: Whether to extract tables (default: True)
@@ -193,6 +195,63 @@ def parse_document(
     except Exception as e:
         logger.error(f"Failed to parse document: {e}")
         raise
+
+
+def parse_document_docling(
+    file_path: Union[str, Path],
+    file_type: Optional[str] = None,
+    **kwargs,
+) -> Dict[str, Any]:
+    """
+    Parse document using Docling (convenience function).
+
+    This function uses Docling for enhanced table extraction and better document
+    structure understanding. Docling must be installed separately.
+
+    Args:
+        file_path: Path to document file (PDF, DOCX, PPTX, XLSX, HTML, images)
+        file_type: Document type (auto-detected if None)
+        **kwargs: Additional options passed to DoclingParser:
+            - extract_text: Whether to extract text (default: True)
+            - extract_tables: Whether to extract tables (default: True)
+            - extract_images: Whether to extract images (default: False)
+            - export_format: Export format ("markdown", "html", "json") (default: "markdown")
+            - enable_ocr: Enable OCR for scanned documents (default: False)
+
+    Returns:
+        dict: Parsed document data
+
+    Examples:
+        >>> from semantica.parse.methods import parse_document_docling
+        >>> doc = parse_document_docling("document.pdf")
+        >>> tables = parse_document_docling("document.pdf", extract_tables=True)
+    """
+    try:
+        from .docling_parser import DoclingParser
+    except (ImportError, OSError):
+        raise ImportError(
+            "Docling is not installed. Install it with: pip install docling"
+        )
+
+    try:
+        config = parse_config.get_method_config("document")
+        config.update(kwargs)
+
+        parser = DoclingParser(**config)
+        return parser.parse(file_path, **kwargs)
+
+    except Exception as e:
+        logger.error(f"Failed to parse document with Docling: {e}")
+        raise
+
+
+# Register Docling method
+try:
+    from .docling_parser import DoclingParser
+    method_registry.register("document", "docling", parse_document_docling)
+except (ImportError, OSError):
+    # Docling not available, skip registration
+    pass
 
 
 def parse_web_content(

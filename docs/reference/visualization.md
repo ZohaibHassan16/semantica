@@ -57,15 +57,21 @@
 ## ⚙️ Algorithms Used
 
 ### Layout Algorithms
-- **Force-Directed**: Simulates physical forces (repulsion between nodes, springs for edges) to find equilibrium.
-- **Hierarchical**: Tree-based layout for taxonomies and directed acyclic graphs (DAGs).
-- **Circular**: Arranges nodes in a circle, useful for analyzing interconnectivity.
-- **Community-Based**: Groups nodes by community (Louvain/Leiden) and separates clusters.
+
+The visualization module uses various layout algorithms:
+
+- **Force-Directed**: Simulates physical forces (repulsion between nodes, springs for edges) to find equilibrium
+- **Hierarchical**: Tree-based layout for taxonomies and directed acyclic graphs (DAGs)
+- **Circular**: Arranges nodes in a circle, useful for analyzing interconnectivity
+- **Community-Based**: Groups nodes by community (Louvain/Leiden) and separates clusters
 
 ### Dimensionality Reduction
-- **UMAP**: Uniform Manifold Approximation and Projection. Preserves global structure better than t-SNE.
-- **t-SNE**: t-Distributed Stochastic Neighbor Embedding. Good for local clustering.
-- **PCA**: Principal Component Analysis. Linear projection for variance maximization.
+
+The module supports multiple dimensionality reduction techniques:
+
+- **UMAP**: Uniform Manifold Approximation and Projection - Preserves global structure better than t-SNE
+- **t-SNE**: t-Distributed Stochastic Neighbor Embedding - Good for local clustering
+- **PCA**: Principal Component Analysis - Linear projection for variance maximization
 
 ### Analytics Visualization
 - **Centrality Sizing**: Node size proportional to Degree/Betweenness/PageRank.
@@ -247,12 +253,12 @@ visualization:
 ### Exploratory Data Analysis (EDA)
 
 ```python
-from semantica.ingest import Ingestor
-from semantica.kg import KnowledgeGraph
+from semantica.kg import GraphBuilder
 from semantica.visualization import KGVisualizer, AnalyticsVisualizer
 
-# 1. Load Data
-kg = KnowledgeGraph.load("my_graph")
+# 1. Build Knowledge Graph
+builder = GraphBuilder()
+kg = builder.build(sources=sample_data)
 
 # 2. Visualize Structure
 kg_viz = KGVisualizer()
@@ -282,5 +288,15 @@ analytics_viz.visualize_degree_distribution(kg, output="degree_dist.png")
 - [Ontology Module](ontology.md) - Source for hierarchy visualizations
 
 ## Cookbook
-- [Visualization](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/introduction/16_Visualization.ipynb)
-- [Complete Visualization Suite](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/advanced/03_Complete_Visualization_Suite.ipynb)
+
+Interactive tutorials to learn graph visualization:
+
+- **[Visualization](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/introduction/16_Visualization.ipynb)**: Basic graph visualization techniques
+  - **Topics**: Graph visualization, network diagrams, basic plotting
+  - **Difficulty**: Beginner
+  - **Use Cases**: Visualizing knowledge graphs, understanding graph structure
+
+- **[Complete Visualization Suite](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/advanced/03_Complete_Visualization_Suite.ipynb)**: Creating interactive, publication-ready visualizations
+  - **Topics**: PyVis, NetworkX, D3.js, interactive visualizations, publication-ready graphics
+  - **Difficulty**: Intermediate
+  - **Use Cases**: Advanced visualizations, presentations, publications

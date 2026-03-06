@@ -58,7 +58,12 @@
 ## ⚙️ Algorithms Used
 
 ### Standard Splitting Algorithms
-- **Recursive Splitting**: Separator hierarchy (`\n\n`, `\n`, ` `, ``) with greedy splitting
+
+**Purpose**: Split documents into chunks using various strategies.
+
+**How it works**:
+
+- **Recursive Splitting**: Separator hierarchy (`` `\n\n` ``, `` `\n` ``, `` ` ` ``, ``) with greedy splitting
 - **Token Counting**: BPE tokenization using tiktoken or transformers
 - **Sentence Segmentation**: NLTK punkt, spaCy sentencizer, or regex-based
 - **Paragraph Detection**: Double newline detection with whitespace normalization
@@ -66,16 +71,26 @@
 - **Word Splitting**: Whitespace tokenization with word boundary preservation
 
 ### Semantic Chunking Algorithms
-- **Semantic Boundary Detection**: 
+
+**Purpose**: Intelligent boundary detection using embeddings and NLP.
+
+**How it works**:
+
+- **Semantic Boundary Detection**:
   - Sentence transformer embeddings (384-1024 dim)
   - Cosine similarity between consecutive sentences
-  - Threshold-based boundary detection (default: 0.7)
-- **LLM-based Splitting**: 
+  - Threshold-based boundary detection (default: `` `0.7` ``)
+- **LLM-based Splitting**:
   - Prompt engineering for optimal split point detection
   - Context window management
   - Coherence scoring
 
 ### KG/Ontology Chunking Algorithms
+
+**Purpose**: Preserve entities, relationships, and graph structure for GraphRAG workflows.
+
+**How it works**:
+
 - **Entity Boundary Detection**:
   - NER-based entity extraction (spaCy, LLM)
   - Entity span tracking
@@ -85,9 +100,9 @@
   - Subject-predicate-object span tracking
   - Relationship boundary preservation
 - **Graph Centrality Analysis**:
-  - Degree centrality: `C_D(v) = deg(v) / (n-1)`
-  - Betweenness centrality: `C_B(v) = Σ(σ_st(v) / σ_st)`
-  - Closeness centrality: `C_C(v) = (n-1) / Σd(v,u)`
+  - Degree centrality: `` `C_D(v) = deg(v) / (n-1)` ``
+  - Betweenness centrality: `` `C_B(v) = Σ(σ_st(v) / σ_st)` ``
+  - Closeness centrality: `` `C_C(v) = (n-1) / Σd(v,u)` ``
   - Eigenvector centrality: Power iteration method
 - **Community Detection**:
   - Louvain algorithm: Modularity optimization O(n log n)
@@ -939,4 +954,10 @@ splitter = TextSplitter(
 - [Vector Store Module](vector_store.md) - Vector storage
 
 ## Cookbook
-- [Chunking and Splitting](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/introduction/11_Chunking_and_Splitting.ipynb)
+
+Interactive tutorials to learn text chunking and splitting:
+
+- **[Chunking and Splitting](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/introduction/11_Chunking_and_Splitting.ipynb)**: Split documents for RAG and processing
+  - **Topics**: Recursive character splitting, semantic splitting, token-based splitting, chunking strategies
+  - **Difficulty**: Beginner
+  - **Use Cases**: Preparing text for RAG, document chunking

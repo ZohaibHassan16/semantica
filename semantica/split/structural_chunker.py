@@ -62,6 +62,9 @@ class StructuralChunker:
         self.logger = get_logger("structural_chunker")
         self.config = config
         self.progress_tracker = get_progress_tracker()
+        # Ensure progress tracker is enabled
+        if not self.progress_tracker.enabled:
+            self.progress_tracker.enabled = True
 
         self.respect_headers = config.get("respect_headers", True)
         self.respect_sections = config.get("respect_sections", True)

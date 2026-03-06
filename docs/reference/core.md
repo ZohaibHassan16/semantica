@@ -6,13 +6,37 @@
 
 ## 🎯 Overview
 
+The **Core Module** provides framework infrastructure, lifecycle management, configuration, and orchestration capabilities. It's the foundation that enables coordination between all Semantica modules.
+
+### What is the Core Module?
+
+The Core module provides:
+
+- **Orchestration**: The `` `Semantica` `` class coordinates multiple modules for complex workflows
+- **Lifecycle Management**: Handles initialization, startup, shutdown, and state transitions
+- **Configuration**: Unified configuration management via YAML and environment variables
+- **Plugin System**: Extensible plugin registry for custom modules and capabilities
+- **Method Registry**: Registry for custom orchestration methods
+
+### When to Use the Core Module
+
+!!! tip "Primary Approach: Individual Modules"
+    For most use cases, **use individual modules directly** (e.g., `semantica.ingest`, `semantica.kg`). This gives you full control and transparency.
+
+!!! note "When to Use Orchestration"
+    Use the `Semantica` orchestration class when you need:
+    - **Complex Workflows**: Multi-step pipelines that span multiple modules
+    - **Lifecycle Management**: Application-level initialization and shutdown
+    - **Centralized Configuration**: Global settings that affect multiple modules
+    - **Plugin Integration**: Custom plugins that need framework coordination
+
 <div class="grid cards" markdown>
 
 -   :material-cogs:{ .lg .middle } **Semantica**
 
     ---
 
-    Main framework class coordinating all components and workflows
+    Orchestration class for coordinating complex workflows across modules
 
 -   :material-lifecycle:{ .lg .middle } **Lifecycle Management**
 
@@ -40,30 +64,60 @@
 
 </div>
 
-!!! tip "When to Use"
-    - **Application Startup**: Initializing the Semantica framework in your app
-    - **Configuration**: Tuning global settings
-    - **Extension**: Developing custom plugins or modules
-    - **Orchestration**: Coordinating complex workflows across multiple modules
-
 ---
 
 ## ⚙️ Algorithms Used
 
 ### Lifecycle Management
+
+**What is Lifecycle Management?**
+
+Lifecycle management handles the initialization, startup, running, and shutdown phases of the Semantica framework. It ensures that all components are properly initialized, resources are managed correctly, and cleanup happens gracefully.
+
+**How it works:**
 - **State Machine**: `UNINITIALIZED` -> `INITIALIZING` -> `READY` -> `RUNNING` -> `STOPPING` -> `STOPPED`
 - **Priority-based Hooks**: Startup and shutdown hooks executed in priority order (lower = earlier)
 - **Graceful Shutdown**: Ensuring all resources (DB connections, thread pools) are closed properly
 
+**Why it matters:**
+- Prevents resource leaks (database connections, file handles)
+- Ensures proper initialization order (dependencies are ready before use)
+- Enables clean application shutdown
+- Supports health monitoring and status tracking
+
 ### Configuration
+
+**What is Configuration Management?**
+
+Configuration management provides a unified way to configure all Semantica modules. It supports multiple configuration sources with a clear priority order, ensuring consistent settings across your application.
+
+**How it works:**
 - **Layered Loading**: Defaults -> Config File -> Environment Variables (Priority order)
 - **Schema Validation**: Validating config structure against defined schemas
 - **Nested Access**: Dot notation for accessing nested configuration values
 
+**Why it matters:**
+- Centralized configuration for all modules
+- Environment-specific settings (dev, staging, production)
+- Secure credential management (via environment variables)
+- Validation prevents configuration errors
+
 ### Plugin System
+
+**What is the Plugin System?**
+
+The plugin system allows you to extend Semantica with custom modules and capabilities. Plugins can add new functionality, modify existing behavior, or integrate with external systems.
+
+**How it works:**
 - **Discovery**: Auto-discovery of plugins via directory scanning
 - **Registration**: Dynamic registration of classes and functions
 - **Dependency Resolution**: Automatic loading of plugin dependencies
+
+**Why it matters:**
+- Extend Semantica with custom functionality
+- Integrate with external systems and APIs
+- Modify or enhance existing modules
+- Share custom functionality across projects
 
 ---
 
@@ -71,29 +125,46 @@
 
 ### Semantica
 
-The main framework class that coordinates all components.
+The **Semantica** class is an orchestration class that coordinates multiple modules for complex workflows. It's designed for applications that need lifecycle management, centralized configuration, and multi-step pipeline coordination.
+
+!!! important "Not a Convenience Wrapper"
+    The `Semantica` class is **not** a convenience wrapper. It's an orchestration tool for complex workflows. For most use cases, use individual modules directly for better control and transparency.
+
+**What it does:**
+- Coordinates multiple modules (ingest, parse, extract, kg, etc.)
+- Manages application lifecycle (initialization, shutdown)
+- Provides centralized configuration
+- Enables plugin integration
+- Handles complex multi-step workflows
+
+**When to use it:**
+- Building applications with multiple components
+- Need lifecycle management (startup/shutdown hooks)
+- Complex workflows spanning multiple modules
+- Want centralized configuration
+- Integrating custom plugins
 
 **Methods:**
 
 | Method | Description |
 |--------|-------------|
-| `__init__(config=None, **kwargs)` | Initialize framework with optional configuration |
-| `initialize()` | Initialize all framework components |
-| `build_knowledge_base(sources, **kwargs)` | Build knowledge base from data sources |
-| `run_pipeline(pipeline, data)` | Execute a processing pipeline |
-| `get_status()` | Get system health and status |
-| `shutdown(graceful=True)` | Shutdown the framework gracefully |
+| `` `__init__(config=None, **kwargs)` `` | Initialize framework with optional configuration |
+| `` `initialize()` `` | Initialize all framework components and modules |
+| `` `build_knowledge_base(sources, **kwargs)` `` | Orchestrate building a knowledge base from data sources |
+| `` `run_pipeline(pipeline, data)` `` | Execute a processing pipeline |
+| `` `get_status()` `` | Get system health and status |
+| `` `shutdown(graceful=True)` `` | Shutdown the framework gracefully |
 
-**Example:**
+**Example - Orchestration for Complex Workflow:**
 
 ```python
 from semantica.core import Semantica
 
-# Initialize framework
+# Initialize framework for orchestration
 framework = Semantica()
 framework.initialize()
 
-# Build knowledge base
+# Build knowledge base (orchestrates multiple modules)
 result = framework.build_knowledge_base(
     sources=["doc1.pdf", "doc2.docx"],
     embeddings=True,
@@ -104,8 +175,34 @@ result = framework.build_knowledge_base(
 status = framework.get_status()
 print(f"System state: {status['state']}")
 
-# Shutdown
+# Shutdown gracefully
 framework.shutdown()
+```
+
+**Alternative - Using Individual Modules (Recommended):**
+
+```python
+from semantica.ingest import FileIngestor
+from semantica.parse import DocumentParser
+from semantica.semantic_extract import NERExtractor, RelationExtractor
+from semantica.kg import GraphBuilder
+from semantica.embeddings import TextEmbedder
+
+# Use modules directly for full control
+ingestor = FileIngestor()
+parser = DocumentParser()
+ner = NERExtractor()
+rel_extractor = RelationExtractor()
+builder = GraphBuilder()
+embedder = TextEmbedder()
+
+# Build your pipeline step by step
+docs = ingestor.ingest_file("doc1.pdf")
+parsed = parser.parse_document("doc1.pdf")
+entities = ner.extract_entities(parsed.get("full_text", ""))
+relationships = rel_extractor.extract_relations(parsed.get("full_text", ""), entities=entities)
+kg = builder.build_graph(entities=entities, relationships=relationships)
+embeddings = embedder.embed_batch([e.text for e in entities])
 ```
 
 ### ConfigManager
@@ -116,9 +213,9 @@ Manages global configuration loading, validation, and merging.
 
 | Method | Description |
 |--------|-------------|
-| `load_from_file(file_path, validate=True)` | Load config from YAML or JSON file |
-| `load_from_dict(config_dict, validate=True)` | Load config from dictionary |
-| `merge_configs(*configs, validate=True)` | Merge multiple configurations |
+| `` `load_from_file(file_path, validate=True)` `` | Load config from YAML or JSON file |
+| `` `load_from_dict(config_dict, validate=True)` `` | Load config from dictionary |
+| `` `merge_configs(*configs, validate=True)` `` | Merge multiple configurations |
 | `get_config()` | Get current configuration |
 | `set_config(config, validate=True)` | Set current configuration |
 | `reload(file_path=None)` | Reload configuration from file |
@@ -550,9 +647,20 @@ result = build_knowledge_base(sources=["doc.pdf"], method="fast")
 ---
 
 ## See Also
-- [Core Usage Guide](core.md) - Comprehensive usage guide with detailed examples
-- [Pipeline Module](pipeline.md) - Executed by the Semantica framework
+- [Pipeline Module](pipeline.md) - Pipeline execution and orchestration
 - [Utils Module](utils.md) - Shared utilities used by Core
+- [Getting Started Guide](../getting-started.md) - Learn the basics
 
 ## Cookbook
-- [Welcome to Semantica](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/introduction/01_Welcome_to_Semantica.ipynb)
+
+Interactive tutorials to learn orchestration and lifecycle management:
+
+- **[Welcome to Semantica](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/introduction/01_Welcome_to_Semantica.ipynb)**: Comprehensive introduction to all Semantica modules and architecture
+  - **Topics**: Framework overview, all modules, architecture, configuration, lifecycle
+  - **Difficulty**: Beginner
+  - **Use Cases**: Understanding the framework structure, first-time users
+
+- **[Pipeline Orchestration](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/advanced/07_Pipeline_Orchestration.ipynb)**: Build robust, automated data processing pipelines
+  - **Topics**: Workflows, automation, error handling, pipeline orchestration
+  - **Difficulty**: Advanced
+  - **Use Cases**: Complex multi-step workflows, production pipelines

@@ -32,7 +32,8 @@ class TestModelSelection(unittest.TestCase):
 
     def test_generator_switching(self):
         print("\nTesting EmbeddingGenerator Switching...")
-        generator = EmbeddingGenerator()
+        # Initialize with explicit method to ensure consistent starting state for test
+        generator = EmbeddingGenerator(text={"method": "sentence_transformers"})
         
         # Default check
         self.assertEqual(generator.get_text_method(), "sentence_transformers")

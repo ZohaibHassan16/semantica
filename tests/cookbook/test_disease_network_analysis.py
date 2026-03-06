@@ -14,7 +14,7 @@ try:
     from semantica.kg import GraphBuilder, GraphAnalyzer, CentralityCalculator, CommunityDetector
     from semantica.kg import ConnectivityAnalyzer, TemporalGraphQuery, TemporalPatternDetector
     from semantica.ontology import OntologyGenerator, ClassInferrer, PropertyGenerator, OntologyValidator
-    from semantica.reasoning import RuleManager, ExplanationGenerator
+    from semantica.reasoning import Reasoner, ExplanationGenerator
     from semantica.export import JSONExporter, RDFExporter, OWLExporter, ReportGenerator
     # Visualization might require matplotlib/networkx which might be missing or headless
     from semantica.visualization import KGVisualizer, OntologyVisualizer, AnalyticsVisualizer
@@ -194,10 +194,17 @@ class TestDiseaseNetworkAnalysis(unittest.TestCase):
         self.assertIn("components", connectivity)
         
         # --- Step 5: Predict Outcomes (Reasoning) ---
-        # Inference logic updated to remove InferenceEngine
-        outcome_predictions = []
-        self.assertIsInstance(outcome_predictions, list)
-       
+        # Inference logic updated to use Reasoner facade
+        reasoner = Reasoner()
+        reasoner.add_rule("IF related_to(?a, ?b) AND related_to(?b, ?c) THEN comorbid(?a, ?c)")
+        
+        # Add some facts for testing
+        reasoner.add_fact("related_to(Diabetes, Hypertension)")
+        reasoner.add_fact("related_to(Hypertension, Obesity)")
+        
+        outcome_predictions = reasoner.infer_facts([])
+        self.assertIn("comorbid(Diabetes, Obesity)", outcome_predictions)
+        
         # --- Step 6: Export/Report ---
         # Mocking exporters to avoid file writing issues or just testing they run
         json_exporter = JSONExporter()

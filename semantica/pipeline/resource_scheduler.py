@@ -103,10 +103,13 @@ class ResourceScheduler:
 
         # Initialize progress tracker
         self.progress_tracker = get_progress_tracker()
+        # Ensure progress tracker is enabled
+        if not self.progress_tracker.enabled:
+            self.progress_tracker.enabled = True
 
         self.resources: Dict[str, Resource] = {}
         self.allocations: Dict[str, ResourceAllocation] = {}
-        self.lock = threading.Lock()
+        self.lock = threading.RLock()  # RLock allows re-entrancy for nested lock acquisition in allocate_resources
 
         self._initialize_resources()
 
@@ -152,7 +155,7 @@ class ResourceScheduler:
                     capacity=100.0,
                     metadata={},
                 )
-        except ImportError:
+        except (ImportError, OSError):
             # Fallback if psutil not available
             self.logger.warning("psutil not available, using default resource values")
             self.resources["cpu"] = Resource(
@@ -201,18 +204,12 @@ class ResourceScheduler:
 
             with self.lock:
                 # Allocate CPU
-                self.progress_tracker.update_tracking(
-                    tracking_id, message="Allocating CPU resources..."
-                )
                 cpu_cores = options.get("cpu_cores", 1)
                 cpu_allocation = self.allocate_cpu(cpu_cores, pipeline.name)
                 if cpu_allocation:
                     allocations["cpu"] = cpu_allocation
 
                 # Allocate memory
-                self.progress_tracker.update_tracking(
-                    tracking_id, message="Allocating memory resources..."
-                )
                 memory_gb = options.get("memory_gb", 1.0)
                 memory_allocation = self.allocate_memory(memory_gb, pipeline.name)
                 if memory_allocation:
@@ -220,15 +217,31 @@ class ResourceScheduler:
 
                 # Allocate GPU if requested
                 if options.get("gpu_device") is not None:
-                    self.progress_tracker.update_tracking(
-                        tracking_id, message="Allocating GPU resources..."
-                    )
                     gpu_allocation = self.allocate_gpu(
                         options["gpu_device"], pipeline.name
                     )
                     if gpu_allocation:
                         allocations["gpu"] = gpu_allocation
 
+            # Validate allocations before returning
+            if not allocations:
+                # Clean up any allocated resources before raising error
+                if allocations:
+                    self.release_resources(allocations)
+                raise ValidationError("No resources were allocated - insufficient capacity")
+
+            # Update progress tracking outside of lock (after validation)
+            self.progress_tracker.update_tracking(
+                tracking_id, message="Allocating CPU resources..."
+            )
+            self.progress_tracker.update_tracking(
+                tracking_id, message="Allocating memory resources..."
+            )
+            if options.get("gpu_device") is not None:
+                self.progress_tracker.update_tracking(
+                    tracking_id, message="Allocating GPU resources..."
+                )
+            
             self.progress_tracker.stop_tracking(
                 tracking_id,
                 status="completed",
@@ -237,6 +250,10 @@ class ResourceScheduler:
             return allocations
 
         except Exception as e:
+            # Clean up resources on any error
+            if 'allocations' in locals() and allocations:
+                self.release_resources(allocations)
+            
             self.progress_tracker.stop_tracking(
                 tracking_id, status="failed", message=str(e)
             )

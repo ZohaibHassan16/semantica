@@ -35,7 +35,7 @@ from ..utils.progress_tracker import get_progress_tracker
 try:
     from pymongo import MongoClient
     from pymongo.errors import ConnectionFailure, OperationFailure
-except ImportError:
+except (ImportError, OSError):
     MongoClient = None
     ConnectionFailure = None
     OperationFailure = None

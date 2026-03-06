@@ -44,18 +44,47 @@
 ## ⚙️ Algorithms Used
 
 ### 6-Stage Generation Pipeline
-1.  **Semantic Network Parsing**: Extract concepts and patterns from raw entity/relationship data.
-2.  **YAML-to-Definition**: Transform patterns into intermediate class definitions.
-3.  **Definition-to-Types**: Map definitions to OWL types (`owl:Class`, `owl:ObjectProperty`).
-4.  **Hierarchy Generation**: Build taxonomy trees using transitive closure and cycle detection.
-5.  **TTL Generation**: Serialize to Turtle format using `rdflib`.
+
+The ontology generation process follows these stages:
+
+1. **Semantic Network Parsing**: Extract concepts and patterns from raw entity/relationship data
+2. **YAML-to-Definition**: Transform patterns into intermediate class definitions
+3. **Definition-to-Types**: Map definitions to OWL types (`` `owl:Class` ``, `` `owl:ObjectProperty` ``)
+4. **Hierarchy Generation**: Build taxonomy trees using transitive closure and cycle detection
+5. **TTL Generation**: Serialize to Turtle format using `` `rdflib` ``
 
 ### Inference Algorithms
-- **Class Inference**: Clustering entities by type and attribute similarity.
-- **Property Inference**: Determining domain/range based on connected entity types.
-- **Hierarchy Inference**: `A is_a B` detection based on subset relationships.
+
+The module uses several inference algorithms:
+
+- **Class Inference**: Clustering entities by type and attribute similarity
+- **Property Inference**: Determining domain/range based on connected entity types
+- **Hierarchy Inference**: `` `A is_a B` `` detection based on subset relationships
 
 ---
+
+## Ontology Ingestion
+
+Ingest existing ontology files directly into usable data structures using `OntologyIngestor`.
+
+**Function:** `ingest_ontology(source, method="file")`
+
+| Argument | Description |
+|----------|-------------|
+| `source` | File path, directory path, or list of paths |
+| `method` | Ingestion method (default: "file") |
+
+**Example:**
+
+```python
+from semantica.ontology import ingest_ontology
+
+# Ingest file
+data = ingest_ontology("ontology.ttl")
+
+# Ingest directory
+dataset = ingest_ontology("ontologies/")
+```
 
 ## Main Classes
 
@@ -164,6 +193,17 @@ Manages external dependencies.
 | `import_external_ontology(uri, ontology)` | Load and merge external ontology |
 | `evaluate_alignment(uri, ontology)` | Assess alignment and compatibility |
 
+### OntologyIngestor
+
+Handles ingestion of existing ontologies from files and directories.
+
+**Methods:**
+
+| Method | Description |
+|--------|-------------|
+| `ingest_ontology(file_path)` | Ingest a single ontology file |
+| `ingest_directory(directory_path)` | Recursively ingest ontology files from a directory |
+
 ---
 
 ## Unified Engine Examples
@@ -216,17 +256,31 @@ ontology:
 
 ```python
 from semantica.ontology import OntologyEngine
-from semantica.kg import KnowledgeGraph
+from semantica.kg import GraphBuilder, GraphValidator
 
 # 1. Generate Ontology from Sample Data
 engine = OntologyEngine()
 ontology = engine.from_data(sample_data)
 
-# 2. Initialize KG with Ontology
-kg = KnowledgeGraph(schema=ontology)
+# 2. Extract schema for validation
+schema = {
+    "entity_types": [c["name"] for c in ontology["classes"]],
+    "relationship_types": [p["name"] for p in ontology["properties"]]
+}
 
-# 3. Add Data (Validated against Ontology)
-kg.add_entities(full_dataset)  # Will raise error if violates schema
+# 3. Initialize Validator and Builder
+validator = GraphValidator(schema=schema, strict=True)
+builder = GraphBuilder()
+
+# 4. Build Knowledge Graph
+kg = builder.build(full_dataset)
+
+# 5. Validate against Ontology Schema
+validation_result = validator.validate(kg)
+if validation_result.is_valid:
+    print("Knowledge Graph matches the ontology schema!")
+else:
+    print(f"Validation issues found: {validation_result.issues}")
 ```
 
 ---
@@ -248,5 +302,14 @@ kg.add_entities(full_dataset)  # Will raise error if violates schema
 
 ## Cookbook
 
-- [Ontology](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/introduction/14_Ontology.ipynb)
-- [Unstructured to Ontology](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/advanced/12_Unstructured_to_Ontology.ipynb)
+Interactive tutorials to learn ontology generation and management:
+
+- **[Ontology](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/introduction/14_Ontology.ipynb)**: Define domain schemas and ontologies to structure your data
+  - **Topics**: OWL, RDF, schema design, ontology generation
+  - **Difficulty**: Intermediate
+  - **Use Cases**: Structuring domain knowledge, schema definition
+
+- **[Unstructured to Ontology](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/advanced/12_Unstructured_to_Ontology.ipynb)**: Generate ontologies automatically from unstructured data
+  - **Topics**: Automatic ontology generation, 6-stage pipeline, OWL validation
+  - **Difficulty**: Advanced
+  - **Use Cases**: Domain modeling, automatic schema generation

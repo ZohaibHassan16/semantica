@@ -6,6 +6,35 @@
 
 ## 🎯 Overview
 
+The **Pipeline Module** provides a robust orchestration engine for building, executing, and managing complex data processing workflows. It enables you to create reusable, scalable pipelines with error handling, parallel execution, and resource management.
+
+### What is Pipeline Orchestration?
+
+**Pipeline orchestration** is the process of coordinating multiple processing steps into a workflow. The Pipeline module enables:
+- **DAG Construction**: Build directed acyclic graphs (DAGs) of processing steps
+- **Parallel Execution**: Run independent steps simultaneously
+- **Error Handling**: Retry, fallback, and recovery strategies
+- **Resource Management**: CPU and memory allocation
+- **Progress Tracking**: Monitor pipeline execution
+
+### Why Use the Pipeline Module?
+
+- **Complex Workflows**: Coordinate multi-step data processing
+- **Reusability**: Create reusable pipeline templates
+- **Reliability**: Built-in error handling and retry logic
+- **Performance**: Parallel execution for faster processing
+- **Monitoring**: Track progress and performance
+- **Scalability**: Handle large-scale data processing
+
+### How It Works
+
+1. **Pipeline Definition**: Define steps and their dependencies
+2. **Validation**: Validate pipeline structure (no cycles, valid dependencies)
+3. **Execution**: Execute steps in dependency order
+4. **Parallelization**: Run independent steps in parallel
+5. **Error Handling**: Retry failed steps, apply fallbacks
+6. **Monitoring**: Track progress and resource usage
+
 <div class="grid cards" markdown>
 
 -   :material-pipe:{ .lg .middle } **Pipeline Builder**
@@ -56,21 +85,41 @@
 ## ⚙️ Algorithms Used
 
 ### Execution Management
-- **DAG Topological Sort**: Determines execution order of steps
-- **State Management**: Tracks `PENDING`, `RUNNING`, `COMPLETED`, `FAILED` states
+
+**Purpose**: Manage pipeline execution order and state tracking.
+
+**How it works**:
+
+- **DAG Topological Sort**: Determines execution order of steps based on dependencies
+- **State Management**: Tracks `` `PENDING` ``, `` `RUNNING` ``, `` `COMPLETED` ``, `` `FAILED` `` states
 - **Checkpointing**: Saves intermediate results to allow resuming failed pipelines
 
 ### Parallelism
+
+**Purpose**: Execute independent steps concurrently for maximum performance.
+
+**How it works**:
+
 - **ThreadPoolExecutor**: For I/O-bound tasks (network requests, DB writes)
 - **ProcessPoolExecutor**: For CPU-bound tasks (parsing, embedding generation)
 - **Dependency Resolution**: Identifies steps that can run concurrently
 
 ### Error Handling
-- **Exponential Backoff**: `wait = base * (factor ^ attempt)`
+
+**Purpose**: Robust error recovery with configurable retry policies.
+
+**How it works**:
+
+- **Exponential Backoff**: `` `wait = base * (factor ^ attempt)` ``
 - **Jitter**: Randomization to prevent thundering herd problem
 - **Circuit Breaker**: Stops execution after threshold failures to prevent cascading issues
 
 ### Resource Scheduling
+
+**Purpose**: Manage CPU/Memory allocation for resource-intensive tasks.
+
+**How it works**:
+
 - **Token Bucket**: Rate limiting for API calls
 - **Semaphore**: Concurrency limiting for resource constraints
 - **Priority Queue**: Scheduling critical tasks first
@@ -82,7 +131,7 @@
 ### Types
 
 - `Pipeline` — Pipeline definition dataclass
-- `PipelineStep` — Pipeline step definition dataclass
+- `PipelineStep` — Pipeline step definition dataclass, Supports `delta_mode` (bool), `base_version_id` (str), and            `target_version_id` (str) for incremental processing.
 - `StepStatus` — Enum: `pending`, `running`, `completed`, `failed`, `skipped`
 - `ExecutionResult` — Execution result dataclass
 - `PipelineStatus` — Enum: `pending`, `running`, `paused`, `completed`, `failed`, `stopped`
@@ -356,6 +405,47 @@ result = engine.execute_pipeline(pipeline, data={"path": "document.pdf"})
 
 ---
 
+### Incremental / Delta-Aware Pipeline
+
+Use `delta_mode` to process only the differences between two graph versions, drastically reducing compute costs for large datasets.
+
+```python
+from semantica.pipeline import PipelineBuilder, ExecutionEngine
+
+builder = (
+    PipelineBuilder()
+    # Adding delta_mode=True tells the execution engine to intercept this step,
+    # compute the diff between v1 and v2, and pass ONLY the delta payload to the handler.
+    .add_step(
+        "validate_diff",
+        "validation",
+        delta_mode=True,
+        base_version_id="v1",
+        target_version_id="v2",
+        handler=diff_validator
+    )
+    .add_step(
+        "alert_on_removals",
+        "alerting",
+        dependencies=["validate_diff"],
+        handler=alert_handler
+    )
+)
+
+pipeline = builder.build(name="IncrementalJob")
+engine = ExecutionEngine()
+
+# Execution requires version_manager and triplet_store injected via options
+# so the engine can resolve URIs and compute the graph differences natively.
+result = engine.execute_pipeline(
+    pipeline,
+    version_manager=my_version_manager,
+    triplet_store=my_triplet_store
+)
+```
+
+---
+
 ## Best Practices
 
 1.  **Idempotency**: Ensure steps are idempotent (can be run multiple times without side effects) to support retries.
@@ -374,6 +464,15 @@ result = engine.execute_pipeline(pipeline, data={"path": "document.pdf"})
 **Solution**: Ensure all data passed between steps is serializable. Avoid passing open file handles or database connections.
 
 ---
+
+## Cookbook
+
+Interactive tutorials to learn pipeline orchestration:
+
+- **[Pipeline Orchestration](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/advanced/07_Pipeline_Orchestration.ipynb)**: Build robust, automated data processing pipelines
+  - **Topics**: Workflows, automation, error handling, pipeline orchestration, DAG construction
+  - **Difficulty**: Advanced
+  - **Use Cases**: Complex multi-step workflows, production pipelines, ETL processes
 
 ## See Also
 

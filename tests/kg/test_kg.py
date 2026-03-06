@@ -31,11 +31,11 @@ class TestGraphBuilder(unittest.TestCase):
     def test_initialization_defaults(self):
         """Test initialization with default parameters"""
         builder = GraphBuilder()
-        self.assertTrue(builder.merge_entities)
+        self.assertFalse(builder.merge_entities)
         self.assertTrue(builder.resolve_conflicts)
         self.assertFalse(builder.enable_temporal)
         # Should initialize resolver and conflict detector by default
-        self.assertIsNotNone(builder.entity_resolver)
+        self.assertIsNone(builder.entity_resolver)
         self.assertIsNotNone(builder.conflict_detector)
 
     def test_initialization_disabled_features(self):
@@ -91,6 +91,30 @@ class TestGraphBuilder(unittest.TestCase):
         graph2 = builder.build(source_list)
         self.assertEqual(len(graph2["entities"]), 2)
 
+    def test_build_with_external_relationship_ids(self):
+        builder = GraphBuilder(merge_entities=False, resolve_conflicts=False)
+
+        entities = [
+            {"id": "1", "name": "A"},
+            {"id": "2", "name": "B"},
+        ]
+        relationships = [
+            {"source_id": "1", "target_id": "2", "type": "rel"},
+        ]
+
+        source = {
+            "entities": entities,
+            "relationships": relationships,
+        }
+
+        graph = builder.build(source)
+
+        self.assertEqual(len(graph["entities"]), 2)
+        self.assertEqual(len(graph["relationships"]), 1)
+        rel = graph["relationships"][0]
+        self.assertEqual(rel.get("source"), "1")
+        self.assertEqual(rel.get("target"), "2")
+
     def test_build_with_conflict_resolution(self):
         """Test building with conflict resolution enabled"""
         builder = GraphBuilder(resolve_conflicts=True)
@@ -105,6 +129,50 @@ class TestGraphBuilder(unittest.TestCase):
         # Verify conflict detector was called
         self.mock_conflict_cls.return_value.detect_conflicts.assert_called_once()
         self.mock_conflict_cls.return_value.resolve_conflicts.assert_called_once()
+
+    def test_build_single_source(self):
+        builder = GraphBuilder(merge_entities=False, resolve_conflicts=False)
+        source = {
+            "entities": [{"id": "1", "name": "A"}],
+            "relationships": [{"source_id": "1", "target_id": "1", "type": "self"}],
+        }
+        graph = builder.build_single_source(source)
+        self.assertEqual(len(graph["entities"]), 1)
+        self.assertEqual(len(graph["relationships"]), 1)
+
+    def test_build_with_explicit_relationships_argument(self):
+        builder = GraphBuilder(merge_entities=False, resolve_conflicts=False)
+
+        entities = [
+            {"id": "1", "name": "A"},
+            {"id": "2", "name": "B"},
+        ]
+        relationships = [
+            {"source_id": "1", "target_id": "2", "type": "rel"},
+        ]
+
+        graph = builder.build(entities, relationships=relationships)
+
+        self.assertEqual(len(graph["entities"]), 2)
+        self.assertEqual(len(graph["relationships"]), 1)
+        rel = graph["relationships"][0]
+        self.assertEqual(rel.get("source"), "1")
+        self.assertEqual(rel.get("target"), "2")
+
+    def test_build_warns_when_all_relationships_dropped(self):
+        builder = GraphBuilder(merge_entities=False, resolve_conflicts=False)
+        source = {
+            "entities": [],
+            "relationships": [{"foo": "x"}, {"bar": "y"}],
+        }
+
+        with patch.object(builder.logger, "warning") as mock_warning:
+            graph = builder.build(source)
+
+        self.assertEqual(len(graph["relationships"]), 0)
+        mock_warning.assert_called()
+        args, _ = mock_warning.call_args
+        self.assertIn("All relationships were dropped", args[0])
 
 class TestGraphAnalyzer(unittest.TestCase):
     def setUp(self):

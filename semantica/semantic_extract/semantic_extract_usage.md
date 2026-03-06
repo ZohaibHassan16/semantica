@@ -36,6 +36,46 @@ print(f"Relations: {relations}")
 print(f"Extracted {len(entities)} entities and {len(relations)} relations")
 ```
 
+## Batch Processing & Provenance
+
+All extractors support batch processing for high-throughput extraction. You can pass a list of strings or a list of dictionaries (with `content` and `id` keys).
+
+**Features:**
+- **Parallel Processing**: Multi-threaded extraction for high throughput (control via `max_workers`).
+- **Progress Tracking**: Automatically shows a progress bar for large batches.
+- **Provenance Metadata**: Each extracted item includes `batch_index` and `document_id` in its `metadata`.
+
+```python
+from semantica.semantic_extract import NERExtractor
+
+documents = [
+    {"id": "doc_1", "content": "Apple Inc. was founded by Steve Jobs."},
+    {"id": "doc_2", "content": "Microsoft Corporation was founded by Bill Gates."}
+]
+
+# Initialize with parallel processing enabled
+extractor = NERExtractor(max_workers=4)
+batch_results = extractor.extract(documents)
+
+# OR override during extraction call
+# batch_results = extractor.extract(documents, max_workers=8)
+
+for i, doc_entities in enumerate(batch_results):
+    print(f"Document {i} entities:")
+    for entity in doc_entities:
+        print(f"  - {entity.text} ({entity.label})")
+        print(f"    Provenance: Batch Index {entity.metadata['batch_index']}, Doc ID {entity.metadata.get('document_id')}")
+```
+
+## Robust Extraction Fallbacks
+
+The framework implements robust fallback chains to prevent empty results when primary methods fail (e.g., due to model unavailability or obscure text).
+
+- **NER**: `ML/LLM` -> `Pattern` -> `Last Resort` (Capitalized Words)
+- **Relation**: `Primary` -> `Pattern` -> `Last Resort` (Adjacency)
+- **Triplet**: `Primary` -> `Relation-to-Triplet` -> `Pattern`
+
+This ensures that you almost always get *some* structured data, even if it requires falling back to simpler heuristics.
 
 ## Entity Extraction
 
@@ -73,15 +113,42 @@ extractor = NERExtractor(method="ml")
 entities = extractor.extract(text)
 print(f"ML method: {len(entities)} entities")
 
-# HuggingFace model extraction
+# HuggingFace model extraction (Bring Your Own Model)
 extractor = NERExtractor(method="huggingface")
-entities = extractor.extract(text, model="dslim/bert-base-NER")
+
+# Use a specific model and aggregation strategy at runtime
+# Runtime options override configuration defaults
+entities = extractor.extract(
+    text, 
+    model="dslim/bert-base-NER", 
+    aggregation_strategy="max", # Options: "simple", "first", "average", "max"
+    device="cpu" # or "cuda"
+)
 print(f"HuggingFace method: {len(entities)} entities")
 
-# LLM-based extraction
+# LLM-based extraction with advanced options
 extractor = NERExtractor(method="llm")
-entities = extractor.extract(text, provider="openai", model="gpt-4")
+entities = extractor.extract(
+    text, 
+    provider="openai", 
+    model="gpt-4",
+    silent_fail=False,      # Raise ProcessingError on failure (default)
+    max_text_length=4000,   # Auto-chunking for long text (default: 64k for major providers)
+    max_tokens=4096,        # Explicitly control generation output length
+    temperature=0.0
+)
 print(f"LLM method: {len(entities)} entities")
+
+# Groq extraction with long context support
+# Groq defaults to 64k chunking limit for models like llama-3.3-70b
+groq_extractor = NERExtractor(method="llm")
+groq_entities = groq_extractor.extract(
+    text,
+    provider="groq",
+    model="llama-3.3-70b-versatile",
+    max_tokens=8000 # Passed directly to Groq API
+)
+print(f"Groq method: {len(groq_entities)} entities")
 ```
 
 ### Using NERExtractor Directly
@@ -170,13 +237,29 @@ relations = extractor.extract(text, entities=entities)
 extractor = RelationExtractor(method="cooccurrence")
 relations = extractor.extract(text, entities=entities)
 
-# HuggingFace model
+# HuggingFace model (Bring Your Own Model)
 extractor = RelationExtractor(method="huggingface")
-relations = extractor.extract(text, entities=entities, model="microsoft/DialoGPT-medium")
 
-# LLM-based
+# Use a sequence classification model trained for relations
+# The extractor automatically formats input with entity markers: 
+# "Steve Jobs founded Apple" -> "<subj> Steve Jobs </subj> founded <obj> Apple </obj>"
+relations = extractor.extract(
+    text, 
+    entities=entities, 
+    model="semantica/relation-model-v1", # Replace with your model ID
+    device="cpu"
+)
+
+# LLM-based relation extraction
 extractor = RelationExtractor(method="llm")
-relations = extractor.extract(text, entities=entities, provider="openai")
+relations = extractor.extract(
+    text, 
+    entities=entities, 
+    provider="openai",
+    model="gpt-4",
+    max_tokens=2048, # Increased output limit for many relations
+    silent_fail=True  # Return empty list if extraction fails
+)
 ```
 
 ### Relation Types
@@ -228,13 +311,26 @@ triplets = extractor.extract_triplets(text)
 extractor = TripletExtractor(method="rules")
 triplets = extractor.extract_triplets(text)
 
-# HuggingFace model
+# HuggingFace model (Seq2Seq / REBEL)
 extractor = TripletExtractor(method="huggingface")
-triplets = extractor.extract_triplets(text, model="t5-base")
 
-# LLM-based
+# Use a Seq2Seq model like REBEL for end-to-end triplet extraction
+# This method generates triplets directly from text without needing separate NER/RE steps
+triplets = extractor.extract_triplets(
+    text, 
+    model="Babelscape/rebel-large",
+    device="cpu"
+)
+
+# LLM-based triplet extraction
 extractor = TripletExtractor(method="llm")
-triplets = extractor.extract_triplets(text, provider="openai", model="gpt-4")
+triplets = extractor.extract_triplets(
+    text, 
+    provider="openai", 
+    model="gpt-4",
+    max_text_length=64000, # Large default chunk size supported
+    max_tokens=4096 # Ensure enough tokens for all triplets
+)
 ```
 
 ### RDF Serialization

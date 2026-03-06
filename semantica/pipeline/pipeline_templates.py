@@ -72,6 +72,9 @@ class PipelineTemplateManager:
 
         # Initialize progress tracker
         self.progress_tracker = get_progress_tracker()
+        # Ensure progress tracker is enabled
+        if not self.progress_tracker.enabled:
+            self.progress_tracker.enabled = True
 
         self.templates: Dict[str, PipelineTemplate] = {}
         self._load_default_templates()

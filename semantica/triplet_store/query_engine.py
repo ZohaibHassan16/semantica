@@ -88,6 +88,9 @@ class QueryEngine:
         self.config = config or {}
         self.config.update(kwargs)
         self.progress_tracker = get_progress_tracker()
+        # Ensure progress tracker is enabled
+        if not self.progress_tracker.enabled:
+            self.progress_tracker.enabled = True
 
         self.enable_caching = self.config.get("enable_caching", True)
         self.enable_optimization = self.config.get("enable_optimization", True)

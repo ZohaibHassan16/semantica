@@ -50,7 +50,7 @@ try:
     )
 
     NEO4J_AVAILABLE = True
-except ImportError:
+except (ImportError, OSError):
     NEO4J_AVAILABLE = False
     GraphDatabase = None
     Neo4jError = Exception
@@ -252,6 +252,9 @@ class Neo4jStore:
         self.logger = get_logger("neo4j_store")
         self.config = config
         self.progress_tracker = get_progress_tracker()
+        # Ensure progress tracker is enabled
+        if not self.progress_tracker.enabled:
+            self.progress_tracker.enabled = True
 
         self.uri = uri or config.get("uri", "bolt://localhost:7687")
         self.user = user or config.get("user", "neo4j")

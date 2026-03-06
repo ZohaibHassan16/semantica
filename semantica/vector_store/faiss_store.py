@@ -49,7 +49,7 @@ try:
     import faiss
 
     FAISS_AVAILABLE = True
-except ImportError:
+except (ImportError, OSError):
     FAISS_AVAILABLE = False
     faiss = None
 
@@ -227,6 +227,9 @@ class FAISSStore:
         self.logger = get_logger("faiss_store")
         self.config = config
         self.progress_tracker = get_progress_tracker()
+        # Ensure progress tracker is enabled
+        if not self.progress_tracker.enabled:
+            self.progress_tracker.enabled = True
         self.dimension = dimension
 
         self.index: Optional[FAISSIndex] = None

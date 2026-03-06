@@ -32,7 +32,7 @@ from ..utils.progress_tracker import get_progress_tracker
 
 try:
     from datasets import load_dataset, Dataset, IterableDataset
-except ImportError:
+except (ImportError, OSError):
     load_dataset = None
     Dataset = None
     IterableDataset = None
@@ -90,6 +90,9 @@ class HuggingFaceIngestor:
 
         # Initialize progress tracker
         self.progress_tracker = get_progress_tracker()
+        # Ensure progress tracker is enabled
+        if not self.progress_tracker.enabled:
+            self.progress_tracker.enabled = True
 
         self.logger.debug("HuggingFace ingestor initialized")
 

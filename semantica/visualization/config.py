@@ -103,7 +103,7 @@ class VisualizationConfig:
                         config_data = tomli.load(f)
                         if config_data and "visualization" in config_data:
                             self._config.update(config_data["visualization"])
-                except ImportError:
+                except (ImportError, OSError):
                     try:
                         import tomllib
 
@@ -111,7 +111,7 @@ class VisualizationConfig:
                             config_data = tomllib.load(f)
                             if config_data and "visualization" in config_data:
                                 self._config.update(config_data["visualization"])
-                    except ImportError:
+                    except (ImportError, OSError):
                         self.logger.warning(
                             "TOML parser not available. Install tomli or use Python 3.11+"
                         )

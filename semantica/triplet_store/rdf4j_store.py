@@ -58,6 +58,9 @@ class RDF4JStore:
         self.logger = get_logger("rdf4j_store")
         self.config = config
         self.progress_tracker = get_progress_tracker()
+        # Ensure progress tracker is enabled
+        if not self.progress_tracker.enabled:
+            self.progress_tracker.enabled = True
 
         self.endpoint = endpoint.rstrip("/")
         self.repository_id = config.get("repository_id", "default")

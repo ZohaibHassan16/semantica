@@ -1,12 +1,13 @@
+# Deployment Trigger: Public GitHub Pages
 site_name: Semantica
 site_description: Open Source Framework for Semantic Intelligence & Knowledge Engineering
-site_url: https://semantica.dev
+site_url: https://hawksight-ai.github.io/semantica/
 repo_url: https://github.com/Hawksight-AI/semantica
 repo_name: Hawksight-AI/semantica
 edit_uri: edit/main/docs/
 
 # Copyright
-copyright: Copyright &copy; 2024 Hawksight AI
+copyright: Copyright &copy; 2026 Hawksight AI
 
 # Theme Configuration
 theme:
@@ -50,7 +51,8 @@ markdown_extensions:
       line_spans: __span
       pygments_lang_class: true
   - pymdownx.inlinehilite
-  - pymdownx.snippets
+  - pymdownx.snippets:
+      base_path: ["."]
   - pymdownx.superfences:
       custom_fences:
         - name: mermaid
@@ -94,8 +96,7 @@ extra_css:
   - css/custom.css
 
 # Custom JavaScript
-extra_javascript:
-  - js/version-selector.js
+extra_javascript: []
 
 # Navigation
 nav:
@@ -105,6 +106,7 @@ nav:
     - installation.md
     - quickstart.md
   - Docs:
+    - Change Management: reference/change_management.md
     - Conflicts: reference/conflicts.md
     - Context: reference/context.md
     - Core: reference/core.md
@@ -115,10 +117,12 @@ nav:
     - Graph Store: reference/graph_store.md
     - Ingest: reference/ingest.md
     - Knowledge Graph: reference/kg.md
+    - LLMs: reference/llms.md
     - Normalize: reference/normalize.md
     - Ontology: reference/ontology.md
     - Parse: reference/parse.md
     - Pipeline: reference/pipeline.md
+    - Provenance: reference/provenance.md
     - Reasoning: reference/reasoning.md
     - Seed: reference/seed.md
     - Semantic Extract: reference/semantic_extract.md
@@ -132,15 +136,14 @@ nav:
     - modules.md
     - use-cases.md
     - examples.md
-    - learning-more.md
+    - glossary.md
+  - Integrations:
+    - Docling: integrations/docling.md
+    - Snowflake: integrations/snowflake.md
   - Cookbook: cookbook.md
   - Resources:
-    - community-projects.md
     - community.md
     - contributing.md
-    - architecture.md
-    - governance.md
-    - citation.md
     - faq.md
     - license.md
 

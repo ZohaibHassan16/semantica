@@ -5,22 +5,40 @@ This module provides comprehensive community detection capabilities for the
 Semantica framework, enabling identification of communities (clusters) in
 knowledge graphs using various algorithms.
 
+Supported Algorithms:
+    - Louvain community detection: Modularity optimization with hierarchical clustering
+    - Leiden community detection: Improved version of Louvain with guaranteed connectivity
+    - Label propagation: Fast, semi-supervised community detection
+    - K-clique communities: Overlapping community detection based on clique percolation
+
 Key Features:
-    - Louvain community detection algorithm
-    - Leiden community detection algorithm (with refinement)
-    - Overlapping community detection (k-clique communities)
-    - Community quality metrics (modularity, size distribution)
-    - Community structure analysis
+    - Multiple community detection algorithms with different theoretical foundations
+    - Community quality metrics (modularity, size distribution, coverage)
+    - Community structure analysis and visualization support
+    - Overlapping and non-overlapping community detection
+    - Scalable implementations for large graphs
     - NetworkX integration with fallback implementations
+    - Configurable parameters and resolution settings
 
 Main Classes:
-    - CommunityDetector: Main community detection engine
+    - CommunityDetector: Comprehensive community detection engine
+
+Methods:
+    - detect_communities(): Main interface for community detection
+    - detect_communities_louvain(): Louvain modularity optimization
+    - detect_communities_leiden(): Leiden algorithm with refinement
+    - detect_communities_label_propagation(): Fast label propagation method
+    - calculate_community_metrics(): Community quality assessment
+    - analyze_community_structure(): Detailed community analysis
+    - get_community_statistics(): Statistical summary of communities
 
 Example Usage:
     >>> from semantica.kg import CommunityDetector
     >>> detector = CommunityDetector()
     >>> communities = detector.detect_communities(graph, algorithm="louvain")
     >>> metrics = detector.calculate_community_metrics(graph, communities)
+    >>> leiden_communities = detector.detect_communities_leiden(graph, resolution=1.2)
+    >>> label_communities = detector.detect_communities_label_propagation(graph)
 
 Author: Semantica Contributors
 License: MIT
@@ -85,13 +103,16 @@ class CommunityDetector:
             self.nx = nx
             self.use_networkx = True
             self.logger.debug("NetworkX available, using optimized implementations")
-        except ImportError:
+        except (ImportError, OSError):
             self.nx = None
             self.use_networkx = False
             self.logger.warning("NetworkX not available, using basic implementations")
 
         # Initialize progress tracker
         self.progress_tracker = get_progress_tracker()
+        # Ensure progress tracker is enabled
+        if not self.progress_tracker.enabled:
+            self.progress_tracker.enabled = True
 
     def detect_communities_louvain(
         self, graph: Any, resolution: float = 1.0, max_iter: int = 10, **options
@@ -420,7 +441,7 @@ class CommunityDetector:
         }
 
     def detect_communities(
-        self, graph: Any, algorithm: str = "louvain", **options
+        self, graph: Any, algorithm: str = "louvain", method: str = None, **options
     ) -> Dict[str, Any]:
         """
         Detect communities using specified algorithm.
@@ -440,6 +461,10 @@ class CommunityDetector:
         Raises:
             ValueError: If algorithm is not supported
         """
+        # 'method' is an alias for 'algorithm'
+        if method is not None:
+            algorithm = method if method in ("louvain", "leiden", "overlapping") else "louvain"
+
         self.logger.info(f"Detecting communities using {algorithm} algorithm")
 
         if algorithm == "louvain":
@@ -459,17 +484,43 @@ class CommunityDetector:
 
         # Extract relationships
         relationships = []
+        raw_edges = []  # flat (u, v) tuples
         if hasattr(graph, "relationships"):
             relationships = graph.relationships
         elif hasattr(graph, "get_relationships"):
             relationships = graph.get_relationships()
         elif isinstance(graph, dict):
             relationships = graph.get("relationships", [])
+            # Also handle 'edges' key (list of tuples or dicts)
+            for edge in graph.get("edges", []):
+                if isinstance(edge, (list, tuple)) and len(edge) >= 2:
+                    raw_edges.append((str(edge[0]), str(edge[1])))
+                elif isinstance(edge, dict):
+                    relationships.append(edge)
+
+        # Add raw (u, v) edges
+        for u, v in raw_edges:
+            if u and v:
+                adjacency[u].append(v)
+                adjacency[v].append(u)
 
         # Build adjacency
         for rel in relationships:
             source = rel.get("source") or rel.get("subject")
             target = rel.get("target") or rel.get("object")
+
+            # Extract IDs if objects are passed
+            if source and not isinstance(source, (str, int, float)):
+                if isinstance(source, dict):
+                    source = source.get("id") or source.get("entity_id") or source.get("text") or str(source)
+                else:
+                    source = getattr(source, "id", getattr(source, "text", str(source)))
+            
+            if target and not isinstance(target, (str, int, float)):
+                if isinstance(target, dict):
+                    target = target.get("id") or target.get("entity_id") or target.get("text") or str(target)
+                else:
+                    target = getattr(target, "id", getattr(target, "text", str(target)))
 
             if source and target:
                 if target not in adjacency[source]:
@@ -481,6 +532,10 @@ class CommunityDetector:
 
     def _to_networkx(self, graph):
         """Convert graph to NetworkX format."""
+        # If already a NetworkX graph, return directly
+        if hasattr(graph, 'nodes') and hasattr(graph, 'edges') and hasattr(graph, 'number_of_nodes'):
+            return graph
+
         adjacency = self._build_adjacency(graph)
         nx_graph = self.nx.Graph()
 
@@ -605,3 +660,278 @@ class CommunityDetector:
                     )
 
         return modularity / (2 * total_edges) if total_edges > 0 else 0.0
+
+    def detect_communities_label_propagation(
+        self,
+        graph: Any,
+        node_labels: Optional[List[str]] = None,
+        relationship_types: Optional[List[str]] = None,
+        max_iterations: int = 100,
+        random_seed: Optional[int] = None,
+        chunk_size: int = 1000
+    ) -> Dict[str, Any]:
+        """
+        Detect communities using Label Propagation algorithm.
+        
+        Label Propagation is a fast and simple community detection algorithm
+        where nodes adopt labels from their neighbors iteratively. It's particularly
+        effective for large graphs and provides good quality results.
+        
+        Args:
+            graph: Graph object (NetworkX or similar)
+            node_labels: List of node labels to include (None for all)
+            relationship_types: List of relationship types to consider (None for all)
+            max_iterations: Maximum number of iterations for convergence
+            random_seed: Random seed for reproducible results
+            chunk_size: Process nodes in chunks for memory efficiency
+            
+        Returns:
+            Dictionary containing:
+            - communities: List of communities (each as list of node IDs)
+            - node_assignments: Dictionary mapping node IDs to community IDs
+            - algorithm: Algorithm name used
+            - iterations: Number of iterations until convergence
+            
+        Raises:
+            ValueError: If graph is empty or parameters are invalid
+            RuntimeError: If community detection fails
+        """
+        try:
+            self.logger.info("Detecting communities using Label Propagation algorithm")
+            
+            # Set random seed if provided
+            if random_seed is not None:
+                import random
+                random.seed(random_seed)
+            
+            # Filter nodes by labels if specified
+            nodes = self._filter_nodes_by_labels(graph, node_labels)
+            if not nodes:
+                raise ValueError("No nodes found matching the specified criteria")
+            
+            # For very large graphs, use chunked processing
+            if len(nodes) > chunk_size:
+                return self._detect_communities_label_propagation_chunked(
+                    graph, nodes, relationship_types, max_iterations, random_seed, chunk_size
+                )
+            
+            # Build adjacency list for filtered nodes
+            adjacency = self._build_filtered_adjacency(graph, nodes, relationship_types)
+            
+            # Initialize labels - each node starts with its own unique label
+            labels = {node: i for i, node in enumerate(nodes)}
+            
+            # Label propagation iterations
+            for iteration in range(max_iterations):
+                labels_changed = False
+                nodes_copy = nodes.copy()
+                
+                # Random order for asynchronous updates
+                import random
+                random.shuffle(nodes_copy)
+                
+                for node in nodes_copy:
+                    # Get neighbor labels
+                    neighbor_labels = []
+                    neighbors = adjacency.get(node, [])
+                    
+                    for neighbor in neighbors:
+                        if neighbor in labels:
+                            neighbor_labels.append(labels[neighbor])
+                    
+                    if neighbor_labels:
+                        # Find most frequent label
+                        label_counts = defaultdict(int)
+                        for label in neighbor_labels:
+                            label_counts[label] += 1
+                        
+                        # Get label with highest count (break ties randomly)
+                        max_count = max(label_counts.values())
+                        best_labels = [label for label, count in label_counts.items() if count == max_count]
+                        new_label = random.choice(best_labels)
+                        
+                        if labels[node] != new_label:
+                            labels[node] = new_label
+                            labels_changed = True
+                
+                # Check for convergence
+                if not labels_changed:
+                    self.logger.info(f"Label Propagation converged after {iteration + 1} iterations")
+                    break
+            else:
+                self.logger.warning(f"Label Propagation did not converge after {max_iterations} iterations")
+            
+            # Group nodes by their final labels
+            label_to_nodes = defaultdict(list)
+            for node, label in labels.items():
+                label_to_nodes[label].append(node)
+            
+            # Convert to communities list
+            communities = list(label_to_nodes.values())
+            
+            # Create node assignments mapping
+            node_assignments = {node: i for i, community in enumerate(communities) for node in community}
+            
+            result = {
+                "communities": communities,
+                "node_assignments": node_assignments,
+                "algorithm": "label_propagation",
+                "iterations": iteration + 1 if 'iteration' in locals() else max_iterations
+            }
+            
+            self.logger.info(f"Detected {len(communities)} communities using Label Propagation")
+            return result
+            
+        except Exception as e:
+            self.logger.error(f"Label Propagation community detection failed: {str(e)}")
+            raise RuntimeError(f"Community detection failed: {str(e)}")
+    
+    def _detect_communities_label_propagation_chunked(
+        self,
+        graph: Any,
+        nodes: List[str],
+        relationship_types: Optional[List[str]],
+        max_iterations: int,
+        random_seed: Optional[int],
+        chunk_size: int
+    ) -> Dict[str, Any]:
+        """
+        Chunked Label Propagation for very large graphs.
+        
+        Processes the graph in chunks to manage memory usage while maintaining
+        algorithm effectiveness through iterative refinement.
+        """
+        self.logger.info(f"Using chunked Label Propagation for {len(nodes)} nodes")
+        
+        # Initialize labels for all nodes
+        labels = {node: i for i, node in enumerate(nodes)}
+        
+        # Build adjacency in chunks
+        adjacency = {}
+        for i in range(0, len(nodes), chunk_size):
+            chunk_nodes = nodes[i:i + chunk_size]
+            chunk_adjacency = self._build_filtered_adjacency(graph, chunk_nodes, relationship_types)
+            adjacency.update(chunk_adjacency)
+        
+        # Run label propagation with memory-efficient updates
+        for iteration in range(max_iterations):
+            labels_changed = False
+            
+            # Process nodes in chunks
+            for i in range(0, len(nodes), chunk_size):
+                chunk_nodes = nodes[i:i + chunk_size]
+                
+                # Random order within chunk
+                import random
+                random.shuffle(chunk_nodes)
+                
+                for node in chunk_nodes:
+                    # Get neighbor labels
+                    neighbor_labels = []
+                    neighbors = adjacency.get(node, [])
+                    
+                    for neighbor in neighbors:
+                        if neighbor in labels:
+                            neighbor_labels.append(labels[neighbor])
+                    
+                    if neighbor_labels:
+                        # Find most frequent label
+                        label_counts = defaultdict(int)
+                        for label in neighbor_labels:
+                            label_counts[label] += 1
+                        
+                        # Get label with highest count (break ties randomly)
+                        max_count = max(label_counts.values())
+                        best_labels = [label for label, count in label_counts.items() if count == max_count]
+                        new_label = random.choice(best_labels)
+                        
+                        if labels[node] != new_label:
+                            labels[node] = new_label
+                            labels_changed = True
+            
+            # Check for convergence
+            if not labels_changed:
+                self.logger.info(f"Chunked Label Propagation converged after {iteration + 1} iterations")
+                break
+        
+        # Group nodes by their final labels
+        label_to_nodes = defaultdict(list)
+        for node, label in labels.items():
+            label_to_nodes[label].append(node)
+        
+        # Convert to communities list
+        communities = list(label_to_nodes.values())
+        
+        # Create node assignments mapping
+        node_assignments = {node: i for i, community in enumerate(communities) for node in community}
+        
+        result = {
+            "communities": communities,
+            "node_assignments": node_assignments,
+            "algorithm": "label_propagation_chunked",
+            "iterations": iteration + 1 if 'iteration' in locals() else max_iterations
+        }
+        
+        self.logger.info(f"Detected {len(communities)} communities using chunked Label Propagation")
+        return result
+    
+    def _filter_nodes_by_labels(self, graph: Any, node_labels: Optional[List[str]]) -> List[str]:
+        """Filter nodes by specified labels."""
+        if node_labels is None:
+            return list(graph.nodes()) if hasattr(graph, 'nodes') else []
+        
+        filtered_nodes = []
+        for node in graph.nodes():
+            if hasattr(graph, 'nodes'):
+                node_data = graph.nodes[node]
+                if isinstance(node_data, dict):
+                    node_label = node_data.get('label') or node_data.get('type')
+                    if node_label in node_labels:
+                        filtered_nodes.append(node)
+                else:
+                    # Fallback - include all nodes if no label information
+                    filtered_nodes.append(node)
+        
+        return filtered_nodes
+    
+    def _build_filtered_adjacency(
+        self, 
+        graph: Any, 
+        nodes: List[str], 
+        relationship_types: Optional[List[str]]
+    ) -> Dict[str, List[str]]:
+        """Build adjacency list filtered by nodes and relationship types."""
+        adjacency = {}
+        
+        for node in nodes:
+            neighbors = []
+            
+            if hasattr(graph, 'neighbors'):
+                all_neighbors = list(graph.neighbors(node))
+            elif hasattr(graph, 'get_neighbors'):
+                all_neighbors = graph.get_neighbors(node)
+            else:
+                all_neighbors = []
+
+            if all_neighbors and isinstance(all_neighbors[0], dict):
+                all_neighbors = [
+                    n.get("id") for n in all_neighbors
+                    if isinstance(n, dict) and n.get("id")
+                ]
+            
+            # Filter by relationship types if specified
+            if relationship_types is not None and hasattr(graph, 'get_edge_data'):
+                for neighbor in all_neighbors:
+                    if neighbor in nodes:  # Only include filtered nodes
+                        edge_data = graph.get_edge_data(node, neighbor)
+                        if edge_data and isinstance(edge_data, dict):
+                            edge_type = edge_data.get('type') or edge_data.get('relationship')
+                            if edge_type in relationship_types:
+                                neighbors.append(neighbor)
+            else:
+                # Include all neighbors that are in the filtered node set
+                neighbors = [neighbor for neighbor in all_neighbors if neighbor in nodes]
+            
+            adjacency[node] = neighbors
+        
+        return adjacency

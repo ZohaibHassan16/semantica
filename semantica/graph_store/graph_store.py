@@ -34,7 +34,7 @@ License: MIT
 
 from typing import Any, Dict, List, Optional, Tuple, Union
 
-from ..utils.exceptions import ProcessingError, ValidationError
+from ..utils.exceptions import ValidationError
 from ..utils.logging import get_logger
 from ..utils.progress_tracker import get_progress_tracker
 from .config import graph_store_config
@@ -214,7 +214,9 @@ class RelationshipManager:
         Returns:
             List of relationships
         """
-        return self.backend.get_relationships(node_id, rel_type, direction, limit, **options)
+        return self.backend.get_relationships(
+            node_id, rel_type, direction, limit, **options
+        )
 
     def delete(
         self,
@@ -290,6 +292,7 @@ class QueryEngine:
     ) -> str:
         """Generate cache key for query."""
         import hashlib
+
         key_str = f"{query}:{str(parameters)}"
         return hashlib.md5(key_str.encode()).hexdigest()
 
@@ -340,7 +343,9 @@ class GraphAnalytics:
         Returns:
             Path information or None
         """
-        return self.backend.shortest_path(start_node_id, end_node_id, rel_type, max_depth, **options)
+        return self.backend.shortest_path(
+            start_node_id, end_node_id, rel_type, max_depth, **options
+        )
 
     def get_neighbors(
         self,
@@ -363,7 +368,9 @@ class GraphAnalytics:
         Returns:
             List of neighboring nodes
         """
-        return self.backend.get_neighbors(node_id, rel_type, direction, depth, **options)
+        return self.backend.get_neighbors(
+            node_id, rel_type, direction, depth, **options
+        )
 
     def degree_centrality(
         self,
@@ -440,7 +447,7 @@ class GraphAnalytics:
             Component information
         """
         backend_type = type(self.backend).__name__
-        
+
         if "Neo4j" in backend_type:
             query = """
             CALL gds.wcc.stream({
@@ -452,16 +459,23 @@ class GraphAnalytics:
             """
             params = {"label": labels[0] if labels else "*"}
             result = self.backend.execute_query(query, params)
-            return [{"component": r["componentId"], "nodes": r["nodes"]} for r in result]
-            
+            return [
+                {"component": r["componentId"], "nodes": r["nodes"]} for r in result
+            ]
+
         elif "NetworkX" in backend_type:
             import networkx as nx
+
             G = self.backend.graph
             components = list(nx.connected_components(G))
-            return [{"component": i, "nodes": list(c)} for i, c in enumerate(components)]
-            
+            return [
+                {"component": i, "nodes": list(c)} for i, c in enumerate(components)
+            ]
+
         else:
-            raise NotImplementedError(f"connected_components not implemented for {backend_type}")
+            raise NotImplementedError(
+                f"connected_components not implemented for {backend_type}"
+            )
 
 
 class GraphManager:
@@ -529,9 +543,16 @@ class GraphStore:
         """
         self.logger = get_logger("graph_store")
         self.progress_tracker = get_progress_tracker()
+        # Ensure progress tracker is enabled
+        if not self.progress_tracker.enabled:
+            self.progress_tracker.enabled = True
 
         # Determine backend
-        self.backend = backend or config.get("backend") or graph_store_config.get("default_backend", "neo4j")
+        self.backend = (
+            backend
+            or config.get("backend")
+            or graph_store_config.get("default_backend", "neo4j")
+        )
         self.config = config
 
         # Initialize store backend
@@ -543,15 +564,31 @@ class GraphStore:
         """Initialize the appropriate store backend based on backend type."""
         if self.backend == "neo4j":
             from .neo4j_store import Neo4jStore
+
             neo4j_config = graph_store_config.get_neo4j_config()
             neo4j_config.update(self.config)
             self._store_backend = Neo4jStore(**neo4j_config)
 
         elif self.backend == "falkordb":
             from .falkordb_store import FalkorDBStore
+
             falkordb_config = graph_store_config.get_falkordb_config()
             falkordb_config.update(self.config)
             self._store_backend = FalkorDBStore(**falkordb_config)
+
+        elif self.backend == "neptune" or self.backend == "amazon_neptune":
+            from .amazon_neptune import AmazonNeptuneStore
+
+            neptune_config = graph_store_config.get_neptune_config()
+            neptune_config.update(self.config)
+            self._store_backend = AmazonNeptuneStore(**neptune_config)
+
+        elif self.backend == "age" or self.backend == "apache_age":
+            from .age_store import ApacheAgeStore
+
+            age_config = graph_store_config.get_age_config()
+            age_config.update(self.config)
+            self._store_backend = ApacheAgeStore(**age_config)
 
         else:
             raise ValidationError(f"Unknown backend: {self.backend}")
@@ -618,7 +655,9 @@ class GraphStore:
         **options,
     ) -> List[Dict[str, Any]]:
         """Get nodes matching criteria."""
-        return self._manager.nodes.get(labels=labels, properties=properties, limit=limit, **options)
+        return self._manager.nodes.get(
+            labels=labels, properties=properties, limit=limit, **options
+        )
 
     def update_node(
         self,
@@ -662,7 +701,9 @@ class GraphStore:
         **options,
     ) -> List[Dict[str, Any]]:
         """Get relationships."""
-        return self._manager.relationships.get(node_id, rel_type, direction, limit, **options)
+        return self._manager.relationships.get(
+            node_id, rel_type, direction, limit, **options
+        )
 
     def delete_relationship(
         self,
@@ -720,7 +761,9 @@ class GraphStore:
             node_id, rel_type, direction, actual_depth, **options
         )
 
-    def query(self, query: str, parameters: Optional[Dict[str, Any]] = None, **options) -> List[Dict[str, Any]]:
+    def query(
+        self, query: str, parameters: Optional[Dict[str, Any]] = None, **options
+    ) -> List[Dict[str, Any]]:
         """
         Execute a query and return results (Compatibility method for ContextRetriever).
 
@@ -768,42 +811,46 @@ class GraphStore:
         # Convert to GraphStore format (labels, properties)
         graph_nodes = []
         for node in nodes:
-            # Extract label from type
-            labels = [node.get("type", "Entity")]
-            if isinstance(labels[0], str):
-                labels = [labels[0]] # Ensure list
+            # Extract labels - support both 'labels' array and 'type' string
+            labels = node.get("labels")
+            if not labels:
+                node_type = node.get("type", "Entity")
+                labels = [node_type] if isinstance(node_type, str) else node_type
+            if isinstance(labels, str):
+                labels = [labels]
 
             # Prepare properties
             props = node.get("properties", {}).copy()
-            
+
             # Ensure ID is preserved
             if "id" in node and "id" not in props:
                 props["id"] = node["id"]
-                
+
             # Ensure content/text is preserved
             if "content" in node and "content" not in props:
                 props["content"] = node["content"]
             if "text" in node and "text" not in props:
                 props["text"] = node["text"]
 
-            graph_nodes.append({
-                "labels": labels,
-                "properties": props
-            })
+            graph_nodes.append({"labels": labels, "properties": props})
 
         # Use batch creation
-        # Note: create_nodes expects dicts with 'labels' and 'properties' keys if passed directly?
+        # Note: create_nodes expects dicts with 'labels' and 'properties'
+        # keys if passed directly?
         # Let's check create_nodes signature implementation in manager.
-        # But here I'll assume create_nodes takes a list of such dicts or similar.
+        # But here I'll assume create_nodes takes a list of such dicts
+        # or similar.
         # Actually, let's look at create_nodes wrapper in this file:
         # def create_nodes(self, nodes: List[Dict[str, Any]], **options)
         # It passes to self._manager.nodes.create_batch(nodes)
-        
+
         # If create_batch expects specific format, I should match it.
         # Assuming create_batch is smart enough or expects standard format.
-        # To be safe, let's look at NodeManager.create_batch if possible, but I can't easily.
-        # Standard expectation: List of dicts where each dict has labels and properties.
-        
+        # To be safe, let's look at NodeManager.create_batch if possible,
+        # but I can't easily.
+        # Standard expectation: List of dicts where each dict has labels
+        # and properties.
+
         result = self.create_nodes(graph_nodes, **options)
         return len(result)
 
@@ -824,17 +871,21 @@ class GraphStore:
             target_id = edge.get("target_id")
             rel_type = edge.get("type", "RELATED_TO")
             properties = edge.get("properties", {}).copy()
-            
+
             # Preserve weight
             if "weight" in edge:
                 properties["weight"] = edge["weight"]
 
             if source_id and target_id:
                 try:
-                    self.create_relationship(source_id, target_id, rel_type, properties, **options)
+                    self.create_relationship(
+                        source_id, target_id, rel_type, properties, **options
+                    )
                     count += 1
                 except Exception as e:
-                    self.logger.warning(f"Failed to add edge {source_id}->{target_id}: {e}")
+                    self.logger.warning(
+                        f"Failed to add edge {source_id}->{target_id}: {e}"
+                    )
         return count
 
     def build_from_conversations(
@@ -869,27 +920,29 @@ class GraphStore:
             all_nodes = []
             all_edges = []
             seen_nodes = set()
-            
+
             for conv in conversations:
                 # Load conversation if string (file path)
                 conv_data = conv
                 if isinstance(conv, str):
                     from pathlib import Path
+
                     from ..utils.helpers import read_json_file
+
                     conv_data = read_json_file(Path(conv))
 
                 nodes, edges = self._process_conversation_to_elements(
-                    conv_data, 
+                    conv_data,
                     extract_intents=extract_intents,
-                    extract_sentiments=extract_sentiments
+                    extract_sentiments=extract_sentiments,
                 )
-                
+
                 # Add unique nodes
                 for node in nodes:
                     if node["id"] not in seen_nodes:
                         all_nodes.append(node)
                         seen_nodes.add(node["id"])
-                
+
                 all_edges.extend(edges)
 
             if link_entities:
@@ -901,13 +954,8 @@ class GraphStore:
             edge_count = self.add_edges(all_edges)
 
             self.progress_tracker.stop_tracking(tracking_id, status="completed")
-            
-            return {
-                "statistics": {
-                    "node_count": node_count,
-                    "edge_count": edge_count
-                }
-            }
+
+            return {"statistics": {"node_count": node_count, "edge_count": edge_count}}
 
         except Exception as e:
             self.progress_tracker.stop_tracking(
@@ -927,92 +975,112 @@ class GraphStore:
         """
         nodes = []
         edges = []
-        
+
         # Process entities
         for entity in entities:
             entity_id = entity.get("id") or entity.get("entity_id")
             if entity_id:
-                nodes.append({
-                    "id": entity_id,
-                    "type": entity.get("type", "entity"),
-                    "properties": {
-                        "content": entity.get("text") or entity.get("label") or entity_id,
-                        **entity
+                nodes.append(
+                    {
+                        "id": entity_id,
+                        "type": entity.get("type", "entity"),
+                        "properties": {
+                            "content": entity.get("text")
+                            or entity.get("label")
+                            or entity_id,
+                            **entity,
+                        },
                     }
-                })
+                )
 
         # Process relationships
         for rel in relationships:
             source = rel.get("source_id")
             target = rel.get("target_id")
             if source and target:
-                edges.append({
-                    "source_id": source,
-                    "target_id": target,
-                    "type": rel.get("type", "related_to"),
-                    "weight": rel.get("confidence", 1.0),
-                    "properties": rel
-                })
+                edges.append(
+                    {
+                        "source_id": source,
+                        "target_id": target,
+                        "type": rel.get("type", "related_to"),
+                        "weight": rel.get("confidence", 1.0),
+                        "properties": rel,
+                    }
+                )
 
         node_count = self.add_nodes(nodes)
         edge_count = self.add_edges(edges)
-        
+
         return {"statistics": {"node_count": node_count, "edge_count": edge_count}}
 
-    def _process_conversation_to_elements(self, conv_data: Dict[str, Any], **kwargs) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
+    def _process_conversation_to_elements(
+        self, conv_data: Dict[str, Any], **kwargs
+    ) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
         """Helper to process conversation into nodes and edges."""
         nodes = []
         edges = []
-        
+
         conv_id = conv_data.get("id") or f"conv_{hash(str(conv_data)) % 10000}"
 
         # Conversation node
-        nodes.append({
-            "id": conv_id,
-            "type": "conversation",
-            "properties": {
-                "content": conv_data.get("content", "") or conv_data.get("summary", ""),
-                "timestamp": conv_data.get("timestamp")
+        nodes.append(
+            {
+                "id": conv_id,
+                "type": "conversation",
+                "properties": {
+                    "content": conv_data.get("content", "")
+                    or conv_data.get("summary", ""),
+                    "timestamp": conv_data.get("timestamp"),
+                },
             }
-        })
+        )
 
         name_to_id = {}
-        extract_entities = kwargs.get("extract_entities", True) # Default true if not passed?
-        # Actually ContextGraph defaults to True in init, but here we are static.
+        # Note: extract_entities option is available but not used in this
+        # implementation. Default true if not passed. ContextGraph defaults
+        # to True in init, but here we are static.
         # Let's assume True unless told otherwise or check config.
-        
+
         # Extract entities
         for entity in conv_data.get("entities", []):
             entity_id = entity.get("id") or entity.get("entity_id")
-            entity_text = entity.get("text") or entity.get("label") or entity.get("name") or entity_id
+            entity_text = (
+                entity.get("text")
+                or entity.get("label")
+                or entity.get("name")
+                or entity_id
+            )
             entity_type = entity.get("type", "entity")
 
             # Generate ID if missing
             if not entity_id and entity_text:
                 import hashlib
-                entity_hash = hashlib.md5(f"{entity_text}_{entity_type}".encode()).hexdigest()[:12]
+
+                entity_hash = hashlib.md5(
+                    f"{entity_text}_{entity_type}".encode()
+                ).hexdigest()[:12]
                 entity_id = f"{entity_type.lower()}_{entity_hash}"
 
             if entity_id:
                 if entity_text:
                     name_to_id[entity_text] = entity_id
 
-                nodes.append({
-                    "id": entity_id,
-                    "type": "entity", # Normalize type?
-                    "properties": {
-                        "content": entity_text,
-                        "type": entity_type,
-                        **entity
+                nodes.append(
+                    {
+                        "id": entity_id,
+                        "type": "entity",  # Normalize type?
+                        "properties": {
+                            "content": entity_text,
+                            "type": entity_type,
+                            **entity,
+                        },
                     }
-                })
-                
+                )
+
                 # Edge: Conversation -> Entity
-                edges.append({
-                    "source_id": conv_id,
-                    "target_id": entity_id,
-                    "type": "mentions"
-                })
+                edges.append(
+                    {"source_id": conv_id, "target_id": entity_id, "type": "mentions"}
+                )
 
         # Extract relationships
         for rel in conv_data.get("relationships", []):
@@ -1026,43 +1094,54 @@ class GraphStore:
                 target = name_to_id[rel.get("target")]
 
             if source and target:
-                edges.append({
-                    "source_id": source,
-                    "target_id": target,
-                    "type": rel.get("type", "related_to"),
-                    "weight": rel.get("confidence", 1.0),
-                    "properties": rel
-                })
-                
+                edges.append(
+                    {
+                        "source_id": source,
+                        "target_id": target,
+                        "type": rel.get("type", "related_to"),
+                        "weight": rel.get("confidence", 1.0),
+                        "properties": rel,
+                    }
+                )
+
         return nodes, edges
 
-    def _link_entities_elements(self, nodes: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    def _link_entities_elements(
+        self, nodes: List[Dict[str, Any]]
+    ) -> List[Dict[str, Any]]:
         """Link similar entities."""
         edges = []
         # Lazy import to avoid circular dependency
         try:
             from ..context.entity_linker import EntityLinker
-            linker = EntityLinker() # Use default config
-        except ImportError:
+
+            linker = EntityLinker()  # Use default config
+        except (ImportError, OSError):
             return []
 
         entity_nodes = [n for n in nodes if n.get("type") == "entity"]
         for i, node1 in enumerate(entity_nodes):
             content1 = node1["properties"].get("content", "")
-            if not content1: continue
-            
+            if not content1:
+                continue
+
             for node2 in entity_nodes[i + 1 :]:
                 content2 = node2["properties"].get("content", "")
-                if not content2: continue
-                
-                similarity = linker._calculate_text_similarity(content1.lower(), content2.lower())
+                if not content2:
+                    continue
+
+                similarity = linker._calculate_text_similarity(
+                    content1.lower(), content2.lower()
+                )
                 if similarity >= linker.similarity_threshold:
-                    edges.append({
-                        "source_id": node1["id"],
-                        "target_id": node2["id"],
-                        "type": "similar_to",
-                        "weight": similarity
-                    })
+                    edges.append(
+                        {
+                            "source_id": node1["id"],
+                            "target_id": node2["id"],
+                            "type": "similar_to",
+                            "weight": similarity,
+                        }
+                    )
         return edges
 
     @property
@@ -1084,4 +1163,3 @@ class GraphStore:
     def analytics(self) -> GraphAnalytics:
         """Get analytics engine."""
         return self._manager.analytics
-

@@ -37,7 +37,7 @@ from ..utils.progress_tracker import get_progress_tracker
 
 try:
     import duckdb
-except ImportError:
+except (ImportError, OSError):
     duckdb = None
 
 
@@ -100,6 +100,9 @@ class DuckDBIngestor:
 
         # Initialize progress tracker
         self.progress_tracker = get_progress_tracker()
+        # Ensure progress tracker is enabled
+        if not self.progress_tracker.enabled:
+            self.progress_tracker.enabled = True
 
         self.logger.debug("DuckDB ingestor initialized")
 
@@ -310,7 +313,7 @@ class DuckDBIngestor:
             # to read Excel and then query it
             try:
                 import pandas as pd
-            except ImportError:
+            except (ImportError, OSError):
                 raise ImportError(
                     "pandas and openpyxl are required for Excel ingestion. "
                     "Install with: pip install pandas openpyxl"

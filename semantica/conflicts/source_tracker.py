@@ -549,3 +549,122 @@ class SourceTracker:
             List of traceability records
         """
         return self.get_traceability_chain(entity_id, property_name)
+
+    def track_sources_batch(
+        self,
+        source_data: List[Dict[str, Any]],
+        pipeline_id: Optional[str] = None,
+    ) -> Dict[str, int]:
+        """
+        Track sources for multiple entities, properties, or relationships in batch.
+
+        Args:
+            source_data: List of source tracking dictionaries, each containing:
+                - type: "entity", "property", or "relationship"
+                - entity_id: Entity identifier (required for all types)
+                - property_name: Property name (required for "property" type)
+                - value: Property value (required for "property" type)
+                - relationship_id: Relationship identifier (required for "relationship" type)
+                - source: SourceReference object or dict to create SourceReference
+                - metadata: Optional metadata dictionary
+            pipeline_id: Optional pipeline ID for progress tracking
+
+        Returns:
+            dict: Statistics with keys:
+                - entities_tracked: Number of entities tracked
+                - properties_tracked: Number of properties tracked
+                - relationships_tracked: Number of relationships tracked
+                - total_tracked: Total number of items tracked
+        """
+        if not source_data:
+            return {
+                "entities_tracked": 0,
+                "properties_tracked": 0,
+                "relationships_tracked": 0,
+                "total_tracked": 0,
+            }
+
+        tracking_id = self.progress_tracker.start_tracking(
+            module="conflicts",
+            submodule="SourceTracker",
+            message=f"Tracking sources for {len(source_data)} items",
+            pipeline_id=pipeline_id,
+        )
+
+        stats = {
+            "entities_tracked": 0,
+            "properties_tracked": 0,
+            "relationships_tracked": 0,
+            "total_tracked": 0,
+        }
+
+        try:
+            for i, item in enumerate(source_data):
+                item_type = item.get("type", "property")
+                source_ref = item.get("source")
+                metadata = item.get("metadata", {})
+
+                # Convert source dict to SourceReference if needed
+                if isinstance(source_ref, dict):
+                    source_ref = SourceReference(**source_ref)
+                elif not isinstance(source_ref, SourceReference):
+                    self.logger.warning(f"Invalid source reference in item {i}: {item}")
+                    continue
+
+                if item_type == "entity":
+                    entity_id = item.get("entity_id")
+                    if entity_id:
+                        self.track_entity_source(entity_id, source_ref, **metadata)
+                        stats["entities_tracked"] += 1
+                        stats["total_tracked"] += 1
+
+                elif item_type == "property":
+                    entity_id = item.get("entity_id")
+                    property_name = item.get("property_name")
+                    value = item.get("value")
+                    if entity_id and property_name is not None:
+                        self.track_property_source(
+                            entity_id, property_name, value, source_ref, **metadata
+                        )
+                        stats["properties_tracked"] += 1
+                        stats["total_tracked"] += 1
+
+                elif item_type == "relationship":
+                    relationship_id = item.get("relationship_id")
+                    if relationship_id:
+                        self.track_relationship_source(
+                            relationship_id, source_ref, **metadata
+                        )
+                        stats["relationships_tracked"] += 1
+                        stats["total_tracked"] += 1
+
+                else:
+                    self.logger.warning(
+                        f"Unknown type '{item_type}' in item {i}, skipping"
+                    )
+
+                # Update progress
+                self.progress_tracker.update_progress(
+                    tracking_id,
+                    processed=i + 1,
+                    total=len(source_data),
+                    message=f"Tracking sources {i+1}/{len(source_data)}...",
+                )
+
+            message = (
+                f"Tracked {stats['total_tracked']} items: "
+                f"{stats['entities_tracked']} entities, "
+                f"{stats['properties_tracked']} properties, "
+                f"{stats['relationships_tracked']} relationships"
+            )
+
+            self.progress_tracker.stop_tracking(
+                tracking_id, status="completed", message=message
+            )
+            return stats
+
+        except Exception as e:
+            self.progress_tracker.stop_tracking(
+                tracking_id, status="failed", message=str(e)
+            )
+            raise

@@ -86,6 +86,7 @@ Main Classes:
     - RepoIngestor: Git repository processing
     - EmailIngestor: Email protocol handling
     - DBIngestor: Database export handling
+    - OntologyIngestor: Ontology file processing
     - MethodRegistry: Registry for custom ingestion methods
     - IngestConfig: Configuration manager for ingest module
 
@@ -98,6 +99,7 @@ Convenience Functions:
     - ingest_repository: Repository ingestion wrapper
     - ingest_email: Email ingestion wrapper
     - ingest_database: Database ingestion wrapper
+    - ingest_ontology: Ontology ingestion wrapper
 
 
 Example Usage:
@@ -134,6 +136,7 @@ from .methods import (
     ingest_feed,
     ingest_file,
     ingest_mcp,
+    ingest_ontology,
     ingest_repository,
     ingest_stream,
     ingest_web,
@@ -165,6 +168,9 @@ from .web_ingestor import (
     WebContent,
     WebIngestor,
 )
+
+from .ontology_ingestor import OntologyData, OntologyIngestor
+from .snowflake_ingestor import SnowflakeConnector, SnowflakeData, SnowflakeIngestor
 
 __all__ = [
     # File ingestion
@@ -216,6 +222,13 @@ __all__ = [
     "MCPClient",
     "MCPResource",
     "MCPTool",
+    # Ontology ingestion
+    "OntologyIngestor",
+    "OntologyData",
+    # Snowflake ingestion
+    "SnowflakeIngestor",
+    "SnowflakeData",
+    "SnowflakeConnector",
     # Registry and Methods
     "MethodRegistry",
     "method_registry",
@@ -227,6 +240,7 @@ __all__ = [
     "ingest_repository",
     "ingest_email",
     "ingest_database",
+    "ingest_ontology",
     "ingest_mcp",
     "get_ingest_method",
     "list_available_methods",

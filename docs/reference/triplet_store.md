@@ -6,6 +6,35 @@
 
 ## 🎯 Overview
 
+The **Triplet Store Module** provides storage and querying for RDF (Resource Description Framework) triplets. It supports industry-standard triplet stores with SPARQL querying and semantic reasoning capabilities.
+
+### What is a Triplet Store?
+
+A **triplet store** (also called an RDF store) is a database designed to store and query RDF triplets. RDF triplets are statements in the form:
+
+- **Subject**: The entity being described
+- **Predicate**: The relationship or property
+- **Object**: The value or related entity
+
+**Example**: `` `(Apple Inc., foundedBy, Steve Jobs)` ``
+
+### Why Use the Triplet Store Module?
+
+- **W3C Standards**: Full support for RDF and SPARQL standards
+- **Semantic Reasoning**: RDFS and OWL reasoning for inference
+- **Multiple Backends**: Support for Blazegraph, Apache Jena, RDF4J
+- **SPARQL Queries**: Powerful SPARQL 1.1 query language
+- **Federation**: Query across multiple stores
+- **Bulk Loading**: High-performance data loading
+
+### How It Works
+
+1. **Store Selection**: Choose a backend (Blazegraph, Jena, RDF4J)
+2. **Triplet Storage**: Store subject-predicate-object triplets
+3. **SPARQL Queries**: Query using SPARQL 1.1
+4. **Reasoning**: Apply RDFS/OWL reasoning for inference
+5. **Federation**: Query across multiple stores if needed
+
 <div class="grid cards" markdown>
 
 -   :material-graph-outline:{ .lg .middle } **RDF Storage**
@@ -125,6 +154,15 @@ SPARQL query execution and optimization engine.
 | `optimize(query)` | Optimize SPARQL query | Query rewriting |
 
 ---
+
+## Cookbook
+
+Interactive tutorials that use triplet stores:
+
+- **[Reasoning and Inference](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/advanced/08_Reasoning_and_Inference.ipynb)**: Use logical reasoning with SPARQL and triplet stores
+  - **Topics**: SPARQL reasoning, RDF stores, inference engines
+  - **Difficulty**: Advanced
+  - **Use Cases**: Semantic reasoning, SPARQL queries, RDF-based knowledge graphs
 
 ## 🚀 Usage
 

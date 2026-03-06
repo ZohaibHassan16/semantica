@@ -4,6 +4,7 @@ Conflict Resolver
 This module provides comprehensive conflict resolution capabilities for the
 Semantica framework, offering multiple strategies for resolving detected conflicts
 including voting mechanisms, credibility-based resolution, and expert review.
+The module includes granular progress tracking for large conflict sets.
 
 Algorithms Used:
 
@@ -129,6 +130,9 @@ class ConflictResolver:
 
         # Initialize progress tracker
         self.progress_tracker = get_progress_tracker()
+        # Ensure progress tracker is enabled
+        if not self.progress_tracker.enabled:
+            self.progress_tracker.enabled = True
 
         self.resolution_history: List[ResolutionResult] = []
 
@@ -290,13 +294,63 @@ class ConflictResolver:
             >>> resolver = ConflictResolver()
             >>> results = resolver.resolve_conflicts(conflicts, strategy="voting")
         """
-        results = []
+        # Track conflict resolution
+        tracking_id = self.progress_tracker.start_tracking(
+            file=None,
+            module="conflicts",
+            submodule="ConflictResolver",
+            message=f"Resolving {len(conflicts)} conflicts",
+        )
 
-        for conflict in conflicts:
-            result = self.resolve_conflict(conflict, strategy)
-            results.append(result)
+        try:
+            results = []
+            total_conflicts = len(conflicts)
+            if total_conflicts <= 10:
+                update_interval = 1  # Update every item for small datasets
+            else:
+                update_interval = max(1, min(10, total_conflicts // 100))
+            
+            # Initial progress update
+            remaining = total_conflicts
+            self.progress_tracker.update_progress(
+                tracking_id,
+                processed=0,
+                total=total_conflicts,
+                message=f"Resolving conflicts... 0/{total_conflicts} (remaining: {remaining})"
+            )
 
-        return results
+            for i, conflict in enumerate(conflicts):
+                result = self.resolve_conflict(conflict, strategy)
+                results.append(result)
+                
+                remaining = total_conflicts - (i + 1)
+                # Update progress: always update for small datasets, or at intervals for large ones
+                should_update = (
+                    (i + 1) % update_interval == 0 or 
+                    (i + 1) == total_conflicts or 
+                    i == 0 or
+                    total_conflicts <= 10  # Always update for small datasets
+                )
+                if should_update:
+                    self.progress_tracker.update_progress(
+                        tracking_id,
+                        processed=i + 1,
+                        total=total_conflicts,
+                        message=f"Resolving conflicts... {i + 1}/{total_conflicts} (remaining: {remaining})"
+                    )
+
+            self.progress_tracker.stop_tracking(
+                tracking_id,
+                status="completed",
+                message=f"Resolved {len(results)} conflicts",
+            )
+            return results
+
+        except Exception as e:
+            self.progress_tracker.stop_tracking(
+                tracking_id, status="failed", message=str(e)
+            )
+            raise
 
     def _resolve_by_voting(self, conflict: Conflict) -> ResolutionResult:
         """Resolve conflict by voting (most common value wins)."""

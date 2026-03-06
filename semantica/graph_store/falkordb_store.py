@@ -47,7 +47,7 @@ try:
     from falkordb import FalkorDB
 
     FALKORDB_AVAILABLE = True
-except ImportError:
+except (ImportError, OSError):
     FALKORDB_AVAILABLE = False
     FalkorDB = None
 
@@ -212,6 +212,9 @@ class FalkorDBStore:
         self.logger = get_logger("falkordb_store")
         self.config = config
         self.progress_tracker = get_progress_tracker()
+        # Ensure progress tracker is enabled
+        if not self.progress_tracker.enabled:
+            self.progress_tracker.enabled = True
 
         self.host = host or config.get("host", "localhost")
         self.port = port or config.get("port", 6379)

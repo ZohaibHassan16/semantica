@@ -59,34 +59,59 @@
 ## ⚙️ Algorithms Used
 
 ### Text Normalization
+
+**Purpose**: Clean and standardize text for consistent processing.
+
+**How it works**:
+
 - **Unicode Normalization**: NFC, NFD, NFKC, NFKD forms using Unicode standard
-- **Whitespace Normalization**: Regex-based cleanup (`\s+` → single space)
+- **Whitespace Normalization**: Regex-based cleanup (`` `\s+` `` → single space)
 - **Case Folding**: Locale-aware case normalization (Unicode case folding)
 - **Diacritic Removal**: Unicode decomposition and combining character removal
 - **Punctuation Handling**: Smart punctuation normalization preserving sentence structure
 
 ### Entity Normalization
-- **Fuzzy Matching**: Levenshtein distance with configurable threshold (default: 0.85)
+
+**Purpose**: Standardize entity names and resolve variations to canonical forms.
+
+**How it works**:
+
+- **Fuzzy Matching**: Levenshtein distance with configurable threshold (default: `` `0.85` ``)
 - **Phonetic Matching**: Soundex and Metaphone algorithms for name variants
 - **Abbreviation Expansion**: Dictionary-based expansion with context awareness
 - **Canonical Form Selection**: Frequency-based or confidence-based selection
 - **Entity Linking**: Hash-based entity ID generation for cross-document linking
 
 ### Date/Time Normalization
+
+**Purpose**: Parse and standardize date/time formats to ISO 8601.
+
+**How it works**:
+
 - **Parsing**: dateutil parser with 100+ format support
 - **Timezone Handling**: pytz for timezone conversion and DST handling
-- **Standardization**: ISO 8601 format output (YYYY-MM-DDTHH:MM:SSZ)
+- **Standardization**: ISO 8601 format output (`` `YYYY-MM-DDTHH:MM:SSZ` ``)
 - **Relative Date Resolution**: Convert "yesterday", "last week" to absolute dates
 - **Fuzzy Date Parsing**: Handle incomplete dates (e.g., "March 2024")
 
 ### Number Normalization
-- **Numeric Parsing**: Handle various formats (1,000.00, 1.000,00, 1 000.00)
+
+**Purpose**: Standardize numeric values, units, and measurements.
+
+**How it works**:
+
+- **Numeric Parsing**: Handle various formats (`` `1,000.00` ``, `` `1.000,00` ``, `` `1 000.00` ``)
 - **Unit Conversion**: Standardize units (km → meters, lbs → kg)
 - **Scientific Notation**: Parse and normalize scientific notation
 - **Percentage Handling**: Normalize percentage representations
 - **Currency Normalization**: Standardize currency symbols and amounts
 
 ### Language Detection
+
+**Purpose**: Automatically detect document language with confidence scoring.
+
+**How it works**:
+
 - **N-gram Analysis**: Character and word n-gram frequency analysis
 - **Statistical Models**: Language-specific statistical models
 - **Confidence Scoring**: Probability-based confidence scores
@@ -104,10 +129,10 @@ Main text normalization orchestrator with comprehensive cleaning capabilities.
 
 | Method | Description |
 |--------|-------------|
-| `normalize_text(text, ...)` | Normalize single text using full pipeline |
-| `clean_text(text, ...)` | Clean text (HTML removal, sanitization) |
-| `standardize_format(text, format_type)` | Standardize formatting (standard/compact/preserve) |
-| `process_batch(texts, ...)` | Batch normalize multiple texts |
+| `` `normalize_text(text, ...)` `` | Normalize single text using full pipeline |
+| `` `clean_text(text, ...)` `` | Clean text (HTML removal, sanitization) |
+| `` `standardize_format(text, format_type)` `` | Standardize formatting (standard/compact/preserve) |
+| `` `process_batch(texts, ...)` `` | Batch normalize multiple texts |
 
 **Example:**
 
@@ -137,10 +162,10 @@ Standardize entity names and resolve variations to canonical forms.
 
 | Method | Description |
 |--------|-------------|
-| `normalize_entity(name, ...)` | Normalize entity name to canonical form |
-| `resolve_aliases(name, ...)` | Resolve aliases via alias map |
-| `disambiguate_entity(name, ...)` | Disambiguate using context and candidates |
-| `link_entities(names, ...)` | Link a list of names to canonical forms |
+| `` `normalize_entity(name, ...)` `` | Normalize entity name to canonical form |
+| `` `resolve_aliases(name, ...)` `` | Resolve aliases via alias map |
+| `` `disambiguate_entity(name, ...)` `` | Disambiguate using context and candidates |
+| `` `link_entities(names, ...)` `` | Link a list of names to canonical forms |
 
 **Configuration Options:**
 
@@ -180,9 +205,9 @@ Parse and standardize date/time formats to ISO 8601.
 
 | Method | Description |
 |--------|-------------|
-| `normalize_date(date_str, ...)` | Parse and normalize date |
-| `normalize_time(time_str, ...)` | Normalize time-only strings |
-| `parse_temporal_expression(expr)` | Parse date ranges and temporal phrases |
+| `` `normalize_date(date_str, ...)` `` | Parse and normalize date |
+| `` `normalize_time(time_str, ...)` `` | Normalize time-only strings |
+| `` `parse_temporal_expression(expr)` `` | Parse date ranges and temporal phrases |
 
 **Configuration Options:**
 
@@ -220,10 +245,10 @@ Standardize numeric values, units, and measurements.
 
 | Method | Description |
 |--------|-------------|
-| `normalize_number(input, ...)` | Parse and normalize number |
-| `normalize_quantity(quantity, ...)` | Parse value with unit |
-| `convert_units(value, from_unit, to_unit)` | Convert units |
-| `process_currency(text, ...)` | Parse currency amount and code |
+| `` `normalize_number(input, ...)` `` | Parse and normalize number |
+| `` `normalize_quantity(quantity, ...)` `` | Parse value with unit |
+| `` `convert_units(value, from_unit, to_unit)` `` | Convert units |
+| `` `process_currency(text, ...)` `` | Parse currency amount and code |
 
 **Example:**
 
@@ -250,10 +275,10 @@ Detect document language with confidence scoring.
 
 | Method | Description |
 |--------|-------------|
-| `detect(text)` | Detect language |
-| `detect_with_confidence(text)` | Detect with confidence score |
-| `detect_multiple(text, top_n)` | List top-N candidate languages |
-| `detect_batch(texts)` | Batch language detection |
+| `` `detect(text)` `` | Detect language |
+| `` `detect_with_confidence(text)` `` | Detect with confidence score |
+| `` `detect_multiple(text, top_n)` `` | List top-N candidate languages |
+| `` `detect_batch(texts)` `` | Batch language detection |
 
 **Example:**
 
@@ -568,4 +593,9 @@ normalized_docs = normalizer.process_batch(documents)
 
 ## Cookbook
 
-- [Data Normalization](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/introduction/04_Data_Normalization.ipynb)
+Interactive tutorials to learn data normalization:
+
+- **[Data Normalization](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/introduction/04_Data_Normalization.ipynb)**: Pipelines for cleaning, normalizing, and preparing text
+  - **Topics**: Text cleaning, Unicode, formatting, language detection, entity normalization
+  - **Difficulty**: Beginner
+  - **Use Cases**: Data preprocessing, text cleaning, standardization

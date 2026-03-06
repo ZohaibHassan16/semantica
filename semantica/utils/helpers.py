@@ -32,6 +32,7 @@ Main Functions:
     - get_nested_value: Get nested dictionary value by dot-separated path
     - set_nested_value: Set nested dictionary value by dot-separated path
     - retry_on_error: Decorator for retrying function on error
+    - safe_import: Safely import optional modules, handling ImportError and OSError
 
 Example Usage:
     >>> from semantica.utils import clean_text, normalize_entities
@@ -55,7 +56,10 @@ Author: Semantica Contributors
 License: MIT
 """
 
+from __future__ import annotations
+
 import hashlib
+import importlib
 import json
 import os
 import re
@@ -85,7 +89,7 @@ def format_data(data: Any, format_type: str = "json") -> str:
             import yaml
 
             return yaml.dump(data, default_flow_style=False)
-        except ImportError:
+        except (ImportError, OSError):
             raise ValueError("PyYAML not installed. Install with: pip install pyyaml")
     else:
         raise ValueError(f"Unsupported format type: {format_type}")
@@ -466,11 +470,60 @@ def set_nested_value(
     d[keys[-1]] = value
 
 
+def safe_import(
+    module_name: str,
+    package: Optional[str] = None,
+    default: Any = None,
+    error_message: Optional[str] = None,
+) -> Tuple[Any, bool]:
+    """
+    Safely import an optional module, handling both ImportError and OSError.
+    
+    This is useful for optional dependencies that may fail to import due to:
+    - Missing package (ImportError)
+    - DLL loading failures on Windows, e.g., PyTorch (OSError)
+    
+    Args:
+        module_name: Name of the module to import (e.g., "spacy", "docling.document_converter")
+        package: Optional package name for relative imports
+        default: Default value to return if import fails
+        error_message: Optional custom error message for logging
+        
+    Returns:
+        Tuple of (module_or_default, success_flag):
+        - If import succeeds: (imported_module, True)
+        - If import fails: (default, False)
+        
+    Example:
+        >>> spacy, available = safe_import("spacy")
+        >>> if available:
+        ...     doc = spacy.load("en_core_web_sm")
+        >>> 
+        >>> converter, available = safe_import("docling.document_converter", default=None)
+        >>> if available:
+        ...     converter = converter()
+    """
+    try:
+        if package:
+            module = importlib.import_module(module_name, package=package)
+        else:
+            module = importlib.import_module(module_name)
+        return module, True
+    except (ImportError, ModuleNotFoundError, OSError) as e:
+        if error_message:
+            import sys
+            if "logging" in sys.modules:
+                from .logging import get_logger
+                logger = get_logger("utils.helpers")
+                logger.debug(f"{error_message}: {e}")
+        return default, False
+
+
 def retry_on_error(
     max_retries: int = 3,
     delay: float = 1.0,
     backoff_factor: float = 2.0,
-    exceptions: Tuple[Type[Exception], ...] = (Exception,),
+    exceptions: Tuple[type[Exception], ...] = (Exception,),
 ):
     """
     Decorator for retrying function on error.

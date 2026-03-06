@@ -55,7 +55,7 @@ try:
     )
 
     QDRANT_AVAILABLE = True
-except ImportError:
+except (ImportError, OSError):
     QDRANT_AVAILABLE = False
     QdrantClientLib = None
     Distance = None
@@ -253,6 +253,9 @@ class QdrantStore:
         self.logger = get_logger("qdrant_store")
         self.config = config
         self.progress_tracker = get_progress_tracker()
+        # Ensure progress tracker is enabled
+        if not self.progress_tracker.enabled:
+            self.progress_tracker.enabled = True
         self.url = url or config.get("url", "http://localhost:6333")
         self.api_key = api_key or config.get("api_key")
 

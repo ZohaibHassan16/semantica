@@ -92,6 +92,9 @@ class EntityAwareChunker:
         self.options = kwargs
         self.logger = get_logger("entity_aware_chunker")
         self.progress_tracker = get_progress_tracker()
+        # Ensure progress tracker is enabled
+        if not self.progress_tracker.enabled:
+            self.progress_tracker.enabled = True
 
     def chunk(self, text: str, **options) -> List[Chunk]:
         """
@@ -167,6 +170,9 @@ class RelationAwareChunker:
         self.options = kwargs
         self.logger = get_logger("relation_aware_chunker")
         self.progress_tracker = get_progress_tracker()
+        # Ensure progress tracker is enabled
+        if not self.progress_tracker.enabled:
+            self.progress_tracker.enabled = True
 
     def chunk(self, text: str, **options) -> List[Chunk]:
         """
@@ -239,6 +245,9 @@ class GraphBasedChunker:
         self.options = kwargs
         self.logger = get_logger("graph_based_chunker")
         self.progress_tracker = get_progress_tracker()
+        # Ensure progress tracker is enabled
+        if not self.progress_tracker.enabled:
+            self.progress_tracker.enabled = True
 
     def chunk(self, text: str, **options) -> List[Chunk]:
         """
@@ -311,6 +320,9 @@ class OntologyAwareChunker:
         self.options = kwargs
         self.logger = get_logger("ontology_aware_chunker")
         self.progress_tracker = get_progress_tracker()
+        # Ensure progress tracker is enabled
+        if not self.progress_tracker.enabled:
+            self.progress_tracker.enabled = True
 
     def chunk(self, text: str, **options) -> List[Chunk]:
         """
@@ -380,6 +392,9 @@ class HierarchicalChunker:
         self.options = kwargs
         self.logger = get_logger("hierarchical_chunker")
         self.progress_tracker = get_progress_tracker()
+        # Ensure progress tracker is enabled
+        if not self.progress_tracker.enabled:
+            self.progress_tracker.enabled = True
 
     def chunk(self, text: str, **options) -> List[Chunk]:
         """

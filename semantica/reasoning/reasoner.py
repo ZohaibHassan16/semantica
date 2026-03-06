@@ -352,6 +352,12 @@ class Reasoner:
                 p_regex += re.escape(seg)
         p_regex = f"^{p_regex}$"
 
+        # Simple regex-based matcher for patterns like "Person(?x)" and facts like "Person(John)"
+        
+        p_regex = re.escape(pattern)
+        p_regex = re.sub(r"\\\?(\w+)", r"(?P<\1>.+)", p_regex)
+        p_regex = f"^{p_regex}$"
+        
         try:
             match = re.match(p_regex, fact)
             if match:
@@ -359,11 +365,13 @@ class Reasoner:
                 for var, value in match.groupdict().items():
                     if var in new_bindings and new_bindings[var] != value:
                         return None  # Binding conflict
+                        return None # Binding conflict
                     new_bindings[var] = value
                 return new_bindings
         except Exception:
             pass
 
+            
         return None
         
     def _substitute(self, pattern: str, bindings: Dict[str, str]) -> str:

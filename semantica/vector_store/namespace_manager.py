@@ -128,6 +128,9 @@ class NamespaceManager:
         self.logger = get_logger("namespace_manager")
         self.config = config
         self.progress_tracker = get_progress_tracker()
+        # Ensure progress tracker is enabled
+        if not self.progress_tracker.enabled:
+            self.progress_tracker.enabled = True
         self.namespaces: Dict[str, Namespace] = {}
         self.default_namespace = config.get("default_namespace", "default")
         self.vector_namespace_map: Dict[str, str] = {}  # vector_id -> namespace

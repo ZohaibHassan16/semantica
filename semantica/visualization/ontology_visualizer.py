@@ -42,7 +42,7 @@ try:
     import plotly.express as px
     import plotly.graph_objects as go
     from plotly.subplots import make_subplots
-except ImportError:
+except (ImportError, OSError):
     px = None
     go = None
     make_subplots = None
@@ -51,7 +51,7 @@ from matplotlib.patches import FancyBboxPatch
 
 try:
     import graphviz
-except ImportError:
+except (ImportError, OSError):
     graphviz = None
 
 from ..utils.exceptions import ProcessingError
@@ -89,6 +89,9 @@ class OntologyVisualizer:
         self.logger = get_logger("ontology_visualizer")
         self.config = config
         self.progress_tracker = get_progress_tracker()
+        # Ensure progress tracker is enabled
+        if not self.progress_tracker.enabled:
+            self.progress_tracker.enabled = True
 
         color_scheme_name = config.get("color_scheme", "default")
         try:

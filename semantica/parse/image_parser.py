@@ -39,12 +39,9 @@ from ..utils.exceptions import ProcessingError, ValidationError
 from ..utils.logging import get_logger
 from ..utils.progress_tracker import get_progress_tracker
 
-try:
-    import pytesseract
+from ..utils.helpers import safe_import
 
-    TESSERACT_AVAILABLE = True
-except ImportError:
-    TESSERACT_AVAILABLE = False
+pytesseract, TESSERACT_AVAILABLE = safe_import("pytesseract")
 
 
 @dataclass

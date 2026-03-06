@@ -39,7 +39,7 @@ try:
     from rdflib.plugins.stores.sparqlstore import SPARQLStore
 
     HAS_JENA_RDFLIB = True
-except ImportError:
+except (ImportError, OSError):
     HAS_JENA_RDFLIB = False
     Graph = None
     RDF = None
@@ -64,6 +64,9 @@ class JenaStore:
         self.logger = get_logger("jena_store")
         self.config = config
         self.progress_tracker = get_progress_tracker()
+        # Ensure progress tracker is enabled
+        if not self.progress_tracker.enabled:
+            self.progress_tracker.enabled = True
 
         self.endpoint = config.get("endpoint")
         self.dataset = config.get("dataset", "default")
@@ -129,7 +132,7 @@ class JenaStore:
         )
 
         try:
-            if not self.graph:
+            if self.graph is None:
                 self.progress_tracker.stop_tracking(
                     tracking_id, status="failed", message="Graph not initialized"
                 )
@@ -172,14 +175,14 @@ class JenaStore:
         return self.add_triplets([triplet], **options)
 
     def get_triplets(
-        self,
-        subject: Optional[str] = None,
-        predicate: Optional[str] = None,
-        object: Optional[str] = None,
-        **options,
+            self,
+            subject: Optional[str] = None,
+            predicate: Optional[str] = None,
+            object: Optional[str] = None,
+            **options,
     ) -> List[Triplet]:
         """Get triplets matching criteria."""
-        if not self.graph:
+        if self.graph is None:
             return []
 
         try:
@@ -215,7 +218,7 @@ class JenaStore:
 
     def delete_triplet(self, triplet: Triplet, **options) -> Dict[str, Any]:
         """Delete triplet."""
-        if not self.graph:
+        if self.graph is None:
             raise ProcessingError("Graph not initialized")
 
         try:
@@ -270,7 +273,7 @@ class JenaStore:
         Returns:
             Query results
         """
-        if not self.graph:
+        if self.graph is None:
             raise ProcessingError("Graph not initialized")
 
         try:
@@ -316,7 +319,7 @@ class JenaStore:
         Returns:
             Serialized RDF string
         """
-        if not self.graph:
+        if self.graph is None:
             return ""
 
         try:

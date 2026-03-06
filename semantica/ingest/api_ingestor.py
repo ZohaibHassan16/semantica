@@ -32,7 +32,7 @@ import requests
 from requests.adapters import HTTPAdapter
 try:
     from urllib3.util.retry import Retry
-except ImportError:
+except (ImportError, OSError):
     from requests.packages.urllib3.util.retry import Retry
 
 from ..utils.exceptions import ProcessingError, ValidationError

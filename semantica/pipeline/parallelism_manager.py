@@ -92,6 +92,9 @@ class ParallelismManager:
 
         # Initialize progress tracker
         self.progress_tracker = get_progress_tracker()
+        # Ensure progress tracker is enabled
+        if not self.progress_tracker.enabled:
+            self.progress_tracker.enabled = True
 
         self.max_workers = self.config.get("max_workers", 4)
         self.use_processes = self.config.get("use_processes", False)
@@ -101,13 +104,14 @@ class ParallelismManager:
         self.lock = threading.Lock()
 
     def execute_parallel(
-        self, tasks: List[Task], **options
+        self, tasks: List[Task], pipeline_id: Optional[str] = None, **options
     ) -> List[ParallelExecutionResult]:
         """
         Execute tasks in parallel.
 
         Args:
             tasks: List of tasks to execute
+            pipeline_id: Optional pipeline ID for progress tracking
             **options: Additional options
 
         Returns:
@@ -117,6 +121,7 @@ class ParallelismManager:
             module="pipeline",
             submodule="ParallelismManager",
             message=f"Executing {len(tasks)} tasks in parallel",
+            pipeline_id=pipeline_id,
         )
 
         try:

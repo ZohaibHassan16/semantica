@@ -38,6 +38,9 @@ from .docx_parser import DOCXParser
 from .html_parser import HTMLParser
 from .pdf_parser import PDFParser
 
+# DoclingParser is available as a standalone parser
+# Import it directly: from semantica.parse import DoclingParser
+
 
 class DocumentParser:
     """
@@ -96,6 +99,9 @@ class DocumentParser:
 
         # Initialize progress tracker
         self.progress_tracker = get_progress_tracker()
+        # Ensure progress tracker is enabled
+        if not self.progress_tracker.enabled:
+            self.progress_tracker.enabled = True
 
     def parse(
         self,
@@ -286,33 +292,67 @@ class DocumentParser:
         Returns:
             dict: Batch processing results
         """
-        results = {"successful": [], "failed": [], "total": len(file_paths)}
+        # Track batch parsing
+        tracking_id = self.progress_tracker.start_tracking(
+            file=None,
+            module="parse",
+            submodule="DocumentParser",
+            message=f"Parsing {len(file_paths)} documents in batch",
+        )
 
-        continue_on_error = options.get("continue_on_error", True)
+        try:
+            results = {"successful": [], "failed": [], "total": len(file_paths)}
 
-        for file_path in file_paths:
-            try:
-                result = self.parse_document(file_path, **options)
-                results["successful"].append(
-                    {"file_path": str(file_path), "result": result}
-                )
-            except Exception as e:
-                error_info = {
-                    "file_path": str(file_path),
-                    "error": str(e),
-                    "error_type": type(e).__name__,
-                }
-                results["failed"].append(error_info)
+            continue_on_error = options.get("continue_on_error", True)
+            total_files = len(file_paths)
+            update_interval = max(1, total_files // 20)  # Update every 5%
 
-                if not continue_on_error:
-                    raise ProcessingError(
-                        f"Batch processing failed at {file_path}: {e}"
+            for idx, file_path in enumerate(file_paths, 1):
+                try:
+                    result = self.parse_document(file_path, **options)
+                    results["successful"].append(
+                        {"file_path": str(file_path), "result": result}
+                    )
+                except Exception as e:
+                    error_info = {
+                        "file_path": str(file_path),
+                        "error": str(e),
+                        "error_type": type(e).__name__,
+                    }
+                    results["failed"].append(error_info)
+
+                    if not continue_on_error:
+                        self.progress_tracker.stop_tracking(
+                            tracking_id, status="failed", message=str(e)
+                        )
+                        raise ProcessingError(
+                            f"Batch processing failed at {file_path}: {e}"
+                        )
+                
+                # Update progress periodically
+                if idx % update_interval == 0 or idx == total_files:
+                    self.progress_tracker.update_progress(
+                        tracking_id,
+                        processed=idx,
+                        total=total_files,
+                        message=f"Parsing documents... {idx}/{total_files}"
                     )
 
-        results["success_count"] = len(results["successful"])
-        results["failure_count"] = len(results["failed"])
+            results["success_count"] = len(results["successful"])
+            results["failure_count"] = len(results["failed"])
 
-        return results
+            self.progress_tracker.stop_tracking(
+                tracking_id,
+                status="completed",
+                message=f"Parsed {results['success_count']}/{total_files} documents successfully",
+            )
+            return results
+
+        except Exception as e:
+            self.progress_tracker.stop_tracking(
+                tracking_id, status="failed", message=str(e)
+            )
+            raise
 
     def _detect_file_type(self, file_path: Path) -> str:
         """Detect document file type from extension."""

@@ -39,7 +39,7 @@ import re
 from ..utils.exceptions import ProcessingError, ValidationError
 from ..utils.logging import get_logger
 from ..utils.progress_tracker import get_progress_tracker
-from .rule_manager import Rule, RuleManager
+from .reasoner import Rule, Reasoner
 
 
 class HypothesisRanking(Enum):
@@ -114,8 +114,11 @@ class AbductiveReasoner:
 
         # Initialize progress tracker
         self.progress_tracker = get_progress_tracker()
+        # Ensure progress tracker is enabled
+        if not self.progress_tracker.enabled:
+            self.progress_tracker.enabled = True
 
-        self.rule_manager = RuleManager(**self.config)
+        self.reasoner = Reasoner(**self.config)
         self.max_hypotheses = self.config.get("max_hypotheses", 10)
         self.ranking_strategy = HypothesisRanking(
             self.config.get("ranking_strategy", "plausibility")
@@ -184,7 +187,7 @@ class AbductiveReasoner:
         hypotheses = []
 
         # Get rules that could explain the observation
-        rules = self.rule_manager.get_all_rules()
+        rules = self.reasoner.rules
 
         # Find rules whose conclusions match observation
         for rule in rules:

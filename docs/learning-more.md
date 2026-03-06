@@ -43,19 +43,36 @@ Additional resources, tutorials, and advanced learning materials for Semantica.
 
 1.  **Installation & Setup** (15 min)
     - [Installation Guide](installation.md)
-    - [Welcome to Semantica](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/introduction/01_Welcome_to_Semantica.ipynb)
+    - **[Welcome to Semantica Cookbook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/introduction/01_Welcome_to_Semantica.ipynb)**: Comprehensive introduction
+      - **Topics**: Framework overview, all modules, architecture, configuration
+      - **Difficulty**: Beginner
+      - **Time**: 30-45 minutes
+      - **Use Cases**: First-time users, understanding the framework
 
 2.  **Core Concepts** (30 min)
     - [Core Concepts](concepts.md)
     - [Getting Started Guide](getting-started.md)
+    - **[Data Ingestion Cookbook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/introduction/02_Data_Ingestion.ipynb)**: Learn to ingest from multiple sources
+      - **Topics**: File, web, feed, stream, database ingestion
+      - **Difficulty**: Beginner
+      - **Time**: 15-20 minutes
+      - **Use Cases**: Loading data from various sources
 
 3.  **First Knowledge Graph** (30 min)
     - [Quickstart Tutorial](quickstart.md)
-    - [Your First Knowledge Graph](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/introduction/08_Your_First_Knowledge_Graph.ipynb)
+    - **[Your First Knowledge Graph Cookbook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/introduction/08_Your_First_Knowledge_Graph.ipynb)**: Build your first knowledge graph
+      - **Topics**: Entity extraction, relationship extraction, graph construction, visualization
+      - **Difficulty**: Beginner
+      - **Time**: 20-30 minutes
+      - **Use Cases**: Learning the basics, quick start
 
 4.  **Basic Operations** (30 min)
     - [Examples](examples.md)
-    - Extract entities and relationships
+    - **[Entity Extraction Cookbook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/introduction/05_Entity_Extraction.ipynb)**: Learn entity extraction
+      - **Topics**: Named entity recognition, entity types, extraction methods
+      - **Difficulty**: Beginner
+      - **Time**: 15-20 minutes
+      - **Use Cases**: Understanding entity extraction
 
 ---
 
@@ -63,18 +80,41 @@ Additional resources, tutorials, and advanced learning materials for Semantica.
 
 1.  **Advanced Concepts** (1 hour)
     - [Modules Guide](modules.md)
-    - Understand: Embeddings, GraphRAG, Ontologies
+    - **[Building Knowledge Graphs Cookbook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/introduction/07_Building_Knowledge_Graphs.ipynb)**: Advanced graph construction
+      - **Topics**: Graph building, entity merging, conflict resolution, temporal graphs
+      - **Difficulty**: Intermediate
+      - **Time**: 30-45 minutes
+      - **Use Cases**: Production graph construction
+    - **[Embeddings Cookbook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/introduction/09_Embeddings.ipynb)**: Learn embeddings
+      - **Topics**: Embedding generation, similarity search, vector operations
+      - **Difficulty**: Beginner
+      - **Time**: 20-30 minutes
+      - **Use Cases**: Understanding embeddings, semantic search
 
 2.  **Use Cases** (1 hour)
     - [Use Cases Guide](use-cases.md)
-    - Implement a complete use case
+    - **[GraphRAG Complete Cookbook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/use_cases/advanced_rag/01_GraphRAG_Complete.ipynb)**: Build production GraphRAG
+      - **Topics**: GraphRAG, hybrid retrieval, graph traversal, LLM integration
+      - **Difficulty**: Advanced
+      - **Time**: 1-2 hours
+      - **Use Cases**: Production GraphRAG systems
 
 3.  **Advanced Examples** (1 hour)
-    - [Examples](examples.md) - Conflict resolution, custom config
+    - [Examples](examples.md)
+    - **[Advanced Extraction Cookbook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/advanced/01_Advanced_Extraction.ipynb)**: Advanced extraction patterns
+      - **Topics**: Custom entity types, domain-specific extraction, hybrid methods
+      - **Difficulty**: Intermediate
+      - **Time**: 30-45 minutes
+      - **Use Cases**: Domain-specific extraction
 
 4.  **Quality & Optimization** (1 hour)
     - [Quality Assurance](concepts.md#8-quality-assurance)
     - [Performance Optimization](#performance-optimization)
+    - **[Multi-Source Data Integration Cookbook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/advanced/06_Multi_Source_Data_Integration.ipynb)**: Integrate multiple sources
+      - **Topics**: Multi-source integration, entity resolution, conflict handling
+      - **Difficulty**: Intermediate
+      - **Time**: 30-45 minutes
+      - **Use Cases**: Building unified knowledge graphs
 
 ---
 
@@ -82,15 +122,36 @@ Additional resources, tutorials, and advanced learning materials for Semantica.
 
 1.  **Advanced Architecture** (2 hours)
     - [Architecture Guide](architecture.md)
-    - Plugin development
+    - **[Temporal Graphs Cookbook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/advanced/04_Temporal_Graphs.ipynb)**: Build temporal graphs
+      - **Topics**: Time-stamped entities, temporal relationships, historical queries
+      - **Difficulty**: Intermediate
+      - **Time**: 30-45 minutes
+      - **Use Cases**: Time-aware knowledge graphs
+    - **[Ontology Cookbook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/introduction/14_Ontology.ipynb)**: Generate ontologies
+      - **Topics**: Ontology generation, OWL, schema design
+      - **Difficulty**: Intermediate
+      - **Time**: 30-45 minutes
+      - **Use Cases**: Formal knowledge representation
 
 2.  **Production Deployment** (2 hours)
     - [Security Best Practices](#security-best-practices)
-    - Scalability patterns
+    - **[GraphRAG Complete Cookbook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/use_cases/advanced_rag/01_GraphRAG_Complete.ipynb)**: Production GraphRAG
+      - **Topics**: Production deployment, scalability, optimization
+      - **Difficulty**: Advanced
+      - **Time**: 1-2 hours
+      - **Use Cases**: Production systems
 
 3.  **Customization** (2 hours)
-    - Custom extractors and exporters
-    - API extensions
+    - **[Complete Visualization Suite Cookbook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/advanced/03_Complete_Visualization_Suite.ipynb)**: Advanced visualization
+      - **Topics**: Custom layouts, filtering, styling, multiple graph types
+      - **Difficulty**: Intermediate
+      - **Time**: 30-45 minutes
+      - **Use Cases**: Production visualizations
+    - **[Multi-Format Export Cookbook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/advanced/05_Multi_Format_Export.ipynb)**: Advanced export patterns
+      - **Topics**: Batch export, custom formats, format conversion
+      - **Difficulty**: Intermediate
+      - **Time**: 30-45 minutes
+      - **Use Cases**: Production exports
 
 ---
 
@@ -98,23 +159,17 @@ Additional resources, tutorials, and advanced learning materials for Semantica.
 
 ### Common Operations
 
-```python
-from semantica.core import Semantica
-semantica = Semantica()
+The typical workflow involves these steps:
 
-# Build Knowledge Graph
-result = semantica.build_knowledge_base(
-    sources=["doc.pdf"],
-    embeddings=True,
-    graph=True
-)
+1. **Ingest** documents using `` `FileIngestor` ``
+2. **Parse** documents using `` `DocumentParser` ``
+3. **Extract** entities and relationships using `` `NERExtractor` `` and `` `RelationExtractor` ``
+4. **Build** knowledge graph using `` `GraphBuilder` ``
+5. **Generate** embeddings using `` `TextEmbedder` ``
 
-# Extract Entities
-entities = semantica.semantic_extract.extract_entities(text)
-
-# Query Graph
-results = semantica.kg.query("MATCH (n) RETURN n LIMIT 10")
-```
+**For complete examples, see:**
+- **[Your First Knowledge Graph Cookbook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/introduction/08_Your_First_Knowledge_Graph.ipynb)**: Complete workflow example
+- **[Welcome to Semantica Cookbook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/introduction/01_Welcome_to_Semantica.ipynb)**: All modules overview
 
 ### Configuration Reference
 
@@ -162,24 +217,15 @@ results = semantica.kg.query("MATCH (n) RETURN n LIMIT 10")
 
 ### 1. Batch Processing
 
-Process multiple documents together for better throughput.
+Process multiple documents together for better throughput. Use batch processing when working with large document collections.
 
-```python
-sources = ["doc1.pdf", "doc2.pdf", ..., "doc100.pdf"]
-result = semantica.build_knowledge_base(sources, batch_size=10)
-```
+**For examples, see:**
+- **[Data Ingestion Cookbook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/introduction/02_Data_Ingestion.ipynb)**: Batch ingestion patterns
+- **[Multi-Source Data Integration Cookbook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/advanced/06_Multi_Source_Data_Integration.ipynb)**: Advanced integration
 
 ### 2. Parallel Execution
 
-Use parallel processing for independent operations.
-
-```python
-result = semantica.build_knowledge_base(
-    sources=sources,
-    parallel=True,
-    max_workers=8
-)
-```
+Use parallel processing for independent operations to improve performance on multi-core systems.
 
 ### 3. Backend Selection
 
@@ -220,13 +266,29 @@ A: Yes, it is designed for production with proper configuration.
 
 ## Next Steps
 
-- **[Deep Dive](deep-dive.md)** - Advanced architecture
+Continue your learning journey:
+
+- **[Cookbook](cookbook.md)** - Interactive Jupyter notebook tutorials
 - **[API Reference](reference/core.md)** - Complete API documentation
-- **[Cookbook](cookbook.md)** - Interactive tutorials
+- **[Use Cases](use-cases.md)** - Real-world applications
+- **[Examples](examples.md)** - Code examples and patterns
+
+### 🍳 Recommended Next Cookbooks
+
+- **[GraphRAG Complete](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/use_cases/advanced_rag/01_GraphRAG_Complete.ipynb)**: Production GraphRAG system
+  - **Topics**: GraphRAG, hybrid retrieval, LLM integration
+  - **Difficulty**: Advanced
+  - **Time**: 1-2 hours
+  - **Use Cases**: Production RAG applications
+
+- **[RAG vs. GraphRAG Comparison](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/use_cases/advanced_rag/02_RAG_vs_GraphRAG_Comparison.ipynb)**: Understand the differences
+  - **Topics**: RAG comparison, reasoning gap, inference engines
+  - **Difficulty**: Intermediate
+  - **Time**: 45-60 minutes
+  - **Use Cases**: Choosing the right approach
 
 ---
 
 !!! info "Contribute"
     Have questions? [Open an issue](https://github.com/Hawksight-AI/semantica/issues) or [start a discussion](https://github.com/Hawksight-AI/semantica/discussions)!
 
-**Last Updated**: 2024

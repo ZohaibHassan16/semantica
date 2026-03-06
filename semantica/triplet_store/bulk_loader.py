@@ -81,6 +81,9 @@ class BulkLoader:
         self.config = config or {}
         self.config.update(kwargs)
         self.progress_tracker = get_progress_tracker()
+        # Ensure progress tracker is enabled
+        if not self.progress_tracker.enabled:
+            self.progress_tracker.enabled = True
 
         self.batch_size = self.config.get("batch_size", 1000)
         self.max_retries = self.config.get("max_retries", 3)
@@ -127,10 +130,6 @@ class BulkLoader:
 
             # Process in batches
             for batch_num in range(total_batches):
-                self.progress_tracker.update_tracking(
-                    tracking_id,
-                    message=f"Processing batch {batch_num + 1}/{total_batches}...",
-                )
                 batch_start = batch_num * batch_size
                 batch_end = min(batch_start + batch_size, total_triplets)
                 batch = triplets[batch_start:batch_end]
@@ -174,7 +173,7 @@ class BulkLoader:
                                     f"Bulk load stopped due to error: {e}"
                                 )
 
-                # Update progress
+                # Update progress with ETA
                 elapsed = time.time() - start_time
                 progress = (
                     (loaded_count / total_triplets * 100) if total_triplets > 0 else 0.0
@@ -184,6 +183,14 @@ class BulkLoader:
                     estimated_remaining = (elapsed / loaded_count) * (
                         total_triplets - loaded_count
                     )
+
+                # Use update_progress for ETA display
+                self.progress_tracker.update_progress(
+                    tracking_id,
+                    processed=loaded_count,
+                    total=total_triplets,
+                    message=f"Processing batch {batch_num + 1}/{total_batches}..."
+                )
 
                 progress_info = LoadProgress(
                     total_triplets=total_triplets,
@@ -227,7 +234,8 @@ class BulkLoader:
 
             self.logger.info(
                 f"Bulk load completed: {loaded_count}/{total_triplets} triplets loaded "
-                f"in {elapsed:.2f}s ({loaded_count / elapsed:.0f} triplets/sec)"
+                f"in {elapsed:.2f}s ({loaded_count / elapsed:.0f} triplets/sec)" if elapsed > 0 else
+                f"in {elapsed:.2f}s (0 triplets/sec)"
             )
 
             self.progress_tracker.stop_tracking(

@@ -353,7 +353,7 @@ class MCPClient:
             )
             response.raise_for_status()
             return response.json()
-        except ImportError:
+        except (ImportError, OSError):
             # Fallback to requests if httpx not available
             try:
                 import requests
@@ -366,7 +366,7 @@ class MCPClient:
                 )
                 response.raise_for_status()
                 return response.json()
-            except ImportError:
+            except (ImportError, OSError):
                 raise ProcessingError(
                     "HTTP transport requires 'httpx' or 'requests' package. "
                     "Install with: pip install httpx or pip install requests"

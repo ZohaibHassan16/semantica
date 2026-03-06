@@ -34,18 +34,18 @@ html {
 [data-md-color-scheme="slate"] {
   /* Dark Mode */
   --md-default-bg-color: #0F1115;
-  /* Very dark grey, almost black */
   --md-default-fg-color: #E0E0E0;
 
   --md-primary-fg-color: #0F1115;
-  /* Match bg for seamless look or slightly lighter */
   --md-primary-fg-color--light: #212121;
   --md-primary-fg-color--dark: #000000;
-
-  margin-bottom: 1rem;
-  color: var(--md-default-fg-color);
 }
 
+/* 
+   ==========================================================================
+   Typography
+   ========================================================================== 
+*/
 .md-typeset h2 {
   font-weight: 700;
   letter-spacing: -0.01em;
@@ -66,6 +66,12 @@ html {
   background-color: #F1F8F5;
 }
 
+/* 
+   ==========================================================================
+   Admonitions
+   ========================================================================== 
+*/
+/* Tip */
 .md-typeset .admonition.tip .admonition-title {
   color: #00C853;
 }
@@ -137,7 +143,11 @@ html {
   border-color: rgba(255, 255, 255, 0.05);
 }
 
-/* Scrollbars */
+/* 
+   ==========================================================================
+   Scrollbars
+   ========================================================================== 
+*/
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -149,303 +159,7 @@ html {
 }
 
 [data-md-color-scheme="slate"] ::-webkit-scrollbar-thumb {
-  background-color: rgba(255, 255, 255, 0.2);
-}
-
-/* 
-   ==========================================================================
-   Version Selector
-   ========================================================================== 
-*/
-.version-scroll-container {
-  display: flex;
-  align-items: center;
-  margin-left: 1.5rem;
-  /* Increased spacing */
-  overflow-x: auto;
-  white-space: nowrap;
-  max-width: 300px;
-  padding: 4px 0;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  height: 100%;
-  /* Match header height context */
-}
-
-.version-scroll-container::-webkit-scrollbar {
-  display: none;
-}
-
-.version-list {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-}
-
-.version-tag {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 4px 12px;
-  /* Larger touch target and better visibility */
-  border-radius: 4px;
-  /* Slightly more squared to match material design */
-  font-size: 0.8rem;
-  /* Slightly larger text */
-  font-weight: 700;
-  /* Bolder for visibility */
-  line-height: 1.2;
-  color: var(--md-default-fg-color);
-  /* Darker text for contrast */
-  background-color: rgba(0, 0, 0, 0.08);
-  /* Slightly darker bg */
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  /* Subtle border */
-  transition: all 0.2s ease;
-  text-decoration: none !important;
-  font-family: var(--md-text-font-family);
-}
-
-.version-tag:hover {
-  background-color: rgba(0, 0, 0, 0.12);
-  color: var(--md-primary-fg-color);
-  border-color: rgba(0, 0, 0, 0.2);
-}
-
-.version-tag.active {
-  background-color: var(--md-accent-fg-color);
-  color: white;
-  border-color: var(--md-accent-fg-color);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  /* Subtle shadow for depth */
-}
-
-/* Dark Mode Adjustments */
-[data-md-color-scheme="slate"] .version-tag {
-  background-color: rgba(255, 255, 255, 0.1);
-  color: var(--md-default-fg-color);
-  border-color: rgba(255, 255, 255, 0.1);
-}
-
-[data-md-color-scheme="slate"] .version-tag:hover {
-  background-color: rgba(255, 255, 255, 0.15);
-  color: white;
-  border-color: rgba(255, 255, 255, 0.2);
-}
-
-[data-md-color-scheme="slate"] .version-tag.active {
-  background-color: var(--md-accent-fg-color);
-  color: white;
-  border-color: var(--md-accent-fg-color);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-}
-
-/* Mobile adjustments */
-@media screen and (max-width: 76.1875em) {
-  .version-scroll-container {
-    margin-left: 1rem;
-    max-width: 120px;
-  }
-
-  .version-tag {
-    padding: 3px 8px;
-    font-size: 0.75rem;
-  }
-}
-
-/* 
-   ==========================================================================
-   Footer Attribution - Keep MkDocs Credit Visible
-   ========================================================================== 
-*/
-.md-footer-meta__inner {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.md-footer-copyright {
-  opacity: 1 !important;
-  color: var(--md-default-fg-color--light) !important;
-}
-
-.md-footer-copyright__highlight {
-  opacity: 1 !important;
-  color: var(--md-default-fg-color) !important;
-  font-weight: 500 !important;
-}
-/* Warning */
-.md-typeset .admonition.warning {
-  border-color: #E0E0E0;
-  border-left-color: #FFAB00;
-  background-color: #FFF8E1;
-}
-
-.md-typeset .admonition.warning .admonition-title {
-  color: #FFAB00;
-}
-
-[data-md-color-scheme="slate"] .md-typeset .admonition.warning {
-  border-color: #2E303E;
-  border-left-color: #FFD740;
-  background-color: #1F1B0E;
-}
-
-[data-md-color-scheme="slate"] .md-typeset .admonition.warning .admonition-title {
-  color: #FFD740;
-}
-
-/* Danger */
-.md-typeset .admonition.danger {
-  border-color: #E0E0E0;
-  border-left-color: #FF1744;
-  background-color: #FFEBEE;
-}
-
-.md-typeset .admonition.danger .admonition-title {
-  color: #FF1744;
-}
-
-[data-md-color-scheme="slate"] .md-typeset .admonition.danger {
-  border-color: #2E303E;
-  border-left-color: #FF5252;
-  background-color: #241214;
-}
-
-[data-md-color-scheme="slate"] .md-typeset .admonition.danger .admonition-title {
-  color: #FF5252;
-}
-
-/* 
-   ==========================================================================
-   Code Blocks
-   ========================================================================== 
-*/
-.md-typeset pre {
-  background-color: var(--md-code-bg-color);
-  border: 1px solid rgba(0, 0, 0, 0.05);
-  border-radius: 6px;
-}
-
-[data-md-color-scheme="slate"] .md-typeset pre {
-  border-color: rgba(255, 255, 255, 0.05);
-}
-
-/* Scrollbars */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-::-webkit-scrollbar-thumb {
-  background-color: rgba(0, 0, 0, 0.2);
-  border-radius: 3px;
-}
-
-[data-md-color-scheme="slate"] ::-webkit-scrollbar-thumb {
-  background-color: rgba(255, 255, 255, 0.2);
-}
-
-/* 
-   ==========================================================================
-   Version Selector
-   ========================================================================== 
-*/
-.version-scroll-container {
-  display: flex;
-  align-items: center;
-  margin-left: 1.5rem;
-  /* Increased spacing */
-  overflow-x: auto;
-  white-space: nowrap;
-  max-width: 300px;
-  padding: 4px 0;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  height: 100%;
-  /* Match header height context */
-}
-
-.version-scroll-container::-webkit-scrollbar {
-  display: none;
-}
-
-.version-list {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-}
-
-.version-tag {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 4px 12px;
-  /* Larger touch target and better visibility */
-  border-radius: 4px;
-  /* Slightly more squared to match material design */
-  font-size: 0.8rem;
-  /* Slightly larger text */
-  font-weight: 700;
-  /* Bolder for visibility */
-  line-height: 1.2;
-  color: var(--md-default-fg-color);
-  /* Darker text for contrast */
-  background-color: rgba(0, 0, 0, 0.08);
-  /* Slightly darker bg */
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  /* Subtle border */
-  transition: all 0.2s ease;
-  text-decoration: none !important;
-  font-family: var(--md-text-font-family);
-}
-
-.version-tag:hover {
-  background-color: rgba(0, 0, 0, 0.12);
-  color: var(--md-primary-fg-color);
-  border-color: rgba(0, 0, 0, 0.2);
-}
-
-.version-tag.active {
-  background-color: var(--md-accent-fg-color);
-  color: white;
-  border-color: var(--md-accent-fg-color);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  /* Subtle shadow for depth */
-}
-
-/* Dark Mode Adjustments */
-[data-md-color-scheme="slate"] .version-tag {
-  background-color: rgba(255, 255, 255, 0.1);
-  color: var(--md-default-fg-color);
-  border-color: rgba(255, 255, 255, 0.1);
-}
-
-[data-md-color-scheme="slate"] .version-tag:hover {
-  background-color: rgba(255, 255, 255, 0.15);
-  color: white;
-  border-color: rgba(255, 255, 255, 0.2);
-}
-
-[data-md-color-scheme="slate"] .version-tag.active {
-  background-color: var(--md-accent-fg-color);
-  color: white;
-  border-color: var(--md-accent-fg-color);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-}
-
-/* Mobile adjustments */
-@media screen and (max-width: 76.1875em) {
-  .version-scroll-container {
-    margin-left: 1rem;
-    max-width: 120px;
-  }
-
-  .version-tag {
-    padding: 3px 8px;
-    font-size: 0.75rem;
-  }
+  background-color: #2962FF;
 }
 
 /* 
@@ -484,7 +198,6 @@ html {
    Active Link Highlighting
    ========================================================================== 
 */
-
 /* Left Sidebar (Navigation) - Active Link */
 .md-nav__link--active {
   color: var(--md-accent-fg-color) !important;
@@ -495,10 +208,92 @@ html {
 .md-nav__item--active > .md-nav__link {
   color: var(--md-accent-fg-color) !important;
   border-left: 2px solid var(--md-accent-fg-color);
-  padding-left: 0.5rem; /* Adjust padding to look good with border */
+  padding-left: 0.5rem;
 }
 
 /* Ensure nested items in TOC don't inherit the border unless active themselves */
 .md-nav__item .md-nav__item--active > .md-nav__link {
-    border-left: 2px solid var(--md-accent-fg-color);
+  border-left: 2px solid var(--md-accent-fg-color);
+}
+
+/* 
+   ==========================================================================
+   Layout Optimization
+   ========================================================================== 
+*/
+/* Reduce spacing between sidebars and content for all pages */
+.md-content__inner {
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+  margin-left: 0;
+}
+
+.md-content {
+  margin-left: 0;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}
+
+/* Reduce spacing before left sidebar for all pages */
+.md-sidebar {
+  padding-left: 0.25rem;
+  margin-left: 0;
+}
+
+.md-sidebar--primary {
+  padding-right: 0.5rem;
+  padding-left: 0.25rem;
+  margin-left: 0;
+}
+
+/* Reduce spacing after right sidebar (table of contents) and shift it right slightly */
+.md-sidebar--secondary {
+  padding-left: 1.25rem;
+  padding-right: 0;
+  margin-right: 0;
+  margin-left: 3.5rem;
+}
+
+/* Reduce right edge spacing - similar to left */
+.md-container {
+  padding-right: 0;
+  margin-right: 0;
+}
+
+.md-main {
+  margin-right: 0;
+  padding-right: 0;
+}
+
+/* Reduce margins of the main container */
+.md-main__inner {
+  margin-left: 0;
+  margin-right: 0;
+  padding-right: 0;
+}
+
+/* Reduce right edge spacing on body/html */
+body {
+  margin-right: 0;
+  padding-right: 0;
+}
+
+html {
+  margin-right: 0;
+  padding-right: 0;
+}
+
+.md-grid {
+  margin-left: 0;
+  padding-left: 0.5rem;
+}
+
+/* Ensure text content is left-aligned by default */
+.md-typeset {
+  text-align: left;
+}
+
+/* Keep hero section centered */
+.md-typeset > div[align="center"] {
+  text-align: center;
 }

@@ -1,124 +1,101 @@
 # Getting Started
 
-## Welcome to Semantica
+## Overview
 
-**Semantica** is a comprehensive knowledge graph and semantic processing framework designed for building production-ready semantic AI applications.
+**Semantica** is a semantic intelligence layer that bridges the gap between raw data and trustworthy AI. It transforms unstructured data into explainable, auditable knowledge graphs perfect for high-stakes domains.
 
-### 🎯 What You'll Learn
-- What Semantica is and why it's useful
-- How to install and configure the framework
-- Understanding the framework architecture
-- Key concepts and terminology
-- Next steps for getting started
-
----
-
-## 🚀 What is Semantica?
-
-Semantica is a powerful, production-ready framework for:
-
-- **Building Knowledge Graphs**: Transform unstructured data into structured knowledge graphs.
-- **Semantic Processing**: Extract entities, relationships, and meaning from text, images, and audio.
-- **GraphRAG**: Next-generation retrieval augmented generation using knowledge graphs.
-- **Temporal Analysis**: Time-aware knowledge graphs for tracking changes over time.
-- **Multi-Modal Processing**: Handle text, images, audio, and structured data.
-- **Enterprise Features**: Quality assurance, conflict resolution, ontology generation, and more.
+### What You Can Build
+- **GraphRAG Systems** - Enhanced retrieval with semantic reasoning
+- **AI Agents** - Trustworthy agents with explainable memory
+- **Knowledge Graphs** - Production-ready semantic databases
+- **Compliance-Ready AI** - Auditable systems with full provenance
 
 ---
 
-## 💡 Use Cases
+## Installation
 
-| Domain | Application |
-| :--- | :--- |
-| **Cybersecurity** | Threat intelligence and analysis |
-| **Healthcare** | Medical research and patient data analysis |
-| **Finance** | Fraud detection and financial analysis |
-| **Supply Chain** | Optimization and risk management |
-| **Research** | Knowledge management and literature review |
-| **AI Systems** | Multi-agent memory and reasoning |
+```bash
+pip install semantica
+```
 
----
+Or with all features:
 
-## 📦 Installation & Setup
+```bash
+pip install semantica[all]
+```
 
-### Prerequisites
-Before installing Semantica, ensure you have:
-- **Python 3.8** or higher
-- **pip** package manager
-- (Optional) Virtual environment for isolation
-
-### Installation Methods
-
-=== "PyPI (Stable)"
-    ```bash
-    pip install semantica
-    ```
-
-=== "Source (Dev)"
-    ```bash
-    git clone https://github.com/Hawksight-AI/semantica.git
-    cd semantica
-    pip install -e .
-    ```
-
-=== "Extras"
-    ```bash
-    pip install semantica[all]           # Install all optional dependencies
-    pip install semantica[gpu]           # Install GPU support
-    pip install semantica[visualization] # Install visualization tools
-    ```
-
-### Verify Installation
+Verify installation:
 
 ```python
 import semantica
-print(semantica.__version__)
+print(f"Semantica {semantica.__version__} installed!")
 ```
 
 ---
 
-## ⚙️ Configuration
+## Quick Start
 
-Semantica can be configured using environment variables or a configuration file.
+```python
+from semantica.semantic_extract import NERExtractor
+from semantica.kg import GraphBuilder
 
-### Environment Variables
+# Extract entities
+ner = NERExtractor(method="ml", model="en_core_web_sm")
+entities = ner.extract("Apple Inc. was founded by Steve Jobs in 1976.")
 
-```bash
-export SEMANTICA_API_KEY=your_openai_key
-export SEMANTICA_EMBEDDING_PROVIDER=openai
-export SEMANTICA_MODEL_NAME=gpt-4
+# Build knowledge graph
+kg = GraphBuilder().build({"entities": entities, "relationships": []})
+print(f"Built KG with {len(kg.get('entities', []))} entities")
 ```
 
-### Config File (`config.yaml`)
+**What this does:**
+- Extracts entities (people, organizations, dates) from text
+- Builds a knowledge graph from extracted entities
+- Outputs the number of entities found
 
-```yaml
-api_keys:
-  openai: your_key_here
-  anthropic: your_key_here
+---
 
-embedding:
-  provider: openai
-  model: text-embedding-3-large
-  dimensions: 3072
+## Core Architecture
 
-knowledge_graph:
-  backend: networkx # or neo4j, arangodb
-  temporal: true
+Semantica uses a **modular architecture** - use only what you need:
 
-graph_store:
-  backend: neo4j # or falkordb
-  neo4j_uri: bolt://localhost:7687
-  neo4j_user: neo4j
-  neo4j_password: password
+### 1️⃣ Input Layer - Data Ingestion
+```python
+from semantica.ingest import FileIngestor
+documents = FileIngestor().ingest_directory("docs/")
+```
+
+### 2️⃣ Semantic Layer - Intelligence Engine
+```python
+from semantica.semantic_extract import NERExtractor, RelationExtractor
+entities = NERExtractor().extract(text)
+relationships = RelationExtractor().extract(text, entities)
+```
+
+### 3️⃣ Output Layer - Knowledge Assets
+```python
+from semantica.kg import GraphBuilder
+kg = GraphBuilder().build_graph(entities, relationships)
 ```
 
 ---
 
-## ⏭️ Next Steps
+## Next Steps
 
-Now that you understand the basics, here are recommended next steps:
+### 🍳 Interactive Tutorials
+1. **[Welcome to Semantica](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/introduction/01_Welcome_to_Semantica.ipynb)** - Complete framework overview
+2. **[Your First Knowledge Graph](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/introduction/08_Your_First_Knowledge_Graph.ipynb)** - Hands-on graph building
+3. **[GraphRAG Complete](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/use_cases/advanced_rag/01_GraphRAG_Complete.ipynb)** - Production-ready RAG
 
-1. **[Your First Knowledge Graph](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/introduction/08_Your_First_Knowledge_Graph.ipynb)**: Build your first knowledge graph from a document.
-2. **[Welcome to Semantica](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/introduction/01_Welcome_to_Semantica.ipynb)**: Learn the framework basics and configuration.
-3. **[Core Workflows](cookbook.md#core-tutorials)**: Learn common patterns and workflows.
-4. **[Use Cases](cookbook.md#industry-use-cases)**: Explore domain-specific applications.
+### 📚 Learn More
+- **[Core Concepts](concepts.md)** - Deep dive into knowledge graphs & ontologies
+- **[Cookbook](cookbook.md)** - 14 domain-specific tutorials
+- **[API Reference](reference/core.md)** - Complete technical documentation
+
+---
+
+## Need Help?
+
+- **[💬 Discord Community](https://discord.gg/N7WmAuDH)** - Get help from the community
+- **[🐛 Issues](https://github.com/Hawksight-AI/semantica/issues)** - Report bugs or request features
+- **[📖 Documentation](https://semantica.readthedocs.io/)** - Full documentation site

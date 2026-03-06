@@ -1808,6 +1808,121 @@ Text to extract from:
 {text}
 Entities found in text: {entities_str}"""
 
+
+    if not entities:
+        error_msg = "No entities provided for relation extraction. Relations require existing entities."
+        logger.error(error_msg)
+        if not silent_fail:
+            raise ProcessingError(error_msg)
+        return []
+
+    # Pass api_key if provided in kwargs
+    provider_kwargs = kwargs.copy()
+    
+    # Check if api_key is provided but empty, or not provided at all
+    if "api_key" not in provider_kwargs or not provider_kwargs["api_key"]:
+        import os
+        env_key = f"{provider.upper()}_API_KEY"
+        api_key = os.getenv(env_key)
+        if api_key:
+            provider_kwargs["api_key"] = api_key
+            
+    # Remove None/empty API key if still present to avoid provider errors
+    if "api_key" in provider_kwargs and not provider_kwargs["api_key"]:
+        del provider_kwargs["api_key"]
+
+    # 2. PROVIDER VALIDATION
+    try:
+        llm = create_provider(provider, model=model, **provider_kwargs)
+        if not llm.is_available():
+            error_msg = f"{provider} provider not available for relation extraction (key missing?)."
+            logger.error(error_msg)
+            if not silent_fail:
+                raise ProcessingError(error_msg)
+            return []
+    except Exception as e:
+        error_msg = f"Failed to create {provider} provider for relations: {e}"
+        logger.error(error_msg)
+        if not silent_fail:
+            raise ProcessingError(error_msg) from e
+        return []
+
+    # 3. TEXT LENGTH CHECK AND CHUNKING
+    if max_text_length is None:
+        # Default limits for chunking only - NOT for LLM generation
+        max_text_length = {
+            "groq": 64000,
+            "openai": 64000,
+            "gemini": 64000,
+            "anthropic": 64000,
+            "deepseek": 64000,
+        }.get(provider.lower(), 32000)
+    
+    if len(text) > max_text_length:
+        logger.info(f"Text length ({len(text)}) exceeds limit for relations. Chunking...")
+        return _extract_relations_chunked(
+            text, entities, provider=provider, model=model, 
+            silent_fail=silent_fail, max_text_length=max_text_length, 
+            max_retries=max_retries,
+            **kwargs
+        )
+
+    original_entities = entities
+    # Use a fixed internal default for prompt entity cap (do not accept overrides from kwargs)
+    max_entities_prompt = 80
+    prompt_entities = original_entities
+    if max_entities_prompt > 0 and len(original_entities) > max_entities_prompt:
+        prompt_entities = filter_entities_for_text(
+            text,
+            original_entities,
+            max_keep=max_entities_prompt,
+        )
+
+    entities_str = ", ".join([f"{e.text} ({e.label})" for e in prompt_entities])
+    
+    # Use custom relation types if provided
+    relation_types = kwargs.get("relation_types")
+    if relation_types:
+        relation_types_str = ", ".join(relation_types)
+        relation_types_instruction = f"""
+Preferred relation types: {relation_types_str}.
+You may also use related or similar relation types if they better capture the relationship (e.g., variations, synonyms, or domain-specific relations).
+If a relation doesn't fit any of the preferred types, use the most appropriate type from the preferred list or a closely related type that accurately describes the relationship."""
+    else:
+        relation_types_instruction = """
+Extract meaningful relationships between entities. Use appropriate relation types that accurately describe how entities are connected.
+Common relation types include: related_to, part_of, located_in, created_by, uses, depends_on, interacts_with, and similar variations."""
+    
+    verbose_mode = kwargs.get("verbose", False)
+    if verbose_mode:
+        import sys
+        print(f"    [methods.extract_relations_llm] Constructing prompt for {len(prompt_entities)} entities...", flush=True, file=sys.stdout)
+    
+    if not SCHEMAS_AVAILABLE:
+        raise ImportError("Pydantic schemas not available. Install pydantic/instructor to use LLM extraction.")
+
+    prompt = f"""Extract relations between entities from the provided text.
+Return the result as a JSON object with a "relations" key containing the list of relations.
+Each relation must have 'subject', 'predicate', and 'object' fields.
+
+Example output (JSON format only):
+{{
+  "relations": [
+    {{"subject": "Entity A", "predicate": "related_to", "object": "Entity B", "confidence": 0.95}},
+    {{"subject": "Subject Entity", "predicate": "action_verb", "object": "Object Entity", "confidence": 0.90}}
+  ]
+}}
+
+Instructions:
+1. Extract relations ONLY from the text provided below.
+2. Do not include any relations from the example above.
+3. Use the provided entities list as a reference for subjects and objects.
+4. {relation_types_instruction}
+
+Text to extract from:
+{text}
+Entities found in text: {entities_str}"""
+
     try:
         # Use typed generation with Pydantic schema
         # Pass kwargs to allow max_tokens and other parameters to be used
@@ -1970,6 +2085,25 @@ def _parse_relation_result(
                 },
             )
         )
+        # Find matching entities using hybrid similarity
+        subject_entity = match_entity(subject_text, entities)
+        object_entity = match_entity(object_text, entities)
+
+        if subject_entity and object_entity:
+            relations.append(
+                Relation(
+                    subject=subject_entity,
+                    predicate=item.get("predicate", "related_to"),
+                    object=object_entity,
+                    confidence=item.get("confidence", 0.9),
+                    context=text,
+                    metadata={
+                        "provider": provider,
+                        "model": model,
+                        "extraction_method": "llm",
+                    },
+                )
+            )
     return relations
 
 

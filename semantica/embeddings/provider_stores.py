@@ -66,7 +66,7 @@ class OpenAIStore(ProviderStore):
                 from openai import OpenAI
 
                 self.client = OpenAI(api_key=self.api_key)
-            except ImportError:
+            except (ImportError, OSError):
                 self.logger.warning("OpenAI library not installed")
 
     def embed(self, text: str, **options) -> np.ndarray:
@@ -114,7 +114,7 @@ class BGEStore(ProviderStore):
 
             self.model = SentenceTransformer(self.model_name)
             self.logger.info(f"Loaded BGE model: {self.model_name}")
-        except ImportError:
+        except (ImportError, OSError):
             self.logger.warning("sentence-transformers not available for BGE")
         except Exception as e:
             self.logger.warning(f"Failed to load BGE model: {e}")
@@ -210,7 +210,7 @@ class FastEmbedStore(ProviderStore):
 
             self.model = TextEmbedding(model_name=self.model_name)
             self.logger.info(f"Loaded FastEmbed model: {self.model_name}")
-        except ImportError:
+        except (ImportError, OSError):
             self.logger.warning(
                 "fastembed not available. Install with: pip install fastembed"
             )

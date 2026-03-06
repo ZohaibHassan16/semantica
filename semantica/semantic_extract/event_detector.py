@@ -85,76 +85,215 @@ class Event:
 class EventDetector:
     """Event detection and extraction handler."""
 
-    def __init__(
-        self,
-        event_types: Optional[List[str]] = None,
-        extract_participants: bool = True,
-        extract_location: bool = True,
-        extract_time: bool = True,
-        method: Union[str, List[str]] = None,
-        config=None,
-        **kwargs
-    ):
+    def __init__(self, method: str = "llm", **config):
         """
         Initialize event detector.
 
         Args:
-            event_types: Specific event types to detect (e.g., ["launch", "acquisition"])
-            extract_participants: Whether to extract event participants
-            extract_location: Whether to extract event locations
-            extract_time: Whether to extract temporal information
-            method: Extraction method(s) for underlying NER/relation extractors.
-                   Can be passed to ner_method and relation_method in config.
-            config: Legacy config dict (deprecated, use kwargs)
-            **kwargs: Configuration options:
-                - ner_method: Method for NER extraction (if entities need to be extracted)
-                - relation_method: Method for relation extraction (if relations need to be extracted)
-                - Other options passed to sub-components
+            method: Extraction method ("llm", "pattern")
+            **config: Configuration options
         """
         self.logger = get_logger("event_detector")
-        self.config = config or {}
-        self.config.update(kwargs)
+        self.config = config
+        self.method = method
         self.progress_tracker = get_progress_tracker()
+        
+        # Ensure progress tracker is enabled
+        if not self.progress_tracker.enabled:
+            self.progress_tracker.enabled = True
 
-        # Store parameters
-        self.event_types_filter = event_types
-        self.extract_participants = extract_participants
-        self.extract_location = extract_location
-        self.extract_time = extract_time
+        # Initialize components
+        self.event_classifier = EventClassifier(**config)
+        self.temporal_processor = TemporalEventProcessor(**config)
 
-        # Store method for passing to extractors if needed
+        # Configure extraction options
+        self.extract_participants = config.get("extract_participants", True)
+        self.extract_location = config.get("extract_location", True)
+        self.extract_time = config.get("extract_time", True)
+        self.event_types_filter = config.get("event_types", [])
+
+        # Define event patterns
+        self.event_patterns = {
+            "acquisition": r"\b(acquired|acquisition|buying|bought|merger|merged)\b",
+            "partnership": r"\b(partnered|partnership|collaborate|collaboration)\b",
+            "launch": r"\b(launch|launched|releasing|released|unveil|unveiled)\b",
+            "investment": r"\b(invest|invested|investment|funding|raised)\b",
+            "legal": r"\b(sue|sued|lawsuit|litigation|legal action)\b",
+        }
+        
+        # Pre-compile location patterns
+        self.location_patterns = [
+            re.compile(r"in\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)"),
+            re.compile(r"at\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)"),
+        ]
+        
+        # Pre-compile time patterns
+        self.time_patterns = [
+            re.compile(r"on\s+([A-Z][a-z]+\s+\d{1,2},?\s+\d{4})"),
+            re.compile(r"in\s+(\d{4})"),
+            re.compile(r"(\d{1,2}[/-]\d{1,2}[/-]\d{2,4})"),
+        ]
+
         if method is not None:
             self.config["ner_method"] = method
             self.config["relation_method"] = method
 
-        self.event_classifier = EventClassifier(**self.config.get("classifier", {}))
-        self.temporal_processor = TemporalEventProcessor(
-            **self.config.get("temporal", {})
-        )
-        self.relationship_extractor = EventRelationshipExtractor(
-            **self.config.get("relationship", {})
-        )
+    def extract(
+        self,
+        text: Union[str, List[str], List[Dict[str, Any]]],
+        pipeline_id: Optional[str] = None,
+        **kwargs
+    ) -> Union[List[Event], List[List[Event]]]:
+        """
+        Detect events in text or list of documents.
+        Handles batch processing with progress tracking.
 
-        # Event patterns
-        self.event_patterns = {
-            "founded": r"founded|created|established",
-            "acquired": r"acquired|bought|purchased",
-            "launched": r"launched|released|introduced",
-            "announced": r"announced|declared|stated",
-            "meeting": r"met|meeting|conference|summit",
-        }
+        Args:
+            text: Input text or list of documents
+            pipeline_id: Optional pipeline ID for progress tracking
+            **kwargs: Detection options
 
-    def detect_events(self, text: str, **options) -> List[Event]:
+        Returns:
+            Union[List[Event], List[List[Event]]]: Detected events
+        """
+        if isinstance(text, list):
+            # Handle batch detection with progress tracking
+            tracking_id = self.progress_tracker.start_tracking(
+                module="semantic_extract",
+                submodule="EventDetector",
+                message=f"Batch detecting events from {len(text)} documents",
+                pipeline_id=pipeline_id,
+            )
+
+            try:
+                results = [None] * len(text)  # Pre-allocate to maintain order
+                total_items = len(text)
+                total_events_count = 0
+                processed_count = 0
+                
+                # Determine update interval
+                if total_items <= 10:
+                    update_interval = 1
+                else:
+                    update_interval = max(1, min(10, total_items // 100))
+                
+                # Initial progress update
+                self.progress_tracker.update_progress(
+                    tracking_id,
+                    processed=0,
+                    total=total_items,
+                    message=f"Starting batch detection... 0/{total_items} (remaining: {total_items})"
+                )
+
+                from .config import resolve_max_workers
+                max_workers = resolve_max_workers(
+                    explicit=kwargs.get("max_workers"),
+                    local_config=self.config,
+                    methods=[self.config.get("ner_method"), self.config.get("relation_method"), self.config.get("method")],
+                )
+
+                def process_item(idx, item):
+                    try:
+                        # Prepare arguments for single item
+                        doc_text = item["content"] if isinstance(item, dict) and "content" in item else str(item)
+                        
+                        # Detect
+                        events = self.detect_events(doc_text, **kwargs)
+
+                        # Add provenance metadata
+                        for event in events:
+                            if event.metadata is None:
+                                event.metadata = {}
+                            event.metadata["batch_index"] = idx
+                            if isinstance(item, dict) and "id" in item:
+                                event.metadata["document_id"] = item["id"]
+                        
+                        return idx, events
+                    except Exception as e:
+                        self.logger.error(f"Error processing item {idx}: {e}")
+                        # Return empty list on failure to continue processing
+                        return idx, []
+
+                if max_workers > 1:
+                    import concurrent.futures
+                    
+                    with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
+                        # Submit tasks
+                        future_to_idx = {}
+                        for idx, item in enumerate(text):
+                            future = executor.submit(process_item, idx, item)
+                            future_to_idx[future] = idx
+                        
+                        for future in concurrent.futures.as_completed(future_to_idx):
+                            idx, events = future.result()
+                            results[idx] = events
+                            total_events_count += len(events)
+                            processed_count += 1
+                            
+                            # Update progress
+                            if processed_count % update_interval == 0 or processed_count == total_items:
+                                remaining = total_items - processed_count
+                                self.progress_tracker.update_progress(
+                                    tracking_id,
+                                    processed=processed_count,
+                                    total=total_items,
+                                    message=f"Processing... {processed_count}/{total_items} (remaining: {remaining}) - Detected {total_events_count} events"
+                                )
+                else:
+                    # Sequential processing
+                    for idx, item in enumerate(text):
+                        _, events = process_item(idx, item)
+                        results[idx] = events
+                        total_events_count += len(events)
+                        processed_count += 1
+
+                        # Update progress
+                        if processed_count % update_interval == 0 or processed_count == total_items:
+                            remaining = total_items - processed_count
+                            self.progress_tracker.update_progress(
+                                tracking_id,
+                                processed=processed_count,
+                                total=total_items,
+                                message=f"Processing... {processed_count}/{total_items} (remaining: {remaining}) - Detected {total_events_count} events"
+                            )
+
+                self.progress_tracker.stop_tracking(
+                    tracking_id,
+                    status="completed",
+                    message=f"Batch detection completed. Processed {len(results)} documents, detected {total_events_count} events.",
+                )
+                return results
+
+            except Exception as e:
+                self.progress_tracker.stop_tracking(
+                    tracking_id, status="failed", message=str(e)
+                )
+                raise
+
+        else:
+            # Single item
+            return self.detect_events(text, **kwargs)
+
+    def detect_events(
+        self,
+        text: Union[str, List[str], List[Dict[str, Any]]],
+        pipeline_id: Optional[str] = None,
+        **options,
+    ) -> Union[List[Event], List[List[Event]]]:
         """
         Detect events in text content.
 
         Args:
             text: Input text
+            pipeline_id: Optional pipeline ID for progress tracking (batch mode)
             **options: Detection options
 
         Returns:
             list: List of detected events
         """
+        if isinstance(text, list):
+            return self.extract(text, pipeline_id=pipeline_id, **options)
+
         tracking_id = self.progress_tracker.start_tracking(
             module="semantic_extract",
             submodule="EventDetector",
@@ -173,11 +312,46 @@ class EventDetector:
                 }
 
             # Detect events using patterns
-            self.progress_tracker.update_tracking(
-                tracking_id, message="Scanning text for event patterns..."
+            total_event_types = len(event_patterns_to_use)
+            if total_event_types <= 10:
+                event_type_update_interval = 1  # Update every type for small datasets
+            else:
+                event_type_update_interval = max(1, min(5, total_event_types // 20))
+            
+            # Initial progress update
+            remaining_types = total_event_types
+            self.progress_tracker.update_progress(
+                tracking_id,
+                processed=0,
+                total=total_event_types,
+                message=f"Scanning text for event patterns... 0/{total_event_types} event types (remaining: {remaining_types})"
             )
+            
+            event_type_idx = 0
             for event_type, pattern in event_patterns_to_use.items():
-                for match in re.finditer(pattern, text, re.IGNORECASE):
+                event_type_idx += 1
+                remaining_types = total_event_types - event_type_idx
+                
+                # Count matches first to show progress
+                matches = list(re.finditer(pattern, text, re.IGNORECASE))
+                total_matches = len(matches)
+                
+                # Initialize match update interval
+                if total_matches <= 10:
+                    match_update_interval = 1
+                else:
+                    match_update_interval = max(1, min(10, total_matches // 100))
+                
+                if tracking_id and total_matches > 0:
+                    remaining_matches = total_matches
+                    self.progress_tracker.update_progress(
+                        tracking_id,
+                        processed=0,
+                        total=total_matches,
+                        message=f"Processing {event_type} events... 0/{total_matches} matches (remaining: {remaining_matches})"
+                    )
+                
+                for match_idx, match in enumerate(matches, 1):
                     # Extract surrounding context
                     start = max(0, match.start() - 50)
                     end = min(len(text), match.end() + 50)
@@ -210,6 +384,39 @@ class EventDetector:
                         metadata={"context": context},
                     )
                     events.append(event)
+                    
+                    # Update progress for matches
+                    if tracking_id and total_matches > 0:
+                        remaining_matches = total_matches - match_idx
+                        should_update = (
+                            match_idx % match_update_interval == 0 or 
+                            match_idx == total_matches or 
+                            match_idx == 1 or
+                            total_matches <= 10  # Always update for small datasets
+                        )
+                        if should_update:
+                            self.progress_tracker.update_progress(
+                                tracking_id,
+                                processed=match_idx,
+                                total=total_matches,
+                                message=f"Processing {event_type} events... {match_idx}/{total_matches} matches (remaining: {remaining_matches})"
+                            )
+                
+                # Update progress for event types
+                if tracking_id:
+                    should_update = (
+                        event_type_idx % event_type_update_interval == 0 or 
+                        event_type_idx == total_event_types or 
+                        event_type_idx == 1 or
+                        total_event_types <= 10  # Always update for small datasets
+                    )
+                    if should_update:
+                        self.progress_tracker.update_progress(
+                            tracking_id,
+                            processed=event_type_idx,
+                            total=total_event_types,
+                            message=f"Scanning text for event patterns... {event_type_idx}/{total_event_types} event types (remaining: {remaining_types})"
+                        )
 
             self.progress_tracker.stop_tracking(
                 tracking_id,

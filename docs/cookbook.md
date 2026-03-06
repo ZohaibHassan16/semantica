@@ -96,7 +96,7 @@ Hand-picked tutorials to show you the power of Semantica.
     
     **Difficulty**: Advanced
     
-    [Open Notebook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/use_cases/cybersecurity/01_Anomaly_Detection_Real_Time.ipynb)
+    [Open Notebook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/use_cases/cybersecurity/01_Real_Time_Anomaly_Detection.ipynb)
 
 </div>
 
@@ -286,8 +286,6 @@ Deep dive into advanced features, customization, and complex workflows.
     
     [Open Notebook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/advanced/06_Multi_Source_Data_Integration.ipynb)
 
-<<<<<<< HEAD
-<<<<<<< Updated upstream
 -   :material-pipe: **Pipeline Orchestration**
     ---
     Building robust, automated data processing pipelines.
@@ -297,8 +295,6 @@ Deep dive into advanced features, customization, and complex workflows.
     **Difficulty**: Advanced
     
     [Open Notebook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/advanced/07_Pipeline_Orchestration.ipynb)
-=======
->>>>>>> main
 
 -   :material-brain: **Reasoning and Inference**
     ---
@@ -309,9 +305,6 @@ Deep dive into advanced features, customization, and complex workflows.
     **Difficulty**: Advanced
     
     [Open Notebook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/advanced/08_Reasoning_and_Inference.ipynb)
-
-=======
->>>>>>> Stashed changes
 -   :material-layers: **Semantic Layer Construction**
     ---
     Building a semantic layer over your data warehouse or lake.
@@ -346,9 +339,9 @@ Real-world examples and end-to-end applications across various industries.
 
 -   :material-pill: **Drug Discovery Pipeline**
     ---
-    Accelerating drug discovery by connecting genes, proteins, and drugs.
+    Accelerating drug discovery by connecting genes, proteins, and drugs using PubMed RSS feeds, entity-aware chunking, GraphRAG, and vector similarity search.
     
-    **Topics**: Bioinformatics, KG Construction
+    **Topics**: Bioinformatics, KG Construction, GraphRAG, Vector Search
     
     **Difficulty**: Advanced
     
@@ -356,9 +349,9 @@ Real-world examples and end-to-end applications across various industries.
 
 -   :material-dna: **Genomic Variant Analysis**
     ---
-    Analyzing genomic variants and their implications for disease.
+    Analyzing genomic variants and their implications for disease using bioRxiv RSS feeds, temporal knowledge graphs, deduplication, and pathway analysis.
     
-    **Topics**: Genomics, Variant Calling
+    **Topics**: Genomics, Variant Calling, Temporal KGs, Graph Analytics
     
     **Difficulty**: Advanced
     
@@ -366,125 +359,29 @@ Real-world examples and end-to-end applications across various industries.
 
 </div>
 
-### Healthcare
-
-<div class="grid cards" markdown>
-
--   :material-hospital-box: **Clinical Reports Processing**
-    ---
-    Processing and structuring unstructured clinical reports.
-    
-    **Topics**: NLP, Medical Records
-    
-    **Difficulty**: Intermediate
-    
-    [Open Notebook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/use_cases/healthcare/01_Clinical_Reports_Processing.ipynb)
-
--   :material-virus: **Disease Network Analysis**
-    ---
-    Analyzing disease networks and comorbidities for population health.
-    
-    **Topics**: Disease Modeling, Comorbidity Networks
-    
-    **Difficulty**: Advanced
-    
-    [Open Notebook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/use_cases/healthcare/02_Disease_Network_Analysis.ipynb)
-
--   :material-pill-multiple: **Drug Interactions Analysis**
-    ---
-    Identifying potential drug interactions and contraindications.
-    
-    **Topics**: Pharmacology, Drug Safety
-    
-    **Difficulty**: Advanced
-    
-    [Open Notebook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/use_cases/healthcare/03_Drug_Interactions_Analysis.ipynb)
-
--   :material-robot-love: **Healthcare GraphRAG Hybrid**
-    ---
-    Hybrid RAG system for healthcare knowledge retrieval.
-    
-    **Topics**: RAG, Medical Knowledge, LLMs
-    
-    **Difficulty**: Advanced
-    
-    [Open Notebook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/use_cases/healthcare/04_Healthcare_GraphRAG_Hybrid.ipynb)
-
--   :material-database-plus: **Medical Database Integration**
-    ---
-    Integrating multiple medical databases into unified knowledge graphs.
-    
-    **Topics**: Data Integration, Medical Databases
-    
-    **Difficulty**: Intermediate
-    
-    [Open Notebook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/use_cases/healthcare/05_Medical_Database_Integration.ipynb)
-
--   :material-account-heart: **Patient Records Temporal**
-    ---
-    Analyzing patient records over time to track health progression.
-    
-    **Topics**: Temporal Analysis, Patient Journeys
-    
-    **Difficulty**: Advanced
-    
-    [Open Notebook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/use_cases/healthcare/06_Patient_Records_Temporal.ipynb)
-
-</div>
-
 ### Finance
 
 <div class="grid cards" markdown>
 
--   :material-finance: **Financial Data Integration**
+-   :material-finance: **Financial Data Integration MCP**
     ---
-    Merging financial data from reports, news, and market feeds.
+    Merging financial data from Alpha Vantage API, MCP servers, RSS feeds, and market feeds with seed data integration.
     
-    **Topics**: Finance, Data Fusion
+    **Topics**: Finance, Data Fusion, MCP Integration, Real-Time Ingestion
     
     **Difficulty**: Intermediate
     
-    [Open Notebook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/use_cases/finance/01_Financial_Data_Integration.ipynb)
-
--   :material-file-chart: **Financial Reports Analysis**
-    ---
-    Extracting insights from financial reports and earnings calls.
-    
-    **Topics**: Financial Analysis, NLP
-    
-    **Difficulty**: Intermediate
-    
-    [Open Notebook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/use_cases/finance/02_Financial_Reports_Analysis.ipynb)
+    [Open Notebook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/use_cases/finance/01_Financial_Data_Integration_MCP.ipynb)
 
 -   :material-incognito: **Fraud Detection**
     ---
-    Identifying fraudulent activities and patterns in transaction networks.
+    Identifying fraudulent activities and patterns in transaction networks using temporal knowledge graphs, conflict detection, and pattern recognition.
     
-    **Topics**: Anomaly Detection, Graph Mining
-    
-    **Difficulty**: Advanced
-    
-    [Open Notebook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/use_cases/finance/03_Fraud_Detection.ipynb)
-
--   :material-chart-box: **Investment Analysis Hybrid RAG**
-    ---
-    AI-powered investment analysis using hybrid RAG approach.
-    
-    **Topics**: Investment Research, RAG, Financial Analysis
+    **Topics**: Anomaly Detection, Graph Mining, Temporal Analysis, Pattern Detection
     
     **Difficulty**: Advanced
     
-    [Open Notebook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/use_cases/finance/04_Investment_Analysis_Hybrid_RAG.ipynb)
-
--   :material-gavel: **Regulatory Compliance**
-    ---
-    Ensuring compliance with financial regulations using knowledge graphs.
-    
-    **Topics**: Compliance, Regulatory Analysis
-    
-    **Difficulty**: Advanced
-    
-    [Open Notebook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/use_cases/finance/05_Regulatory_Compliance.ipynb)
+    [Open Notebook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/use_cases/finance/02_Fraud_Detection.ipynb)
 
 </div>
 
@@ -494,9 +391,9 @@ Real-world examples and end-to-end applications across various industries.
 
 -   :material-bitcoin: **DeFi Protocol Intelligence**
     ---
-    Analyzing decentralized finance protocols and transaction flows.
+    Analyzing decentralized finance protocols and transaction flows using CoinDesk RSS feeds, ontology-aware chunking, conflict detection, and ontology generation.
     
-    **Topics**: Blockchain, DeFi, Smart Contracts
+    **Topics**: Blockchain, DeFi, Smart Contracts, Ontology, Conflict Resolution
     
     **Difficulty**: Advanced
     
@@ -504,9 +401,9 @@ Real-world examples and end-to-end applications across various industries.
 
 -   :material-network: **Transaction Network Analysis**
     ---
-    Mapping and analyzing blockchain transaction networks.
+    Mapping and analyzing blockchain transaction networks using blockchain APIs, deduplication, and network pattern detection.
     
-    **Topics**: Blockchain Analytics, Network Analysis
+    **Topics**: Blockchain Analytics, Network Analysis, Deduplication, Pattern Detection
     
     **Difficulty**: Advanced
     
@@ -518,65 +415,25 @@ Real-world examples and end-to-end applications across various industries.
 
 <div class="grid cards" markdown>
 
--   :material-shield-alert: **Anomaly Detection Real-Time**
+-   :material-shield-alert: **Real-Time Anomaly Detection**
     ---
-    Detecting anomalies in real-time network traffic streams.
+    Detecting anomalies in real-time network traffic streams using CVE RSS feeds, Kafka streams, temporal knowledge graphs, and sentence chunking.
     
-    **Topics**: Network Security, Streaming
+    **Topics**: Network Security, Streaming, Temporal KGs, Pattern Detection
     
     **Difficulty**: Advanced
     
-    [Open Notebook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/use_cases/cybersecurity/01_Anomaly_Detection_Real_Time.ipynb)
-
--   :material-shield-search: **Incident Analysis**
-    ---
-    Analyzing security incidents and breaches using graph forensics.
-    
-    **Topics**: Incident Response, Forensics
-    
-    **Difficulty**: Intermediate
-    
-    [Open Notebook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/use_cases/cybersecurity/02_Incident_Analysis.ipynb)
-
--   :material-shield-link-variant: **Threat Correlation**
-    ---
-    Correlating threats across different vectors to identify campaigns.
-    
-    **Topics**: Threat Intel, Correlation
-    
-    **Difficulty**: Advanced
-    
-    [Open Notebook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/use_cases/cybersecurity/03_Threat_Correlation.ipynb)
+    [Open Notebook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/use_cases/cybersecurity/01_Real_Time_Anomaly_Detection.ipynb)
 
 -   :material-robot-angry: **Threat Intelligence Hybrid RAG**
     ---
-    Combining RAG with threat intelligence for enhanced security insights.
+    Combining enhanced GraphRAG with threat intelligence for security insights using security RSS feeds, entity-aware chunking, deduplication, and temporal knowledge graphs.
     
-    **Topics**: Threat Intelligence, RAG, Security
-    
-    **Difficulty**: Advanced
-    
-    [Open Notebook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/use_cases/cybersecurity/04_Threat_Intelligence_Hybrid_RAG.ipynb)
-
--   :material-shield-plus: **Threat Intelligence Integration**
-    ---
-    Integrating threat feeds into a unified knowledge graph.
-    
-    **Topics**: STIX/TAXII, Threat Feeds, Integration
+    **Topics**: Threat Intelligence, GraphRAG, Security, Hybrid Retrieval
     
     **Difficulty**: Advanced
     
-    [Open Notebook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/use_cases/cybersecurity/05_Threat_Intelligence_Integration.ipynb)
-
--   :material-bug: **Vulnerability Tracking**
-    ---
-    Tracking and managing system vulnerabilities using knowledge graphs.
-    
-    **Topics**: CVE, Vulnerability Management
-    
-    **Difficulty**: Intermediate
-    
-    [Open Notebook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/use_cases/cybersecurity/06_Vulnerability_Tracking.ipynb)
+    [Open Notebook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/use_cases/cybersecurity/02_Threat_Intelligence_Hybrid_RAG.ipynb)
 
 </div>
 
@@ -586,89 +443,23 @@ Real-world examples and end-to-end applications across various industries.
 
 -   :material-account-network: **Criminal Network Analysis**
     ---
-    Analyze criminal networks with graph analytics and key player detection.
+    Analyze criminal networks with graph analytics and key player detection using OSINT RSS feeds, deduplication, and network centrality analysis.
     
-    **Topics**: Forensics, Social Network Analysis
+    **Topics**: Forensics, Social Network Analysis, Deduplication, Graph Analytics
     
     **Difficulty**: Advanced
     
     [Open Notebook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/use_cases/intelligence/01_Criminal_Network_Analysis.ipynb)
 
--   :material-file-search: **Intelligence Analysis**
+-   :material-file-search: **Intelligence Analysis Orchestrator Worker**
     ---
-    Comprehensive intelligence analysis using orchestrator-worker pattern with graph analytics and hybrid RAG.
+    Comprehensive intelligence analysis using pipeline orchestrator with multiple RSS feeds, conflict detection, and multi-source integration.
     
-    **Topics**: Intelligence Analysis, Orchestrator-Worker, Graph Analytics
+    **Topics**: Intelligence Analysis, Pipeline Orchestration, Multi-Source Integration, Conflict Resolution
     
     **Difficulty**: Advanced
     
-    [Open Notebook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/use_cases/intelligence/02_Intelligence_Analysis.ipynb)
-
--   :material-gavel: **Law Enforcement Forensics**
-    ---
-    Forensic analysis pipeline for processing case files and evidence.
-    
-    **Topics**: Forensics, Evidence Analysis, Case Correlation
-    
-    **Difficulty**: Advanced
-    
-    [Open Notebook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/use_cases/intelligence/03_Law_Enforcement_Forensics.ipynb)
-
-</div>
-
-### Trading
-
-<div class="grid cards" markdown>
-
--   :material-chart-areaspline: **Market Data Analysis**
-    ---
-    Analyzing trading market data for patterns and opportunities.
-    
-    **Topics**: Trading, Market Analysis
-    
-    **Difficulty**: Intermediate
-    
-    [Open Notebook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/use_cases/trading/01_Market_Data_Analysis.ipynb)
-
--   :material-newspaper-variant: **News Sentiment Analysis**
-    ---
-    Analyzing news sentiment for trading signals and market predictions.
-    
-    **Topics**: Sentiment Analysis, Trading Signals
-    
-    **Difficulty**: Intermediate
-    
-    [Open Notebook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/use_cases/trading/02_News_Sentiment_Analysis.ipynb)
-
--   :material-monitor-dashboard: **Real-Time Monitoring**
-    ---
-    Monitoring trading systems and positions in real-time.
-    
-    **Topics**: Monitoring, Real-Time Systems
-    
-    **Difficulty**: Advanced
-    
-    [Open Notebook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/use_cases/trading/03_Real_Time_Monitoring.ipynb)
-
--   :material-shield-check: **Risk Assessment**
-    ---
-    Assessing trading risks using knowledge graphs and analytics.
-    
-    **Topics**: Risk Management, Portfolio Analysis
-    
-    **Difficulty**: Advanced
-    
-    [Open Notebook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/use_cases/trading/04_Risk_Assessment.ipynb)
-
--   :material-history: **Strategy Backtesting**
-    ---
-    Backtesting trading strategies using historical data and graphs.
-    
-    **Topics**: Backtesting, Strategy Optimization
-    
-    **Difficulty**: Advanced
-    
-    [Open Notebook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/use_cases/trading/05_Strategy_Backtesting.ipynb)
+    [Open Notebook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/use_cases/intelligence/02_Intelligence_Analysis_Orchestrator_Worker.ipynb)
 
 </div>
 
@@ -678,43 +469,13 @@ Real-world examples and end-to-end applications across various industries.
 
 -   :material-wind-turbine: **Energy Market Analysis**
     ---
-    Analyzing trends and pricing in the renewable energy market.
+    Analyzing trends and pricing in the renewable energy market using energy RSS feeds, EIA API, temporal knowledge graphs, TemporalPatternDetector, and seed data integration.
     
-    **Topics**: Energy, Time Series
+    **Topics**: Energy, Time Series, Temporal Analysis, Trend Prediction
     
     **Difficulty**: Intermediate
     
     [Open Notebook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/use_cases/renewable_energy/01_Energy_Market_Analysis.ipynb)
-
--   :material-leaf: **Environmental Impact**
-    ---
-    Assessing environmental impact of energy projects and policies.
-    
-    **Topics**: Environmental Science, Impact Analysis
-    
-    **Difficulty**: Intermediate
-    
-    [Open Notebook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/use_cases/renewable_energy/02_Environmental_Impact.ipynb)
-
--   :material-transmission-tower: **Grid Management**
-    ---
-    Optimizing power grid management and distribution.
-    
-    **Topics**: Grid Optimization, Energy Distribution
-    
-    **Difficulty**: Advanced
-    
-    [Open Notebook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/use_cases/renewable_energy/03_Grid_Management.ipynb)
-
--   :material-solar-power: **Resource Optimization**
-    ---
-    Optimizing renewable energy resources and generation.
-    
-    **Topics**: Resource Management, Optimization
-    
-    **Difficulty**: Advanced
-    
-    [Open Notebook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/use_cases/renewable_energy/04_Resource_Optimization.ipynb)
 
 </div>
 
@@ -724,23 +485,13 @@ Real-world examples and end-to-end applications across various industries.
 
 -   :material-truck-delivery: **Supply Chain Data Integration**
     ---
-    Integrating supply chain data to optimize logistics and reduce risk.
+    Integrating supply chain data to optimize logistics and reduce risk using logistics RSS feeds, deduplication, and multi-source relationship mapping.
     
-    **Topics**: Logistics, Risk Management
+    **Topics**: Logistics, Risk Management, Data Integration, Deduplication
     
     **Difficulty**: Advanced
     
     [Open Notebook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/use_cases/supply_chain/01_Supply_Chain_Data_Integration.ipynb)
-
--   :material-alert-octagon: **Supply Chain Risk Management**
-    ---
-    Managing and mitigating supply chain risks using knowledge graphs.
-    
-    **Topics**: Risk Management, Supply Chain Resilience
-    
-    **Difficulty**: Advanced
-    
-    [Open Notebook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/use_cases/supply_chain/02_Supply_Chain_Risk_Management.ipynb)
 
 </div>
 

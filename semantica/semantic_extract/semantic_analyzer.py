@@ -71,6 +71,7 @@ class SemanticRole:
     start_char: int
     end_char: int
     confidence: float = 1.0
+    metadata: Dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -81,6 +82,7 @@ class SemanticCluster:
     cluster_id: int
     centroid: Optional[str] = None
     similarity_score: float = 0.0
+    metadata: Dict[str, Any] = field(default_factory=dict)
 
 
 class SemanticAnalyzer:
@@ -103,6 +105,9 @@ class SemanticAnalyzer:
         self.config = config or {}
         self.config.update(kwargs)
         self.progress_tracker = get_progress_tracker()
+        # Ensure progress tracker is enabled
+        if not self.progress_tracker.enabled:
+            self.progress_tracker.enabled = True
 
         # Store method for passing to extractors if needed
         if method is not None:
@@ -114,6 +119,147 @@ class SemanticAnalyzer:
         )
         self.role_labeler = RoleLabeler(**self.config.get("role", {}))
         self.semantic_clusterer = SemanticClusterer(**self.config.get("clustering", {}))
+
+    def analyze(
+        self,
+        text: Union[str, List[str], List[Dict[str, Any]]],
+        pipeline_id: Optional[str] = None,
+        **kwargs
+    ) -> Union[Dict[str, Any], List[Dict[str, Any]]]:
+        """
+        Perform semantic analysis on text or list of documents.
+        Handles batch processing with progress tracking.
+
+        Args:
+            text: Input text or list of documents
+            pipeline_id: Optional pipeline ID for progress tracking
+            **kwargs: Analysis options
+
+        Returns:
+            Union[Dict[str, Any], List[Dict[str, Any]]]: Analysis results
+        """
+        if isinstance(text, list):
+            # Handle batch analysis with progress tracking
+            tracking_id = self.progress_tracker.start_tracking(
+                module="semantic_extract",
+                submodule="SemanticAnalyzer",
+                message=f"Batch analyzing {len(text)} documents",
+                pipeline_id=pipeline_id,
+            )
+
+            try:
+                results = [None] * len(text)
+                total_items = len(text)
+                processed_count = 0
+                
+                # Determine update interval
+                if total_items <= 10:
+                    update_interval = 1
+                else:
+                    update_interval = max(1, min(10, total_items // 100))
+                
+                # Initial progress update
+                self.progress_tracker.update_progress(
+                    tracking_id,
+                    processed=0,
+                    total=total_items,
+                    message=f"Starting batch analysis... 0/{total_items} (remaining: {total_items})"
+                )
+
+                from .config import resolve_max_workers
+                max_workers = resolve_max_workers(
+                    explicit=kwargs.get("max_workers"),
+                    local_config=self.config,
+                )
+
+                def process_item(idx, item):
+                    try:
+                        doc_text = item["content"] if isinstance(item, dict) and "content" in item else str(item)
+                        analysis = self.analyze_semantics(doc_text, **kwargs)
+
+                        analysis["batch_index"] = idx
+                        if isinstance(item, dict) and "id" in item:
+                            analysis["document_id"] = item["id"]
+
+                        if "semantic_roles" in analysis:
+                            for role in analysis["semantic_roles"]:
+                                if "metadata" not in role:
+                                    role["metadata"] = {}
+
+                                role["metadata"]["batch_index"] = idx
+                                if isinstance(item, dict) and "id" in item:
+                                    role["metadata"]["document_id"] = item["id"]
+
+                        return idx, analysis
+                    except Exception as e:
+                        self.logger.warning(f"Failed to analyze item {idx}: {e}")
+                        return idx, {"error": str(e), "batch_index": idx}
+
+                if max_workers > 1:
+                    import concurrent.futures
+
+                    with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
+                        future_to_idx = {
+                            executor.submit(process_item, idx, item): idx
+                            for idx, item in enumerate(text)
+                        }
+
+                        for future in concurrent.futures.as_completed(future_to_idx):
+                            idx, analysis = future.result()
+                            results[idx] = analysis
+                            processed_count += 1
+
+                            should_update = (
+                                processed_count % update_interval == 0
+                                or processed_count == total_items
+                                or processed_count == 1
+                                or total_items <= 10
+                            )
+                            if should_update:
+                                remaining = total_items - processed_count
+                                self.progress_tracker.update_progress(
+                                    tracking_id,
+                                    processed=processed_count,
+                                    total=total_items,
+                                    message=f"Processing... {processed_count}/{total_items} (remaining: {remaining})"
+                                )
+                else:
+                    for idx, item in enumerate(text):
+                        _, analysis = process_item(idx, item)
+                        results[idx] = analysis
+                        processed_count += 1
+
+                        should_update = (
+                            processed_count % update_interval == 0
+                            or processed_count == total_items
+                            or processed_count == 1
+                            or total_items <= 10
+                        )
+                        if should_update:
+                            remaining = total_items - processed_count
+                            self.progress_tracker.update_progress(
+                                tracking_id,
+                                processed=processed_count,
+                                total=total_items,
+                                message=f"Processing... {processed_count}/{total_items} (remaining: {remaining})"
+                            )
+
+                self.progress_tracker.stop_tracking(
+                    tracking_id,
+                    status="completed",
+                    message=f"Batch analysis completed. Processed {len(results)} documents.",
+                )
+                return results
+
+            except Exception as e:
+                self.progress_tracker.stop_tracking(
+                    tracking_id, status="failed", message=str(e)
+                )
+                raise
+
+        else:
+            # Single item
+            return self.analyze_semantics(text, **kwargs)
 
     def analyze_semantics(self, text: str, **options) -> Dict[str, Any]:
         """
@@ -197,13 +343,13 @@ class SemanticAnalyzer:
         return self.label_semantic_roles(text, **options)
 
     def cluster_semantically(
-        self, texts: List[str], **options
+        self, texts: Union[List[str], List[Dict[str, Any]]], **options
     ) -> List[SemanticCluster]:
         """
         Perform semantic clustering of texts.
 
         Args:
-            texts: List of texts to cluster
+            texts: List of texts or documents to cluster
             **options: Clustering options
 
         Returns:
@@ -364,13 +510,19 @@ class SemanticClusterer:
         """Initialize semantic clusterer."""
         self.logger = get_logger("semantic_clusterer")
         self.config = config
+        # Initialize progress tracker and ensure it's enabled
+        self.progress_tracker = get_progress_tracker()
+        if not self.progress_tracker.enabled:
+            self.progress_tracker.enabled = True
 
-    def cluster(self, texts: List[str], **options) -> List[SemanticCluster]:
+    def cluster(
+        self, texts: Union[List[str], List[Dict[str, Any]]], **options
+    ) -> List[SemanticCluster]:
         """
         Perform semantic clustering of texts.
 
         Args:
-            texts: List of texts to cluster
+            texts: List of texts or documents (dict with 'content' and 'id') to cluster
             **options: Clustering options:
                 - num_clusters: Number of clusters (default: auto)
                 - similarity_threshold: Minimum similarity for clustering
@@ -381,38 +533,116 @@ class SemanticClusterer:
         if not texts:
             return []
 
-        similarity_threshold = options.get("similarity_threshold", 0.5)
-        similarity_analyzer = SimilarityAnalyzer()
+        # Extract content and IDs if input is list of dicts
+        processed_texts = []
+        doc_ids = []
+        
+        for item in texts:
+            if isinstance(item, dict):
+                content = item.get("content", str(item))
+                processed_texts.append(content)
+                if "id" in item:
+                    doc_ids.append(item["id"])
+                else:
+                    doc_ids.append(None)
+            else:
+                processed_texts.append(str(item))
+                doc_ids.append(None)
 
-        clusters = []
-        assigned = set()
+        # Track clustering
+        tracking_id = self.progress_tracker.start_tracking(
+            module="semantic_extract",
+            submodule="SemanticClusterer",
+            message=f"Clustering {len(processed_texts)} texts",
+        )
 
-        cluster_id = 0
-        for i, text1 in enumerate(texts):
-            if i in assigned:
-                continue
+        try:
+            similarity_threshold = options.get("similarity_threshold", 0.5)
+            similarity_analyzer = SimilarityAnalyzer()
 
-            cluster_texts = [text1]
-            assigned.add(i)
+            clusters = []
+            assigned = set()
 
-            # Find similar texts
-            for j, text2 in enumerate(texts[i + 1 :], start=i + 1):
-                if j in assigned:
+            total_texts = len(processed_texts)
+            if total_texts <= 10:
+                update_interval = 1  # Update every item for small datasets
+            else:
+                update_interval = max(1, min(10, total_texts // 100))
+            
+            # Initial progress update
+            remaining = total_texts
+            self.progress_tracker.update_progress(
+                tracking_id,
+                processed=0,
+                total=total_texts,
+                message=f"Clustering texts... 0/{total_texts} (remaining: {remaining})"
+            )
+
+            cluster_id = 0
+            for i, text1 in enumerate(processed_texts):
+                if i in assigned:
                     continue
 
-                similarity = similarity_analyzer.calculate_similarity(text1, text2)
-                if similarity >= similarity_threshold:
-                    cluster_texts.append(text2)
-                    assigned.add(j)
+                cluster_texts = [text1]
+                cluster_doc_ids = []
+                if doc_ids[i] is not None:
+                    cluster_doc_ids.append(doc_ids[i])
+                    
+                assigned.add(i)
 
-            # Create cluster
-            cluster = SemanticCluster(
-                texts=cluster_texts,
-                cluster_id=cluster_id,
-                centroid=cluster_texts[0],  # Use first as centroid
-                similarity_score=similarity_threshold,
+                # Find similar texts
+                remaining_texts = len(processed_texts) - (i + 1)
+                for j, text2 in enumerate(processed_texts[i + 1 :], start=i + 1):
+                    if j in assigned:
+                        continue
+
+                    similarity = similarity_analyzer.calculate_similarity(text1, text2)
+                    if similarity >= similarity_threshold:
+                        cluster_texts.append(text2)
+                        if doc_ids[j] is not None:
+                            cluster_doc_ids.append(doc_ids[j])
+                        assigned.add(j)
+
+                # Create cluster
+                cluster = SemanticCluster(
+                    texts=cluster_texts,
+                    cluster_id=cluster_id,
+                    centroid=cluster_texts[0],  # Use first as centroid
+                    similarity_score=similarity_threshold,
+                )
+                
+                # Add provenance metadata
+                if cluster_doc_ids:
+                    cluster.metadata["document_ids"] = cluster_doc_ids
+                
+                clusters.append(cluster)
+                cluster_id += 1
+                
+                remaining = total_texts - (i + 1)
+                # Update progress: always update for small datasets, or at intervals for large ones
+                should_update = (
+                    (i + 1) % update_interval == 0 or 
+                    (i + 1) == total_texts or 
+                    i == 0 or
+                    total_texts <= 10  # Always update for small datasets
+                )
+                if should_update:
+                    self.progress_tracker.update_progress(
+                        tracking_id,
+                        processed=i + 1,
+                        total=total_texts,
+                        message=f"Clustering texts... {i + 1}/{total_texts} (remaining: {remaining})"
+                    )
+
+            self.progress_tracker.stop_tracking(
+                tracking_id,
+                status="completed",
+                message=f"Created {len(clusters)} clusters",
             )
-            clusters.append(cluster)
-            cluster_id += 1
+            return clusters
 
-        return clusters
+        except Exception as e:
+            self.progress_tracker.stop_tracking(
+                tracking_id, status="failed", message=str(e)
+            )
+            raise

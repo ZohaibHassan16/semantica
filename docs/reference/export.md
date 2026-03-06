@@ -57,17 +57,51 @@
 ## ⚙️ Algorithms Used
 
 ### Serialization Algorithms
-- **RDF/XML Serialization**: W3C RDF/XML specification
-- **Turtle Serialization**: Compact RDF format with prefix compression
-- **JSON-LD Serialization**: JSON-based linked data with context
-- **GraphML Generation**: XML-based graph format
-- **Cypher Query Generation**: Neo4j query language generation
+
+**RDF/XML Serialization**:
+- **Standard**: W3C RDF/XML specification
+- **Format**: XML-based RDF representation
+- **Use case**: Interoperability with XML-based systems
+
+**Turtle Serialization**:
+- **Standard**: W3C Turtle specification
+- **Format**: Compact RDF format with prefix compression
+- **Use case**: Human-readable RDF representation
+
+**JSON-LD Serialization**:
+- **Standard**: W3C JSON-LD specification
+- **Format**: JSON-based linked data with context
+- **Use case**: Web APIs and JavaScript applications
+
+**GraphML Generation**:
+- **Format**: XML-based graph format
+- **Use case**: Graph visualization tools (Gephi, Cytoscape)
+
+**Cypher Query Generation**:
+- **Format**: Neo4j query language
+- **Use case**: Direct import into Neo4j graph database
 
 ### Export Optimization
-- **Streaming Export**: Memory-efficient export for large graphs
-- **Batch Processing**: Chunked export with configurable batch sizes
-- **Compression**: GZIP compression for large exports
-- **Incremental Export**: Export only changed data
+
+**Streaming Export**:
+- **Purpose**: Memory-efficient export for large graphs
+- **How it works**: Processes data in chunks without loading entire graph into memory
+- **Use case**: Exporting graphs with millions of nodes/edges
+
+**Batch Processing**:
+- **Purpose**: Efficient large-scale data export
+- **How it works**: Chunked export with configurable batch sizes
+- **Use case**: Exporting multiple graphs or large datasets
+
+**Compression**:
+- **Purpose**: Reduce file size for large exports
+- **How it works**: GZIP compression for large exports
+- **Use case**: Network transfer and storage optimization
+
+**Incremental Export**:
+- **Purpose**: Export only changed data
+- **How it works**: Tracks changes and exports only modified entities/relationships
+- **Use case**: Regular updates and synchronization
 
 ---
 
@@ -81,10 +115,10 @@ Export knowledge graphs to RDF formats (Turtle, RDF/XML, JSON-LD, N-Triples).
 
 | Method | Description | Algorithm |
 |--------|-------------|-----------|
-| `export(graph, filename, format)` | Export to RDF format | RDF serialization with format-specific encoding |
-| `export_knowledge_graph(kg, filename, format)` | Export knowledge graph | Knowledge graph to RDF conversion |
-| `serialize(graph, format)` | Serialize to string | In-memory RDF generation |
-| `validate_rdf(rdf_data)` | Validate RDF syntax | RDF schema validation |
+| `` `export(graph, filename, format)` `` | Export to RDF format | RDF serialization with format-specific encoding |
+| `` `export_knowledge_graph(kg, filename, format)` `` | Export knowledge graph | Knowledge graph to RDF conversion |
+| `` `serialize(graph, format)` `` | Serialize to string | In-memory RDF generation |
+| `` `validate_rdf(rdf_data)` `` | Validate RDF syntax | RDF schema validation |
 
 ### RDFSerializer
 
@@ -94,9 +128,9 @@ RDF serialization engine for format conversion.
 
 | Method | Description | Algorithm |
 |--------|-------------|-----------|
-| `serialize_to_turtle(rdf_data)` | Serialize to Turtle | Compact RDF format with prefix compression |
-| `serialize_to_rdfxml(rdf_data)` | Serialize to RDF/XML | XML-based RDF format |
-| `serialize_to_jsonld(rdf_data)` | Serialize to JSON-LD | JSON-based linked data format |
+| `` `serialize_to_turtle(rdf_data)` `` | Serialize to Turtle | Compact RDF format with prefix compression |
+| `` `serialize_to_rdfxml(rdf_data)` `` | Serialize to RDF/XML | XML-based RDF format |
+| `` `serialize_to_jsonld(rdf_data)` `` | Serialize to JSON-LD | JSON-based linked data format |
 
 ### RDFValidator
 
@@ -106,8 +140,8 @@ RDF validation engine for syntax and consistency checking.
 
 | Method | Description | Algorithm |
 |--------|-------------|-----------|
-| `validate_rdf_syntax(rdf_data, format)` | Validate RDF syntax | Format-specific syntax validation |
-| `check_rdf_consistency(rdf_data)` | Check consistency | Entity reference and structure validation |
+| `` `validate_rdf_syntax(rdf_data, format)` `` | Validate RDF syntax | Format-specific syntax validation |
+| `` `check_rdf_consistency(rdf_data)` `` | Check consistency | Entity reference and structure validation |
 
 ### NamespaceManager
 
@@ -117,9 +151,9 @@ RDF namespace management and conflict resolution.
 
 | Method | Description | Algorithm |
 |--------|-------------|-----------|
-| `extract_namespaces(rdf_data)` | Extract namespaces | Namespace discovery from RDF data |
-| `generate_namespace_declarations(namespaces, format)` | Generate declarations | Format-specific namespace declaration |
-| `resolve_conflicts(namespaces)` | Resolve conflicts | Prefix conflict resolution |
+| `` `extract_namespaces(rdf_data)` `` | Extract namespaces | Namespace discovery from RDF data |
+| `` `generate_namespace_declarations(namespaces, format)` `` | Generate declarations | Format-specific namespace declaration |
+| `` `resolve_conflicts(namespaces)` `` | Resolve conflicts | Prefix conflict resolution |
 
 **Supported RDF Formats:**
 
@@ -169,10 +203,10 @@ Export knowledge graphs to JSON formats including JSON-LD, Cytoscape.js, and D3.
 
 | Method | Description | Algorithm |
 |--------|-------------|-----------|
-| `export(graph, filename, format)` | Export to JSON | JSON serialization with schema |
-| `export_nodes(graph)` | Export nodes only | Node extraction and serialization |
-| `export_edges(graph)` | Export edges only | Edge extraction and serialization |
-| `export_cytoscape(graph)` | Export Cytoscape.js format | Cytoscape JSON generation |
+| `` `export(graph, filename, format)` `` | Export to JSON | JSON serialization with schema |
+| `` `export_nodes(graph)` `` | Export nodes only | Node extraction and serialization |
+| `` `export_edges(graph)` `` | Export edges only | Edge extraction and serialization |
+| `` `export_cytoscape(graph)` `` | Export Cytoscape.js format | Cytoscape JSON generation |
 | `export_d3(graph)` | Export D3.js format | D3 force-directed graph format |
 
 **JSON Formats:**
@@ -210,11 +244,11 @@ Export to graph visualization formats (GraphML, GEXF, DOT, Pajek).
 
 | Method | Description | Algorithm |
 |--------|-------------|-----------|
-| `export(graph, filename, format)` | Export to graph format | Format-specific serialization |
-| `to_graphml(graph, filename)` | Export to GraphML | XML-based graph format |
-| `to_gexf(graph, filename)` | Export to GEXF | Gephi exchange format |
-| `to_dot(graph, filename)` | Export to DOT | Graphviz format |
-| `to_pajek(graph, filename)` | Export to Pajek | Pajek network format |
+| `` `export(graph, filename, format)` `` | Export to graph format | Format-specific serialization |
+| `` `to_graphml(graph, filename)` `` | Export to GraphML | XML-based graph format |
+| `` `to_gexf(graph, filename)` `` | Export to GEXF | Gephi exchange format |
+| `` `to_dot(graph, filename)` `` | Export to DOT | Graphviz format |
+| `` `to_pajek(graph, filename)` `` | Export to Pajek | Pajek network format |
 
 **Graph Formats:**
 
@@ -250,9 +284,9 @@ Export to LPG (Labeled Property Graph) format for Neo4j, Memgraph, and similar d
 
 | Method | Description | Algorithm |
 |--------|-------------|-----------|
-| `export(knowledge_graph, file_path)` | Export to LPG format | Cypher query generation |
-| `export_knowledge_graph(kg, file_path)` | Export knowledge graph | Knowledge graph to Cypher conversion |
-| `generate_cypher(kg)` | Generate Cypher queries | CREATE/MERGE statement generation |
+| `` `export(knowledge_graph, file_path)` `` | Export to LPG format | Cypher query generation |
+| `` `export_knowledge_graph(kg, file_path)` `` | Export knowledge graph | Knowledge graph to Cypher conversion |
+| `` `generate_cypher(kg)` `` | Generate Cypher queries | CREATE/MERGE statement generation |
 
 **Cypher Generation:**
 ```cypher
@@ -289,10 +323,10 @@ Export to CSV format for spreadsheets and database imports.
 
 | Method | Description | Algorithm |
 |--------|-------------|-----------|
-| `export_nodes(graph, filename)` | Export nodes to CSV | Node flattening and CSV writing |
-| `export_edges(graph, filename)` | Export edges to CSV | Edge list CSV generation |
-| `export_combined(graph, prefix)` | Export nodes + edges | Separate CSV files |
-| `flatten_properties(properties)` | Flatten nested properties | Recursive property flattening |
+| `` `export_nodes(graph, filename)` `` | Export nodes to CSV | Node flattening and CSV writing |
+| `` `export_edges(graph, filename)` `` | Export edges to CSV | Edge list CSV generation |
+| `` `export_combined(graph, prefix)` `` | Export nodes + edges | Separate CSV files |
+| `` `flatten_properties(properties)` `` | Flatten nested properties | Recursive property flattening |
 
 **CSV Formats:**
 - **Nodes CSV**: id, label, properties (flattened)
@@ -325,10 +359,10 @@ Export vector embeddings to various formats.
 
 | Method | Description | Algorithm |
 |--------|-------------|-----------|
-| `export(vectors, filename, format)` | Export vectors | Format-specific vector serialization |
-| `export_numpy(vectors, filename)` | Export to NumPy | .npy format |
-| `export_hdf5(vectors, filename)` | Export to HDF5 | Hierarchical data format |
-| `export_parquet(vectors, filename)` | Export to Parquet | Columnar storage format |
+| `` `export(vectors, filename, format)` `` | Export vectors | Format-specific vector serialization |
+| `` `export_numpy(vectors, filename)` `` | Export to NumPy | .npy format |
+| `` `export_hdf5(vectors, filename)` `` | Export to HDF5 | Hierarchical data format |
+| `` `export_parquet(vectors, filename)` `` | Export to Parquet | Columnar storage format |
 
 **Example:**
 
@@ -349,9 +383,9 @@ Export ontologies to OWL format (OWL/XML, Turtle).
 
 | Method | Description | Algorithm |
 |--------|-------------|-----------|
-| `export(ontology, filename, format)` | Export ontology | OWL serialization |
-| `export_classes(classes, filename)` | Export classes | Class definition export |
-| `export_properties(properties, filename)` | Export properties | Property definition export |
+| `` `export(ontology, filename, format)` `` | Export ontology | OWL serialization |
+| `` `export_classes(classes, filename)` `` | Export classes | Class definition export |
+| `` `export_properties(properties, filename)` `` | Export properties | Property definition export |
 
 **Example:**
 
@@ -372,8 +406,8 @@ Export semantic networks to YAML format.
 
 | Method | Description | Algorithm |
 |--------|-------------|-----------|
-| `export(semantic_network, filename)` | Export semantic network | YAML serialization |
-| `export_semantic_network(semantic_network)` | Export to string | In-memory YAML generation |
+| `` `export(semantic_network, filename)` `` | Export semantic network | YAML serialization |
+| `` `export_semantic_network(semantic_network)` `` | Export to string | In-memory YAML generation |
 
 **Example:**
 
@@ -394,7 +428,7 @@ Export ontology schemas to YAML format.
 
 | Method | Description | Algorithm |
 |--------|-------------|-----------|
-| `export_ontology_schema(ontology, filename)` | Export ontology schema | YAML schema serialization |
+| `` `export_ontology_schema(ontology, filename)` `` | Export ontology schema | YAML schema serialization |
 
 **Example:**
 
@@ -415,8 +449,8 @@ Generate reports in multiple formats (HTML, Markdown, JSON, Text).
 
 | Method | Description | Algorithm |
 |--------|-------------|-----------|
-| `generate_report(data, filename, format)` | Generate report | Template-based report generation |
-| `generate_quality_report(metrics, filename, format)` | Generate quality report | Quality metrics aggregation |
+| `` `generate_report(data, filename, format)` `` | Generate report | Template-based report generation |
+| `` `generate_quality_report(metrics, filename, format)` `` | Generate quality report | Quality metrics aggregation |
 
 **Example:**
 
@@ -437,11 +471,11 @@ Registry for custom export methods.
 
 | Method | Description | Algorithm |
 |--------|-------------|-----------|
-| `register(task, name, method_func)` | Register method | Dictionary-based registration |
-| `get(task, name)` | Get method | Hash-based lookup |
-| `list_all(task)` | List methods | Method discovery |
-| `unregister(task, name)` | Unregister method | Method removal |
-| `clear(task)` | Clear methods | Registry cleanup |
+| `` `register(task, name, method_func)` `` | Register method | Dictionary-based registration |
+| `` `get(task, name)` `` | Get method | Hash-based lookup |
+| `` `list_all(task)` `` | List methods | Method discovery |
+| `` `unregister(task, name)` `` | Unregister method | Method removal |
+| `` `clear(task)` `` | Clear methods | Registry cleanup |
 
 **Global Instance:**
 - `method_registry`: Global method registry instance
@@ -466,10 +500,10 @@ Configuration manager for export module.
 
 | Method | Description | Algorithm |
 |--------|-------------|-----------|
-| `set(key, value)` | Set configuration | Configuration storage |
-| `get(key, default)` | Get configuration | Configuration retrieval |
-| `set_method_config(task, **config)` | Set method config | Method-specific configuration |
-| `get_method_config(task)` | Get method config | Method configuration retrieval |
+| `` `set(key, value)` `` | Set configuration | Configuration storage |
+| `` `get(key, default)` `` | Get configuration | Configuration retrieval |
+| `` `set_method_config(task, **config)` `` | Set method config | Method-specific configuration |
+| `` `get_method_config(task)` `` | Get method config | Method configuration retrieval |
 
 **Global Instance:**
 - `export_config`: Global export configuration instance
@@ -495,22 +529,22 @@ config = ExportConfig(config_file="config.yaml")
 
 | Function | Description | Format |
 |----------|-------------|--------|
-| `export_rdf(data, file_path, format)` | Export to RDF | turtle, rdfxml, jsonld, ntriples, n3 |
-| `export_json(data, file_path, format)` | Export to JSON | json, json-ld |
-| `export_csv(data, file_path)` | Export to CSV | csv |
-| `export_graph(graph_data, file_path, format)` | Export to graph format | graphml, gexf, dot |
-| `export_yaml(data, file_path, method)` | Export to YAML | semantic_network, schema |
-| `export_owl(ontology, file_path, format)` | Export to OWL | owl-xml, turtle |
-| `export_vector(vectors, file_path, format)` | Export vectors | json, numpy, binary, faiss |
-| `export_lpg(kg, file_path, method)` | Export to LPG | cypher, lpg |
-| `generate_report(data, file_path, format)` | Generate report | html, markdown, json, text |
+| `` `export_rdf(data, file_path, format)` `` | Export to RDF | turtle, rdfxml, jsonld, ntriples, n3 |
+| `` `export_json(data, file_path, format)` `` | Export to JSON | json, json-ld |
+| `` `export_csv(data, file_path)` `` | Export to CSV | csv |
+| `` `export_graph(graph_data, file_path, format)` `` | Export to graph format | graphml, gexf, dot |
+| `` `export_yaml(data, file_path, method)` `` | Export to YAML | semantic_network, schema |
+| `` `export_owl(ontology, file_path, format)` `` | Export to OWL | owl-xml, turtle |
+| `` `export_vector(vectors, file_path, format)` `` | Export vectors | json, numpy, binary, faiss |
+| `` `export_lpg(kg, file_path, method)` `` | Export to LPG | cypher, lpg |
+| `` `generate_report(data, file_path, format)` `` | Generate report | html, markdown, json, text |
 
 ### Registry Functions
 
 | Function | Description |
 |----------|-------------|
-| `get_export_method(task, name)` | Get registered export method |
-| `list_available_methods(task)` | List all available methods |
+| `` `get_export_method(task, name)` `` | Get registered export method |
+| `` `list_available_methods(task)` `` | List all available methods |
 
 **Example:**
 
@@ -596,17 +630,17 @@ export:
 
 ## Cookbook
 
-- [Export](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/introduction/15_Export.ipynb)
-- [Multi-Format Export](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/advanced/05_Multi_Format_Export.ipynb)
+Interactive tutorials to learn export capabilities:
 
+- **[Export](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/introduction/15_Export.ipynb)**: Export knowledge graphs to various formats
+  - **Topics**: RDF, JSON, CSV, OWL export, format conversion
+  - **Difficulty**: Intermediate
+  - **Use Cases**: Data export, format conversion, interoperability
 
-## Overview
-
-- **Multi-Format Export**: Support for 10+ export formats
-- **Graph Database Export**: Direct export to Neo4j, ArangoDB, Memgraph
-- **RDF Serialization**: W3C-compliant RDF formats
-- **Custom Serializers**: Extensible serialization framework
-- **Batch Export**: Efficient large-scale data export
+- **[Multi-Format Export](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/advanced/05_Multi_Format_Export.ipynb)**: Exporting to RDF, OWL, JSON-LD, and NetworkX formats
+  - **Topics**: Serialization, interoperability, multiple formats, batch export
+  - **Difficulty**: Intermediate
+  - **Use Cases**: Multi-format export, data interoperability
 
 ---
 
@@ -636,11 +670,11 @@ export:
 
 | Method | Description | Algorithm |
 |--------|-------------|-----------|
-| `export(graph, filename, format)` | Export to RDF format | RDF serialization with format-specific encoding |
-| `serialize(graph, format)` | Serialize to string | In-memory RDF generation |
-| `validate(rdf_data)` | Validate RDF syntax | RDF schema validation |
-| `add_namespace(prefix, uri)` | Add namespace | Prefix registration |
-| `set_base_uri(uri)` | Set base URI | Base URI configuration |
+| `` `export(graph, filename, format)` `` | Export to RDF format | RDF serialization with format-specific encoding |
+| `` `serialize(graph, format)` `` | Serialize to string | In-memory RDF generation |
+| `` `validate(rdf_data)` `` | Validate RDF syntax | RDF schema validation |
+| `` `add_namespace(prefix, uri)` `` | Add namespace | Prefix registration |
+| `` `set_base_uri(uri)` `` | Set base URI | Base URI configuration |
 
 **Supported RDF Formats:**
 
@@ -689,10 +723,10 @@ exporter.export(
 
 | Method | Description | Algorithm |
 |--------|-------------|-----------|
-| `export(graph, filename, format)` | Export to JSON | JSON serialization with schema |
-| `export_nodes(graph)` | Export nodes only | Node extraction and serialization |
-| `export_edges(graph)` | Export edges only | Edge extraction and serialization |
-| `export_cytoscape(graph)` | Export Cytoscape.js format | Cytoscape JSON generation |
+| `` `export(graph, filename, format)` `` | Export to JSON | JSON serialization with schema |
+| `` `export_nodes(graph)` `` | Export nodes only | Node extraction and serialization |
+| `` `export_edges(graph)` `` | Export edges only | Edge extraction and serialization |
+| `` `export_cytoscape(graph)` `` | Export Cytoscape.js format | Cytoscape JSON generation |
 | `export_d3(graph)` | Export D3.js format | D3 force-directed graph format |
 
 **JSON Formats:**
@@ -729,11 +763,11 @@ exporter.export_cytoscape(kg, "cytoscape.json")
 
 | Method | Description | Algorithm |
 |--------|-------------|-----------|
-| `export(graph, filename, format)` | Export to graph format | Format-specific serialization |
-| `to_graphml(graph, filename)` | Export to GraphML | XML-based graph format |
-| `to_gexf(graph, filename)` | Export to GEXF | Gephi exchange format |
-| `to_dot(graph, filename)` | Export to DOT | Graphviz format |
-| `to_pajek(graph, filename)` | Export to Pajek | Pajek network format |
+| `` `export(graph, filename, format)` `` | Export to graph format | Format-specific serialization |
+| `` `to_graphml(graph, filename)` `` | Export to GraphML | XML-based graph format |
+| `` `to_gexf(graph, filename)` `` | Export to GEXF | Gephi exchange format |
+| `` `to_dot(graph, filename)` `` | Export to DOT | Graphviz format |
+| `` `to_pajek(graph, filename)` `` | Export to Pajek | Pajek network format |
 
 **Graph Formats:**
 
@@ -768,11 +802,11 @@ exporter.to_dot(kg, "graph.dot")
 
 | Method | Description | Algorithm |
 |--------|-------------|-----------|
-| `export(graph, uri, username, password)` | Export to Neo4j | Cypher query execution |
-| `generate_cypher(graph)` | Generate Cypher queries | CREATE/MERGE statement generation |
-| `batch_import(graph, batch_size)` | Batch import | Chunked Cypher execution |
-| `create_indexes(properties)` | Create indexes | Index creation for performance |
-| `create_constraints(constraints)` | Create constraints | Uniqueness constraint creation |
+| `` `export(graph, uri, username, password)` `` | Export to Neo4j | Cypher query execution |
+| `` `generate_cypher(graph)` `` | Generate Cypher queries | CREATE/MERGE statement generation |
+| `` `batch_import(graph, batch_size)` `` | Batch import | Chunked Cypher execution |
+| `` `create_indexes(properties)` `` | Create indexes | Index creation for performance |
+| `` `create_constraints(constraints)` `` | Create constraints | Uniqueness constraint creation |
 
 **Cypher Generation:**
 ```cypher
@@ -813,10 +847,10 @@ print(cypher_queries)
 
 | Method | Description | Algorithm |
 |--------|-------------|-----------|
-| `export_nodes(graph, filename)` | Export nodes to CSV | Node flattening and CSV writing |
-| `export_edges(graph, filename)` | Export edges to CSV | Edge list CSV generation |
-| `export_combined(graph, prefix)` | Export nodes + edges | Separate CSV files |
-| `flatten_properties(properties)` | Flatten nested properties | Recursive property flattening |
+| `` `export_nodes(graph, filename)` `` | Export nodes to CSV | Node flattening and CSV writing |
+| `` `export_edges(graph, filename)` `` | Export edges to CSV | Edge list CSV generation |
+| `` `export_combined(graph, prefix)` `` | Export nodes + edges | Separate CSV files |
+| `` `flatten_properties(properties)` `` | Flatten nested properties | Recursive property flattening |
 
 **CSV Formats:**
 - **Nodes CSV**: id, label, properties (flattened)
@@ -848,10 +882,10 @@ exporter.export_combined(kg, prefix="graph")
 
 | Method | Description | Algorithm |
 |--------|-------------|-----------|
-| `export(embeddings, filename, format)` | Export vectors | Format-specific vector serialization |
-| `export_numpy(embeddings, filename)` | Export to NumPy | .npy format |
-| `export_hdf5(embeddings, filename)` | Export to HDF5 | Hierarchical data format |
-| `export_parquet(embeddings, filename)` | Export to Parquet | Columnar storage format |
+| `` `export(embeddings, filename, format)` `` | Export vectors | Format-specific vector serialization |
+| `` `export_numpy(embeddings, filename)` `` | Export to NumPy | .npy format |
+| `` `export_hdf5(embeddings, filename)` `` | Export to HDF5 | Hierarchical data format |
+| `` `export_parquet(embeddings, filename)` `` | Export to Parquet | Columnar storage format |
 
 ---
 

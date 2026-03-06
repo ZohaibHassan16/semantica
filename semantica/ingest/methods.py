@@ -150,6 +150,7 @@ from .email_ingestor import EmailData, EmailIngestor
 from .feed_ingestor import FeedData, FeedIngestor
 from .file_ingestor import FileIngestor, FileObject
 from .mcp_ingestor import MCPData, MCPIngestor
+from .ontology_ingestor import OntologyData, OntologyIngestor
 from .registry import method_registry
 from .repo_ingestor import RepoIngestor
 from .stream_ingestor import StreamIngestor, StreamProcessor
@@ -537,6 +538,66 @@ def ingest_email(
         raise
 
 
+def ingest_ontology(
+    source: Union[str, Path, List[Union[str, Path]]], method: str = "file", **kwargs
+) -> Union[OntologyData, List[OntologyData]]:
+    """
+    Ingest ontology from source (convenience function).
+
+    This is a user-friendly wrapper that ingests ontologies using the specified method.
+
+    Args:
+        source: Ontology file path, directory path, or list of paths
+        method: Ingestion method (default: "file")
+            - "file": Single file ingestion
+            - "directory": Directory ingestion with recursive scanning
+        **kwargs: Additional options passed to OntologyIngestor
+
+    Returns:
+        OntologyData, List[OntologyData] with ingestion results
+
+    Examples:
+        >>> from semantica.ingest.methods import ingest_ontology
+        >>> ontology = ingest_ontology("ontology.ttl")
+        >>> ontologies = ingest_ontology("./ontologies", method="directory")
+    """
+    # Check for custom method in registry
+    custom_method = method_registry.get("ontology", method)
+    if custom_method and custom_method != ingest_ontology:
+        try:
+            return custom_method(source, **kwargs)
+        except Exception as e:
+            logger.warning(
+                f"Custom method {method} failed: {e}, falling back to default"
+            )
+
+    try:
+        # Get config
+        config = ingest_config.get_method_config("ontology")
+        config.update(kwargs)
+
+        ingestor = OntologyIngestor(**config)
+
+        source_path = str(source) if isinstance(source, (str, Path)) else None
+        
+        if method == "file" and source_path:
+            if isinstance(source, list):
+                return [ingestor.ingest_ontology(str(s), **kwargs) for s in source]
+            return ingestor.ingest_ontology(source_path, **kwargs)
+        elif method == "directory" and source_path:
+             recursive = kwargs.get("recursive", ingest_config.get("recursive", True))
+             return ingestor.ingest_directory(source_path, recursive=recursive, **kwargs)
+        else:
+             # Default: try as file
+             if isinstance(source, list):
+                return [ingestor.ingest_ontology(str(s), **kwargs) for s in source]
+             return ingestor.ingest_ontology(str(source), **kwargs)
+
+    except Exception as e:
+        logger.error(f"Failed to ingest ontology: {e}")
+        raise
+
+
 def ingest_database(
     source: Union[str, Dict[str, Any]], method: Optional[str] = None, **kwargs
 ) -> Union[TableData, List[TableData], Dict[str, Any]]:
@@ -769,6 +830,7 @@ def ingest(
             - "repo": Repository ingestion
             - "email": Email ingestion
             - "db": Database ingestion
+            - "ontology": Ontology ingestion
         method: Optional specific ingestion method
         **kwargs: Additional options passed to ingestor
 
@@ -802,6 +864,8 @@ def ingest(
                 ("git@", "https://github.com", "https://gitlab.com")
             ):
                 source_type = "repo"
+            elif source_str.endswith((".ttl", ".owl", ".rdf", ".jsonld", ".n3", ".nt")):
+                source_type = "ontology"
             else:
                 source_type = "file"
         else:
@@ -830,6 +894,8 @@ def ingest(
             raise ProcessingError("Email ingestion requires configuration dictionary")
     elif source_type == "db":
         return {"data": ingest_database(sources, method=method, **kwargs)}
+    elif source_type == "ontology":
+        return {"ontology": ingest_ontology(sources, method=method or "file", **kwargs)}
     elif source_type == "mcp":
         return {"data": ingest_mcp(sources, method=method or "resources", **kwargs)}
     else:
@@ -909,5 +975,8 @@ method_registry.register("mcp", "default", ingest_mcp)
 method_registry.register("mcp", "resources", ingest_mcp)
 method_registry.register("mcp", "tools", ingest_mcp)
 method_registry.register("mcp", "all", ingest_mcp)
+method_registry.register("ontology", "default", ingest_ontology)
+method_registry.register("ontology", "file", ingest_ontology)
+method_registry.register("ontology", "directory", ingest_ontology)
 method_registry.register("ingest", "default", ingest)
 method_registry.register("ingest", "unified", ingest)
