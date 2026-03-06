@@ -32,6 +32,13 @@ _mock_psycopg2_extras = MagicMock()
 sys.modules["psycopg2"] = _mock_psycopg2
 sys.modules["psycopg2.extras"] = _mock_psycopg2_extras
 
+# Evict any cached import of age_store so it re-imports with our mock psycopg2,
+# even if other tests already loaded semantica (which would have cached the module
+# with its original psycopg2 binding, making the sys.modules patch above a no-op).
+for _key in list(sys.modules.keys()):
+    if "semantica" in _key and "age_store" in _key:
+        del sys.modules[_key]
+
 from semantica.graph_store.age_store import (
     ApacheAgeStore,
     _edge_to_rel_dict,
