@@ -819,7 +819,7 @@ class TestKGAlgorithmsRealWorld:
 
     def test_node_embedder_generates_embeddings(self):
         G = _build_nx_tech_graph()
-        embedder = NodeEmbedder()
+        embedder = NodeEmbedder(embedding_dimension=16, walk_length=10, num_walks=2, epochs=1)
         node_labels = list({data.get("type", "entity") for _, data in G.nodes(data=True)})
         rel_types = list({data.get("type", "related_to") for _, _, data in G.edges(data=True)})
         embeddings = embedder.compute_embeddings(G, node_labels=node_labels, relationship_types=rel_types)

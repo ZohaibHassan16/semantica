@@ -1982,7 +1982,7 @@ Entities found in text: {entities_str}"""
                     import sys
                     print("    [methods.extract_relations_llm] Typed result empty, attempting structured JSON fallback...", flush=True, file=sys.stdout)
                 raw_json = llm.generate_structured(prompt, **call_kwargs)
-                relations = _parse_relation_result(raw_json, original_entities, text, provider, model)
+                relations = _parse_relation_result(raw_json, original_entities, text, provider, model, extraction_method="llm_typed")
             except Exception as _e:
                 # Keep relations as empty if fallback fails
                 pass
