@@ -391,3 +391,28 @@ prod_manager = TemporalVersionManager(
 for version in prod_manager.list_versions():
     print(f"{version['timestamp']}: {version['description']} by {version['author']}")
 ```
+
+---
+
+## Ontology Diff & Migration
+
+Semantica allows you to treat ontology schema changes with the same rigor as database migrations. By comparing two versions, you can generate a machine-readable diff and a structured impact report to catch breaking changes before they reach production.
+
+
+### Comparing Versions
+
+The `OntologyEngine` provides a high-level API to orchestrate the comparison of two schema versions.
+
+```python
+from semantica.ontology.engine import OntologyEngine
+
+engine = OntologyEngine()
+
+# Generate a migration impact report between v1.0 and v2.0
+report = engine.compare_versions(
+    base_id="v1.0", 
+    target_id="v2.0"
+)
+
+print(f"Total changes detected: {report['summary']['total_changes']}")
+```
