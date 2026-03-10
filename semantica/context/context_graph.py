@@ -107,7 +107,7 @@ Production Use Cases:
 
 from collections import defaultdict, deque
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional, Set, Tuple, Union
 import uuid
 
@@ -127,6 +127,21 @@ except ImportError:
     KG_AVAILABLE = False
 
 
+def _parse_iso_dt(value: str) -> Optional[datetime]:
+    """Parse an ISO datetime string into a tz-naive UTC datetime.
+
+    Always returns a naive datetime in UTC so callers can compare uniformly
+    without worrying about mixed aware/naive arithmetic.
+    """
+    try:
+        dt = datetime.fromisoformat(str(value).replace("Z", "+00:00"))
+        if dt.tzinfo is not None:
+            dt = dt.astimezone(timezone.utc).replace(tzinfo=None)
+        return dt
+    except (ValueError, AttributeError):
+        return None
+
+
 @dataclass
 class ContextNode:
     """Context graph node (Internal implementation)."""
@@ -140,26 +155,22 @@ class ContextNode:
     valid_until: Optional[str] = None  # ISO datetime string; None = no expiry
 
     def is_active(self, at_time: Optional[datetime] = None) -> bool:
-        """Return True if this node is active at the given time (defaults to now)."""
+        """Return True if this node is active at the given time (defaults to now).
+
+        Both ``at_time`` and stored bounds are normalized to tz-naive UTC so that
+        callers may pass either aware or naive datetimes without raising TypeError.
+        """
         if self.valid_from is None and self.valid_until is None:
             return True
-        now = at_time or datetime.utcnow()
-        if self.valid_from is not None:
-            try:
-                start = datetime.fromisoformat(self.valid_from.replace("Z", "+00:00"))
-                start = start.replace(tzinfo=None)
-            except ValueError:
-                start = None
-            if start is not None and now < start:
-                return False
-        if self.valid_until is not None:
-            try:
-                end = datetime.fromisoformat(self.valid_until.replace("Z", "+00:00"))
-                end = end.replace(tzinfo=None)
-            except ValueError:
-                end = None
-            if end is not None and now > end:
-                return False
+        now = at_time if at_time is not None else datetime.utcnow()
+        if now.tzinfo is not None:
+            now = now.astimezone(timezone.utc).replace(tzinfo=None)
+        start = _parse_iso_dt(self.valid_from) if self.valid_from is not None else None
+        end = _parse_iso_dt(self.valid_until) if self.valid_until is not None else None
+        if start is not None and now < start:
+            return False
+        if end is not None and now > end:
+            return False
         return True
 
     def to_dict(self) -> Dict[str, Any]:
@@ -187,26 +198,22 @@ class ContextEdge:
     valid_until: Optional[str] = None  # ISO datetime string; None = no expiry
 
     def is_active(self, at_time: Optional[datetime] = None) -> bool:
-        """Return True if this edge is active at the given time (defaults to now)."""
+        """Return True if this edge is active at the given time (defaults to now).
+
+        Both ``at_time`` and stored bounds are normalized to tz-naive UTC so that
+        callers may pass either aware or naive datetimes without raising TypeError.
+        """
         if self.valid_from is None and self.valid_until is None:
             return True
-        now = at_time or datetime.utcnow()
-        if self.valid_from is not None:
-            try:
-                start = datetime.fromisoformat(self.valid_from.replace("Z", "+00:00"))
-                start = start.replace(tzinfo=None)
-            except ValueError:
-                start = None
-            if start is not None and now < start:
-                return False
-        if self.valid_until is not None:
-            try:
-                end = datetime.fromisoformat(self.valid_until.replace("Z", "+00:00"))
-                end = end.replace(tzinfo=None)
-            except ValueError:
-                end = None
-            if end is not None and now > end:
-                return False
+        now = at_time if at_time is not None else datetime.utcnow()
+        if now.tzinfo is not None:
+            now = now.astimezone(timezone.utc).replace(tzinfo=None)
+        start = _parse_iso_dt(self.valid_from) if self.valid_from is not None else None
+        end = _parse_iso_dt(self.valid_until) if self.valid_until is not None else None
+        if start is not None and now < start:
+            return False
+        if end is not None and now > end:
+            return False
         return True
 
     def to_dict(self) -> Dict[str, Any]:
@@ -323,7 +330,20 @@ class ContextGraph:
             # Extract content from properties if not explicit
             node_props = node.get("properties", {})
             content = node_props.get("content", node.get("id"))
-            metadata = {k: v for k, v in node_props.items() if k != "content"}
+            # Restore validity windows from properties (written there by ContextNode.to_dict)
+            # or from top-level keys on the node dict
+            valid_from = (
+                node.get("valid_from")
+                or node_props.get("valid_from")
+            )
+            valid_until = (
+                node.get("valid_until")
+                or node_props.get("valid_until")
+            )
+            metadata = {
+                k: v for k, v in node_props.items()
+                if k not in ("content", "valid_from", "valid_until")
+            }
 
             internal_node = ContextNode(
                 node_id=node.get("id"),
@@ -331,6 +351,8 @@ class ContextGraph:
                 content=content,
                 metadata=metadata,
                 properties=node_props,
+                valid_from=valid_from,
+                valid_until=valid_until,
             )
 
             if self._add_internal_node(internal_node):
@@ -350,12 +372,18 @@ class ContextGraph:
         """
         count = 0
         for edge in edges:
+            edge_props = edge.get("properties", {})
+            # Restore validity windows — ContextEdge.to_dict() writes them at top level
+            valid_from = edge.get("valid_from") or edge_props.get("valid_from")
+            valid_until = edge.get("valid_until") or edge_props.get("valid_until")
             internal_edge = ContextEdge(
                 source_id=edge.get("source_id"),
                 target_id=edge.get("target_id"),
                 edge_type=edge.get("type", "related_to"),
                 weight=edge.get("weight", 1.0),
-                metadata=edge.get("properties", {}),
+                metadata=edge_props,
+                valid_from=valid_from,
+                valid_until=valid_until,
             )
 
             if self._add_internal_edge(internal_edge):
@@ -737,11 +765,24 @@ class ContextGraph:
         link_id = str(uuid.uuid4())
         self._linked_graphs[link_id] = (other_graph, source_node_id, target_node_id)
 
-        # Record a lightweight marker edge so the link shows up in graph traversal
+        # Create a dedicated marker node so it is clearly typed and does not pollute
+        # the entity namespace. _add_internal_edge auto-creates missing targets as
+        # "entity" nodes — by pre-inserting a "cross_graph_link" node we prevent that.
+        marker_node_id = f"__cross_graph_{link_id}"
+        self._add_internal_node(
+            ContextNode(
+                node_id=marker_node_id,
+                node_type="cross_graph_link",
+                content=f"Cross-graph link → {target_node_id}",
+                metadata={"cross_graph": True, "link_id": link_id, "target_node_id": target_node_id},
+                properties={},
+            )
+        )
+        # Record a marker edge so the link shows up in graph traversal
         self._add_internal_edge(
             ContextEdge(
                 source_id=source_node_id,
-                target_id=f"__cross_graph_{link_id}",
+                target_id=marker_node_id,
                 edge_type=link_type,
                 weight=1.0,
                 metadata={"cross_graph": True, "link_id": link_id},
@@ -1106,26 +1147,38 @@ class ContextGraph:
 
     def to_dict(self) -> Dict[str, Any]:
         """Export graph to dictionary format."""
+        nodes_out = []
+        for n in self.nodes.values():
+            entry: Dict[str, Any] = {
+                "id": n.node_id,
+                "type": n.node_type,
+                "content": n.content,
+                "properties": n.properties,
+                "metadata": n.metadata,
+            }
+            if n.valid_from is not None:
+                entry["valid_from"] = n.valid_from
+            if n.valid_until is not None:
+                entry["valid_until"] = n.valid_until
+            nodes_out.append(entry)
+
+        edges_out = []
+        for e in self.edges:
+            entry = {
+                "source": e.source_id,
+                "target": e.target_id,
+                "type": e.edge_type,
+                "weight": e.weight,
+            }
+            if e.valid_from is not None:
+                entry["valid_from"] = e.valid_from
+            if e.valid_until is not None:
+                entry["valid_until"] = e.valid_until
+            edges_out.append(entry)
+
         return {
-            "nodes": [
-                {
-                    "id": n.node_id,
-                    "type": n.node_type,
-                    "content": n.content,
-                    "properties": n.properties,
-                    "metadata": n.metadata,
-                }
-                for n in self.nodes.values()
-            ],
-            "edges": [
-                {
-                    "source": e.source_id,
-                    "target": e.target_id,
-                    "type": e.edge_type,
-                    "weight": e.weight,
-                }
-                for e in self.edges
-            ],
+            "nodes": nodes_out,
+            "edges": edges_out,
             "statistics": {
                 "node_count": len(self.nodes),
                 "edge_count": len(self.edges),
@@ -1137,26 +1190,31 @@ class ContextGraph:
         # Clear existing graph
         self.nodes.clear()
         self.edges.clear()
-        
-        # Add nodes
+
+        # Add nodes — restore validity windows if present
         for node_data in graph_dict.get("nodes", []):
+            node_props = node_data.get("properties", {})
             node = ContextNode(
                 node_id=node_data["id"],
                 node_type=node_data["type"],
                 content=node_data.get("content", ""),
-                properties=node_data.get("properties", {}),
-                metadata=node_data.get("metadata", {})
+                properties=node_props,
+                metadata=node_data.get("metadata", {}),
+                valid_from=node_data.get("valid_from") or node_props.get("valid_from"),
+                valid_until=node_data.get("valid_until") or node_props.get("valid_until"),
             )
             self._add_internal_node(node)
-        
-        # Add edges
+
+        # Add edges — restore validity windows if present
         for edge_data in graph_dict.get("edges", []):
             edge = ContextEdge(
                 source_id=edge_data["source"],
                 target_id=edge_data["target"],
                 edge_type=edge_data["type"],
                 weight=edge_data.get("weight", 1.0),
-                metadata=edge_data.get("metadata", {})
+                metadata=edge_data.get("metadata", {}),
+                valid_from=edge_data.get("valid_from"),
+                valid_until=edge_data.get("valid_until"),
             )
             self._add_internal_edge(edge)
 
