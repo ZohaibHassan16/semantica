@@ -110,17 +110,18 @@ class VectorStore:
             self.progress_tracker.enabled = True
 
         self.backend = backend.lower()
-        
+        self.dimension = self.config.get("dimension", 768)
+
         # Initialize backend-specific store if not using generic in-memory implementation
         self._backend_store = None
+        self.embedder = None  # Always initialized; may be overridden in _init_backend_store
         if self.backend != "inmemory":
             self._init_backend_store()
-        
+
         # For in-memory backend, initialize local storage
         if self.backend == "inmemory":
             self.vectors: Dict[str, np.ndarray] = {}
             self.metadata: Dict[str, Dict[str, Any]] = {}
-            self.dimension = self.config.get("dimension", 768)
 
             # Initialize backend-specific indexer
             # Avoid duplicate dimension argument
@@ -132,6 +133,15 @@ class VectorStore:
                 backend=backend, dimension=self.dimension, **indexer_config
             )
             self.retriever = VectorRetriever(backend=backend, **self.config)
+
+            # Initialize embedding and decision components for inmemory backend
+            try:
+                self.embedder = EmbeddingGenerator()
+            except Exception as e:
+                self.logger.warning(f"Could not initialize embedding generator: {e}")
+                self.embedder = None
+            self.hybrid_calculator = HybridSimilarityCalculator()
+            self.decision_pipeline: Optional[DecisionEmbeddingPipeline] = None
 
     def _init_backend_store(self):
         """Initialize backend-specific store instance."""
@@ -480,8 +490,9 @@ class VectorStore:
             self.progress_tracker.update_tracking(
                 tracking_id, message="Storing vectors..."
             )
+            start_idx = len(self.vectors)
             for i, (vector, meta) in enumerate(zip(vectors, metadata)):
-                vector_id = f"vec_{len(self.vectors) + i}"
+                vector_id = f"vec_{start_idx + i}"
                 self.vectors[vector_id] = vector
                 self.metadata[vector_id] = meta
                 vector_ids.append(vector_id)
@@ -771,12 +782,21 @@ class VectorStore:
         Returns:
             List of processed decision results
         """
-        if not self.decision_pipeline:
-            raise RuntimeError("Decision pipeline not initialized. Call initialize_decision_pipeline() first.")
-        
-        return self.decision_pipeline.process_decision_batch(
-            decisions, batch_size=batch_size
-        )
+        if self.decision_pipeline:
+            return self.decision_pipeline.process_decision_batch(
+                decisions, batch_size=batch_size
+            )
+
+        # Fallback: process each decision individually using store_decision
+        results = []
+        for decision in decisions:
+            try:
+                vector_id = self.store_decision(**decision)
+                results.append({"vector_id": vector_id, "status": "success"})
+            except Exception as e:
+                self.logger.warning(f"Failed to process decision: {e}")
+                results.append({"vector_id": None, "status": "error", "error": str(e)})
+        return results
 
     def search_decisions(
         self,

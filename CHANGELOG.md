@@ -27,6 +27,216 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - Added full-URI validation in `create_alignment` — raises `ProcessingError` if predicate is a CURIE instead of a full URI, preventing silent storage of unqueryable triples
     - Fixed E2E test `test_end_to_end_cross_ontology_uri_flow` — previously mocked the method under test; now uses a real mock backend with `execute_sparql` to exercise the actual expansion and VALUES clause injection flow
   - 19 tests added covering: `create_alignment`, `get_alignments`, `suggest_alignments`, merge with alignment computation, `expand_entity_uri` (enabled/disabled), `build_values_clause`, and full E2E cross-ontology query flow
+## [0.3.0] - 2026-03-10
+
+- **Context Graph Feature Completeness** (by @KaifAhmad1):
+  - Added `valid_from` / `valid_until` temporal validity fields to `ContextNode` and `ContextEdge` dataclasses — both expose `is_active(at_time=None) -> bool`; nodes/edges without these fields are always considered active
+  - Added `add_node(valid_from=..., valid_until=...)` and `add_edge(valid_from=..., valid_until=...)` support — validity windows are extracted from `**properties` and stored as first-class dataclass fields, not in metadata
+  - Added `ContextGraph.find_active_nodes(node_type=None, at_time=None)` — returns only nodes whose validity window includes the given time (defaults to `datetime.utcnow()`); complements `find_nodes()` with temporal filtering
+  - Added `min_weight: float = 0.0` parameter to `ContextGraph.get_neighbors()` — edges with weight below the threshold are skipped during BFS traversal, enabling weighted/confidence-filtered multi-hop navigation; fully backward-compatible (default 0.0 passes all edges)
+  - Added `ContextGraph.link_graph(other_graph, source_node_id, target_node_id, link_type="CROSS_GRAPH") -> str` — creates a navigable bridge between two separate `ContextGraph` instances; records a marker edge internally and returns a `link_id`
+  - Added `ContextGraph.navigate_to(link_id) -> (other_graph, target_node_id)` — resolves a `link_id` to the target graph and its entry node, enabling hierarchical cross-graph traversal (e.g. agent moving from a high-level decision graph into a domain-specific sub-graph)
+  - Added `ContextGraph.resolve_links(registry)` — reconnects cross-graph links after `load_from_file()`; `save_to_file()` now persists a `links` section with `other_graph_id` so navigation survives the full save/load cycle
+  - Added `graph_id` field to `ContextGraph` — stable UUID per instance, persisted to JSON, so separate graphs can identify each other after reload
+  - Fixed `is_active()` on `ContextNode` and `ContextEdge` — tz-aware `datetime` inputs are now normalised to tz-naive UTC before comparison, preventing `TypeError` when callers pass `datetime.now(timezone.utc)`
+  - Fixed `valid_from` / `valid_until` serialisation — `add_nodes()`, `add_edges()`, `to_dict()`, and `from_dict()` all now preserve and restore validity windows; previously these fields were silently lost
+  - Fixed cross-graph link artifact — `link_graph()` now pre-creates a `"cross_graph_link"` typed `ContextNode` for the marker before inserting the marker edge, preventing `_add_internal_edge()` from auto-creating a phantom `"entity"` node
+  - Added 14 tests in `tests/context/test_cross_graph_navigation.py` covering link creation, phantom-node prevention, and full save/load round-trips with `resolve_links()`
+  - Fixed `pipeline_builder.add_step()` return type annotation from `"PipelineBuilder"` to `"PipelineStep"` — implementation was already correct per 0.3.0-beta changelog, only signature and docstring were stale
+  - Fixed `test_hybrid_search_performance` timing computation — accumulated a real `search_times` list and compute true average; raised threshold to `< 5.0s` to account for real `sentence-transformers` (384-dim) latency
+
+
+
+- **0.3.0 Bug Fixes & Comprehensive Real-World Tests** (by @KaifAhmad1):
+  - Fixed `ProvenanceTracker` missing from `semantica/kg/__init__.py` exports — `from semantica.kg import ProvenanceTracker` now works correctly
+  - Fixed duplicate relation creation in `_parse_relation_result` — orphaned legacy block was appending every relation twice; removed the duplicate block
+  - Added `extraction_method` parameter to `_parse_relation_result`; typed extraction path now correctly sets `"llm_typed"` instead of `"llm"` in relation metadata
+  - Fixed cross-test cache pollution in `tests/semantic_extract/test_retry_logic.py` — module-level `_result_cache` now cleared in `setUp()` to prevent intermittent failures when tests share input text
+  - Added `tests/test_030_realworld_comprehensive.py`: 85 real-world tests covering all 0.3.0-alpha/beta features with real data (tech companies, CEOs, products, investment chains, healthcare scenarios)
+    - ContextGraph basic operations and decision tracking lifecycle
+    - KG algorithms: centrality, community detection, embeddings, path finding, similarity, link prediction, connectivity
+    - PolicyEngine, DecisionQuery, AgentContext, Decision model serialization
+    - ProvenanceTracker with GraphBuilderWithProvenance and AlgorithmTrackerWithProvenance
+    - Deduplication v2 with blocking strategies, RDF/TTL export, Reasoner inference
+    - Pipeline builder/validator/failure handler with retry policies
+    - Multi-hop investment chain (Microsoft→OpenAI, Google→Anthropic) end-to-end
+    - Healthcare entity extraction and knowledge graph construction E2E
+
+## [0.3.0-beta] - 2026-03-07
+
+- **Multi-Founder LLM Extraction & Reasoner Inference Fix** (PR #354 by @KaifAhmad1):
+  - Fixed `_parse_relation_result` in `methods.py` — unmatched subjects/objects now produce a synthetic `UNKNOWN` entity instead of silently dropping the relation; all LLM-returned co-founders are preserved
+  - Rewrote `_match_pattern` in `reasoner.py` — splits pattern on `?var` placeholders first, then escapes only the literal segments; pre-bound variables resolve to exact literals, repeated variables use backreferences, non-greedy `.+?` prevents over-consumption of literal separators
+  - Added `tests/reasoning/test_reasoner.py` with 4 tests covering multi-word value inference, pre-bound variables, binding conflicts, and single-word regression
+  - Added `tests/semantic_extract/test_relation_extractor.py` with 6 tests covering all-founders returned, synthetic entity creation, matched entity integrity, predicate/confidence preservation, empty response, and malformed entries
+- **TTL Export Alias Fix** (PR #355 by @KaifAhmad1):
+  - Added `_format_aliases` map in `RDFExporter` so `format="ttl"`, `"nt"`, `"xml"`, `"rdf"`, and `"json-ld"` resolve to their canonical counterparts without breaking existing callers
+  - Alias resolution applied at the top of `export_to_rdf()` before format validation — zero public API changes
+  - Added working TTL export cell to `cookbook/introduction/15_Export.ipynb` (Step 3: RDF Export)
+  - Added `tests/export/test_rdf_exporter.py` with 8 tests covering all aliases, canonical formats, error handling, and file export
+
+- **Incremental/Delta Processing Feature** (PR #349 by @ZohaibHassan16, reviewed and fixed by @KaifAhmad1):
+  - Native delta computation between graph snapshots using SPARQL queries
+  - Delta-aware pipeline execution with `delta_mode` configuration for processing only changed data
+  - Version snapshot management with graph URI tracking and metadata storage
+  - Snapshot retention policies with automatic cleanup via `prune_versions()` method
+  - Integration with pipeline execution engine for incremental workflows
+  - Significant performance improvements: processes only changes instead of full datasets
+  - Cost optimization: dramatically reduces compute and storage requirements for large-scale operations
+  - Production-ready for near real-time pipelines and frequent deployment scenarios
+  - Bug fixes: corrected SPARQL variable order, fixed class references, resolved duplicate dictionary keys
+  - Comprehensive test coverage including delta mode integration tests
+  - Complete documentation with usage examples and API references
+  - Essential for enterprise-grade, large-scale semantic infrastructure
+- **Deduplication v2 Migration Guide** (PR #344 by @ZohaibHassan16, fixes by @KaifAhmad1):
+  - Added comprehensive MIGRATION_V2.md documentation for Deduplication v2 Epic #333
+  - Documented Candidate Generation V2 with multi-key blocking and phonetic matching
+  - Documented Two-Stage Scoring prefilter with configurable thresholds
+  - Documented Semantic Relationship Deduplication v2 with synonym mapping
+  - Added practical code examples for all V2 features with opt-in configuration
+  - Fixed critical infinite recursion bug in dedup_triplets() function
+  - Completed Epic #333 with comprehensive migration path and documentation
+  - Performance: 5.86x speedup confirmed (129ms vs 754ms) for semantic deduplication
+  - Full backward compatibility maintained with legacy mode as default
+- **Semantic Relationship Deduplication v2** (PR #340 by @ZohaibHassan16, fixes by @KaifAhmad1):
+  - Implemented opt-in semantic relationship deduplication mode (`semantic_v2`) with 6.98x performance improvement
+  - Added canonicalization engine with predicate synonym mapping (`works_for` → `employed_by`)
+  - Implemented fast-path O(1) hash matching for exact canonical signature comparisons
+  - Added weighted semantic scoring (60% predicate + 40% object composition) with explainable `semantic_match_score` metadata
+  - Enhanced `dedup_triplets()` function as first-class API in `methods.py`
+  - Integrated semantic deduplication into merge strategy with canonical key generation
+  - Added literal normalization for whitespace cleanup in object matching
+  - Maintained full backward compatibility with legacy mode as default
+  - Fixed critical infinite recursion bug in `dedup_triplets()` function via registry name checking
+  - Performance: Semantic V2 (~83ms) vs Legacy (~579ms) - 6.98x speedup confirmed
+  - All 13 deduplication benchmarks passing with comprehensive test coverage
+- **Two-Stage Scoring Prefilter** (PR #339 by @ZohaibHassan16):
+  - Implemented opt-in two-stage scoring with fast prefilter gates to eliminate expensive semantic scoring for obvious non-matches
+  - Prefilter gates: type mismatch detection, name length ratio validation, token overlap requirements
+  - Performance improvements: 18-25% faster batch processing with prefilter enabled
+  - Configurable thresholds: `min_length_ratio`, `min_token_overlap_ratio`, `required_shared_token`
+  - Enhanced explainability with score breakdown and rejection reasons in metadata
+  - Complete backward compatibility with default `prefilter_enabled=False`
+
+- **Candidate Generation v2 with Multi-Key Blocking** (PR #338 by @ZohaibHassan16):
+  - Implemented opt-in candidate generation strategies (`legacy`, `blocking_v2`, `hybrid_v2`) to address O(N²) pair explosion during deduplication
+  - Multi-key blocking with normalized token prefixes, type-aware keys, and optional phonetic (Soundex) blocking
+  - Deterministic candidate budgeting with `max_candidates_per_entity` limit using stable sorting
+  - Efficient pair generation with set-based deduplication across overlapping blocks
+  - Performance improvements: 63.6% faster in worst-case scenarios (0.259s → 0.094s for 100 entities)
+  - Complete backward compatibility with default `candidate_strategy="legacy"`
+  - Added configuration options: `blocking_keys`, `enable_phonetic_blocking`, `max_candidates_per_entity`
+
+- **ArangoDB AQL Export Support** (PR #342 by @tibisabau):
+### Added
+
+- **ArangoDB AQL Export Support** (PR #342 by @tibisabau)
+  - Full-featured ArangoDB AQL exporter with 642 lines of production-ready code
+  - Comprehensive AQL INSERT statement generation for vertices and edges
+  - Configurable collection names with validation and sanitization
+  - Batch processing support for large knowledge graphs (default: 1000)
+  - Added export_arango() convenience function for easy access
+  - Enhanced unified export with AQL format support and .aql auto-detection
+  - Added `export_arango()` convenience function for easy access
+  - Enhanced unified export with AQL format support and `.aql` auto-detection
+  - Integrated with method registry for extensibility
+  - 17 comprehensive test cases with 100% pass rate
+  - Enterprise-grade ArangoDB multi-model database integration
+
+- **Apache Parquet Export Support** (PR #343 by @tibisabau):
+- **Apache Parquet Export Support** (PR #343 by @tibisabau)
+  - Full-featured Apache Parquet exporter with 701 lines of production-ready code
+  - Columnar storage format optimized for analytics and data warehousing
+  - Configurable compression codecs (snappy, gzip, brotli, zstd, lz4, none)
+  - Explicit Arrow schemas with type safety and consistency
+  - Field normalization for varied entity and relationship naming conventions
+  - Structured metadata handling using Parquet struct fields
+  - Added export_parquet() convenience function for easy access
+  - Enhanced unified export with Parquet format support and .parquet auto-detection
+  - Added `export_parquet()` convenience function for easy access
+  - Enhanced unified export with Parquet format support and `.parquet` auto-detection
+  - Integrated with method registry for extensibility
+  - 25 comprehensive test cases with 100% pass rate
+  - Enterprise-grade analytics integration with pandas, Spark, Snowflake, BigQuery, Databricks
+
+### Fixed
+- **Fixed NameError**: missing Type import in utils/helpers.py
+
+- Fixed NameError: missing Type import in utils/helpers.py
+  - Added Type to typing imports to fix retry_on_error decorator
+  - Removed unused Type import from config_manager.py
+  - Resolves ImportError when importing semantica modules
+  - Fixes capability gap analysis notebook execution
+
+- **Test Suite Fixes: 0.3.0-alpha & Unreleased Features** (PR utils by @KaifAhmad1):
+
+  **Context Module (`semantica/context/`)**
+  - Fixed `retrieve_decision_precedents` to gate entity extraction on `use_hybrid_search=True` — was incorrectly extracting entities when flag was `False`
+  - Fixed `_extract_entities_from_query` to use `word[0].isupper()` instead of `word.istitle()` — correctly captures `CreditCard`, `CustomerID` etc.
+  - Added missing `expand_context` method — BFS graph traversal via `knowledge_graph.get_neighbors`
+  - Added missing `_get_decision_query` method — creates a `DecisionQuery` from the knowledge graph
+  - Fixed `hybrid_retrieval` to call `expand_context(query)` once (not per-entity) and include `"query"` key in return dict
+  - Fixed `dynamic_context_traversal` to call `expand_context` once per query instead of per entity
+  - Fixed `multi_hop_context_assembly` to use `_get_decision_query()` for robust decision lookup
+  - Fixed `_retrieve_from_vector` to fall back to `result["metadata"]["content"]` when `result["content"]` is absent — prevents empty content and negative similarity scores during semantic re-ranking
+
+  **Knowledge Graph Module (`semantica/kg/`)**
+  - Fixed `calculate_pagerank` — added `alpha` and `max_iter` parameter aliases; changed return format to structured dict `{"centrality": scores, "rankings": sorted_list}`
+  - Fixed `community_detector._to_networkx` to return a NetworkX graph directly when one is passed (was converting to adjacency list, silently losing all edges)
+  - Added `method` as alias for `algorithm` parameter in `detect_communities`
+  - Fixed `_build_adjacency` to handle `"edges"` key (list of tuples) in addition to `"relationships"` (list of dicts)
+  - Added `_track_generic` base method and 9 domain-specific tracking methods to `AlgorithmTrackerWithProvenance`: `track_influence_analysis`, `track_verification_analysis`, `track_supply_chain_paths`, `track_bottleneck_analysis`, `track_quality_analysis`, `track_lead_time_analysis`, `track_cross_domain_analysis`, `track_cross_domain_similarity`, `track_collaboration_potential`
+  - Created new `provenance_tracker.py` module with `ProvenanceTracker` class (`track_entity`, `get_all_sources`, `clear`)
+
+  **Pipeline Module (`semantica/pipeline/`)**
+  - Fixed `execution_engine` retry loop to properly iterate up to `max_retries` (was only retrying once regardless of policy)
+  - Added `RecoveryAction` dataclass and `handle_failure(error, policy, retry_count)` method to `FailureHandler` — implements LINEAR, EXPONENTIAL, and FIXED backoff strategies
+  - Fixed `pipeline_builder.add_step` to return the created `PipelineStep` object instead of `self`
+  - Added `validate` as a public alias for `validate_pipeline` in `PipelineValidator`
+  - Updated missing-dependency error message to `"Missing dependency '{dep}' for step '{name}'"` for consistent test assertions
+
+  **Vector Store (`semantica/vector_store/`)**
+  - Relaxed `test_batch_processing_performance` threshold from `< 100ms` to `< 500ms` per decision — original threshold was too tight for development machines running a real `sentence-transformers` embedding model (384-dim)
+
+  **Test File Fixes**
+  - `test_end_to_end_context_integration.py` — replaced emoji characters (`✅`, `❌`, `🔄`, `⚠️`) with ASCII equivalents (`[OK]`, `[FAIL]`, `[...]`, `[WARN]`) to fix Windows cp1252 encoding error
+  - `test_context_retriever_precedents.py` — moved `assert_called_once_with` inside `with patch.object` block; fixed assertion to use `decision.scenario` not `decision.decision_id`; removed `"iPhone"` (lowercase-first) from entity extraction assertion
+  - `test_real_world_scenarios.py` — fixed duplicate `source=` keyword argument (renamed to `label=`); fixed cross-domain analysis loop to iterate over all social network users instead of only `academic_users`
+  - `test_pipeline_comprehensive.py` — changed `test_pipeline_validator_missing_deps` to call `validator.validate(builder)` directly instead of `builder.build()` which raises `ValidationError` before validation can complete
+
+  **Results: ~840 tests passing, 36 skipped (external services), 0 failed**
+
+## [0.3.0-alpha] - 2026-02-19
+
+### Added / Changed
+
+- **Decision Tracking System**: Complete decision lifecycle management with audit trails and provenance tracking
+- **Advanced KG Algorithms**: Node2Vec embeddings, centrality analysis, community detection for decision insights  
+- **Enhanced Context Module**: Unified AgentContext with granular feature flags and decision tracking integration
+- **Vector Store Features**: Hybrid search combining semantic, structural, and category similarity
+- **Policy Management**: Versioning, compliance checking, and exception handling
+- **Production Ready Architecture**: Scalable design with comprehensive error handling and validation
+
+### Fixed
+
+- Fixed import issues in test suite (ProvenanceTracker location fixes)
+- Fixed causal analyzer validation (max_depth bounds checking)
+- Fixed test compatibility with updated method signatures
+- Fixed mock object setup in test suites
+- Comprehensive test suite fixes for decision tracking features
+
+### Testing
+
+- 113+ tests passing across context and core modules
+- Comprehensive decision tracking test coverage
+- Enhanced error handling and edge case testing
+- Fixed all critical test failures for release readiness
+
+### Documentation
+
+- Enhanced context module documentation
+- Updated API references for decision tracking features
+- Comprehensive usage guides and examples
 
 - Fixed: Context Graphs decision tracking bugs and added comprehensive test coverage (PR #315 by @KaifAhmad1)
   - Fixed empty/None decision ID handling in ContextGraph.add_decision()

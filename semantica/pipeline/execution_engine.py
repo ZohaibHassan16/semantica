@@ -283,30 +283,49 @@ class ExecutionEngine:
                 step.status = StepStatus.FAILED
                 step.error = e
 
-                # Handle failure
-                recovery_result = self.failure_handler.handle_step_failure(step, e)
-                if not recovery_result.get("retry", False):
-                    self.progress_tracker.stop_tracking(
-                        step_tracking_id, status="failed", message=str(e)
-                    )
-                    raise
-                else:
-                    # Retry step
+                # Retry loop respecting max_retries from the policy
+                retry_policy = self.failure_handler.get_retry_policy(step.step_type)
+                max_retries = retry_policy.max_retries if retry_policy else 0
+                retry_count = 0
+                success = False
+
+                while retry_count < max_retries:
+                    recovery_result = self.failure_handler.handle_step_failure(step, e)
+                    if not recovery_result.get("retry", False):
+                        break
+                    retry_delay = recovery_result.get("retry_delay", 0.0)
+                    if retry_delay > 0:
+                        time.sleep(retry_delay)
                     self.progress_tracker.update_tracking(
                         step_tracking_id,
                         status="running",
-                        message=f"Retrying step: {step.name}",
+                        message=f"Retrying step: {step.name} (attempt {retry_count + 1})",
                     )
                     step.status = StepStatus.RUNNING
-                    step_result = self._execute_step(step, current_data, **options)
-                    step.status = StepStatus.COMPLETED
-                    step.result = step_result
-                    current_data = step_result
+                    try:
+                        step_result = self._execute_step(step, current_data, **options)
+                        step.status = StepStatus.COMPLETED
+                        step.result = step_result
+                        current_data = step_result
+                        success = True
+                        break
+                    except Exception as retry_e:
+                        step.status = StepStatus.FAILED
+                        step.error = retry_e
+                        e = retry_e
+                        retry_count += 1
+
+                if success:
                     self.progress_tracker.stop_tracking(
                         step_tracking_id,
                         status="completed",
                         message=f"Retry successful: {step.name}",
                     )
+                else:
+                    self.progress_tracker.stop_tracking(
+                        step_tracking_id, status="failed", message=str(e)
+                    )
+                    raise e
 
         return current_data
 

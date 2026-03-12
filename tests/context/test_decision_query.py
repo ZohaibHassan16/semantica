@@ -177,7 +177,7 @@ class TestDecisionQuery:
             }
         ]
         
-        decisions = decision_engine.find_by_category(category, limit)
+        decisions = decision_query.find_by_category(category, limit)
         
         assert len(decisions) == 2
         assert all(d.category == category for d in decisions)
@@ -189,7 +189,7 @@ class TestDecisionQuery:
         """Test finding decisions by category with no results."""
         mock_graph_store.execute_query.return_value = []
         
-        decisions = decision_engine.find_by_category("nonexistent_category", 10)
+        decisions = decision_query.find_by_category("nonexistent_category", 10)
         
         assert len(decisions) == 0
     
@@ -211,14 +211,14 @@ class TestDecisionQuery:
             }
         ]
         
-        decisions = decision_engine.find_by_entity(entity_id, limit)
+        decisions = decision_query.find_by_entity(entity_id, limit)
         
         assert len(decisions) == 1
         
-        # Verify query was called with correct entity
+        # Verify query was called with correct entity in params
         call_args = mock_graph_store.execute_query.call_args
-        query = call_args[0][0]
-        assert entity_id in query
+        params = call_args[0][1]
+        assert params["entity_id"] == entity_id
     
     def test_find_by_time_range_success(self, decision_query, mock_graph_store):
         """Test finding decisions by time range."""
@@ -239,7 +239,7 @@ class TestDecisionQuery:
             }
         ]
         
-        decisions = decision_engine.find_by_time_range(start_time, end_time, limit)
+        decisions = decision_query.find_by_time_range(start_time, end_time, limit)
         
         assert len(decisions) == 1
         
@@ -255,7 +255,7 @@ class TestDecisionQuery:
         end_time = datetime.now() - timedelta(days=1)  # End before start
         
         with pytest.raises(ValueError, match="End time must be after start time"):
-            decision_engine.find_by_time_range(start_time, end_time, 10)
+            decision_query.find_by_time_range(start_time, end_time, 10)
     
     def test_multi_hop_reasoning_success(self, decision_query, mock_graph_store):
         """Test multi-hop reasoning."""
@@ -277,7 +277,7 @@ class TestDecisionQuery:
             }
         ]
         
-        decisions = decision_engine.multi_hop_reasoning(start_entity, query_context, max_hops)
+        decisions = decision_query.multi_hop_reasoning(start_entity, query_context, max_hops)
         
         assert len(decisions) == 1
         assert decisions[0].decision_id == "decision_001"
@@ -290,10 +290,10 @@ class TestDecisionQuery:
     def test_multi_hop_reasoning_invalid_max_hops(self, decision_query):
         """Test multi-hop reasoning with invalid max hops."""
         with pytest.raises(ValueError, match="max_hops must be between 1 and 10"):
-            decision_engine.multi_hop_reasoning("entity", "query", 0)
+            decision_query.multi_hop_reasoning("entity", "query", 0)
         
         with pytest.raises(ValueError, match="max_hops must be between 1 and 10"):
-            decision_engine.multi_hop_reasoning("entity", "query", 11)
+            decision_query.multi_hop_reasoning("entity", "query", 11)
     
     def test_trace_decision_path_success(self, decision_query, mock_graph_store):
         """Test tracing decision paths."""
@@ -311,7 +311,7 @@ class TestDecisionQuery:
             }
         ]
         
-        paths = decision_engine.trace_decision_path(decision_id, relationship_types)
+        paths = decision_query.trace_decision_path(decision_id, relationship_types)
         
         assert len(paths) == 2
         assert paths[0]["path"] == "mock_path_1"
@@ -341,7 +341,7 @@ class TestDecisionQuery:
             }
         ]
         
-        exceptions = decision_engine.find_similar_exceptions(exception_reason, limit)
+        exceptions = decision_query.find_similar_exceptions(exception_reason, limit)
         
         assert len(exceptions) == 1
         assert exceptions[0].exception_id == "exception_001"
@@ -369,7 +369,7 @@ class TestDecisionQuery:
             [0.1, 0.2, 0.3, 0.5]
         ]
         
-        similarity = decision_engine._calculate_semantic_similarity(text1, text2)
+        similarity = decision_query._calculate_semantic_similarity(text1, text2)
         
         assert isinstance(similarity, float)
         assert 0 <= similarity <= 1
@@ -377,34 +377,35 @@ class TestDecisionQuery:
     
     def test_calculate_semantic_similarity_no_generator(self, decision_query):
         """Test semantic similarity calculation without embedding generator."""
-        similarity = decision_engine._calculate_semantic_similarity("text1", "text2")
-        
+        decision_query.embedding_generator = None  # Simulate no generator
+        similarity = decision_query._calculate_semantic_similarity("text1", "text2")
+
         assert similarity == 0.0  # Default when no generator
     
     def test_calculate_structural_similarity_success(self, decision_query):
-        """Test structural similarity calculation."""
+        """Test structural (cosine) similarity calculation between two embeddings."""
         embedding1 = [0.1, 0.2, 0.3, 0.4]
         embedding2 = [0.1, 0.2, 0.3, 0.5]
-        
-        similarity = decision_engine._calculate_structural_similarity(embedding1, embedding2)
-        
+
+        similarity = decision_query._cosine_similarity(embedding1, embedding2)
+
         assert isinstance(similarity, float)
         assert 0 <= similarity <= 1
         assert similarity > 0.9  # Should be high similarity
-    
+
     def test_calculate_structural_similarity_empty_embeddings(self, decision_query):
-        """Test structural similarity with empty embeddings."""
-        similarity = decision_engine._calculate_structural_similarity([], [])
-        
+        """Test cosine similarity with empty embeddings."""
+        similarity = decision_query._cosine_similarity([], [])
+
         assert similarity == 0.0
-    
+
     def test_calculate_structural_similarity_mismatched_lengths(self, decision_query):
-        """Test structural similarity with mismatched embedding lengths."""
+        """Test cosine similarity with mismatched embedding lengths."""
         embedding1 = [0.1, 0.2, 0.3]
         embedding2 = [0.1, 0.2, 0.3, 0.4]
-        
-        similarity = decision_engine._calculate_structural_similarity(embedding1, embedding2)
-        
+
+        similarity = decision_query._cosine_similarity(embedding1, embedding2)
+
         assert similarity == 0.0  # Should handle mismatch gracefully
     
     def test_hybrid_score_calculation(self, decision_query):
@@ -413,11 +414,11 @@ class TestDecisionQuery:
         structural_score = 0.7
         
         # Test default weights
-        hybrid_score = decision_engine._calculate_hybrid_score(semantic_score, structural_score)
+        hybrid_score = decision_query._calculate_hybrid_score(semantic_score, structural_score)
         assert hybrid_score == 0.75  # (0.8 + 0.7) / 2
         
         # Test custom weights
-        hybrid_score = decision_engine._calculate_hybrid_score(
+        hybrid_score = decision_query._calculate_hybrid_score(
             semantic_score, structural_score, semantic_weight=0.7, structural_weight=0.3
         )
         assert hybrid_score == 0.77  # 0.8 * 0.7 + 0.7 * 0.3
@@ -425,46 +426,46 @@ class TestDecisionQuery:
     def test_hybrid_score_calculation_invalid_weights(self, decision_query):
         """Test hybrid score calculation with invalid weights."""
         with pytest.raises(ValueError, match="Weights must sum to 1.0"):
-            decision_engine._calculate_hybrid_score(0.8, 0.7, 0.8, 0.3)  # Sum = 1.1
+            decision_query._calculate_hybrid_score(0.8, 0.7, 0.8, 0.3)  # Sum = 1.1
     
     def test_query_execution_error_handling(self, decision_query, mock_graph_store):
         """Test error handling during query execution."""
         mock_graph_store.execute_query.side_effect = Exception("Database error")
         
         with pytest.raises(Exception, match="Database error"):
-            decision_engine.find_by_category("test", 10)
+            decision_query.find_by_category("test", 10)
     
     def test_empty_result_handling(self, decision_query, mock_graph_store):
         """Test handling of empty query results."""
         mock_graph_store.execute_query.return_value = []
         
-        decisions = decision_engine.find_by_category("test", 10)
+        decisions = decision_query.find_by_category("test", 10)
         
         assert decisions == []
     
     def test_malformed_result_handling(self, decision_query, mock_graph_store):
-        """Test handling of malformed query results."""
-        # Return result missing required fields
+        """Test handling of partial/malformed query results — should succeed with defaults."""
         mock_graph_store.execute_query.return_value = [
-            {"decision_id": "test"}  # Missing other required fields
+            {"decision_id": "test"}  # Missing optional fields — handled with defaults
         ]
-        
-        with pytest.raises(KeyError):
-            decision_engine.find_by_category("test", 10)
+
+        decisions = decision_query.find_by_category("test", 10)
+        assert len(decisions) == 1
+        assert decisions[0].decision_id == "test"
     
     def test_large_limit_handling(self, decision_query, mock_graph_store):
         """Test handling of large limit values."""
         mock_graph_store.execute_query.return_value = []
         
         # Should handle large limits gracefully
-        decisions = decision_engine.find_by_category("test", 10000)
+        decisions = decision_query.find_by_category("test", 10000)
         
         assert isinstance(decisions, list)
         
-        # Verify limit was passed to query
+        # Verify limit was passed as a parameter
         call_args = mock_graph_store.execute_query.call_args
-        query = call_args[0][0]
-        assert "LIMIT 10000" in query
+        params = call_args[0][1]
+        assert params["limit"] == 10000
     
     def test_special_characters_in_search(self, decision_query, mock_graph_store):
         """Test handling of special characters in search strings."""
@@ -472,7 +473,7 @@ class TestDecisionQuery:
         
         # Test with special characters
         scenario = "Credit limit increase for customer with special chars: @#$%^&*()"
-        decisions = decision_engine.find_precedents_hybrid(scenario, "test", 5)
+        decisions = decision_query.find_precedents_hybrid(scenario, "test", 5)
         
         assert isinstance(decisions, list)
     
@@ -492,7 +493,7 @@ class TestDecisionQuery:
             }
         ]
         
-        decisions = decision_engine.find_by_category("test", 10)
+        decisions = decision_query.find_by_category("test", 10)
         
         assert len(decisions) == 1
         assert decisions[0].category is None
@@ -509,7 +510,7 @@ class TestDecisionQuery:
         def query_thread(category):
             try:
                 mock_graph_store.execute_query.return_value = []
-                decisions = decision_engine.find_by_category(category, 10)
+                decisions = decision_query.find_by_category(category, 10)
                 results.append(len(decisions))
             except Exception as e:
                 errors.append(e)
@@ -548,7 +549,7 @@ class TestDecisionQuery:
         
         mock_graph_store.execute_query.return_value = large_results
         
-        decisions = decision_engine.find_by_category("test", 1000)
+        decisions = decision_query.find_by_category("test", 1000)
         
         assert len(decisions) == 1000
         # Verify memory usage is reasonable (this is a basic check)
@@ -557,17 +558,24 @@ class TestDecisionQuery:
 
 class TestDecisionQueryEdgeCases:
     """Test edge cases and boundary conditions."""
-    
+
     @pytest.fixture
-    def decision_query(self):
+    def mock_graph_store(self):
+        """Mock graph store for testing."""
+        mock_store = Mock()
+        mock_store.execute_query = Mock()
+        return mock_store
+
+    @pytest.fixture
+    def decision_query(self, mock_graph_store):
         """Create DecisionQuery with minimal dependencies."""
-        return DecisionQuery(graph_store=Mock())
+        return DecisionQuery(graph_store=mock_graph_store)
     
     def test_empty_string_search(self, decision_query, mock_graph_store):
         """Test searching with empty strings."""
         mock_graph_store.execute_query.return_value = []
         
-        decisions = decision_engine.find_precedents_hybrid("", "", 10)
+        decisions = decision_query.find_precedents_hybrid("", "", 10)
         
         assert isinstance(decisions, list)
     
@@ -576,7 +584,7 @@ class TestDecisionQueryEdgeCases:
         mock_graph_store.execute_query.return_value = []
         
         scenario = "Crédit limit increase for customer café"
-        decisions = decision_engine.find_precedents_hybrid(scenario, "test", 5)
+        decisions = decision_query.find_precedents_hybrid(scenario, "test", 5)
         
         assert isinstance(decisions, list)
     
@@ -606,7 +614,7 @@ class TestDecisionQueryEdgeCases:
             }
         ]
         
-        decisions = decision_engine.find_by_category("test", 10)
+        decisions = decision_query.find_by_category("test", 10)
         
         assert len(decisions) == 2
         assert decisions[0].confidence == 1.0
@@ -629,7 +637,7 @@ class TestDecisionQueryEdgeCases:
             }
         ]
         
-        decisions = decision_engine.find_by_category("test", 10)
+        decisions = decision_query.find_by_category("test", 10)
         
         assert len(decisions) == 1
         assert decisions[0].timestamp > datetime.now()
@@ -651,7 +659,7 @@ class TestDecisionQueryEdgeCases:
             }
         ]
         
-        decisions = decision_engine.find_by_category("test", 10)
+        decisions = decision_query.find_by_category("test", 10)
         
         assert len(decisions) == 1
         assert len(decisions[0].scenario) == len(long_scenario)

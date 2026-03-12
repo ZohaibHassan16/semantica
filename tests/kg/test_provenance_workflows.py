@@ -104,7 +104,7 @@ class TestProvenanceWorkflows:
         assert 'entities' in graph_result
         assert 'relationships' in graph_result
         assert len(graph_result['entities']) == 8
-        assert len(graph_result['relationships']) == 11
+        assert len(graph_result['relationships']) == 12
         
         # Step 2: Track graph construction
         construction_id = tracker.track_graph_construction(

@@ -191,7 +191,7 @@ class TestSimilarityCalculator:
         query_embedding = [1.0, 0.0]  # 2D
         embeddings_3d = {"node1": [1.0, 0.0, 0.0]}  # 3D
         
-        with pytest.raises(ValueError, match="Query embedding dimension must match"):
+        with pytest.raises(ValueError, match="Query embedding dimension"):
             self.calculator.batch_similarity(embeddings_3d, query_embedding)
     
     def test_pairwise_similarity(self):

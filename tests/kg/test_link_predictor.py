@@ -251,7 +251,7 @@ class TestLinkPredictor:
         self.mock_graph_store.get_nodes_by_label.return_value = ["A", "B", "C"]
         
         nodes = self.predictor._get_candidate_nodes(self.mock_graph_store, ["Entity"])
-        assert nodes == ["A", "B", "C"]
+        assert set(nodes) == {"A", "B", "C"}
     
     def test_get_existing_edges(self):
         """Test getting existing edges."""
@@ -335,8 +335,9 @@ class TestLinkPredictor:
     def test_get_node_degree_fallback(self):
         """Test getting node degree with fallback method."""
         self.mock_graph_store.get_node_degree = None
+        self.mock_graph_store.get_neighbors.return_value = None  # disable get_neighbors
         self.mock_graph_store.neighbors.return_value = ["B", "C", "D"]
-        
+
         degree = self.predictor._get_node_degree(self.mock_graph_store, "A")
         assert degree == 3
     
@@ -353,6 +354,7 @@ class TestLinkPredictor:
     
     def test_get_node_neighbors_filtered(self):
         """Test getting node neighbors with relationship type filtering."""
+        self.mock_graph_store.get_neighbors.return_value = None  # disable get_neighbors
         self.mock_graph_store.neighbors.return_value = ["B", "C", "D"]
         self.mock_graph_store.get_edge_data.side_effect = lambda u, v: {
             ("A", "B"): {"type": "RELATED"},
@@ -756,7 +758,7 @@ class TestLinkPredictorEdgeCases:
     def test_score_link_edge_cases(self):
         """Test score_link with edge cases."""
         graph = nx.Graph()
-        graph.add_edges_from([("A", "B")])
+        graph.add_edges_from([("A", "B"), ("B", "C")])
         
         # Test with existing edge
         score = self.predictor.score_link(graph, "A", "B")

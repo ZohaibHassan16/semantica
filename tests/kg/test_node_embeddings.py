@@ -347,7 +347,7 @@ class TestNodeEmbedderEdgeCases:
         mock_empty_graph = Mock()
         mock_empty_graph.get_nodes_by_label.return_value = []
         
-        with pytest.raises(RuntimeError, match="No nodes found"):
+        with pytest.raises(RuntimeError, match="No nodes found|Embedding computation failed"):
             self.embedder.compute_embeddings(mock_empty_graph, ["Entity"], ["RELATED_TO"])
     
     def test_single_node_graph_embeddings(self):

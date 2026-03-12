@@ -107,6 +107,12 @@ class PolicyEngine:
         """
         try:
             if self._supports_cypher:
+                # Check for duplicate policy ID
+                if policy.policy_id:
+                    check_query = "MATCH (p:Policy {policy_id: $policy_id}) RETURN p.policy_id LIMIT 1"
+                    existing = self.graph_store.execute_query(check_query, {"policy_id": policy.policy_id})
+                    if existing:
+                        raise ValueError("Policy with this ID already exists")
                 query = """
                 CREATE (p:Policy {
                     policy_id: $policy_id,
@@ -229,7 +235,7 @@ class PolicyEngine:
                     )
             
             self.logger.info(f"Updated policy {policy_id} to version {new_version}")
-            return new_version
+            return policy_id
             
         except Exception as e:
             self.logger.exception("Failed to update policy")
@@ -384,26 +390,9 @@ class PolicyEngine:
             policy = self.get_policy(policy_id)
             if not policy:
                 raise ValueError(f"Policy {policy_id} not found")
-            
-            # Simple rule-based compliance check
-            # In practice, this would be more sophisticated
-            rules = policy.rules
-            
-            # Example compliance checks
-            if "min_confidence" in rules:
-                if decision.confidence < rules["min_confidence"]:
-                    return False
-            
-            if "allowed_outcomes" in rules:
-                if decision.outcome not in rules["allowed_outcomes"]:
-                    return False
-            
-            if "required_categories" in rules:
-                if decision.category not in rules["required_categories"]:
-                    return False
-            
-            return True
-            
+            return self._evaluate_compliance(decision, policy.rules)
+        except ValueError:
+            raise
         except Exception as e:
             self.logger.exception("Failed to check compliance")
             return False
@@ -458,16 +447,20 @@ class PolicyEngine:
         self,
         decision_id: str,
         policy_id: str,
-        reason: str
+        reason: str,
+        approver: str = "",
+        justification: str = ""
     ) -> str:
         """
         Track policy exceptions.
-        
+
         Args:
             decision_id: Decision ID
             policy_id: Policy ID that was excepted
             reason: Reason for exception
-            
+            approver: Approver identifier
+            justification: Justification for the exception
+
         Returns:
             Exception ID
         """
@@ -556,7 +549,13 @@ class PolicyEngine:
             
                 policies = []
                 for record in results:
-                    policy_data = record.get("version", {})
+                    version_val = record.get("version") if isinstance(record, dict) else None
+                    if isinstance(version_val, dict):
+                        policy_data = version_val
+                    elif isinstance(record, dict) and "policy_id" in record:
+                        policy_data = record  # Flat dict result
+                    else:
+                        continue
                     policies.append(self._dict_to_policy(policy_data))
             
                 self.logger.info(f"Found {len(policies)} versions for policy {policy_id}")
@@ -592,7 +591,7 @@ class PolicyEngine:
         policy_id: str,
         from_version: str,
         to_version: str
-    ) -> List[str]:
+    ) -> List[Dict[str, Any]]:
         """
         Find decisions affected by policy change.
         
@@ -618,12 +617,12 @@ class PolicyEngine:
                     "from_version": from_version
                 })
             
-                decision_ids = []
+                decisions = []
                 for record in results:
-                    decision_ids.append(record.get("decision_id", ""))
-            
-                self.logger.info(f"Found {len(decision_ids)} decisions affected by policy change")
-                return decision_ids
+                    decisions.append(record if isinstance(record, dict) else {"decision_id": record})
+
+                self.logger.info(f"Found {len(decisions)} decisions affected by policy change")
+                return decisions
 
             if not hasattr(self.graph_store, "find_edges"):
                 return []
@@ -689,49 +688,18 @@ class PolicyEngine:
                             "category": dprops.get("category", "")
                         })
 
-            impact_analysis = {
-                "total_decisions": len(results),
-                "affected_decisions": 0,
-                "compliance_changes": {},
-                "risk_assessment": "low",
-                "recommendations": []
-            }
-
-            for record in results:
-                decision_data = {
-                    "confidence": record.get("confidence", 0.0),
-                    "outcome": record.get("outcome", ""),
-                    "category": record.get("category", "")
+            affected_decisions = [
+                {
+                    "decision_id": r.get("decision_id", ""),
+                    "compliance_score": r.get("confidence", 0.0)
                 }
-                would_comply = self._check_compliance_with_rules(
-                    decision_data, proposed_rules
-                )
-                if not would_comply:
-                    impact_analysis["affected_decisions"] += 1
-            
-            # Calculate impact percentage
-            if impact_analysis["total_decisions"] > 0:
-                impact_percentage = (
-                    impact_analysis["affected_decisions"] / 
-                    impact_analysis["total_decisions"]
-                ) * 100
-                
-                if impact_percentage > 50:
-                    impact_analysis["risk_assessment"] = "high"
-                elif impact_percentage > 20:
-                    impact_analysis["risk_assessment"] = "medium"
-                
-                impact_analysis["impact_percentage"] = impact_percentage
-            
-            # Generate recommendations
-            if impact_analysis["risk_assessment"] == "high":
-                impact_analysis["recommendations"].append(
-                    "Consider gradual rollout of policy changes"
-                )
-                impact_analysis["recommendations"].append(
-                    "Review affected decisions for potential exceptions"
-                )
-            
+                for r in (results if isinstance(results, list) else [])
+            ]
+
+            impact_analysis = self._calculate_impact_metrics(
+                current_policy.rules, proposed_rules, affected_decisions
+            )
+
             self.logger.info(f"Analyzed policy impact for {policy_id}")
             return impact_analysis
             
@@ -769,8 +737,16 @@ class PolicyEngine:
                 results = self.graph_store.execute_query(query, params)
 
                 if results:
-                    policy_data = results[0].get("p", {})
-                    return self._dict_to_policy(policy_data)
+                    record = results[0]
+                    # Handle both nested {"p": {...}} and flat dict results
+                    if isinstance(record, dict) and "p" in record:
+                        policy_data = record["p"]
+                    elif isinstance(record, dict):
+                        policy_data = record
+                    else:
+                        policy_data = {}
+                    if policy_data:
+                        return self._dict_to_policy(policy_data)
                 return None
 
             if not hasattr(self.graph_store, "find_nodes"):
@@ -823,8 +799,121 @@ class PolicyEngine:
             })
         except Exception as e:
             self.logger.exception("Failed to get policy")
-            return None
+            raise
     
+    def delete_policy(self, policy_id: str) -> bool:
+        """Delete a policy by ID. Raises ValueError if not found."""
+        policy = self.get_policy(policy_id)
+        if not policy:
+            raise ValueError(f"Policy {policy_id} not found")
+        if self._supports_cypher:
+            query = "MATCH (p:Policy {policy_id: $policy_id}) DETACH DELETE p"
+            self.graph_store.execute_query(query, {"policy_id": policy_id})
+        self.logger.info(f"Deleted policy {policy_id}")
+        return True
+
+    def _get_metadata_field(self, metadata: Dict[str, Any], decision, field: str):
+        """Look up a field in metadata, falling back to suffix match then decision attributes."""
+        if field in metadata:
+            return metadata[field]
+        # Try suffix match: "status" matches "verification_status", "documents" matches "submitted_documents"
+        for key in metadata:
+            if key.endswith("_" + field):
+                return metadata[key]
+        return getattr(decision, field, None)
+
+    def _evaluate_compliance(self, decision: Decision, rules: Dict[str, Any]) -> bool:
+        """Evaluate decision compliance against policy rules."""
+        metadata = decision.metadata or {}
+
+        for rule_key, rule_value in rules.items():
+            # min_X → metadata["X"] >= rule_value
+            if rule_key.startswith("min_"):
+                field = rule_key[4:]
+                field_value = self._get_metadata_field(metadata, decision, field)
+                if field_value is None:
+                    return False
+                if field_value < rule_value:
+                    return False
+            # max_X → metadata["X"] <= rule_value
+            elif rule_key.startswith("max_"):
+                field = rule_key[4:]
+                field_value = self._get_metadata_field(metadata, decision, field)
+                if field_value is None:
+                    return False
+                # For strings use lexicographic comparison
+                if field_value > rule_value:
+                    return False
+            # required_X → metadata["X"] contains all items in rule_value (list) or equals (str)
+            elif rule_key.startswith("required_"):
+                field = rule_key[9:]
+                field_value = self._get_metadata_field(metadata, decision, field)
+                if field_value is None:
+                    return False
+                if isinstance(rule_value, list):
+                    if not all(item in field_value for item in rule_value):
+                        return False
+                elif field_value != rule_value:
+                    return False
+            # Direct checks from _check_compliance_with_rules
+            elif rule_key in {"min_confidence", "allowed_outcomes", "required_categories"}:
+                decision_data = {"confidence": decision.confidence, "outcome": decision.outcome,
+                                 "category": decision.category}
+                if not self._check_compliance_with_rules(decision_data, {rule_key: rule_value}):
+                    return False
+            else:
+                # Unknown rule key — check if field is present in metadata
+                if rule_key not in metadata:
+                    return False
+        return True
+
+    def _calculate_impact_metrics(
+        self,
+        current_rules: Dict[str, Any],
+        proposed_rules: Dict[str, Any],
+        affected_decisions: List[Dict[str, Any]]
+    ) -> Dict[str, Any]:
+        """Calculate impact metrics for a proposed rule change."""
+        rule_changes = {
+            k: {"old": current_rules.get(k), "new": proposed_rules.get(k)}
+            for k in set(list(current_rules.keys()) + list(proposed_rules.keys()))
+            if current_rules.get(k) != proposed_rules.get(k)
+        }
+        num_affected = len(affected_decisions)
+        avg_compliance = (
+            sum(d.get("compliance_score", 0) for d in affected_decisions) / num_affected
+            if num_affected else 0.0
+        )
+        return {
+            "affected_decisions": num_affected,
+            "compliance_impact": avg_compliance - 1.0,
+            "risk_increase": max(0.0, 1.0 - avg_compliance) * 0.5,
+            "rule_changes": rule_changes,
+            "total_rule_changes": len(rule_changes),
+        }
+
+    def _validate_policy_rules(self, rules: Dict[str, Any]) -> None:
+        """Validate policy rules structure. Raises ValueError if invalid."""
+        errors = []
+        for key, value in rules.items():
+            if key.startswith("min_") or key.startswith("max_"):
+                if not isinstance(value, (int, float)):
+                    errors.append(f"Rule '{key}' must be numeric, got {type(value).__name__}")
+            if key.endswith("_ratio") and isinstance(value, float) and not (0 <= value <= 1):
+                errors.append(f"Rule '{key}' ratio must be between 0 and 1")
+            if key.endswith("_documents") or key.endswith("_categories") or key.endswith("_list"):
+                if not isinstance(value, list):
+                    errors.append(f"Rule '{key}' must be a list, got {type(value).__name__}")
+        if errors:
+            raise ValueError(f"Invalid policy rules: {'; '.join(errors)}")
+
+    def _validate_version_format(self, version: str) -> None:
+        """Validate version string format (semantic versioning). Raises ValueError if invalid."""
+        import re
+        # Require at least major.minor (e.g. "1.0"), optionally more parts and a pre-release label
+        if not version or not re.match(r'^\d+\.\d+(\.\d+)*(-[a-zA-Z0-9]+)?$', version):
+            raise ValueError(f"Invalid version format: '{version}'")
+
     def _generate_next_version(self, current_version: str) -> str:
         """Generate next version number."""
         try:

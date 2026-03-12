@@ -355,8 +355,9 @@ class TestProvenanceIntegration:
         }
         
         # Test connected components
-        components = conn_analyzer.find_connected_components(graph_dict)
-        
+        result = conn_analyzer.find_connected_components(graph_dict)
+        components = result['components']
+
         assert isinstance(components, list)
         assert len(components) > 0
         # Each component should be a list of nodes

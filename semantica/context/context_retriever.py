@@ -292,10 +292,10 @@ class ContextRetriever:
                         source = f"vector:{result.id}" if hasattr(result, 'id') else "vector:unknown"
                         metadata = result.metadata or {}
                     else:
-                        content = result.get("content", "")
+                        metadata = result.get("metadata", {})
+                        content = result.get("content") or metadata.get("content", "")
                         score = result.get("score", 0.0)
                         source = result.get("source") or f"vector:{result.get('id', 'unknown')}"
-                        metadata = result.get("metadata", {})
 
                     results.append(
                         RetrievedContext(
@@ -1805,7 +1805,7 @@ Answer:"""
             return []
         
         # Search for similar decisions
-        if hasattr(self.vector_store, 'search_decisions'):
+        try:
             similar_decisions = self.vector_store.search_decisions(
                 query=query,
                 semantic_weight=semantic_weight,
@@ -1814,7 +1814,7 @@ Answer:"""
                 limit=limit,
                 use_hybrid_search=use_hybrid_search
             )
-        else:
+        except (AttributeError, NotImplementedError):
             # Fallback to regular vector search
             vector_results = self.vector_store.search(query, limit=limit)
             similar_decisions = []
@@ -1850,14 +1850,14 @@ Answer:"""
                 metadata=metadata
             )
             
-            # Add context if requested
-            if include_context and self.knowledge_graph:
+            # Add context if requested (only when hybrid search is enabled)
+            if include_context and self.knowledge_graph and use_hybrid_search:
                 context_entities = self._extract_entities_from_decision(metadata)
                 if context_entities:
                     precedent.related_entities = context_entities
-                    
+
                     # Expand context with graph traversal
-                    if use_hybrid_search and max_hops > 0:
+                    if max_hops > 0:
                         expanded_entities = self._expand_decision_context(
                             context_entities, max_hops
                         )
@@ -2009,27 +2009,45 @@ Answer:"""
             
             # Find related entities using multiple KG algorithms
             try:
-                # Basic neighbor expansion
-                if hasattr(self.knowledge_graph, 'get_neighbors'):
-                    if hasattr(self.knowledge_graph, "neighbors"):
-                        neighbor_ids = list(self.knowledge_graph.neighbors(entity_name))
-                    elif hasattr(self.knowledge_graph, "get_neighbor_ids"):
-                        neighbor_ids = self.knowledge_graph.get_neighbor_ids(entity_name)
-                    else:
-                        neighbor_details = self.knowledge_graph.get_neighbors(entity_name, hops=1)
-                        neighbor_ids = [
-                            n.get("id") for n in neighbor_details
-                            if isinstance(n, dict) and n.get("id")
-                        ]
+                # Basic neighbor expansion — prefer get_neighbors > get_neighbor_ids > neighbors
+                # Supports multi-hop BFS when max_hops > 1
+                try:
+                    def _get_neighbors(node: str) -> List[Any]:
+                        if hasattr(self.knowledge_graph, 'get_neighbors'):
+                            try:
+                                raw = self.knowledge_graph.get_neighbors(node)
+                            except TypeError:
+                                raw = self.knowledge_graph.get_neighbors(node, hops=1)
+                            if isinstance(raw, list):
+                                return [n.get("id") if isinstance(n, dict) else n for n in raw if n]
+                        elif hasattr(self.knowledge_graph, "get_neighbor_ids"):
+                            return list(self.knowledge_graph.get_neighbor_ids(node))
+                        elif hasattr(self.knowledge_graph, "neighbors"):
+                            return list(self.knowledge_graph.neighbors(node))
+                        return []
 
-                    for neighbor in neighbor_ids[:5]:  # Limit to prevent explosion
-                        expanded_entities.append({
-                            "name": neighbor,
-                            "type": "related_entity",
-                            "source": "graph_expansion",
-                            "parent_entity": entity_name,
-                            "relationship_type": "neighbor"
-                        })
+                    visited: set = {entity_name}
+                    frontier = _get_neighbors(entity_name)
+                    for hop in range(1, max_hops + 1):
+                        next_frontier: List[Any] = []
+                        for neighbor in frontier[:5]:  # Limit per level
+                            if neighbor and neighbor not in visited:
+                                visited.add(neighbor)
+                                expanded_entities.append({
+                                    "name": neighbor,
+                                    "type": "related_entity",
+                                    "source": "graph_expansion",
+                                    "parent_entity": entity_name,
+                                    "relationship_type": "neighbor",
+                                    "hop_distance": hop,
+                                })
+                                next_hop = _get_neighbors(neighbor)
+                                next_frontier.extend(next_hop)
+                        frontier = next_frontier
+                        if not frontier:
+                            break
+                except Exception:
+                    pass  # Neighbor expansion is best-effort
                 
                 # Use path finder for multi-hop relationships
                 if self.path_finder and max_hops > 1:
@@ -2068,7 +2086,7 @@ Answer:"""
                                 break
                         
                         # Add other entities from same community
-                        if entity_community:
+                        if entity_community is not None:
                             same_community_entities = communities[entity_community]
                             for comm_entity in same_community_entities:
                                 if comm_entity != entity_name and comm_entity not in [e["name"] for e in expanded_entities]:
@@ -2245,10 +2263,12 @@ Answer:"""
             
             # Find related decisions
             decisions = []
-            if hasattr(self.knowledge_graph, 'execute_query'):
-                from .decision_query import DecisionQuery
-                query_engine = DecisionQuery(self.knowledge_graph)
-                decisions = query_engine.multi_hop_reasoning(start_node, query_context, max_hops)
+            query_engine = self._get_decision_query()
+            if query_engine is not None:
+                try:
+                    decisions = query_engine.multi_hop_reasoning(start_node, query_context, max_hops)
+                except Exception:
+                    decisions = []
             
             return {
                 "context": context,
@@ -2375,18 +2395,12 @@ Answer:"""
                 if result.get("type") in entity_types:
                     relevant_entities.append(result)
             
-            # Expand context for filtered entities
-            expanded_context = []
-            for entity in relevant_entities[:10]:  # Limit entities
-                entity_id = entity.get("name") or entity.get("id")
-                if entity_id:
-                    context = self.expand_context(entity_id, max_hops=max_hops)
-                    # Filter by entity types again
-                    filtered_context = [
-                        item for item in context 
-                        if item.get("type") in entity_types
-                    ]
-                    expanded_context.extend(filtered_context)
+            # Expand context for all relevant entities via single traversal
+            raw_context = self.expand_context(query, max_hops=max_hops)
+            expanded_context = [
+                item for item in raw_context
+                if item.get("type") in entity_types
+            ]
             
             return {
                 "query": query,
@@ -2420,7 +2434,7 @@ Answer:"""
         Returns:
             Hybrid retrieval results
         """
-        results = {"vector_results": [], "graph_results": [], "hybrid_results": []}
+        results = {"query": query, "vector_results": [], "graph_results": [], "hybrid_results": []}
         
         try:
             # Vector search
@@ -2429,11 +2443,8 @@ Answer:"""
             
             # Graph search
             if use_graph:
-                # Find entities from query
-                entities = self._extract_entities_from_query(query)
-                for entity in entities[:5]:  # Limit entities
-                    context = self.expand_context(entity, max_hops=2)
-                    results["graph_results"].extend(context)
+                graph_context = self.expand_context(query, max_hops=2)
+                results["graph_results"] = graph_context
             
             # Combine results
             all_results = results["vector_results"] + results["graph_results"]
@@ -2499,11 +2510,73 @@ Answer:"""
         """Extract potential entity names from query."""
         # Simple entity extraction - could be enhanced with NER
         entities = []
-        
+
         # Split query and look for capitalized terms (potential entities)
         words = query.split()
         for word in words:
-            if word.istitle() and len(word) > 2:
-                entities.append(word)
-        
+            # Strip punctuation for length check but keep original
+            stripped = word.strip(".,;:!?")
+            if stripped and stripped[0].isupper() and len(stripped) > 2:
+                entities.append(stripped)
+
         return entities[:10]  # Limit entities
+
+    def expand_context(
+        self,
+        entity_id: str,
+        max_hops: int = 2
+    ) -> List[Dict[str, Any]]:
+        """
+        Expand context for an entity using graph traversal.
+
+        Args:
+            entity_id: Entity ID or query term to expand context for
+            max_hops: Maximum hops to traverse
+
+        Returns:
+            List of related context items
+        """
+        if not self.knowledge_graph:
+            return []
+
+        try:
+            results = []
+            visited: set = {entity_id}
+            current_level = [entity_id]
+
+            for hop in range(max_hops):
+                next_level = []
+                for node in current_level:
+                    try:
+                        neighbors = self.knowledge_graph.get_neighbors(node)
+                        for neighbor in (neighbors or []):
+                            if neighbor not in visited:
+                                visited.add(neighbor)
+                                next_level.append(neighbor)
+                                results.append({
+                                    "id": neighbor,
+                                    "type": "Unknown",
+                                    "content": str(neighbor),
+                                    "hop": hop + 1
+                                })
+                    except Exception:
+                        pass
+                current_level = next_level
+                if not current_level:
+                    break
+
+            return results
+
+        except Exception as e:
+            self.logger.error(f"Context expansion failed: {e}")
+            return []
+
+    def _get_decision_query(self):
+        """Get a DecisionQuery instance for the current knowledge graph."""
+        if not self.knowledge_graph:
+            return None
+        try:
+            from .decision_query import DecisionQuery
+            return DecisionQuery(self.knowledge_graph)
+        except Exception:
+            return None

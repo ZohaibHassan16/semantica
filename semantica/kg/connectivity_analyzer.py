@@ -394,10 +394,19 @@ class ConnectivityAnalyzer:
         elif hasattr(graph, "get_relationships"):
             relationships = graph.get_relationships()
         elif isinstance(graph, dict):
-            relationships = graph.get("relationships", [])
+            relationships = graph.get("relationships", graph.get("edges", []))
 
         # Build adjacency
         for rel in relationships:
+            # Handle tuple/list edges (e.g., from NetworkX)
+            if isinstance(rel, (tuple, list)) and len(rel) >= 2:
+                source, target = str(rel[0]), str(rel[1])
+                if source and target:
+                    if target not in adjacency[source]:
+                        adjacency[source].append(target)
+                    if source not in adjacency[target]:
+                        adjacency[target].append(source)
+                continue
             source = rel.get("source") or rel.get("subject")
             target = rel.get("target") or rel.get("object")
 

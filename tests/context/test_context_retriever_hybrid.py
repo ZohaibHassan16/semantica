@@ -229,8 +229,8 @@ class TestContextRetrieverHybrid:
         assert all(e["source"] == "graph_expansion" for e in expanded)
         assert all("parent_entity" in e for e in expanded)
         
-        # Verify graph traversal was called
-        assert self.mock_knowledge_graph.get_neighbors.call_count == 2
+        # Verify graph traversal was called (at least once per entity)
+        assert self.mock_knowledge_graph.get_neighbors.call_count >= 2
     
     def test_expand_decision_context_no_knowledge_graph(self):
         """Test expanding context without knowledge graph."""

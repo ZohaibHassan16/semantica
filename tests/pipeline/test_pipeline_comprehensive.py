@@ -157,14 +157,14 @@ class TestPipelineComprehensive(unittest.TestCase):
         builder = PipelineBuilder()
         builder.add_step("A", "dummy")
         step_b = builder.add_step("B", "dummy")
-        
+
         # Manually add a non-existent dependency
         step_b.dependencies.append("NON_EXISTENT")
-        
-        pipeline = builder.build("broken_pipeline")
+
+        # Validate the builder directly (build() raises due to missing dep)
         validator = PipelineValidator()
-        result = validator.validate(pipeline)
-        
+        result = validator.validate(builder)
+
         self.assertFalse(result.valid)
         self.assertTrue(any("Missing dependency" in e for e in result.errors))
 

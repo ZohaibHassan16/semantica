@@ -527,10 +527,19 @@ class CentralityCalculator:
         elif hasattr(graph, "get_relationships"):
             relationships = graph.get_relationships()
         elif isinstance(graph, dict):
-            relationships = graph.get("relationships", [])
+            relationships = graph.get("relationships", graph.get("edges", []))
 
         # Build adjacency
         for rel in relationships:
+            # Handle tuple/list edges (e.g., from NetworkX)
+            if isinstance(rel, (tuple, list)) and len(rel) >= 2:
+                source, target = str(rel[0]), str(rel[1])
+                if source and target:
+                    if target not in adjacency[source]:
+                        adjacency[source].append(target)
+                    if source not in adjacency[target]:
+                        adjacency[target].append(source)
+                continue
             source = rel.get("source") or rel.get("subject")
             target = rel.get("target") or rel.get("object")
 
@@ -621,7 +630,10 @@ class CentralityCalculator:
         relationship_types: Optional[List[str]] = None,
         max_iterations: int = 20,
         damping_factor: float = 0.85,
-        tolerance: float = 1e-6
+        tolerance: float = 1e-6,
+        # Aliases used by some callers
+        alpha: Optional[float] = None,
+        max_iter: Optional[int] = None,
     ) -> Dict[str, float]:
         """
         Calculate PageRank scores for nodes in the graph.
@@ -645,9 +657,15 @@ class CentralityCalculator:
             ValueError: If graph is empty or parameters are invalid
             RuntimeError: If PageRank calculation fails
         """
+        # Apply parameter aliases
+        if alpha is not None:
+            damping_factor = alpha
+        if max_iter is not None:
+            max_iterations = max_iter
+
         try:
             self.logger.info("Calculating PageRank scores")
-            
+
             # Filter nodes by labels if specified
             nodes = self._filter_nodes_by_labels(graph, node_labels)
             if not nodes:
@@ -698,11 +716,14 @@ class CentralityCalculator:
                 self.logger.warning(f"PageRank did not converge after {max_iterations} iterations")
             
             # Convert to dictionary
-            result = {}
+            scores = {}
             for node, idx in node_index.items():
-                result[node] = float(pagerank[idx])
-            
-            self.logger.info(f"Calculated PageRank for {len(result)} nodes")
+                scores[node] = float(pagerank[idx])
+
+            rankings = sorted(scores.items(), key=lambda x: x[1], reverse=True)
+            result = {"centrality": scores, "rankings": rankings}
+
+            self.logger.info(f"Calculated PageRank for {len(scores)} nodes")
             return result
             
         except Exception as e:

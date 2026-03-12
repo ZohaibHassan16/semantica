@@ -467,6 +467,8 @@ class DecisionQuery:
         Returns:
             List of decisions in time range
         """
+        if end <= start:
+            raise ValueError("End time must be after start time")
         try:
             query = """
             MATCH (d:Decision)
@@ -513,6 +515,8 @@ class DecisionQuery:
         Returns:
             List of relevant decisions
         """
+        if not (1 <= max_hops <= 10):
+            raise ValueError("max_hops must be between 1 and 10")
         try:
             # Build multi-hop query
             query = f"""
@@ -699,6 +703,29 @@ class DecisionQuery:
             metadata=data.get("metadata", {}),
         )
     
+    def _calculate_semantic_similarity(self, text1: str, text2: str) -> float:
+        """Calculate semantic similarity between two texts using embeddings."""
+        if not self.embedding_generator:
+            return 0.0
+        try:
+            emb1 = self.embedding_generator.generate(text1)
+            emb2 = self.embedding_generator.generate(text2)
+            return self._cosine_similarity(emb1, emb2)
+        except Exception:
+            return 0.0
+
+    def _calculate_hybrid_score(
+        self,
+        semantic_score: float,
+        structural_score: float,
+        semantic_weight: float = 0.5,
+        structural_weight: float = 0.5
+    ) -> float:
+        """Calculate hybrid score from semantic and structural components."""
+        if abs(semantic_weight + structural_weight - 1.0) > 1e-6:
+            raise ValueError("Weights must sum to 1.0")
+        return round(semantic_weight * semantic_score + structural_weight * structural_score, 10)
+
     def _cosine_similarity(self, vec1: List[float], vec2: List[float]) -> float:
         """Calculate cosine similarity between two vectors."""
         try:

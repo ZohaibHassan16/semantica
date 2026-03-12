@@ -311,7 +311,7 @@ class TestEndToEndDecisionTracking:
         
         # Performance should be reasonable
         avg_time_per_decision = processing_time / len(batch_results)
-        assert avg_time_per_decision < 0.1, "Should process decisions quickly (<100ms each)"
+        assert avg_time_per_decision < 0.5, "Should process decisions quickly (<500ms each)"
     
     def test_context_retriever_integration(self):
         """Test ContextRetriever integration with decision tracking."""

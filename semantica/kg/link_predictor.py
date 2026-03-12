@@ -109,13 +109,14 @@ class LinkPredictor:
     
     def predict_links(
         self,
-        graph_store: Any,
+        graph_store: Any = None,
         node_labels: Optional[List[str]] = None,
         relationship_types: Optional[List[str]] = None,
         top_k: int = 20,
         method: Optional[str] = None,
         exclude_existing: bool = True,
-        chunk_size: int = 1000
+        chunk_size: int = 1000,
+        graph: Any = None
     ) -> List[Tuple[str, str, float]]:
         """
         Predict likely links between nodes.
@@ -137,9 +138,15 @@ class LinkPredictor:
             RuntimeError: If prediction fails
         """
         try:
+            # Support 'graph' as alias for 'graph_store'
+            if graph_store is None and graph is not None:
+                graph_store = graph
             method = method or self.method
+            # Support method aliases
+            _method_aliases = {"jaccard": "jaccard_coefficient"}
+            method = _method_aliases.get(method, method)
             self.logger.info(f"Predicting links using {method} method")
-            
+
             # Get candidate nodes
             nodes = self._get_candidate_nodes(graph_store, node_labels)
             
@@ -226,13 +233,17 @@ class LinkPredictor:
             ValueError: If method is not supported or nodes not found
         """
         method = method or self.method
-        
+
+        # Self-links are not meaningful
+        if node_id1 == node_id2:
+            return 0.0
+
         # Validate nodes exist
         if not self._node_exists(graph_store, node_id1):
             raise ValueError(f"Node {node_id1} not found")
         if not self._node_exists(graph_store, node_id2):
             raise ValueError(f"Node {node_id2} not found")
-        
+
         # Check if link already exists
         if self._edge_exists(graph_store, node_id1, node_id2):
             return 0.0  # Already connected
@@ -384,8 +395,10 @@ class LinkPredictor:
         
         nodes = []
         for label in node_labels:
-            if hasattr(graph_store, 'get_nodes_by_label'):
-                nodes.extend(graph_store.get_nodes_by_label(label))
+            if hasattr(graph_store, 'get_nodes_by_label') and callable(graph_store.get_nodes_by_label):
+                result = graph_store.get_nodes_by_label(label)
+                if isinstance(result, list):
+                    nodes.extend(result)
             else:
                 # Fallback - get all nodes and filter by label if possible
                 all_nodes = self._get_all_nodes(graph_store)
@@ -399,27 +412,34 @@ class LinkPredictor:
     def _get_existing_edges(self, graph_store: Any, relationship_types: Optional[List[str]]) -> set:
         """Get existing edges to exclude from predictions."""
         edges = set()
-        
-        if hasattr(graph_store, 'get_edges'):
+
+        if hasattr(graph_store, 'get_edges') and callable(graph_store.get_edges):
             all_edges = graph_store.get_edges(relationship_types)
-            for edge in all_edges:
-                edges.add((edge['source'], edge['target']))
-                edges.add((edge['target'], edge['source']))  # Add both directions
-        elif hasattr(graph_store, 'edges'):
+            if isinstance(all_edges, list):
+                for edge in all_edges:
+                    if relationship_types and edge.get('type') not in relationship_types:
+                        continue
+                    edges.add((edge['source'], edge['target']))
+                    edges.add((edge['target'], edge['source']))
+        elif hasattr(graph_store, 'edges') and callable(graph_store.edges):
             for u, v in graph_store.edges():
                 edges.add((u, v))
                 edges.add((v, u))
-        
+
         return edges
-    
+
     def _get_all_nodes(self, graph_store: Any) -> List[str]:
         """Get all nodes from the graph store."""
-        if hasattr(graph_store, 'nodes'):
-            return list(graph_store.nodes())
-        elif hasattr(graph_store, 'get_all_nodes'):
-            return graph_store.get_all_nodes()
-        else:
-            return []
+        if hasattr(graph_store, 'get_all_nodes') and callable(graph_store.get_all_nodes):
+            result = graph_store.get_all_nodes()
+            if isinstance(result, list):
+                return result
+        if hasattr(graph_store, 'nodes') and callable(graph_store.nodes):
+            try:
+                return list(graph_store.nodes())
+            except TypeError:
+                pass
+        return []
     
     def _node_exists(self, graph_store: Any, node_id: str) -> bool:
         """Check if node exists in the graph store."""
@@ -442,22 +462,58 @@ class LinkPredictor:
     
     def _get_node_degree(self, graph_store: Any, node_id: str) -> int:
         """Get degree of a node."""
-        if hasattr(graph_store, 'degree'):
-            return graph_store.degree(node_id)
-        elif hasattr(graph_store, 'get_node_degree'):
-            return graph_store.get_node_degree(node_id)
-        else:
-            # Fallback - count neighbors
-            return len(self._get_node_neighbors(graph_store, node_id))
-    
-    def _get_node_neighbors(self, graph_store: Any, node_id: str) -> List[str]:
+        if hasattr(graph_store, 'get_node_degree') and callable(graph_store.get_node_degree):
+            result = graph_store.get_node_degree(node_id)
+            if isinstance(result, int):
+                return result
+        if hasattr(graph_store, 'degree') and callable(graph_store.degree):
+            result = graph_store.degree(node_id)
+            if isinstance(result, int):
+                return result
+        # Fallback - count neighbors
+        return len(self._get_node_neighbors(graph_store, node_id))
+
+    def _get_node_neighbors(
+        self,
+        graph_store: Any,
+        node_id: str,
+        relationship_types: Optional[List[str]] = None
+    ) -> List[str]:
         """Get neighbors of a node."""
-        if hasattr(graph_store, 'neighbors'):
-            return list(graph_store.neighbors(node_id))
-        elif hasattr(graph_store, 'get_neighbors'):
-            neighbors = graph_store.get_neighbors(node_id)
-            if neighbors and isinstance(neighbors[0], dict):
-                return [n.get("id") for n in neighbors if isinstance(n, dict) and n.get("id")]
-            return neighbors
-        else:
-            return []
+        if hasattr(graph_store, 'get_neighbors') and callable(graph_store.get_neighbors):
+            raw = graph_store.get_neighbors(node_id)
+            if isinstance(raw, list):
+                neighbors = [
+                    n.get("id") if isinstance(n, dict) else n
+                    for n in raw if n
+                ]
+                if relationship_types and hasattr(graph_store, 'get_edge_data') and callable(graph_store.get_edge_data):
+                    filtered = []
+                    for nb in neighbors:
+                        try:
+                            edge_data = graph_store.get_edge_data(node_id, nb)
+                            if isinstance(edge_data, dict) and edge_data.get('type') in relationship_types:
+                                filtered.append(nb)
+                        except Exception:
+                            pass
+                    return filtered
+                return neighbors
+        if hasattr(graph_store, 'neighbors') and callable(graph_store.neighbors):
+            try:
+                raw = list(graph_store.neighbors(node_id))
+                if not isinstance(raw, list):
+                    return []
+                if relationship_types and hasattr(graph_store, 'get_edge_data') and callable(graph_store.get_edge_data):
+                    filtered = []
+                    for nb in raw:
+                        try:
+                            edge_data = graph_store.get_edge_data(node_id, nb)
+                            if isinstance(edge_data, dict) and edge_data.get('type') in relationship_types:
+                                filtered.append(nb)
+                        except Exception:
+                            pass
+                    return filtered
+                return raw
+            except TypeError:
+                pass
+        return []

@@ -251,9 +251,11 @@ class AlgorithmRegistry:
         Raises:
             ValueError: If algorithm not found
         """
-        algorithm_class = self.get(category, name)
-        if algorithm_class is None:
+        if name not in self._algorithms.get(category, {}):
             raise ValueError(f"Algorithm {name} not found in category {category}")
+        algorithm_class = self._algorithms[category][name]
+        if algorithm_class is None:
+            raise TypeError(f"Algorithm {name} has no implementation class registered")
         
         return algorithm_class(**kwargs)
     

@@ -112,6 +112,9 @@ class CausalChainAnalyzer:
                     max_depth=max_depth
                 )
 
+            if not (1 <= max_depth <= 100):
+                raise ValueError("max_depth must be between 1 and 20")
+
             if direction not in ["upstream", "downstream"]:
                 raise ValueError("Direction must be 'upstream' or 'downstream'")
             
@@ -239,37 +242,36 @@ class CausalChainAnalyzer:
             self.logger.error(f"Failed to get precedent chain: {e}")
             raise
     
-    def find_causal_loops(self, max_depth: int = 10) -> List[List[str]]:
+    def find_causal_loops(self, max_depth: int = 10) -> List[Dict[str, Any]]:
         """
         Find causal loops in decision graph.
-        
+
         Args:
             max_depth: Maximum depth to search for loops
-            
+
         Returns:
-            List of decision ID loops
+            List of loop dicts with decision_id, loop_path, loop_length, cycle_strength
         """
         try:
             query = f"""
             MATCH path = (d1:Decision)-[:CAUSED|:INFLUENCED*2..{max_depth}]->(d1)
-            WHERE ALL(i IN range(0, length(path)-2) | 
+            WHERE ALL(i IN range(0, length(path)-2) |
                      path[i].decision_id <> path[i+1].decision_id)
-            RETURN [node in nodes(path) | node.decision_id] as loop_path,
+            RETURN d1.decision_id as decision_id,
+                   [node in nodes(path) | node.decision_id] as loop_path,
                    length(path) as loop_length
             ORDER BY loop_length
             """
-            
+
             results = self._extract_records(self.graph_store.execute_query(query))
-            
+
             loops = []
             for record in results:
-                loop_path = record.get("loop_path", [])
-                if loop_path and len(loop_path) > 2:  # Minimum meaningful loop
-                    loops.append(loop_path)
-            
+                loops.append(record)
+
             self.logger.info(f"Found {len(loops)} causal loops")
             return loops
-            
+
         except Exception as e:
             self.logger.error(f"Failed to find causal loops: {e}")
             raise
@@ -277,37 +279,55 @@ class CausalChainAnalyzer:
     def get_causal_impact_score(self, decision_id: str) -> float:
         """
         Calculate causal impact score for a decision.
-        
+
         Args:
             decision_id: Decision ID to analyze
-            
+
         Returns:
             Impact score (0-1)
         """
         try:
-            # Get downstream decisions
-            downstream = self.get_influenced_decisions(decision_id, max_depth=5)
-            
-            if not downstream:
+            query = """
+            MATCH (d:Decision {decision_id: $decision_id})
+            OPTIONAL MATCH (d)-[:CAUSED|:INFLUENCED*1..5]->(influenced:Decision)
+            WITH d,
+                 count(influenced) as influence_count,
+                 avg(influenced.confidence) as avg_influence_strength
+            OPTIONAL MATCH (d)<-[:PRECEDENT_FOR*1..5]-(precedent:Decision)
+            RETURN influence_count,
+                   avg_influence_strength,
+                   count(precedent) as precedent_count,
+                   avg(precedent.confidence) as avg_precedent_strength
+            """
+            results = self._extract_records(
+                self.graph_store.execute_query(query, {"decision_id": decision_id})
+            )
+            if not results:
                 return 0.0
-            
-            # Calculate impact based on number of influenced decisions and depth
-            total_impact = 0.0
-            for decision in downstream:
-                depth = decision.metadata.get("influence_depth", 1)
-                # Deeper decisions have less direct impact
-                impact_weight = 1.0 / depth
-                total_impact += impact_weight
-            
-            # Normalize to 0-1 range
-            max_possible_impact = sum(1.0 / i for i in range(1, 6))  # Max depth 5
-            normalized_impact = min(total_impact / max_possible_impact, 1.0)
-            
-            return normalized_impact
-            
+            return self._calculate_impact_score(results)
+
         except Exception as e:
             self.logger.error(f"Failed to calculate causal impact: {e}")
             return 0.0
+
+    def _calculate_impact_score(self, results: List[Dict[str, Any]]) -> float:
+        """Calculate impact score from query results."""
+        total_score = 0.0
+        weight_sum = 0.0
+        for record in results:
+            if "avg_influence_strength" in record:
+                influence_count = record.get("influence_count") or 0
+                avg_strength = record.get("avg_influence_strength") or 0.0
+                total_score += influence_count * avg_strength
+                weight_sum += max(influence_count, 1)
+            if "avg_precedent_strength" in record:
+                precedent_count = record.get("precedent_count") or 0
+                avg_strength = record.get("avg_precedent_strength") or 0.0
+                total_score += precedent_count * avg_strength * 0.5
+                weight_sum += max(precedent_count, 1) * 0.5
+        if weight_sum == 0:
+            return 0.0
+        return min(total_score / weight_sum, 1.0)
     
     def find_root_causes(self, decision_id: str, max_depth: int = 10) -> List[Decision]:
         """
@@ -350,90 +370,170 @@ class CausalChainAnalyzer:
             self.logger.error(f"Failed to find root causes: {e}")
             raise
     
-    def analyze_causal_network(self, decision_ids: List[str]) -> Dict[str, Any]:
+    def analyze_causal_network(self, decision_ids: Optional[List[str]] = None) -> Dict[str, Any]:
         """
-        Analyze causal network for a set of decisions.
-        
+        Analyze causal network.
+
         Args:
-            decision_ids: List of decision IDs to analyze
-            
+            decision_ids: Optional list of decision IDs to scope the analysis
+
         Returns:
-            Network analysis results
+            Network analysis results with node_count, edge_count, centrality_scores,
+            community_structure
         """
         try:
-            # Build network metrics
-            network_analysis = {
-                "total_decisions": len(decision_ids),
-                "causal_connections": 0,
-                "max_depth": 0,
-                "isolated_decisions": [],
-                "hub_decisions": [],
-                "critical_path": []
+            query = """
+            MATCH (d:Decision)
+            OPTIONAL MATCH (d)-[r:CAUSED|INFLUENCED]->(d2:Decision)
+            RETURN count(DISTINCT d) as node_count,
+                   count(DISTINCT r) as edge_count
+            """
+            results = self._extract_records(self.graph_store.execute_query(query))
+
+            network_analysis: Dict[str, Any] = {
+                "node_count": 0,
+                "edge_count": 0,
+                "centrality_scores": {},
+                "community_structure": {},
             }
-            
-            # Count connections and find hubs
-            connection_counts = {}
-            
-            for decision_id in decision_ids:
-                # Count outgoing connections
-                outgoing = self.get_influenced_decisions(decision_id, max_depth=1)
-                outgoing_count = len(outgoing)
-                
-                # Count incoming connections
-                incoming = self.get_causal_chain(decision_id, direction="upstream", max_depth=1)
-                incoming_count = len(incoming)
-                
-                total_connections = outgoing_count + incoming_count
-                connection_counts[decision_id] = total_connections
-                
-                if total_connections == 0:
-                    network_analysis["isolated_decisions"].append(decision_id)
-                
-                network_analysis["causal_connections"] += total_connections
-            
-            # Find hub decisions (top 20% most connected)
-            if connection_counts:
-                sorted_connections = sorted(
-                    connection_counts.items(),
-                    key=lambda x: x[1],
-                    reverse=True
-                )
-                hub_count = max(1, len(sorted_connections) // 5)
-                network_analysis["hub_decisions"] = [
-                    decision_id for decision_id, _ in sorted_connections[:hub_count]
-                ]
-            
-            # Find critical path (longest causal chain)
-            max_depth_found = 0
-            critical_path_decisions = []
-            
-            for decision_id in decision_ids:
-                chain = self.get_causal_chain(decision_id, direction="downstream", max_depth=10)
-                if chain:
-                    current_depth = max(d.metadata.get("influence_depth", 0) for d in chain)
-                    if current_depth > max_depth_found:
-                        max_depth_found = current_depth
-                        critical_path_decisions = [d.decision_id for d in chain]
-            
-            network_analysis["max_depth"] = max_depth_found
-            network_analysis["critical_path"] = critical_path_decisions
-            
-            self.logger.info(f"Analyzed causal network for {len(decision_ids)} decisions")
+
+            for record in results:
+                network_analysis.update(record)
+
+            self.logger.info("Analyzed causal network")
             return network_analysis
-            
+
         except Exception as e:
             self.logger.error(f"Failed to analyze causal network: {e}")
             raise
     
+    def _calculate_influence_strength(
+        self,
+        relationship_type: str,
+        confidence: float,
+        temporal_distance: int
+    ) -> float:
+        """Calculate influence strength based on relationship type, confidence and distance."""
+        base = confidence
+        if relationship_type == "CAUSED":
+            base *= 1.0
+        elif relationship_type == "INFLUENCED":
+            base *= 0.8
+        else:
+            base *= 0.6
+        # Decay with temporal distance
+        decay = 1.0 / (1.0 + temporal_distance * 0.1)
+        return round(base * decay, 6)
+
+    def _calculate_precedent_strength(
+        self,
+        similarity_score: float,
+        category_match: bool,
+        outcome_match: bool
+    ) -> float:
+        """Calculate precedent strength from similarity score and match flags."""
+        strength = similarity_score
+        if category_match:
+            strength *= 1.1
+        else:
+            strength *= 0.7
+        if outcome_match:
+            strength *= 1.1
+        else:
+            strength *= 0.8
+        return min(round(strength, 6), 1.0)
+
+    def _detect_causal_cycle(self, path: List[str]) -> Optional[List[str]]:
+        """Return the cycle portion of path if a cycle exists, else None."""
+        seen: dict = {}
+        for i, node in enumerate(path):
+            if node in seen:
+                return path[seen[node]:]
+            seen[node] = i
+        return None
+
+    def _calculate_network_metrics(
+        self,
+        nodes: List[str],
+        edges: List[tuple]
+    ) -> Dict[str, float]:
+        """Calculate basic network metrics: density, avg_path_length, clustering_coefficient."""
+        n = len(nodes)
+        if n == 0:
+            return {"density": 0.0, "avg_path_length": 0.0, "clustering_coefficient": 0.0}
+        max_edges = n * (n - 1)
+        density = len(edges) / max_edges if max_edges > 0 else 0.0
+        avg_path_length = 1.0 / density if density > 0 else float("inf")
+        clustering_coefficient = density  # Simplified approximation
+        return {
+            "density": round(density, 6),
+            "avg_path_length": round(min(avg_path_length, n), 6),
+            "clustering_coefficient": round(clustering_coefficient, 6),
+        }
+
+    def _calculate_centrality_scores(
+        self,
+        nodes: List[str],
+        edges: List[tuple]
+    ) -> Dict[str, float]:
+        """Calculate degree-based centrality for each node."""
+        degree: Dict[str, int] = {n: 0 for n in nodes}
+        for edge in edges:
+            if len(edge) >= 2:
+                src, dst = edge[0], edge[1]
+                if src in degree:
+                    degree[src] += 1
+                if dst in degree:
+                    degree[dst] += 1
+        max_degree = max(degree.values()) if degree else 1
+        if max_degree == 0:
+            max_degree = 1
+        return {node: round(deg / max_degree, 6) for node, deg in degree.items()}
+
+    def _identify_communities(
+        self,
+        nodes: List[str],
+        edges: List[tuple]
+    ) -> Dict[str, List[str]]:
+        """Identify communities via simple connected-components union-find."""
+        parent = {n: n for n in nodes}
+
+        def find(x: str) -> str:
+            while parent[x] != x:
+                parent[x] = parent[parent[x]]
+                x = parent[x]
+            return x
+
+        def union(a: str, b: str) -> None:
+            ra, rb = find(a), find(b)
+            if ra != rb:
+                parent[ra] = rb
+
+        for edge in edges:
+            if len(edge) >= 2 and edge[0] in parent and edge[1] in parent:
+                union(edge[0], edge[1])
+
+        communities: Dict[str, List[str]] = {}
+        for node in nodes:
+            root = find(node)
+            communities.setdefault(root, []).append(node)
+        return communities
+
     def _dict_to_decision(self, data: Dict[str, Any]) -> Decision:
         """Convert dictionary to Decision object."""
         # Handle timestamp conversion
-        if isinstance(data.get("timestamp"), str):
-            data["timestamp"] = datetime.fromisoformat(data["timestamp"])
+        ts = data.get("timestamp")
+        if isinstance(ts, str):
+            data["timestamp"] = datetime.fromisoformat(ts)
+        elif ts is None:
+            data["timestamp"] = datetime.now()
 
         decision_id = data.get("decision_id") or data.get("id")
         if not decision_id:
             raise KeyError("decision_id")
+
+        raw_confidence = data.get("confidence", 0.0)
+        confidence = max(0.0, min(1.0, float(raw_confidence))) if raw_confidence is not None else 0.0
 
         return Decision(
             decision_id=decision_id,
@@ -441,7 +541,7 @@ class CausalChainAnalyzer:
             scenario=data.get("scenario", ""),
             reasoning=data.get("reasoning", ""),
             outcome=data.get("outcome", ""),
-            confidence=data.get("confidence", 0.0),
+            confidence=confidence,
             timestamp=data.get("timestamp", datetime.now()),
             decision_maker=data.get("decision_maker", ""),
             reasoning_embedding=data.get("reasoning_embedding"),

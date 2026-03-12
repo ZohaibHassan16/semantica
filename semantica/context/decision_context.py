@@ -105,12 +105,16 @@ class DecisionContext:
         set_global_vector_store(vector_store)
         
         # Initialize decision pipeline
+        pipeline_kwargs = {}
+        if "use_graph_features" in kwargs:
+            pipeline_kwargs["use_graph_features"] = kwargs.pop("use_graph_features")
         self.decision_pipeline = DecisionEmbeddingPipeline(
             vector_store=vector_store,
             graph_store=graph_store,
             auto_embed=auto_embed,
             semantic_weight=semantic_weight,
-            structural_weight=structural_weight
+            structural_weight=structural_weight,
+            **pipeline_kwargs
         )
         
         # Initialize context retriever
@@ -132,7 +136,7 @@ class DecisionContext:
     
     def record_decision(
         self,
-        scenario: str,
+        scenario: Optional[str] = None,
         reasoning: Optional[str] = None,
         outcome: Optional[str] = None,
         confidence: Optional[float] = None,
@@ -155,6 +159,8 @@ class DecisionContext:
         Returns:
             Decision vector ID
         """
+        if not scenario:
+            raise ValueError("Missing required field: scenario")
         # Sanitize scenario for logging (remove sensitive data)
         safe_scenario = scenario[:30] if scenario else "unknown"
         tracking_id = self.progress_tracker.start_tracking(
@@ -248,20 +254,7 @@ class DecisionContext:
             filters=filters
         )
         
-        # Convert RetrievedContext to dict format
-        results = []
-        for precedent in precedents:
-            result = {
-                "content": precedent.content,
-                "score": precedent.score,
-                "source": precedent.source,
-                "metadata": precedent.metadata,
-                "related_entities": precedent.related_entities,
-                "related_relationships": precedent.related_relationships
-            }
-            results.append(result)
-        
-        return results
+        return list(precedents)
     
     def query_decisions(
         self,

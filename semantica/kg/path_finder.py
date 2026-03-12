@@ -443,6 +443,19 @@ class PathFinder:
         
         return total_length
     
+    def find_shortest_path(
+        self,
+        graph: Any,
+        source: str,
+        target: str,
+        **kwargs
+    ) -> Optional[List[str]]:
+        """Find shortest path between source and target (alias for bfs_shortest_path)."""
+        result = self.bfs_shortest_path(graph, source, target)
+        if isinstance(result, dict):
+            return result.get("path")
+        return result
+
     def find_k_shortest_paths(
         self,
         graph: Any,

@@ -178,7 +178,7 @@ class TestComprehensiveIntegration:
         assert 'entities' in graph_result
         assert 'relationships' in graph_result
         assert len(graph_result['entities']) == 15
-        assert len(graph_result['relationships']) == 22
+        assert len(graph_result['relationships']) == 24
         
         construction_id = tracker.track_graph_construction(
             input_data=complex_graph_data,
@@ -214,7 +214,7 @@ class TestComprehensiveIntegration:
         execution_ids['centrality'] = cent_id
         
         # Connectivity analysis
-        components = conn_analyzer.find_connected_components(graph_dict)
+        components = conn_analyzer.find_connected_components(graph_dict)['components']
         conn_id = tracker.track_connectivity_analysis(
             graph=network_graph,
             components=components,
@@ -352,7 +352,7 @@ class TestComprehensiveIntegration:
         )
         
         # Verify all phases completed successfully
-        assert len(execution_ids) == 7
+        assert len(execution_ids) == 8
         for phase, exec_id in execution_ids.items():
             assert exec_id is not None
             assert len(exec_id) > 10

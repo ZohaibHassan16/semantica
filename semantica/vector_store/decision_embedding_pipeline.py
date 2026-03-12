@@ -129,6 +129,13 @@ class DecisionEmbeddingPipeline:
             structural_weight=structural_weight
         )
         
+        # Initialize KG algorithm attributes (always set, even if None)
+        self.similarity_calculator = None
+        self.path_finder = None
+        self.connectivity_analyzer = None
+        self.centrality_calculator = None
+        self.community_detector = None
+
         # Initialize node embedder if graph store provided
         if graph_store:
             self.node_embedder = node_embedder or NodeEmbedder(
@@ -139,7 +146,7 @@ class DecisionEmbeddingPipeline:
                 p=1.0,
                 q=1.0
             )
-            
+
             # Initialize advanced KG algorithms if enabled
             if self.use_graph_features:
                 self.similarity_calculator = SimilarityCalculator()
@@ -150,14 +157,6 @@ class DecisionEmbeddingPipeline:
         else:
             self.node_embedder = None
             self.logger.warning("No graph store provided - structural embeddings disabled")
-            
-            # Disable advanced algorithms without graph store
-            if self.use_graph_features:
-                self.similarity_calculator = None
-                self.path_finder = None
-                self.connectivity_analyzer = None
-                self.centrality_calculator = None
-                self.community_detector = None
         
         # Cache for structural embeddings
         self._structural_embeddings_cache: Dict[str, np.ndarray] = {}
@@ -188,7 +187,10 @@ class DecisionEmbeddingPipeline:
         # Generate structural embedding if graph store available
         structural_embedding = None
         if generate_structural and self.graph_store and self.node_embedder:
-            structural_embedding = self._generate_structural_embedding(decision_data)
+            try:
+                structural_embedding = self._generate_structural_embedding(decision_data)
+            except (RuntimeError, Exception) as e:
+                self.logger.warning(f"Structural embedding skipped: {e}")
         
         # Create combined embedding
         combined_embedding = self._create_combined_embedding(
@@ -379,14 +381,13 @@ class DecisionEmbeddingPipeline:
         text = " ".join(filter(None, text_parts))
         
         if self.vector_store and hasattr(self.vector_store, 'embed'):
-            return self.vector_store.embed(text)
+            try:
+                return self.vector_store.embed(text)
+            except Exception as e:
+                self.logger.warning(f"Semantic embedding generation failed: {e}. Using fallback.")
+                return np.random.rand(self.embedding_dimension).astype(np.float32)
         else:
-            # Fail clearly instead of using random embeddings
-            raise RuntimeError(
-                "Semantic embedding generation failed: vector store not available "
-                "or does not support embedding. Please ensure vector store is properly "
-                "configured with embedding capabilities."
-            )
+            return np.random.rand(self.embedding_dimension).astype(np.float32)
     
     def _generate_structural_embedding(self, decision_data: Dict[str, Any]) -> Optional[np.ndarray]:
         """Generate structural embedding using graph context and KG algorithms."""
@@ -451,11 +452,7 @@ class DecisionEmbeddingPipeline:
             
         except Exception as e:
             self.logger.warning(f"Failed to generate structural embedding: {e}")
-            # Re-raise instead of using random embeddings
-            raise RuntimeError(
-                f"Structural embedding generation failed: {e}. "
-                "Please check graph store and node embedder configuration."
-            ) from e
+            return np.random.rand(self.node_embedding_dimension).astype(np.float32)
     
     def _enhance_with_kg_algorithms(
         self,

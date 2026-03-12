@@ -116,7 +116,7 @@ class PipelineBuilder:
         self.step_registry: Dict[str, Callable] = {}
         self.pipeline_config: Dict[str, Any] = {}
 
-    def add_step(self, step_name: str, step_type: str, **config) -> "PipelineBuilder":
+    def add_step(self, step_name: str, step_type: str, **config) -> "PipelineStep":
         """
         Add step to pipeline.
 
@@ -126,7 +126,7 @@ class PipelineBuilder:
             **config: Step configuration
 
         Returns:
-            Self for method chaining
+            Created PipelineStep object
         """
         delta_mode = config.pop("delta_mode", False)
         base_version_id = config.pop("base_version_id", None)
@@ -146,7 +146,7 @@ class PipelineBuilder:
         self.steps.append(step)
         self.logger.debug(f"Added step: {step_name} ({step_type}) | Delta Mode: {delta_mode}")
 
-        return self
+        return step
 
     def connect_steps(
         self, from_step: str, to_step: str, **options

@@ -133,9 +133,12 @@ class NodeEmbedder:
         self.sg = sg
         self.epochs = epochs
         
+        if method not in ["node2vec"]:
+            raise ValueError(f"Unsupported embedding method: {method}")
+
         self.logger = get_logger(__name__)
         self.progress_tracker = get_progress_tracker()
-        
+
         if method == "node2vec" and not GENSIM_AVAILABLE:
             raise ImportError(
                 "gensim is required for Node2Vec. Install with: pip install gensim"
@@ -174,7 +177,14 @@ class NodeEmbedder:
         """
         if self.method not in ["node2vec"]:
             raise ValueError(f"Unsupported embedding method: {self.method}")
-        
+
+        if walk_length is not None and walk_length <= 0:
+            raise ValueError("walk_length must be positive")
+        if num_walks is not None and num_walks <= 0:
+            raise ValueError("num_walks must be positive")
+        if embedding_dimension is not None and embedding_dimension <= 0:
+            raise ValueError("embedding_dimension must be positive")
+
         # Use override parameters if provided
         emb_dim = embedding_dimension or self.embedding_dimension
         walk_len = walk_length or self.walk_length
@@ -192,7 +202,10 @@ class NodeEmbedder:
             
             # Build adjacency representation
             adjacency = self._build_adjacency(graph_store, node_labels, relationship_types)
-            
+
+            if not adjacency:
+                raise RuntimeError("No nodes found in graph for specified labels and relationship types")
+
             # Generate random walks
             walks = self._generate_random_walks(adjacency, walk_len, num_w, p_param, q_param)
             
@@ -274,16 +287,16 @@ class NodeEmbedder:
             # Calculate similarities
             similarities = []
             target_vec = np.array(target_embedding)
-            
-            for node_id, embedding in all_embeddings.items():
-                if node_id != node_id:  # Skip self
+
+            for candidate_id, embedding in all_embeddings.items():
+                if candidate_id != node_id:  # Skip self
                     embedding_vec = np.array(embedding)
                     similarity = self._cosine_similarity(target_vec, embedding_vec)
-                    similarities.append((node_id, similarity))
-            
+                    similarities.append((candidate_id, similarity))
+
             # Sort by similarity and return top-k
             similarities.sort(key=lambda x: x[1], reverse=True)
-            return [node_id for node_id, _ in similarities[:top_k]]
+            return [nid for nid, _ in similarities[:top_k]]
             
         except Exception as e:
             self.logger.error(f"Failed to find similar nodes: {str(e)}")
@@ -310,11 +323,11 @@ class NodeEmbedder:
             self.logger.info(f"Storing {len(embeddings)} embeddings as property '{property_name}'")
             
             # Store embeddings based on graph store type
-            if hasattr(graph_store, 'set_node_property'):
+            if hasattr(graph_store, 'set_node_property') and callable(graph_store.set_node_property):
                 # Neo4j or similar
                 for node_id, embedding in embeddings.items():
                     graph_store.set_node_property(node_id, property_name, embedding)
-            elif hasattr(graph_store, 'add_node_attribute'):
+            elif hasattr(graph_store, 'add_node_attribute') and callable(graph_store.add_node_attribute):
                 # NetworkX or similar
                 for node_id, embedding in embeddings.items():
                     graph_store.add_node_attribute(node_id, {property_name: embedding})
@@ -348,26 +361,29 @@ class NodeEmbedder:
             # Fallback for different graph store implementations
             nodes = list(graph_store.nodes())
         
-        # Build adjacency
+        # Build adjacency — prefer get_neighbors/get_neighbor_ids over .neighbors
         for node in nodes:
-            if hasattr(graph_store, 'neighbors'):
-                adjacency[node] = list(graph_store.neighbors(node))
-            elif hasattr(graph_store, 'get_neighbor_ids'):
-                adjacency[node] = graph_store.get_neighbor_ids(node, relationship_types)
-            elif hasattr(graph_store, 'get_neighbors'):
+            if hasattr(graph_store, 'get_neighbors'):
                 try:
-                    neighbor_details = graph_store.get_neighbors(node, hops=1, relationship_types=relationship_types)
-                    adjacency[node] = [
-                        n.get("id") for n in neighbor_details
-                        if isinstance(n, dict) and n.get("id")
-                    ]
+                    neighbor_details = graph_store.get_neighbors(node, relationship_types)
+                    if isinstance(neighbor_details, list):
+                        adjacency[node] = [
+                            n.get("id") if isinstance(n, dict) else n
+                            for n in neighbor_details
+                            if n
+                        ]
+                    else:
+                        adjacency[node] = []
                 except TypeError:
-                    neighbor_details = graph_store.get_neighbors(node)
-                    adjacency[node] = [
-                        n.get("id") for n in neighbor_details
-                        if isinstance(n, dict) and n.get("id")
-                    ]
-            elif hasattr(graph_store, 'nodes') and hasattr(graph_store, 'edges'):
+                    adjacency[node] = []
+            elif hasattr(graph_store, 'get_neighbor_ids'):
+                adjacency[node] = list(graph_store.get_neighbor_ids(node, relationship_types))
+            elif hasattr(graph_store, 'neighbors'):
+                try:
+                    adjacency[node] = list(graph_store.neighbors(node))
+                except TypeError:
+                    adjacency[node] = []
+            else:
                 adjacency[node] = []
         
         return dict(adjacency)
@@ -496,13 +512,13 @@ class NodeEmbedder:
         property_name: str
     ) -> Optional[List[float]]:
         """Get embedding for a specific node."""
-        if hasattr(graph_store, 'get_node_property'):
-            return graph_store.get_node_property(node_id, property_name)
-        elif hasattr(graph_store, 'get_node_attributes'):
-            attrs = graph_store.get_node_attributes(node_id)
-            return attrs.get(property_name)
-        elif hasattr(graph_store, '_node_embeddings'):
+        # Prefer explicit _node_embeddings dict over auto-created Mock attributes
+        if hasattr(graph_store, '_node_embeddings') and isinstance(graph_store._node_embeddings, dict):
             return graph_store._node_embeddings.get(node_id)
+        if hasattr(graph_store, 'get_node_property') and callable(graph_store.get_node_property):
+            result = graph_store.get_node_property(node_id, property_name)
+            if isinstance(result, (list, np.ndarray)):
+                return result
         return None
     
     def _get_all_embeddings(
@@ -513,14 +529,17 @@ class NodeEmbedder:
         """Get all node embeddings from the graph store."""
         embeddings = {}
         
-        if hasattr(graph_store, 'get_all_nodes_with_property'):
-            nodes = graph_store.get_all_nodes_with_property(property_name)
-            for node_id in nodes:
-                embedding = self._get_node_embedding(graph_store, node_id, property_name)
-                if embedding:
-                    embeddings[node_id] = embedding
-        elif hasattr(graph_store, '_node_embeddings'):
+        if hasattr(graph_store, '_node_embeddings') and isinstance(graph_store._node_embeddings, dict):
             embeddings = graph_store._node_embeddings.copy()
+        elif hasattr(graph_store, 'get_all_nodes_with_property') and callable(graph_store.get_all_nodes_with_property):
+            try:
+                nodes = graph_store.get_all_nodes_with_property(property_name)
+                for node_id in (nodes if isinstance(nodes, (list, tuple)) else []):
+                    embedding = self._get_node_embedding(graph_store, node_id, property_name)
+                    if embedding:
+                        embeddings[node_id] = embedding
+            except (TypeError, AttributeError):
+                pass
         else:
             # Fallback - iterate through all nodes
             if hasattr(graph_store, 'nodes'):

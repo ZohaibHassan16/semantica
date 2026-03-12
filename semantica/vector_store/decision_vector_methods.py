@@ -103,12 +103,13 @@ def find_precedents(
     category: Optional[str] = None,
     outcome: Optional[str] = None,
     confidence_min: Optional[float] = None,
+    filters: Optional[Dict[str, Any]] = None,
     vector_store: Optional[Any] = None,
     **kwargs
 ) -> List[Dict[str, Any]]:
     """
     Find similar decisions (precedents) for a given query.
-    
+
     Args:
         query: Search query
         limit: Number of results
@@ -117,28 +118,29 @@ def find_precedents(
         category: Filter by decision category
         outcome: Filter by decision outcome
         confidence_min: Minimum confidence threshold
+        filters: Additional metadata filters
         vector_store: Vector store instance (uses global if None)
         **kwargs: Additional search parameters
-        
+
     Returns:
         List of similar decisions with scores
     """
     store = vector_store or get_global_vector_store()
-    
-    # Build filters
-    filters = {}
+
+    # Build filters, merging with any provided filters dict
+    merged_filters = dict(filters) if filters else {}
     if category is not None:
-        filters["category"] = category
+        merged_filters["category"] = category
     if outcome is not None:
-        filters["outcome"] = outcome
+        merged_filters["outcome"] = outcome
     if confidence_min is not None:
-        filters["confidence"] = {"min": confidence_min}
-    
+        merged_filters["confidence"] = {"min": confidence_min}
+
     return store.search_decisions(
         query=query,
         semantic_weight=semantic_weight,
         structural_weight=structural_weight,
-        filters=filters,
+        filters=merged_filters,
         limit=limit,
         **kwargs
     )

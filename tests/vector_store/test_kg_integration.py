@@ -148,9 +148,9 @@ class TestKGAlgorithmIntegration:
         assert result["structural_embedding"] is not None
         assert isinstance(result["structural_embedding"], np.ndarray)
     
-    @patch('semantica.kg.path_finder.PathFinder')
-    @patch('semantica.kg.community_detector.CommunityDetector')
-    @patch('semantica.kg.centrality_calculator.CentralityCalculator')
+    @patch('semantica.context.context_retriever.PathFinder')
+    @patch('semantica.context.context_retriever.CommunityDetector')
+    @patch('semantica.context.context_retriever.CentralityCalculator')
     def test_context_expansion_uses_kg_algorithms(self, mock_centrality, mock_community, mock_path_finder):
         """Test that context expansion uses KG algorithms."""
         # Mock KG algorithms
@@ -166,10 +166,13 @@ class TestKGAlgorithmIntegration:
             knowledge_graph=self.mock_graph_store
         )
         
-        # Test context expansion
-        entities = [{"name": "customer_123", "type": "entity"}]
+        # Test context expansion with multiple entities so path_finder is invoked
+        entities = [
+            {"name": "customer_123", "type": "entity"},
+            {"name": "related_entity1", "type": "entity"}
+        ]
         expanded = retriever._expand_decision_context(entities, max_hops=2)
-        
+
         # Verify KG algorithms were called
         mock_path_finder.return_value.find_shortest_path.assert_called()
         mock_community.return_value.detect_communities.assert_called()
@@ -190,7 +193,7 @@ class TestKGAlgorithmIntegration:
         from semantica.context import DecisionContext
         
         # Mock decision pipeline to use KG algorithms
-        with patch('semantica.context.decision_embedding_pipeline.DecisionEmbeddingPipeline') as mock_pipeline:
+        with patch('semantica.context.decision_context.DecisionEmbeddingPipeline') as mock_pipeline:
             mock_pipeline.return_value.process_decision.return_value = {
                 "vector_id": "decision_123",
                 "semantic_embedding": np.array([0.1, 0.2, 0.3, 0.4]),
@@ -215,22 +218,23 @@ class TestKGAlgorithmIntegration:
             graph_store=self.mock_graph_store,
             use_graph_features=True
         )
-        
-        # Mock NodeEmbedder to raise exception
-        with patch('semantica.vector_store.decision_embedding_pipeline.NodeEmbedder') as mock_node_embedder:
-            mock_node_embedder.return_value.compute_embeddings.side_effect = Exception("KG algorithm error")
-            
-            # Mock vector store methods
-            self.mock_vector_store.store_vectors.return_value = ["decision_123"]
-            
-            # Process decision should handle error gracefully
-            result = pipeline.process_decision(self.sample_decision)
-            
-            # Should still return a result with fallback embedding
-            assert result["vector_id"] == "decision_123"
-            assert result["semantic_embedding"] is not None
-            # Structural embedding should be fallback (random) due to error
-            assert result["structural_embedding"] is not None
+
+        # Mock the pipeline's node_embedder instance directly to raise exception
+        mock_node_embedder = Mock()
+        mock_node_embedder.compute_embeddings.side_effect = Exception("KG algorithm error")
+        pipeline.node_embedder = mock_node_embedder
+
+        # Mock vector store methods
+        self.mock_vector_store.store_vectors.return_value = ["decision_123"]
+
+        # Process decision should handle error gracefully
+        result = pipeline.process_decision(self.sample_decision)
+
+        # Should still return a result with fallback embedding
+        assert result["vector_id"] == "decision_123"
+        assert result["semantic_embedding"] is not None
+        # Structural embedding should be fallback (random) due to error
+        assert result["structural_embedding"] is not None
 
 
 class TestKGAlgorithmSpecificFeatures:

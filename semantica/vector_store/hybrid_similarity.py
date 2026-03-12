@@ -326,7 +326,8 @@ class HybridSimilarityCalculator:
         
         if metric == "cosine":
             # Use scipy's cosine distance (returns distance, not similarity)
-            return 1 - cosine(vec1, vec2)
+            sim = 1 - cosine(vec1, vec2)
+            return 0.0 if np.isnan(sim) else float(sim)
         elif metric == "pearson":
             # Use scipy's pearson correlation
             correlation, _ = pearsonr(vec1, vec2)
@@ -337,9 +338,10 @@ class HybridSimilarityCalculator:
             return 1 / (1 + distance)
         elif metric == "dot_product":
             # Normalize vectors and compute dot product
-            vec1_norm = vec1 / (np.linalg.norm(vec1) + 1e-10)
-            vec2_norm = vec2 / (np.linalg.norm(vec2) + 1e-10)
-            return np.dot(vec1_norm, vec2_norm)
+            n1, n2 = np.linalg.norm(vec1), np.linalg.norm(vec2)
+            if n1 == 0 or n2 == 0:
+                return 0.0
+            return float(np.clip(np.dot(vec1 / n1, vec2 / n2), -1.0, 1.0))
         else:
             raise ValueError(f"Unknown metric: {metric}")
     

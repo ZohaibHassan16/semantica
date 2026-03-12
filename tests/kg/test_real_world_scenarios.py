@@ -446,7 +446,7 @@ class TestRealWorldScenarios:
                 source='P2',
                 paths=citation_paths,
                 method='all_shortest_paths',
-                source='academic_analysis'
+                label='academic_analysis'
             )
         except Exception as e:
             print(f"Citation path analysis failed: {e}")
@@ -792,7 +792,7 @@ class TestRealWorldScenarios:
         
         for paper_id, paper_embedding in academic_embeddings.items():
             query_embedding = paper_embedding
-            
+
             # Find similar papers
             similar_papers = sim_calc.batch_similarity(
                 embeddings=academic_embeddings,
@@ -800,17 +800,20 @@ class TestRealWorldScenarios:
                 method='cosine',
                 top_k=3
             )
-            
-            # Map to users with matching interests
+
+            # Map to users with matching interests (check all social network users)
             matching_users = []
             paper_data = academic_citation_network.nodes[paper_id]
             paper_keywords = paper_data.get('keywords', [])
-            
-            for user_id in academic_users:
+
+            for user_id in social_media_network.nodes():
                 user_data = social_media_network.nodes[user_id]
                 user_interests = user_data.get('interests', [])
-                
-                if any(keyword.lower() in interest.lower() for keyword in paper_keywords for interest in user_interests):
+
+                if any(
+                    keyword.lower() in interest.lower() or interest.lower() in keyword.lower()
+                    for keyword in paper_keywords for interest in user_interests
+                ):
                     matching_users.append(user_id)
             
             if matching_users:

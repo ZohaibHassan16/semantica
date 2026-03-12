@@ -441,7 +441,7 @@ class CommunityDetector:
         }
 
     def detect_communities(
-        self, graph: Any, algorithm: str = "louvain", **options
+        self, graph: Any, algorithm: str = "louvain", method: str = None, **options
     ) -> Dict[str, Any]:
         """
         Detect communities using specified algorithm.
@@ -461,6 +461,10 @@ class CommunityDetector:
         Raises:
             ValueError: If algorithm is not supported
         """
+        # 'method' is an alias for 'algorithm'
+        if method is not None:
+            algorithm = method if method in ("louvain", "leiden", "overlapping") else "louvain"
+
         self.logger.info(f"Detecting communities using {algorithm} algorithm")
 
         if algorithm == "louvain":
@@ -480,12 +484,25 @@ class CommunityDetector:
 
         # Extract relationships
         relationships = []
+        raw_edges = []  # flat (u, v) tuples
         if hasattr(graph, "relationships"):
             relationships = graph.relationships
         elif hasattr(graph, "get_relationships"):
             relationships = graph.get_relationships()
         elif isinstance(graph, dict):
             relationships = graph.get("relationships", [])
+            # Also handle 'edges' key (list of tuples or dicts)
+            for edge in graph.get("edges", []):
+                if isinstance(edge, (list, tuple)) and len(edge) >= 2:
+                    raw_edges.append((str(edge[0]), str(edge[1])))
+                elif isinstance(edge, dict):
+                    relationships.append(edge)
+
+        # Add raw (u, v) edges
+        for u, v in raw_edges:
+            if u and v:
+                adjacency[u].append(v)
+                adjacency[v].append(u)
 
         # Build adjacency
         for rel in relationships:
@@ -515,6 +532,10 @@ class CommunityDetector:
 
     def _to_networkx(self, graph):
         """Convert graph to NetworkX format."""
+        # If already a NetworkX graph, return directly
+        if hasattr(graph, 'nodes') and hasattr(graph, 'edges') and hasattr(graph, 'number_of_nodes'):
+            return graph
+
         adjacency = self._build_adjacency(graph)
         nx_graph = self.nx.Graph()
 

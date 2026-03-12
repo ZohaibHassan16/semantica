@@ -293,7 +293,7 @@ class AlgorithmTrackerWithProvenance:
                     "input_data_type": type(graph).__name__,
                     "output_data_type": "embeddings",
                     "node_count": len(embeddings),
-                    "embedding_dimension": len(next(iter(embeddings.values()))) if embeddings else 0,
+                    "embedding_dimension": (len(next(iter(embeddings.values()))) if embeddings and hasattr(next(iter(embeddings.values())), '__len__') else 0),
                     "timestamp": time.time()
                 }
             )
@@ -307,7 +307,7 @@ class AlgorithmTrackerWithProvenance:
                         "entity_type": "node_embedding",
                         "algorithm": algorithm,
                         "node_id": node_id,
-                        "embedding_dimension": len(embedding_vector),
+                        "embedding_dimension": len(embedding_vector) if hasattr(embedding_vector, '__len__') else 0,
                         "execution_id": execution_id,
                         "timestamp": time.time()
                     }
@@ -322,7 +322,8 @@ class AlgorithmTrackerWithProvenance:
         query_embedding: List[float],
         similarities: Dict[str, float],
         method: str,
-        source: str = None
+        source: str = None,
+        **kwargs
     ):
         """
         Track similarity calculation analysis with provenance.
@@ -381,7 +382,8 @@ class AlgorithmTrackerWithProvenance:
         predictions: List[tuple],
         method: str,
         parameters: Dict[str, Any],
-        source: str = None
+        source: str = None,
+        **kwargs
     ):
         """Track link prediction with provenance."""
         if self.provenance and self._prov_manager:
@@ -427,8 +429,9 @@ class AlgorithmTrackerWithProvenance:
         graph: Any,
         centrality_scores: Dict[str, float],
         method: str,
-        parameters: Dict[str, Any],
-        source: str = None
+        parameters: Dict[str, Any] = None,
+        source: str = None,
+        **kwargs
     ):
         """
         Track centrality measure calculation with provenance.
@@ -485,8 +488,9 @@ class AlgorithmTrackerWithProvenance:
         graph: Any,
         communities: List[List[str]],
         method: str,
-        parameters: Dict[str, Any],
-        source: str = None
+        parameters: Dict[str, Any] = None,
+        source: str = None,
+        **kwargs
     ):
         """Track community detection with provenance."""
         if self.provenance and self._prov_manager:
@@ -526,6 +530,376 @@ class AlgorithmTrackerWithProvenance:
             
             return execution_id
         return None
+
+    def track_graph_construction(
+        self,
+        input_data: Dict[str, Any],
+        output_graph: Dict[str, Any],
+        entities_count: int,
+        relationships_count: int,
+        construction_time: float = None,
+        source: str = None,
+        **kwargs
+    ):
+        """Track graph construction with provenance."""
+        if self.provenance and self._prov_manager:
+            execution_id = f"graph_construction_{uuid.uuid4().hex[:8]}"
+            self._prov_manager.track_entity(
+                entity_id=execution_id,
+                source=source or "graph_construction",
+                metadata={
+                    "entity_type": "graph_construction",
+                    "entities_count": entities_count,
+                    "relationships_count": relationships_count,
+                    "construction_time": construction_time,
+                    "timestamp": time.time()
+                }
+            )
+            return execution_id
+        return None
+
+    def track_similarity_result(
+        self,
+        node_id: str,
+        similarity_score: float,
+        method: str,
+        execution_id: str,
+        source: str = None,
+        **kwargs
+    ):
+        """Track individual similarity result with provenance."""
+        if self.provenance and self._prov_manager:
+            result_id = f"similarity_result_{uuid.uuid4().hex[:8]}"
+            self._prov_manager.track_entity(
+                entity_id=result_id,
+                source=source or "similarity_result",
+                metadata={
+                    "entity_type": "similarity_result",
+                    "node_id": node_id,
+                    "similarity_score": similarity_score,
+                    "method": method,
+                    "execution_id": execution_id,
+                    "timestamp": time.time()
+                }
+            )
+            return result_id
+        return None
+
+    def track_similarity_threshold_analysis(
+        self,
+        execution_id: str,
+        threshold: float,
+        high_similarity_nodes: Dict[str, float],
+        source: str = None,
+        **kwargs
+    ):
+        """Track similarity threshold analysis with provenance."""
+        if self.provenance and self._prov_manager:
+            result_id = f"similarity_threshold_{uuid.uuid4().hex[:8]}"
+            self._prov_manager.track_entity(
+                entity_id=result_id,
+                source=source or "similarity_threshold",
+                metadata={
+                    "entity_type": "similarity_threshold_analysis",
+                    "execution_id": execution_id,
+                    "threshold": threshold,
+                    "high_similarity_count": len(high_similarity_nodes),
+                    "timestamp": time.time()
+                }
+            )
+            return result_id
+        return None
+
+    def track_entity_processing(
+        self,
+        entity_id: str,
+        entity_type: str,
+        entity_data: Dict[str, Any],
+        source: str = None,
+        **kwargs
+    ):
+        """Track entity processing with provenance."""
+        if self.provenance and self._prov_manager:
+            result_id = f"entity_processing_{uuid.uuid4().hex[:8]}"
+            self._prov_manager.track_entity(
+                entity_id=result_id,
+                source=source or "entity_processing",
+                metadata={
+                    "entity_type": "entity_processing",
+                    "processed_entity_id": entity_id,
+                    "processed_entity_type": entity_type,
+                    "timestamp": time.time()
+                }
+            )
+            return result_id
+        return None
+
+    def track_relationship_processing(
+        self,
+        relationship_id: str,
+        relationship_type: str,
+        relationship_data: Dict[str, Any],
+        source: str = None,
+        **kwargs
+    ):
+        """Track relationship processing with provenance."""
+        if self.provenance and self._prov_manager:
+            result_id = f"relationship_processing_{uuid.uuid4().hex[:8]}"
+            self._prov_manager.track_entity(
+                entity_id=result_id,
+                source=source or "relationship_processing",
+                metadata={
+                    "entity_type": "relationship_processing",
+                    "processed_relationship_id": relationship_id,
+                    "processed_relationship_type": relationship_type,
+                    "timestamp": time.time()
+                }
+            )
+            return result_id
+        return None
+
+    def track_path_analysis(
+        self,
+        graph: Any,
+        paths: Dict[str, Any] = None,
+        method: str = None,
+        source: str = None,
+        **kwargs
+    ):
+        """Track path analysis with provenance."""
+        if self.provenance and self._prov_manager:
+            result_id = f"path_analysis_{uuid.uuid4().hex[:8]}"
+            self._prov_manager.track_entity(
+                entity_id=result_id,
+                source=source or "path_analysis",
+                metadata={
+                    "entity_type": "path_analysis",
+                    "paths_count": len(paths) if paths else 0,
+                    "method": method,
+                    "timestamp": time.time()
+                }
+            )
+            return result_id
+        return None
+
+    def track_path_finding(
+        self,
+        graph: Any,
+        source_node: str = None,
+        target_node: str = None,
+        paths: Any = None,
+        path: Any = None,
+        method: str = None,
+        parameters: Dict[str, Any] = None,
+        source: str = None,
+        **kwargs
+    ):
+        """Track path finding with provenance."""
+        if self.provenance and self._prov_manager:
+            result_id = f"path_finding_{uuid.uuid4().hex[:8]}"
+            self._prov_manager.track_entity(
+                entity_id=result_id,
+                source=source or "path_finding",
+                metadata={
+                    "entity_type": "path_finding",
+                    "source_node": source_node,
+                    "target_node": target_node,
+                    "method": method,
+                    "timestamp": time.time()
+                }
+            )
+            return result_id
+        return None
+
+    def track_embedding_analysis(
+        self,
+        embeddings: Dict[str, Any],
+        analysis_results: Dict[str, Any] = None,
+        source: str = None,
+        **kwargs
+    ):
+        """Track embedding analysis with provenance."""
+        if self.provenance and self._prov_manager:
+            result_id = f"embedding_analysis_{uuid.uuid4().hex[:8]}"
+            self._prov_manager.track_entity(
+                entity_id=result_id,
+                source=source or "embedding_analysis",
+                metadata={
+                    "entity_type": "embedding_analysis",
+                    "embeddings_count": len(embeddings),
+                    "timestamp": time.time()
+                }
+            )
+            return result_id
+        return None
+
+    def track_connectivity_analysis(
+        self,
+        graph: Any,
+        components: List[List[str]],
+        source: str = None,
+        **kwargs
+    ):
+        """Track connectivity analysis with provenance."""
+        if self.provenance and self._prov_manager:
+            result_id = f"connectivity_{uuid.uuid4().hex[:8]}"
+            self._prov_manager.track_entity(
+                entity_id=result_id,
+                source=source or "connectivity_analysis",
+                metadata={
+                    "entity_type": "connectivity_analysis",
+                    "components_count": len(components),
+                    "timestamp": time.time()
+                }
+            )
+            return result_id
+        return None
+
+    def track_cross_layer_analysis(
+        self,
+        graph_data: Any = None,
+        cross_layer_results: Dict[str, Any] = None,
+        source: str = None,
+        **kwargs
+    ):
+        """Track cross-layer analysis with provenance."""
+        if self.provenance and self._prov_manager:
+            result_id = f"cross_layer_{uuid.uuid4().hex[:8]}"
+            self._prov_manager.track_entity(
+                entity_id=result_id,
+                source=source or "cross_layer_analysis",
+                metadata={
+                    "entity_type": "cross_layer_analysis",
+                    "layers_count": len(cross_layer_results) if cross_layer_results else 0,
+                    "timestamp": time.time()
+                }
+            )
+            return result_id
+        return None
+
+    def track_pipeline_summary(
+        self,
+        pipeline_id: str,
+        execution_phases: List[str],
+        execution_ids: Dict[str, str],
+        total_time: float = None,
+        input_data_size: int = None,
+        source: str = None,
+        **kwargs
+    ):
+        """Track pipeline summary with provenance."""
+        if self.provenance and self._prov_manager:
+            result_id = f"pipeline_summary_{uuid.uuid4().hex[:8]}"
+            self._prov_manager.track_entity(
+                entity_id=result_id,
+                source=source or "pipeline_summary",
+                metadata={
+                    "entity_type": "pipeline_summary",
+                    "pipeline_id": pipeline_id,
+                    "phases_count": len(execution_phases),
+                    "total_time": total_time,
+                    "input_data_size": input_data_size,
+                    "timestamp": time.time()
+                }
+            )
+            return result_id
+        return None
+
+    def track_workflow_summary(
+        self,
+        master_workflow_id: str,
+        execution_phases: List[str],
+        execution_ids: Dict[str, str],
+        total_time: float = None,
+        source: str = None,
+        **kwargs
+    ):
+        """Track workflow summary with provenance."""
+        if self.provenance and self._prov_manager:
+            summary_id = f"workflow_summary_{uuid.uuid4().hex[:8]}"
+            self._prov_manager.track_entity(
+                entity_id=summary_id,
+                source=source or "workflow_summary",
+                metadata={
+                    "entity_type": "workflow_summary",
+                    "master_workflow_id": master_workflow_id,
+                    "execution_phases": execution_phases,
+                    "phases_count": len(execution_phases),
+                    "total_time": total_time,
+                    "timestamp": time.time()
+                }
+            )
+            return summary_id
+        return None
+
+    def track_link_prediction_result(
+        self,
+        source_node: str,
+        target_node: str,
+        prediction_score: float,
+        method: str,
+        execution_id: str,
+        source: str = None,
+        **kwargs
+    ):
+        """Track individual link prediction result with provenance."""
+        if self.provenance and self._prov_manager:
+            result_id = f"link_prediction_result_{uuid.uuid4().hex[:8]}"
+            self._prov_manager.track_entity(
+                entity_id=result_id,
+                source=source or "link_prediction_result",
+                metadata={
+                    "entity_type": "link_prediction_result",
+                    "source_node": source_node,
+                    "target_node": target_node,
+                    "prediction_score": prediction_score,
+                    "method": method,
+                    "execution_id": execution_id,
+                    "timestamp": time.time()
+                }
+            )
+            return result_id
+        return None
+
+
+    def _track_generic(self, analysis_type: str, source: str = None, **kwargs):
+        """Generic tracking method for domain-specific analyses."""
+        if self.provenance and self._prov_manager:
+            result_id = f"{analysis_type}_{uuid.uuid4().hex[:8]}"
+            self._prov_manager.track_entity(
+                entity_id=result_id,
+                source=source or analysis_type,
+                metadata={"entity_type": analysis_type, "timestamp": time.time(), **{k: str(v)[:100] for k, v in kwargs.items() if not callable(v)}},
+            )
+            return result_id
+        return None
+
+    def track_influence_analysis(self, graph=None, source=None, **kwargs):
+        return self._track_generic("influence_analysis", source=source, **kwargs)
+
+    def track_verification_analysis(self, graph=None, source=None, **kwargs):
+        return self._track_generic("verification_analysis", source=source, **kwargs)
+
+    def track_supply_chain_paths(self, graph=None, source=None, **kwargs):
+        return self._track_generic("supply_chain_paths", source=source, **kwargs)
+
+    def track_bottleneck_analysis(self, graph=None, source=None, **kwargs):
+        return self._track_generic("bottleneck_analysis", source=source, **kwargs)
+
+    def track_quality_analysis(self, graph=None, source=None, **kwargs):
+        return self._track_generic("quality_analysis", source=source, **kwargs)
+
+    def track_lead_time_analysis(self, graph=None, source=None, **kwargs):
+        return self._track_generic("lead_time_analysis", source=source, **kwargs)
+
+    def track_cross_domain_analysis(self, graph=None, source=None, **kwargs):
+        return self._track_generic("cross_domain_analysis", source=source, **kwargs)
+
+    def track_cross_domain_similarity(self, graph=None, source=None, **kwargs):
+        return self._track_generic("cross_domain_similarity", source=source, **kwargs)
+
+    def track_collaboration_potential(self, graph=None, source=None, **kwargs):
+        return self._track_generic("collaboration_potential", source=source, **kwargs)
 
 
 # Convenience functions for easy access

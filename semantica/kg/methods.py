@@ -137,6 +137,7 @@ Example Usage:
     >>> centrality = calculate_centrality(kg, method="degree")
 """
 
+import numpy as np
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
 from ..utils.exceptions import ConfigurationError, ProcessingError
@@ -148,7 +149,11 @@ from .connectivity_analyzer import ConnectivityAnalyzer
 from .entity_resolver import EntityResolver
 from .graph_analyzer import GraphAnalyzer
 from .graph_builder import GraphBuilder
+from .link_predictor import LinkPredictor
+from .node_embeddings import NodeEmbedder
+from .path_finder import PathFinder
 from .registry import method_registry
+from .similarity_calculator import SimilarityCalculator
 from .temporal_query import TemporalGraphQuery
 
 logger = get_logger("kg_methods")
@@ -606,7 +611,7 @@ def compute_node_embeddings(
         ... )
     """
     try:
-        from .node_embeddings import NodeEmbedder
+        pass  # NodeEmbedder imported at module level
         
         embedder = NodeEmbedder(method=method, **kwargs)
         return embedder.compute_embeddings(
@@ -654,7 +659,7 @@ def calculate_similarity(
         ... )
     """
     try:
-        from .similarity_calculator import SimilarityCalculator
+        pass  # SimilarityCalculator imported at module level
         
         calc = SimilarityCalculator(method=method)
         
@@ -717,7 +722,7 @@ def predict_links(
         ... )
     """
     try:
-        from .link_predictor import LinkPredictor
+        pass  # LinkPredictor imported at module level
         
         predictor = LinkPredictor(method=method)
         return predictor.predict_links(
@@ -765,7 +770,7 @@ def find_shortest_path(
         ... )
     """
     try:
-        from .path_finder import PathFinder
+        pass  # PathFinder imported at module level
         
         finder = PathFinder()
         
@@ -823,7 +828,7 @@ def calculate_pagerank(
         ... )
     """
     try:
-        from .centrality_calculator import CentralityCalculator
+        pass  # CentralityCalculator imported at module level
         
         calculator = CentralityCalculator()
         return calculator.calculate_pagerank(
@@ -871,7 +876,7 @@ def detect_communities_label_propagation(
         ... )
     """
     try:
-        from .community_detector import CommunityDetector
+        pass  # CommunityDetector imported at module level
         
         detector = CommunityDetector()
         return detector.detect_communities_label_propagation(
@@ -888,16 +893,22 @@ def detect_communities_label_propagation(
 # Helper functions
 
 def _get_node_embedding(
-    graph_store: Any, 
-    node_id: str, 
+    graph_store: Any,
+    node_id: str,
     property_name: str
 ) -> Optional[List[float]]:
     """Get embedding for a specific node."""
-    if hasattr(graph_store, 'get_node_property'):
-        return graph_store.get_node_property(node_id, property_name)
-    elif hasattr(graph_store, 'get_node_attributes'):
-        attrs = graph_store.get_node_attributes(node_id)
-        return attrs.get(property_name)
-    elif hasattr(graph_store, '_node_embeddings'):
+    # Prefer explicit _node_embeddings dict over auto-created Mock attributes
+    if hasattr(graph_store, '_node_embeddings') and isinstance(graph_store._node_embeddings, dict):
         return graph_store._node_embeddings.get(node_id)
+    if hasattr(graph_store, 'get_node_property') and callable(graph_store.get_node_property):
+        result = graph_store.get_node_property(node_id, property_name)
+        if isinstance(result, (list, np.ndarray)):
+            return result
+    if hasattr(graph_store, 'get_node_attributes') and callable(graph_store.get_node_attributes):
+        attrs = graph_store.get_node_attributes(node_id)
+        if isinstance(attrs, dict):
+            result = attrs.get(property_name)
+            if isinstance(result, (list, np.ndarray)):
+                return result
     return None
