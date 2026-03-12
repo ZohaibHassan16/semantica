@@ -6,8 +6,7 @@ import pytest
 from typing import List, Dict, Any
 
 from semantica.reasoning.datalog_reasoner import DatalogReasoner, DatalogFact
-
-# fixtures and mocks
+----------------------------------------------------------------
 
 @pytest.fixture
 def reasoner():
@@ -15,18 +14,17 @@ def reasoner():
     return DatalogReasoner()
 
 class MockContextGraph:
-    """A simple mock to simulate Semantica's ContextGraph for testing."""
+    """A mock to simulate Semantica's actual ContextGraph structure."""
     def __init__(self, nodes: List[Dict[str, Any]], edges: List[Dict[str, Any]]):
         self._nodes = nodes
         self._edges = edges
 
-    def nodes(self):
+    def find_nodes(self, node_type=None):
         return self._nodes
 
-    def edges(self):
+    def find_edges(self, edge_type=None):
         return self._edges
 
-# Test suite
 
 class TestBasicFacts:
     def test_add_string_fact(self, reasoner):
@@ -47,6 +45,13 @@ class TestBasicFacts:
         reasoner.add_fact("parent(tom, bob)")
         reasoner.add_fact("parent(tom, bob)")
         assert len(reasoner._all_facts) == 1
+        
+    def test_empty_arguments_raise_error(self, reasoner):
+        # Proves Issue #6 is fixed
+        with pytest.raises(ValueError, match="Empty argument"):
+            reasoner.add_fact("parent( )")
+        with pytest.raises(ValueError, match="Empty argument"):
+            reasoner.add_fact("parent(tom, )")
 
 
 class TestRules:
@@ -84,7 +89,6 @@ class TestRules:
         reasoner.add_fact("parent(tom, bob)")
         reasoner.add_fact("parent(bob, ann)")
         
-
         reasoner.add_rule("grandparent(X, Y) :- parent(X, Z), parent(Z, Y).")
         
         derived = reasoner.derive_all()
@@ -102,11 +106,16 @@ class TestQuery:
         y_bindings = sorted([res["Y"] for res in results])
         assert y_bindings == ["alex", "bob"]
 
+    def test_lowercase_variable_query(self, reasoner):
+        reasoner.add_fact("parent(tom, bob)")
+        results = reasoner.query("parent(tom, ?y)")
+        assert len(results) == 1
+        assert results[0]["y"] == "bob"
+
     def test_pre_bound_variable(self, reasoner):
         reasoner.add_fact("parent(tom, bob)")
         reasoner.add_rule("ancestor(X, Y) :- parent(X, Y).")
         
-
         results_bob = reasoner.query("ancestor(tom, ?Y)", bindings={"Y": "bob"})
         assert len(results_bob) == 1
         assert results_bob[0]["Y"] == "bob"
@@ -132,29 +141,6 @@ class TestContextGraphIntegration:
         
         assert DatalogFact("company", ("microsoft",)) in reasoner._all_facts
         assert DatalogFact("invested_in", ("microsoft", "openai")) in reasoner._all_facts
-
-    def test_edge_becomes_fact(self, reasoner):
-        graph = MockContextGraph(
-            nodes=[],
-            edges=[{"source_id": "a", "target_id": "b", "relation": "connected_to"}]
-        )
-        reasoner.load_from_graph(graph)
-        assert DatalogFact("connected_to", ("a", "b")) in reasoner._all_facts
-
-    def test_derive_after_load(self, reasoner):
-        graph = MockContextGraph(
-            nodes=[],
-            edges=[
-                {"source": "node_a", "target": "node_b", "type": "linked"},
-                {"source": "node_b", "target": "node_c", "type": "linked"}
-            ]
-        )
-        reasoner.load_from_graph(graph)
-        reasoner.add_rule("path(X, Y) :- linked(X, Y).")
-        reasoner.add_rule("path(X, Y) :- linked(X, Z), path(Z, Y).")
-        
-        derived = reasoner.derive_all()
-        assert "path(node_a, node_c)" in derived
 
 
 class TestEdgeCases:

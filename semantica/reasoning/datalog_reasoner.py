@@ -79,24 +79,35 @@ class DatalogReasoner:
         elif isinstance(fact, dict):
             if "subject" in fact and "predicate" in fact and "object" in fact:
                 parsed_fact = DatalogFact(
-                    predicate=str(fact["predicate"]),
-                    args=(str(fact["subject"]), str(fact["object"]))
+                    predicate=str(fact["predicate"]).replace(' ', '_').lower(),
+                    args=(str(fact["subject"]).replace(' ', '_').lower(), str(fact["object"]).replace(' ', '_').lower())
                 )
-            elif "source_id" in fact or "source_name" in fact:
-                source = fact.get("source_name", fact.get("source_id"))
-                target = fact.get("target_name", fact.get("target_id"))
-                rtype = fact.get("type", "relationship")
-                parsed_fact = DatalogFact(
-                    predicate=rtype,
-                    args=(str(source), str(target))
-                )
-            elif "type" in fact and ("name" in fact or "id" in fact):
-                name = fact.get("name", fact.get("id"))
-                etype = fact.get("type", "Entity")
-                parsed_fact = DatalogFact(
-                    predicate=etype,
-                    args=(str(name),)
-                )
+            elif "source" in fact or "source_id" in fact or "source_name" in fact:
+                source = fact.get("source", fact.get("source_name", fact.get("source_id")))
+                target = fact.get("target", fact.get("target_name", fact.get("target_id")))
+                rtype = fact.get("type", fact.get("relation", "connected_to"))
+                if source and target:
+                    parsed_fact = DatalogFact(
+                        predicate=str(rtype).replace(' ', '_').lower(),
+                        args=(str(source).replace(' ', '_').lower(), str(target).replace(' ', '_').lower())
+                    )
+                    
+            elif "type" in fact and ("id" in fact or "name" in fact):
+                name = fact.get("id", fact.get("name"))
+                etype = fact.get("type", "entity")
+                if name:
+                    parsed_fact = DatalogFact(
+                        predicate=str(etype).replace(' ', '_').lower(),
+                        args=(str(name).replace(' ', '_').lower(),)
+                    )
+            
+
+            if parsed_fact:
+                for arg in parsed_fact.args:
+                    if not arg:
+                        raise ValueError("Facts cannot contain empty arguments")
+                    if arg[0].isupper():
+                        raise ValueError(f"Facts must be constants only. Found variable '{arg}' in {fact}")
         
         if parsed_fact and parsed_fact not in self._all_facts:
             self._all_facts.add(parsed_fact)
@@ -120,6 +131,8 @@ class DatalogReasoner:
         args = tuple(arg.strip() for arg in args_str.split(','))
         
         for arg in args:
+            if not arg:
+                raise ValueError(f"Empty argument found in fact: {s}")
             if arg[0].isupper():
                 raise ValueError(f"Facts must be constants only (no variables). Found variable '{arg}' in {s}")
                 
@@ -248,7 +261,7 @@ class DatalogReasoner:
                 delta_index[f.predicate].add(f)
             
             for rule in self._rules:
-                new_facts = self._apply_rule_seminaive(rule, delta_index)
+                new_facts = self._apply_rule(rule, delta_index)
                 
                 for fact in new_facts:
                     if fact not in self._all_facts:
@@ -267,11 +280,12 @@ class DatalogReasoner:
         
         return [f"{f.predicate}({', '.join(f.args)})" for f in self._all_facts]
 
-    def _apply_rule_seminaive(
-        self, rule: DatalogRule, delta_index: Dict[str, Set[DatalogFact]]
+    def _apply_rule(
+        self, rule: DatalogRule, delta_index: Optional[Dict[str, Set[DatalogFact]]] = None
     ) -> Set[DatalogFact]:
         """
-        Evaluates a single rule using semi-naive strategy.
+        Evaluates a single rule.
+        Uses semi-naive strategy if delta_index is provided, otherwise falls back to naive evaluation.
         """
         results = set()
         
@@ -281,14 +295,16 @@ class DatalogReasoner:
                 results.add(fact)
             return results
 
-        # Evaluate the rule N times, binding the i-th atom strictly to delta_old facts
-        for delta_index_pos in range(len(rule.body)):
+        is_seminaive = delta_index is not None
+        evaluation_paths = range(len(rule.body)) if is_seminaive else [0]
+
+        for delta_index_pos in evaluation_paths:
             bindings_list = [{}]
             
             for i, atom in enumerate(rule.body):
                 new_bindings_list = []
                 
-                if i == delta_index_pos:
+                if is_seminaive and i == delta_index_pos:
                     candidate_facts = delta_index.get(atom.predicate, set())
                 else:
                     candidate_facts = self._fact_index.get(atom.predicate, set())
@@ -309,16 +325,15 @@ class DatalogReasoner:
                     results.add(head_fact)
                     
         return results
-
-
+    
     # Query & ContextGraph Integration
 
 
     def query(self, pattern: str, bindings: dict = None) -> List[dict]:
         """
         Queries the derived fact set. Automatically runs derive_all() if rules exist.
-        Syntax: "ancestor(tom, ?Y)"
-        Returns: [{"Y": "bob"}, {"Y": "ann"}]
+        Syntax: "ancestor(tom, ?Y)" or "ancestor(tom, ?y)"
+        Returns: [{"Y": "bob"}] or [{"y": "bob"}]
         """
         if self._rules:
             self.derive_all()
@@ -336,15 +351,22 @@ class DatalogReasoner:
         for i, arg in enumerate(raw_args):
             if arg.startswith('?'):
                 var_name = arg[1:]
-                query_vars[i] = var_name
-                pattern_args.append(var_name)
+                if not var_name:
+                    raise ValueError("Empty variable name after '?'")
+                internal_var = var_name[0].upper() + var_name[1:]
+                query_vars[i] = (var_name, internal_var)
+                pattern_args.append(internal_var)
             elif self._is_variable(arg):
-                query_vars[i] = arg
+                query_vars[i] = (arg, arg)
                 pattern_args.append(arg)
             else:
                 pattern_args.append(arg)
                 
-        initial_bindings = bindings or {}
+        initial_bindings = {}
+        for k, v in (bindings or {}).items():
+            internal_k = k[0].upper() + k[1:] if k and not k[0].isupper() else k
+            initial_bindings[internal_k] = v
+
         for i, arg in enumerate(pattern_args):
             if self._is_variable(arg) and arg in initial_bindings:
                 pattern_args[i] = initial_bindings[arg] 
@@ -356,66 +378,43 @@ class DatalogReasoner:
             match_bindings = self._unify(tuple(pattern_args), fact.args, {})
             if match_bindings is not None:
                 result_row = {}
-                for idx, var_name in query_vars.items():
-                    if var_name in match_bindings:
-                        result_row[var_name] = match_bindings[var_name]
-                    elif var_name in initial_bindings:
-                        result_row[var_name] = initial_bindings[var_name]
+                for idx, (orig_var, internal_var) in query_vars.items():
+                    if internal_var in match_bindings:
+                        result_row[orig_var] = match_bindings[internal_var]
+                    elif internal_var in initial_bindings:
+                        result_row[orig_var] = initial_bindings[internal_var]
                 
                 if result_row and result_row not in results:
                     results.append(result_row)
                     
         return results
-
+    
     def load_from_graph(self, graph: Any) -> int:
         """
-        Loads a ContextGraph into Datalog facts.
-        Edges become binary facts, nodes become unary facts.
+        Loads a ContextGraph into Datalog facts using central add_fact validation.
         """
-        facts_added = 0
+        initial_count = len(self._all_facts)
         
-        if hasattr(graph, 'edges'):
-            edges = graph.edges() if callable(graph.edges) else graph.edges
-            for edge in edges:
-                if isinstance(edge, dict):
-                    source = edge.get('source_id', edge.get('source'))
-                    target = edge.get('target_id', edge.get('target'))
-                    rel_type = edge.get('type', edge.get('relation', 'connected_to'))
-                else:
-                    source = getattr(edge, 'source_id', getattr(edge, 'source', None))
-                    target = getattr(edge, 'target_id', getattr(edge, 'target', None))
-                    rel_type = getattr(edge, 'type', getattr(edge, 'relation', 'connected_to'))
-                
-                if source and target:
-                    s_clean = str(source).replace(' ', '_').lower()
-                    t_clean = str(target).replace(' ', '_').lower()
-                    pred_clean = str(rel_type).replace(' ', '_').lower()
-                    
-                    fact = DatalogFact(pred_clean, (s_clean, t_clean))
-                    if fact not in self._all_facts:
-                        self._all_facts.add(fact)
-                        self._fact_index[pred_clean].add(fact)
-                        facts_added += 1
-
-        if hasattr(graph, 'nodes'):
-            nodes = graph.nodes() if callable(graph.nodes) else graph.nodes
-            for node in nodes:
-                if isinstance(node, dict):
-                    node_id = node.get('id', node.get('name'))
-                    node_type = node.get('type', 'entity')
-                else:
-                    node_id = getattr(node, 'id', getattr(node, 'name', None))
-                    node_type = getattr(node, 'type', 'entity')
-                    
-                if node_id:
-                    n_clean = str(node_id).replace(' ', '_').lower()
-                    t_clean = str(node_type).replace(' ', '_').lower()
-                    
-                    fact = DatalogFact(t_clean, (n_clean,))
-                    if fact not in self._all_facts:
-                        self._all_facts.add(fact)
-                        self._fact_index[t_clean].add(fact)
-                        facts_added += 1
+        if hasattr(graph, 'find_edges') and hasattr(graph, 'find_nodes'):
+            for edge_dict in graph.find_edges():
+                self.add_fact(edge_dict)
+            for node_dict in graph.find_nodes():
+                self.add_fact(node_dict)
+        else:
+            if hasattr(graph, 'edges'):
+                edges = graph.edges() if callable(graph.edges) else graph.edges
+                for edge in edges:
+                    self.add_fact(edge if isinstance(edge, dict) else edge.__dict__)
+            
+            if hasattr(graph, 'nodes'):
+                nodes = graph.nodes() if callable(graph.nodes) else graph.nodes
+                if isinstance(nodes, dict): 
+                    nodes = nodes.values()
+                for node in nodes:
+                    self.add_fact(node if isinstance(node, dict) else node.__dict__)
                         
+        facts_added = len(self._all_facts) - initial_count
         self.logger.info(f"Loaded {facts_added} facts from ContextGraph.")
         return facts_added
+    
+    
