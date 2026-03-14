@@ -430,7 +430,7 @@ class ContextGraph:
                     "id": node.node_id,
                     "content": node.content,
                     "type": node.node_type,
-                    "metadata": node.properties,
+                    "metadata": (node.properties or {}).copy(),
                 })
         return result
 
@@ -2220,6 +2220,20 @@ class ContextGraph:
     def _add_decision_to_graph(self, decision: Dict[str, Any]) -> None:
         """Add decision to context graph."""
         try:
+            protected_properties = {
+                "category",
+                "scenario",
+                "reasoning",
+                "outcome",
+                "confidence",
+                "timestamp",
+                "decision_maker",
+            }
+            safe_metadata = {
+                key: value
+                for key, value in (decision.get("metadata") or {}).items()
+                if key not in protected_properties
+            }
             extra_properties = {
                 key: value
                 for key, value in decision.items()
@@ -2248,7 +2262,7 @@ class ContextGraph:
                 scenario=decision["scenario"],
                 decision_maker=decision.get("decision_maker", ""),
                 reasoning=decision["reasoning"],
-                **(decision.get("metadata") or {}),
+                **safe_metadata,
                 **extra_properties,
             )
             

@@ -347,9 +347,14 @@ class TestContextGraphAdvancedDecisionMethods:
         result = g.analyze_decision_influence(ids["alice"])
         # alice, bob, and carol all share underwriter_ai_v5 — they should appear in influence
         direct = result["direct_influence"]
-        # At minimum the category-shared decisions should appear
         assert isinstance(direct, list)
-        assert result["total_influenced"] >= 0  # May be 0 if no category overlap
+        assert all(isinstance(item, dict) for item in direct)
+        assert all(
+            {"decision_id", "scenario", "outcome", "category"}.issubset(item.keys())
+            for item in direct
+        )
+        direct_ids = {item["decision_id"] for item in direct}
+        assert ids["bob"] in direct_ids
 
     def test_analyze_decision_influence_category_cross(self):
         """Decisions in same category appear in influence set."""

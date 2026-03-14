@@ -109,6 +109,17 @@ class TestContextModule(unittest.TestCase):
         self.assertEqual(neighbors[0]["id"], "n2")
         self.assertEqual(neighbors[0]["relationship"], "knows")
 
+    def test_get_nodes_by_label_returns_metadata_copy(self):
+        graph = ContextGraph()
+        graph.add_node("n1", "person", "Alice", role="engineer")
+
+        nodes = graph.get_nodes_by_label("person")
+        self.assertEqual(len(nodes), 1)
+
+        nodes[0]["metadata"]["role"] = "mutated"
+
+        self.assertEqual(graph.get_node_property("n1", "role"), "engineer")
+
     def test_context_graph_preserves_full_decision_text(self):
         graph = ContextGraph()
         scenario = "Launch regional expansion plan " + ("X" * 140)
@@ -133,6 +144,30 @@ class TestContextModule(unittest.TestCase):
         self.assertEqual(graph.nodes[root_id].content, scenario)
         self.assertEqual(graph.nodes[root_id].properties["scenario"], scenario)
         self.assertEqual(chain[0].scenario, scenario)
+
+    def test_record_decision_metadata_cannot_override_core_fields(self):
+        graph = ContextGraph()
+        decision_id = graph.record_decision(
+            category="strategy",
+            scenario="Open LATAM expansion program",
+            reasoning="High growth potential",
+            outcome="approved",
+            confidence=0.9,
+            metadata={
+                "scenario": "metadata override",
+                "category": "metadata category",
+                "outcome": "metadata outcome",
+                "custom_note": "keep me",
+            },
+        )
+
+        node = graph.nodes[decision_id]
+
+        self.assertEqual(node.content, "Open LATAM expansion program")
+        self.assertEqual(node.properties["scenario"], "Open LATAM expansion program")
+        self.assertEqual(node.properties["category"], "strategy")
+        self.assertEqual(node.properties["outcome"], "approved")
+        self.assertEqual(node.properties["custom_note"], "keep me")
 
     # --- AgentMemory Tests ---
     def test_agent_memory_store(self):
