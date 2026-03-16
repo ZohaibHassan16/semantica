@@ -215,3 +215,13 @@ class GraphSession:
         """Delete an annotation. Returns True if found and deleted."""
         with self._lock:
             return self.annotations.pop(annotation_id, None) is not None
+
+    def add_nodes(self, nodes: List[Dict[str, Any]]) -> int:
+        """Thread-safe node addition."""
+        with self._lock:
+            return self.graph.add_nodes(nodes)
+
+    def add_edges(self, edges: List[Dict[str, Any]]) -> int:
+        """Thread-safe edge addition."""
+        with self._lock:
+            return self.graph.add_edges(edges)

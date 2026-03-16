@@ -151,11 +151,46 @@ async def import_file(
     try:
         if filename.endswith(".json") or filename.endswith(".jsonld"):
             data = json.loads(content)
-            nodes = data.get("nodes", data.get("entities", []))
-            edges = data.get("edges", data.get("relationships", []))
 
-            added_nodes = await asyncio.to_thread(session.graph.add_nodes, nodes)
-            added_edges = await asyncio.to_thread(session.graph.add_edges, edges)
+
+            raw_nodes = data.get("nodes", data.get("entities", []))
+            raw_edges = data.get("edges", data.get("relationships", []))
+
+    
+            # KG export uses {id, type, text, metadata}
+            # ContextGraph.add_nodes expects {id, type, properties: {content, ...}}
+            nodes = []
+            for n in raw_nodes:
+                if "properties" in n:
+                    nodes.append(n)
+                else:
+                    nodes.append({
+                        "id": n.get("id"),
+                        "type": n.get("type", "entity"),
+                        "properties": {
+                            "content": n.get("text", n.get("content", n.get("id", ""))),
+                            **(n.get("metadata") or {}),
+                        },
+                    })
+
+            # KG export uses {source, target, type, metadata}
+            # ContextGraph.add_edges expects {source_id, target_id, type, weight, properties}
+            edges = []
+            for r in raw_edges:
+                src = r.get("source_id", r.get("source"))
+                tgt = r.get("target_id", r.get("target"))
+                if not src or not tgt:
+                    continue  
+                edges.append({
+                    "source_id": src,
+                    "target_id": tgt,
+                    "type": r.get("type", "related_to"),
+                    "weight": r.get("weight", 1.0),
+                    "properties": r.get("metadata") or r.get("properties") or {},
+                })
+
+            added_nodes = await asyncio.to_thread(session.add_nodes, nodes)
+            added_edges = await asyncio.to_thread(session.add_edges, edges)
 
             result = {
                 "status": "success",
