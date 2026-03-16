@@ -363,9 +363,8 @@ class Reasoner:
                         return None  # Binding conflict
                     new_bindings[var] = value
                 return new_bindings
-        except Exception:
-            pass
-
+        except Exception as e:
+            self.logger.warning(f"Error matching pattern '{pattern}' (regex: '{p_regex}') against fact '{fact}': {e}")
             
         return None
         
