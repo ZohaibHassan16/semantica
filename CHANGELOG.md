@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- **Native Datalog Reasoning Engine** (PR #371, Issue #368 by @ZohaibHassan16, reviewed and fixed by @KaifAhmad1):
+  - Added `DatalogReasoner` to `semantica.reasoning` — a pure-Python, bottom-up semi-naive fixpoint engine with guaranteed termination on finite graphs
+  - Supports recursive Horn clause rules (e.g. `ancestor(X,Y) :- parent(X,Z), ancestor(Z,Y).`) that existing engines loop on indefinitely
+  - Memory-optimized `_unify()` with deferred dict allocation — zero allocation on failed unifications
+  - `O(1)` delta-index lookup per iteration eliminates redundant `O(N)` rule re-evaluations in semi-naive loop
+  - `query("pred(?X, ?Y)")` returns variable-binding dicts; supports both uppercase `?Y` and lowercase `?y` variable syntax
+  - `query(..., bindings={"Y": "val"})` pre-binds variables for exact-match verification
+  - `load_from_graph(ContextGraph)` converts all edges and nodes to Datalog facts in one call; handles both `find_edges`/`find_nodes` and raw `edges`/`nodes` graph APIs
+  - `add_fact()` accepts `"pred(a, b)"` strings and Semantica dicts (`subject/predicate/object`, `source/target/type`, `type/id` shapes); warns on unrecognised dict format instead of silently dropping
+  - `_derived` cache flag — `derive_all()` skips re-evaluation when no facts or rules have changed since last run; `query()` respects the cache
+  - Progress tracking wrapped in `try/finally` — `stop_tracking()` always called even on exception
+  - `DatalogReasoner`, `DatalogFact`, `DatalogRule` exported from `semantica.reasoning`
+  - 18 tests covering recursive rules, multi-hop inference, variable binding, graph integration, idempotency, and edge cases — all passing
 
 - **Multi-Founder LLM Extraction & Reasoner Inference Fix** (PR #354 by @KaifAhmad1):
   - Fixed `_parse_relation_result` in `methods.py` — unmatched subjects/objects now produce a synthetic `UNKNOWN` entity instead of silently dropping the relation; all LLM-returned co-founders are preserved
