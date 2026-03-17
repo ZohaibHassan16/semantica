@@ -9,14 +9,14 @@ on:
       - 'docs/**'
       - 'mkdocs.yml'
       - 'requirements-docs.txt'
-      - '*.md'
+      - '**/*.md'
   pull_request:
     branches: [main]
     paths-ignore:
       - 'docs/**'
       - 'mkdocs.yml'
       - 'requirements-docs.txt'
-      - '*.md'
+      - '**/*.md'
 
 jobs:
   security-scan:
@@ -168,7 +168,7 @@ jobs:
             }
             
             // Create summary comment
-            const comment = `# 🔒 Security Scan Results\\n\\n${safetyResults}\\n\\n${banditResults}\\n\\n${semgrepResults}\\n\\n---\\n\\n*This security scan runs automatically on every PR and bi-weekly.*\\n\\n📊 **Security Policy**: CI fails on vulnerabilities and HIGH severity issues.`;
+            const comment = `# 🔒 Security Scan Results\\n\\n${safetyResults}\\n\\n${banditResults}\\n\\n${semgrepResults}\\n\\n---\\n\\n*This security scan runs automatically on source-code PRs and bi-weekly (skipped for doc/markdown-only changes).*\\n\\n📊 **Security Policy**: CI fails on vulnerabilities and HIGH severity issues.`;
             
             // Post comment with error handling
             try {
