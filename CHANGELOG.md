@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- **Reasoning Dead Code Removal** (PR #387, Issue #382 by @ZohaibHassan16):
+  - Removed lines 357–358 in `semantica/reasoning/reasoner.py` that silently overwrote the sophisticated `_match_pattern` regex (which handles pre-bound variable embedding, repeated-variable backreferences via `(?P=var)`, and non-greedy named capture groups) with a simpler `re.escape`-based pattern, making all the prior logic unreachable dead code
+  - Removed duplicate unreachable `return None` on line 368 (syntactically dead, appearing immediately after another `return None` in the same branch)
+  - Surfaced `re.error` exceptions instead of swallowing them with `except Exception: pass`, preventing silent failures when malformed patterns were passed to `re.match`
+  - Before this fix, any rule using the same variable twice (e.g. `rel(?x, ?x)`) generated a duplicate named group error that was silently caught, causing the match to return `None` regardless of the fact — breaking transitivity, symmetry, and self-join rule patterns entirely
+
 - **Context Explainability Output Fixes** (PR pending on `context` by @KaifAhmad1):
   - Fixed decision-node storage in `ContextGraph` so full human-readable `scenario`, `reasoning`, and decision metadata are preserved on graph nodes instead of degrading into opaque IDs or truncated display text
   - Fixed causal and precedent reconstruction paths in the context module so returned `Decision` objects prefer readable stored fields over raw node identifiers
