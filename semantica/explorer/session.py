@@ -140,21 +140,29 @@ class GraphSession:
     ) -> tuple[list[dict[str, Any]], int]:
         """Return a paginated slice of nodes and the total count."""
         with self._lock:
-            all_nodes = self.graph.find_nodes(node_type=node_type)
-
-        # Optional keyword filter
-        if search:
-            search_lower = search.lower()
-            all_nodes = [
-                n for n in all_nodes
-                if search_lower in n.get("id", "").lower()
-                or search_lower in n.get("content", "").lower()
-                or search_lower in str(n.get("metadata", {})).lower()
-            ]
-
-        total = len(all_nodes)
-        page = all_nodes[skip: skip + limit]
-        return page, total
+            if search:
+                # Must load all nodes to apply the in-memory keyword filter.
+                all_nodes = self.graph.find_nodes(node_type=node_type)
+                search_lower = search.lower()
+                all_nodes = [
+                    n for n in all_nodes
+                    if search_lower in n.get("id", "").lower()
+                    or search_lower in n.get("content", "").lower()
+                    or search_lower in str(n.get("metadata", {})).lower()
+                ]
+                total = len(all_nodes)
+                page = all_nodes[skip: skip + limit]
+            else:
+                # Delegate pagination to the graph layer to avoid loading
+                # the full node list into memory unnecessarily.
+                stats = self.graph.stats()
+                total = (
+                    stats.get("node_types", {}).get(node_type, 0)
+                    if node_type
+                    else stats.get("node_count", 0)
+                )
+                page = self.graph.find_nodes(node_type=node_type, skip=skip, limit=limit)
+            return page, total
 
     def get_edges(
         self,
@@ -166,16 +174,24 @@ class GraphSession:
     ) -> tuple[list[dict[str, Any]], int]:
         """Return a paginated slice of edges and the total count."""
         with self._lock:
-            all_edges = self.graph.find_edges(edge_type=edge_type)
-
-        if source:
-            all_edges = [e for e in all_edges if e.get("source") == source]
-        if target:
-            all_edges = [e for e in all_edges if e.get("target") == target]
-
-        total = len(all_edges)
-        page = all_edges[skip: skip + limit]
-        return page, total
+            if source or target:
+                # Must load all edges to apply source/target filters in memory.
+                all_edges = self.graph.find_edges(edge_type=edge_type)
+                if source:
+                    all_edges = [e for e in all_edges if e.get("source") == source]
+                if target:
+                    all_edges = [e for e in all_edges if e.get("target") == target]
+                total = len(all_edges)
+                page = all_edges[skip: skip + limit]
+            else:
+                stats = self.graph.stats()
+                total = (
+                    stats.get("edge_types", {}).get(edge_type, 0)
+                    if edge_type
+                    else stats.get("edge_count", 0)
+                )
+                page = self.graph.find_edges(edge_type=edge_type, skip=skip, limit=limit)
+            return page, total
 
     def get_neighbors(self, node_id: str, depth: int = 1) -> List[Dict[str, Any]]:
         """Get neighbours for a node (BFS). Returns [] for unknown nodes."""
@@ -183,9 +199,28 @@ class GraphSession:
             return self.graph.get_neighbors(node_id, hops=depth)
 
     def search(self, query: str, limit: int = 20) -> List[Dict[str, Any]]:
-        """Keyword search across node content."""
+        """Keyword search across node content.
+
+        ``ContextGraph.query`` returns ``{"node": node.to_dict(), "score": …}``
+        where ``node.to_dict()`` uses a ``"properties"`` envelope.  We normalise
+        each result to the flat ``{"id", "type", "content", "metadata"}`` shape
+        that the rest of the session/route layer expects.
+        """
         with self._lock:
-            return self.graph.query(query)[:limit]
+            raw = self.graph.query(query)[:limit]
+
+        normalised = []
+        for r in raw:
+            node = r.get("node", {})
+            props = node.get("properties", {})
+            flat_node = {
+                "id": node.get("id", ""),
+                "type": node.get("type", "entity"),
+                "content": props.get("content", node.get("content", "")),
+                "metadata": {k: v for k, v in props.items() if k != "content"},
+            }
+            normalised.append({"node": flat_node, "score": r.get("score", 0.0)})
+        return normalised
 
     def get_stats(self) -> Dict[str, Any]:
         """Graph-level statistics."""

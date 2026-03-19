@@ -149,6 +149,7 @@ async def check_compliance(
     """
     Check policy compliance for a decision.
 
+    Returns a stub result when no PolicyEngine is wired up.
     Inspects edges of type ``violates``, ``non_compliant``, or ``breaches``
     originating from the decision node.  Returns ``compliant=True`` when no
     such edges are found, which is the correct result for graphs that have
@@ -157,6 +158,7 @@ async def check_compliance(
     node = await asyncio.to_thread(session.get_node, decision_id)
     if node is None:
         raise KeyError(decision_id)
+
 
     edges, _ = await asyncio.to_thread(session.get_edges, skip=0, limit=999_999)
 

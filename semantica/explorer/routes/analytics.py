@@ -14,6 +14,24 @@ from ..session import GraphSession
 router = APIRouter(prefix="/api/analytics", tags=["Analytics"])
 
 
+def _build_graph_dict(session: GraphSession) -> dict:
+    """Build the entity/relationship dict expected by KG analysers."""
+    nodes, _ = session.get_nodes(skip=0, limit=999_999)
+    edges, _ = session.get_edges(skip=0, limit=999_999)
+    return {
+        "entities": [
+            {"id": n.get("id"), "type": n.get("type", "entity"),
+             "text": n.get("content", n.get("id", "")), "metadata": n.get("metadata", {})}
+            for n in nodes
+        ],
+        "relationships": [
+            {"source": e.get("source"), "target": e.get("target"),
+             "type": e.get("type", "related_to"), "metadata": e.get("metadata", {})}
+            for e in edges
+        ],
+    }
+
+
 @router.get("", response_model=AnalyticsResponse)
 async def get_analytics(
     metrics: Optional[str] = Query(
@@ -24,6 +42,7 @@ async def get_analytics(
 ):
     """Compute graph analytics (centrality, community, connectivity)."""
     requested = set((metrics or "centrality,community,connectivity").split(","))
+    graph_dict = await asyncio.to_thread(_build_graph_dict, session)
     graph_dict = await asyncio.to_thread(session.build_graph_dict)
     result: dict = {}
 
@@ -66,6 +85,7 @@ async def validate_graph(
     if validator is None:
         return ValidationReportResponse(valid=True, error_count=0, warning_count=0, issues=[])
 
+    graph_dict = await asyncio.to_thread(_build_graph_dict, session)
     graph_dict = await asyncio.to_thread(session.build_graph_dict)
 
     try:
@@ -76,6 +96,7 @@ async def validate_graph(
             error_count=1,
             issues=[ValidationIssue(severity="error", message=str(exc))],
         )
+
 
     if isinstance(report, dict):
         valid = report.get("valid", True)

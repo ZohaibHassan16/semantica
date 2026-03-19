@@ -3,6 +3,8 @@ Export & import routes.
 """
 
 import asyncio
+import io
+import json
 import json
 import os
 import tempfile
@@ -35,6 +37,39 @@ _FORMAT_MAP = {
 }
 
 
+def _build_kg_dict(session: GraphSession, node_ids: Optional[list] = None) -> dict:
+    """Build the knowledge-graph dict that exporters expect."""
+    nodes, _ = session.get_nodes(skip=0, limit=999_999)
+    edges, _ = session.get_edges(skip=0, limit=999_999)
+
+    if node_ids:
+        id_set = set(node_ids)
+        nodes = [n for n in nodes if n.get("id") in id_set]
+        edges = [
+            e for e in edges
+            if e.get("source") in id_set and e.get("target") in id_set
+        ]
+
+    return {
+        "entities": [
+            {
+                "id": n.get("id"),
+                "type": n.get("type", "entity"),
+                "text": n.get("content", n.get("id", "")),
+                "metadata": n.get("metadata", {}),
+            }
+            for n in nodes
+        ],
+        "relationships": [
+            {
+                "source": e.get("source"),
+                "target": e.get("target"),
+                "type": e.get("type", "related_to"),
+                "metadata": e.get("metadata", {}),
+            }
+            for e in edges
+        ],
+    }
 
 
 @router.post("/api/export")
@@ -50,6 +85,8 @@ async def export_graph(
         )
 
     func_name, content_type, ext = _FORMAT_MAP[fmt]
+
+    kg = await asyncio.to_thread(_build_kg_dict, session, body.node_ids)
 
     kg = await asyncio.to_thread(session.build_graph_dict, body.node_ids)
 
@@ -72,6 +109,20 @@ async def export_graph(
         if export_fn is None:
             raise ValueError(f"Export function {func_name} not found.")
 
+        # Write to a temp file, read back content.
+        with tempfile.NamedTemporaryFile(suffix=ext, delete=False, mode="w") as tmp:
+            tmp_path = tmp.name
+
+        await asyncio.to_thread(export_fn, kg, tmp_path)
+
+        with open(tmp_path, "r", encoding="utf-8", errors="replace") as fh:
+            content = fh.read()
+
+        import os
+        os.unlink(tmp_path)
+
+    except ImportError:
+  
         # Write to a temp file; always clean up even if export or read fails.
         tmp_path = None
         try:
@@ -118,6 +169,43 @@ async def import_file(
     try:
         if filename.endswith(".json") or filename.endswith(".jsonld"):
             data = json.loads(content)
+
+
+            raw_nodes = data.get("nodes", data.get("entities", []))
+            raw_edges = data.get("edges", data.get("relationships", []))
+
+    
+            # KG export uses {id, type, text, metadata}
+            # ContextGraph.add_nodes expects {id, type, properties: {content, ...}}
+            nodes = []
+            for n in raw_nodes:
+                if "properties" in n:
+                    nodes.append(n)
+                else:
+                    nodes.append({
+                        "id": n.get("id"),
+                        "type": n.get("type", "entity"),
+                        "properties": {
+                            "content": n.get("text", n.get("content", n.get("id", ""))),
+                            **(n.get("metadata") or {}),
+                        },
+                    })
+
+            # KG export uses {source, target, type, metadata}
+            # ContextGraph.add_edges expects {source_id, target_id, type, weight, properties}
+            edges = []
+            for r in raw_edges:
+                src = r.get("source_id", r.get("source"))
+                tgt = r.get("target_id", r.get("target"))
+                if not src or not tgt:
+                    continue  
+                edges.append({
+                    "source_id": src,
+                    "target_id": tgt,
+                    "type": r.get("type", "related_to"),
+                    "weight": r.get("weight", 1.0),
+                    "properties": r.get("metadata") or r.get("properties") or {},
+                })
             nodes = data.get("nodes", data.get("entities", []))
             edges = data.get("edges", data.get("relationships", []))
 

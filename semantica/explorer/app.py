@@ -119,8 +119,8 @@ def create_app(session: Optional[GraphSession] = None) -> FastAPI:
         }
 
     static_dir = Path(__file__).resolve().parent.parent / "static"
-    static_dir.mkdir(parents=True, exist_ok=True)
-    from fastapi.staticfiles import StaticFiles
-    app.mount("/", StaticFiles(directory=str(static_dir), html=True), name="static")
+    if static_dir.is_dir():
+        from fastapi.staticfiles import StaticFiles
+        app.mount("/", StaticFiles(directory=str(static_dir), html=True), name="static")
 
     return app

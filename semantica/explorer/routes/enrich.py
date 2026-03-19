@@ -65,9 +65,6 @@ async def predict_links(
     if node is None:
         raise KeyError(body.node_id)
 
-    # Get all nodes and edges to build candidate pairs manually,
-    # because ContextGraph.nodes is a dict (not callable) and is incompatible
-    # with LinkPredictor._get_all_nodes which requires nodes() or get_all_nodes().
     nodes, _ = await asyncio.to_thread(session.get_nodes, skip=0, limit=999_999)
     edges, _ = await asyncio.to_thread(session.get_edges, skip=0, limit=999_999)
 
@@ -82,21 +79,25 @@ async def predict_links(
 
     # Score each candidate via score_link (which works with ContextGraph because
     # it falls back to has_node / get_neighbors).
-    scored = []
-    for n in nodes:
-        candidate = n.get("id")
-        if not candidate or candidate == body.node_id or candidate in existing_neighbours:
-            continue
-        try:
-            score = predictor.score_link(session.graph, body.node_id, candidate)
-            if score > 0:
-                scored.append(
-                    {"target": candidate, "score": score, "type": n.get("type", "entity")}
-                )
-        except Exception:
-            continue
+    # Run in a thread so the CPU-bound scoring loop never blocks the event loop.
+    def _score_all() -> list:
+        results = []
+        for n in nodes:
+            candidate = n.get("id")
+            if not candidate or candidate == body.node_id or candidate in existing_neighbours:
+                continue
+            try:
+                score = predictor.score_link(session.graph, body.node_id, candidate)
+                if score > 0:
+                    results.append(
+                        {"target": candidate, "score": score, "type": n.get("type", "entity")}
+                    )
+            except Exception:
+                continue
+        results.sort(key=lambda x: x["score"], reverse=True)
+        return results
 
-    scored.sort(key=lambda x: x["score"], reverse=True)
+    scored = await asyncio.to_thread(_score_all)
 
     return LinkPredictionResponse(
         node_id=body.node_id,
