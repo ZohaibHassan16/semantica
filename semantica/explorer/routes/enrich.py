@@ -65,32 +65,6 @@ async def predict_links(
     if node is None:
         raise KeyError(body.node_id)
 
-    # Build graph dict
-    nodes, _ = await asyncio.to_thread(session.get_nodes, skip=0, limit=999_999)
-    edges, _ = await asyncio.to_thread(session.get_edges, skip=0, limit=999_999)
-    graph_dict = {
-        "entities": [{"id": n.get("id"), "type": n.get("type", "entity")} for n in nodes],
-        "relationships": [
-            {"source": e.get("source"), "target": e.get("target"),
-             "type": e.get("type", "related_to")}
-            for e in edges
-        ],
-    }
-
-    try:
-        predictions = await asyncio.to_thread(
-            predictor.predict_links, graph_dict, body.node_id, top_n=body.top_n
-        )
-        pred_list = predictions if isinstance(predictions, list) else []
-        return LinkPredictionResponse(
-            node_id=body.node_id,
-            predictions=[_safe_dict(p) for p in pred_list],
-        )
-    except Exception as exc:
-        raise ValueError(f"Link prediction failed: {exc}")
-    # Get all nodes and edges to build candidate pairs manually,
-    # because ContextGraph.nodes is a dict (not callable) and is incompatible
-    # with LinkPredictor._get_all_nodes which requires nodes() or get_all_nodes().
     nodes, _ = await asyncio.to_thread(session.get_nodes, skip=0, limit=999_999)
     edges, _ = await asyncio.to_thread(session.get_edges, skip=0, limit=999_999)
 
@@ -105,21 +79,25 @@ async def predict_links(
 
     # Score each candidate via score_link (which works with ContextGraph because
     # it falls back to has_node / get_neighbors).
-    scored = []
-    for n in nodes:
-        candidate = n.get("id")
-        if not candidate or candidate == body.node_id or candidate in existing_neighbours:
-            continue
-        try:
-            score = predictor.score_link(session.graph, body.node_id, candidate)
-            if score > 0:
-                scored.append(
-                    {"target": candidate, "score": score, "type": n.get("type", "entity")}
-                )
-        except Exception:
-            continue
+    # Run in a thread so the CPU-bound scoring loop never blocks the event loop.
+    def _score_all() -> list:
+        results = []
+        for n in nodes:
+            candidate = n.get("id")
+            if not candidate or candidate == body.node_id or candidate in existing_neighbours:
+                continue
+            try:
+                score = predictor.score_link(session.graph, body.node_id, candidate)
+                if score > 0:
+                    results.append(
+                        {"target": candidate, "score": score, "type": n.get("type", "entity")}
+                    )
+            except Exception:
+                continue
+        results.sort(key=lambda x: x["score"], reverse=True)
+        return results
 
-    scored.sort(key=lambda x: x["score"], reverse=True)
+    scored = await asyncio.to_thread(_score_all)
 
     return LinkPredictionResponse(
         node_id=body.node_id,
@@ -137,11 +115,6 @@ async def detect_duplicates(
         from ...deduplication import DuplicateDetector
 
         detector = DuplicateDetector()
-        nodes, _ = await asyncio.to_thread(session.get_nodes, skip=0, limit=999_999)
-
-        entities = [
-            {"id": n.get("id"), "text": n.get("content", n.get("id", "")),
-             "type": n.get("type", "entity")}
         # Use asyncio.to_thread — get_nodes acquires an RLock and must not block
         # the event loop.
         nodes, _ = await asyncio.to_thread(session.get_nodes, skip=0, limit=999_999)
@@ -191,7 +164,6 @@ async def run_reasoning(
         raise ValueError("Reasoning module not available.")
     except Exception as exc:
         raise ValueError(f"Reasoning failed: {exc}")
-
 
 
 def _safe_dict(obj) -> dict:

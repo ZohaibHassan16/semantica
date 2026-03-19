@@ -383,7 +383,10 @@ class ContextGraph:
         count = 0
         with self._lock:
             for edge in edges:
-                edge_props = edge.get("properties", {})
+                # Accept both "properties" (ContextEdge.to_dict format) and "metadata"
+                # (find_edges / build_graph_dict format) so round-trip imports never
+                # silently drop edge metadata.
+                edge_props = edge.get("properties") or edge.get("metadata", {})
                 # Restore validity windows — ContextEdge.to_dict() writes them at top level
                 valid_from = edge.get("valid_from") or edge_props.get("valid_from")
                 valid_until = edge.get("valid_until") or edge_props.get("valid_until")

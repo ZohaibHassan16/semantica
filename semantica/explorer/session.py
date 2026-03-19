@@ -36,7 +36,6 @@ class GraphSession:
 
     Thread safety: all mutations to the graph or the annotations store
     must go through methods on this class, which are protected by an
-    ``RLock``.
     ``RLock``.  Lazy analytics properties are also initialised under the
     same lock to prevent double-instantiation under concurrent requests.
     """
@@ -44,10 +43,6 @@ class GraphSession:
     def __init__(self, graph: ContextGraph) -> None:
         self.graph = graph
         self._lock = threading.RLock()
-
-
-        self.annotations: Dict[str, Dict[str, Any]] = {}
-
 
         self.annotations: Dict[str, Dict[str, Any]] = {}
 
@@ -60,62 +55,12 @@ class GraphSession:
         self._link_predictor: Any = None
         self._validator: Any = None
 
-
     @classmethod
     def from_file(cls, path: str) -> "GraphSession":
         """Load a ContextGraph from a JSON file and wrap it in a session."""
         graph = ContextGraph()
         graph.load_from_file(path)
         return cls(graph)
-
-
-    @property
-    def centrality(self) -> Any:
-        if self._centrality is None and _KG_AVAILABLE:
-            self._centrality = CentralityCalculator()
-        return self._centrality
-
-    @property
-    def community(self) -> Any:
-        if self._community is None and _KG_AVAILABLE:
-            self._community = CommunityDetector()
-        return self._community
-
-    @property
-    def connectivity(self) -> Any:
-        if self._connectivity is None and _KG_AVAILABLE:
-            self._connectivity = ConnectivityAnalyzer()
-        return self._connectivity
-
-    @property
-    def path_finder(self) -> Any:
-        if self._path_finder is None and _KG_AVAILABLE:
-            self._path_finder = PathFinder()
-        return self._path_finder
-
-    @property
-    def node_embedder(self) -> Any:
-        if self._node_embedder is None and _KG_AVAILABLE:
-            self._node_embedder = NodeEmbedder()
-        return self._node_embedder
-
-    @property
-    def similarity(self) -> Any:
-        if self._similarity is None and _KG_AVAILABLE:
-            self._similarity = SimilarityCalculator()
-        return self._similarity
-
-    @property
-    def link_predictor(self) -> Any:
-        if self._link_predictor is None and _KG_AVAILABLE:
-            self._link_predictor = LinkPredictor()
-        return self._link_predictor
-
-    @property
-    def validator(self) -> Any:
-        if self._validator is None and _KG_AVAILABLE:
-            self._validator = GraphValidator()
-        return self._validator
 
     # ------------------------------------------------------------------
     # Lazy analytics properties (thread-safe double-checked locking)
@@ -195,9 +140,8 @@ class GraphSession:
     ) -> tuple[list[dict[str, Any]], int]:
         """Return a paginated slice of nodes and the total count."""
         with self._lock:
-            # We fetch all nodes if there is a search filter as we need to filter them in memory,
-            # otherwise we let the context graph handle the pagination natively.
             if search:
+                # Must load all nodes to apply the in-memory keyword filter.
                 all_nodes = self.graph.find_nodes(node_type=node_type)
                 search_lower = search.lower()
                 all_nodes = [
@@ -209,24 +153,16 @@ class GraphSession:
                 total = len(all_nodes)
                 page = all_nodes[skip: skip + limit]
             else:
-                total = self.graph.stats().get("node_types", {}).get(node_type, 0) if node_type else self.graph.stats().get("node_count", 0)
+                # Delegate pagination to the graph layer to avoid loading
+                # the full node list into memory unnecessarily.
+                stats = self.graph.stats()
+                total = (
+                    stats.get("node_types", {}).get(node_type, 0)
+                    if node_type
+                    else stats.get("node_count", 0)
+                )
                 page = self.graph.find_nodes(node_type=node_type, skip=skip, limit=limit)
-                
-            all_nodes = self.graph.find_nodes(node_type=node_type)
-
-        # Optional keyword filter
-        if search:
-            search_lower = search.lower()
-            all_nodes = [
-                n for n in all_nodes
-                if search_lower in n.get("id", "").lower()
-                or search_lower in n.get("content", "").lower()
-                or search_lower in str(n.get("metadata", {})).lower()
-            ]
-
-        total = len(all_nodes)
-        page = all_nodes[skip: skip + limit]
-        return page, total
+            return page, total
 
     def get_edges(
         self,
@@ -239,6 +175,7 @@ class GraphSession:
         """Return a paginated slice of edges and the total count."""
         with self._lock:
             if source or target:
+                # Must load all edges to apply source/target filters in memory.
                 all_edges = self.graph.find_edges(edge_type=edge_type)
                 if source:
                     all_edges = [e for e in all_edges if e.get("source") == source]
@@ -247,19 +184,14 @@ class GraphSession:
                 total = len(all_edges)
                 page = all_edges[skip: skip + limit]
             else:
-                total = self.graph.stats().get("edge_types", {}).get(edge_type, 0) if edge_type else self.graph.stats().get("edge_count", 0)
+                stats = self.graph.stats()
+                total = (
+                    stats.get("edge_types", {}).get(edge_type, 0)
+                    if edge_type
+                    else stats.get("edge_count", 0)
+                )
                 page = self.graph.find_edges(edge_type=edge_type, skip=skip, limit=limit)
-                
-            all_edges = self.graph.find_edges(edge_type=edge_type)
-
-        if source:
-            all_edges = [e for e in all_edges if e.get("source") == source]
-        if target:
-            all_edges = [e for e in all_edges if e.get("target") == target]
-
-        total = len(all_edges)
-        page = all_edges[skip: skip + limit]
-        return page, total
+            return page, total
 
     def get_neighbors(self, node_id: str, depth: int = 1) -> List[Dict[str, Any]]:
         """Get neighbours for a node (BFS). Returns [] for unknown nodes."""
@@ -267,9 +199,28 @@ class GraphSession:
             return self.graph.get_neighbors(node_id, hops=depth)
 
     def search(self, query: str, limit: int = 20) -> List[Dict[str, Any]]:
-        """Keyword search across node content."""
+        """Keyword search across node content.
+
+        ``ContextGraph.query`` returns ``{"node": node.to_dict(), "score": …}``
+        where ``node.to_dict()`` uses a ``"properties"`` envelope.  We normalise
+        each result to the flat ``{"id", "type", "content", "metadata"}`` shape
+        that the rest of the session/route layer expects.
+        """
         with self._lock:
-            return self.graph.query(query)[:limit]
+            raw = self.graph.query(query)[:limit]
+
+        normalised = []
+        for r in raw:
+            node = r.get("node", {})
+            props = node.get("properties", {})
+            flat_node = {
+                "id": node.get("id", ""),
+                "type": node.get("type", "entity"),
+                "content": props.get("content", node.get("content", "")),
+                "metadata": {k: v for k, v in props.items() if k != "content"},
+            }
+            normalised.append({"node": flat_node, "score": r.get("score", 0.0)})
+        return normalised
 
     def get_stats(self) -> Dict[str, Any]:
         """Graph-level statistics."""
@@ -283,9 +234,6 @@ class GraphSession:
         with self._lock:
             return self.graph.find_active_nodes(node_type=node_type, at_time=at_time)
 
-
-    def add_annotation(self, annotation: Dict[str, Any]) -> str:
-        """Add an annotation and return its ID."""
     # ------------------------------------------------------------------
     # Annotation CRUD
     # ------------------------------------------------------------------
