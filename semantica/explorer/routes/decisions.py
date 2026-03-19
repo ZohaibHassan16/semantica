@@ -160,15 +160,6 @@ async def check_compliance(
         raise KeyError(decision_id)
 
 
-    try:
-        from ...context.policy_engine import PolicyEngine
-    except ImportError:
-        pass
-
-    return ComplianceResponse(
-        decision_id=decision_id,
-        compliant=True,
-        violations=[],
     edges, _ = await asyncio.to_thread(session.get_edges, skip=0, limit=999_999)
 
     _VIOLATION_TYPES = {"violates", "non_compliant", "breaches"}

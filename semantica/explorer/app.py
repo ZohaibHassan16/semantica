@@ -6,12 +6,10 @@ static file serving, route registration, and WebSocket support.
 """
 
 import os
-import traceback
 from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Optional
 
-from fastapi import FastAPI, Request
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -33,12 +31,10 @@ def create_app(session: Optional[GraphSession] = None) -> FastAPI:
 
     @asynccontextmanager
     async def lifespan(app: FastAPI):
-  
         if session is not None:
             app.state.session = session
         app.state.ws_manager = ConnectionManager()
         yield
-    
 
     app = FastAPI(
         title="Semantica Knowledge Explorer",
@@ -46,7 +42,6 @@ def create_app(session: Optional[GraphSession] = None) -> FastAPI:
         version=__version__,
         lifespan=lifespan,
     )
-
 
     cors_origins = os.environ.get("EXPLORER_CORS_ORIGINS", "*")
     app.add_middleware(
@@ -56,7 +51,6 @@ def create_app(session: Optional[GraphSession] = None) -> FastAPI:
         allow_methods=["*"],
         allow_headers=["*"],
     )
-
 
     @app.exception_handler(KeyError)
     async def key_error_handler(request: Request, exc: KeyError):
@@ -74,10 +68,6 @@ def create_app(session: Optional[GraphSession] = None) -> FastAPI:
 
     @app.exception_handler(Exception)
     async def generic_error_handler(request: Request, exc: Exception):
-        tb = traceback.format_exc()
-        return JSONResponse(
-            status_code=500,
-            content={"detail": f"Internal Server Error: {exc}", "traceback": tb},
         # Let FastAPI's built-in HTTPException handler take precedence so that
         # responses from dependency injection (e.g. 503 from get_session) are
         # not swallowed and converted to 500.
@@ -104,7 +94,6 @@ def create_app(session: Optional[GraphSession] = None) -> FastAPI:
     app.include_router(export_import_router)
     app.include_router(annotations_router)
 
-
     from fastapi import WebSocket, WebSocketDisconnect
 
     @app.websocket("/ws/graph-updates")
@@ -113,11 +102,9 @@ def create_app(session: Optional[GraphSession] = None) -> FastAPI:
         await manager.connect(websocket)
         try:
             while True:
-    
                 await websocket.receive_text()
         except WebSocketDisconnect:
             manager.disconnect(websocket)
-
 
     @app.get("/api/health")
     async def health():
@@ -131,14 +118,9 @@ def create_app(session: Optional[GraphSession] = None) -> FastAPI:
             "status": "active",
         }
 
-
     static_dir = Path(__file__).resolve().parent.parent / "static"
     if static_dir.is_dir():
         from fastapi.staticfiles import StaticFiles
         app.mount("/", StaticFiles(directory=str(static_dir), html=True), name="static")
-    static_dir = Path(__file__).resolve().parent.parent / "static"
-    static_dir.mkdir(parents=True, exist_ok=True)
-    from fastapi.staticfiles import StaticFiles
-    app.mount("/", StaticFiles(directory=str(static_dir), html=True), name="static")
 
     return app

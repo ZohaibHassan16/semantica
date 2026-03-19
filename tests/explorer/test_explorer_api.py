@@ -22,7 +22,6 @@ except ImportError:
     )
 
 
-
 def _build_sample_graph() -> ContextGraph:
     """Create a small ContextGraph with a handful of nodes and edges."""
     g = ContextGraph(advanced_analytics=False)
@@ -75,8 +74,6 @@ class TestHealthInfo:
         body = r.json()
         assert body["name"] == "Semantica Knowledge Explorer"
         assert "version" in body
-
-
         assert body["status"] == "active"
 
 
@@ -135,10 +132,6 @@ class TestGraphNodes:
         assert len(body) >= 1
         ids = [nb["id"] for nb in body]
         assert "ml" in ids or "web_dev" in ids
-
-
-
-        # Each neighbour must have required fields
         for nb in body:
             assert "id" in nb and "type" in nb and "hop" in nb
 
@@ -172,10 +165,6 @@ class TestGraphEdges:
         r = client.get("/api/graph/edges?source=python")
         assert r.status_code == 200
         body = r.json()
-        assert all(e["source"] == "python" for e in body["edges"])
-
-
-
         assert len(body["edges"]) >= 1
         assert all(e["source"] == "python" for e in body["edges"])
 
@@ -197,10 +186,20 @@ class TestSearchStats:
         body = r.json()
         assert body["query"] == "programming"
         assert len(body["results"]) >= 1
-        # Each result must carry a node and a score
         for item in body["results"]:
             assert "node" in item and "score" in item
             assert item["node"]["id"]  # non-empty id
+
+    def test_search_content_populated(self, client):
+        """Bug fix: search results must carry non-empty content (not empty string)."""
+        r = client.post("/api/graph/search", json={"query": "programming", "limit": 5})
+        assert r.status_code == 200
+        for item in r.json()["results"]:
+            node = item["node"]
+            assert node.get("content"), (
+                f"Node {node.get('id')!r} has empty content in search result — "
+                "node.to_dict() 'properties' envelope was not normalised"
+            )
 
     def test_search_no_results(self, client):
         r = client.post("/api/graph/search", json={"query": "zzznomatchzzz"})
@@ -214,7 +213,6 @@ class TestSearchStats:
         assert body["node_count"] >= 5
         assert body["edge_count"] >= 3
         assert "density" in body
-
         assert "node_types" in body and "edge_types" in body
         assert body["density"] >= 0.0
 
@@ -243,7 +241,6 @@ class TestDecisions:
     def test_get_decision(self, client):
         r = client.get("/api/decisions/decision_1")
         assert r.status_code == 200
-        assert r.json()["decision_id"] == "decision_1"
         body = r.json()
         assert body["decision_id"] == "decision_1"
         assert body["outcome"] == "approved"
@@ -262,16 +259,6 @@ class TestDecisions:
     def test_precedents(self, client):
         r = client.get("/api/decisions/decision_1/precedents")
         assert r.status_code == 200
-        assert isinstance(r.json(), list)
-
-    def test_compliance(self, client):
-        r = client.get("/api/decisions/decision_1/compliance")
-        assert r.status_code == 200
-        body = r.json()
-        assert "compliant" in body
-
-
-
         body = r.json()
         assert isinstance(body, list)
         # decision_2 shares category "tech" so should appear
@@ -289,8 +276,7 @@ class TestDecisions:
 
     def test_compliance_with_violation(self, client):
         """Add a violation edge then check compliance detects it."""
-        # Add a policy node and a violates edge directly on the underlying graph
-        session = GraphSession(client.app.state.session.graph)
+        session = client.app.state.session
         session.graph.add_node("policy_1", node_type="policy", content="Data policy")
         session.graph.add_edge("decision_1", "policy_1", edge_type="violates")
 
@@ -300,10 +286,6 @@ class TestDecisions:
         assert body["compliant"] is False
         assert len(body["violations"]) >= 1
         assert body["violations"][0]["policy_id"] == "policy_1"
-
-        # Clean up — remove the test edge so other tests are not affected
-        # (ContextGraph doesn't expose edge removal; re-create the session fixture
-        #  to isolate: this test intentionally runs after all other decision tests)
 
 
 # ---------------------------------------------------------------------------
@@ -316,8 +298,6 @@ class TestTemporal:
         assert r.status_code == 200
         body = r.json()
         assert "active_node_count" in body
-
-    def test_snapshot_at(self, client):
         assert "timestamp" in body
         assert isinstance(body["active_nodes"], list)
 
@@ -343,16 +323,6 @@ class TestTemporal:
         )
         assert r.status_code == 200
         body = r.json()
-        assert "added_nodes" in body
-        assert "removed_nodes" in body
-
-
-
-
-class TestAnalytics:
-    def test_analytics(self, client):
-        r = client.get("/api/analytics")
-        assert r.status_code == 200
         assert "added_nodes" in body and "removed_nodes" in body
         # temporal_node became active between t1 and t2
         assert "temporal_node" in body["added_nodes"]
@@ -381,7 +351,6 @@ class TestAnalytics:
     def test_analytics_select_metric(self, client):
         r = client.get("/api/analytics?metrics=centrality")
         assert r.status_code == 200
-        # When KG extras are absent the key is still present but None; otherwise a dict
         body = r.json()
         assert "centrality" in body
 
@@ -390,11 +359,6 @@ class TestAnalytics:
         assert r.status_code == 200
         body = r.json()
         assert "valid" in body
-
-
-
-class TestReasoning:
-    def test_reason(self, client):
         assert "error_count" in body and "warning_count" in body
         assert isinstance(body["issues"], list)
 
@@ -413,16 +377,7 @@ class TestReasoning:
                 "mode": "forward",
             },
         )
-        assert r.status_code in (200, 422)
-
-
-
-
-class TestAnnotations:
-    def test_create_and_list(self, client):
-    
         # 200 when reasoning module is available; 422 when it's not installed.
-        # Either is acceptable — the endpoint must not 500.
         assert r.status_code in (200, 422), (
             f"Unexpected status {r.status_code}: {r.text}"
         )
@@ -572,10 +527,8 @@ class TestExport:
     def test_export_json(self, client):
         r = client.post("/api/export", json={"format": "json"})
         assert r.status_code == 200
-        assert "json" in r.headers.get("content-type", "").lower() or len(r.content) > 0
         ct = r.headers.get("content-type", "")
         assert "json" in ct.lower()
-        # Payload must be valid JSON with entities and relationships
         data = r.json()
         assert "entities" in data and "relationships" in data
         assert len(data["entities"]) >= 5
@@ -590,7 +543,6 @@ class TestExport:
     def test_export_unsupported(self, client):
         r = client.post("/api/export", json={"format": "pdf"})
         assert r.status_code == 422
-
 
 
 # ---------------------------------------------------------------------------
@@ -616,9 +568,6 @@ class TestImport:
 
         r2 = client.get("/api/graph/node/imported_node")
         assert r2.status_code == 200
-        # Verify the node is now in the graph
-        r2 = client.get("/api/graph/node/imported_node")
-        assert r2.status_code == 200
         assert r2.json()["id"] == "imported_node"
 
     def test_import_with_edges(self, client):
@@ -639,6 +588,40 @@ class TestImport:
         body = r.json()
         assert body["status"] == "success"
         assert body["nodes_added"] >= 2
+        assert body["edges_added"] >= 1
+
+    def test_import_edge_metadata_preserved(self, client):
+        """Bug fix: edge metadata must survive the import round-trip."""
+        payload = json.dumps({
+            "nodes": [
+                {"id": "meta_src", "type": "test", "properties": {"content": "src"}},
+                {"id": "meta_tgt", "type": "test", "properties": {"content": "tgt"}},
+            ],
+            "edges": [
+                {
+                    "source": "meta_src",
+                    "target": "meta_tgt",
+                    "type": "tagged",
+                    "metadata": {"label": "important", "weight": 0.7},
+                }
+            ],
+        })
+        r = client.post(
+            "/api/import",
+            files={"file": ("meta_import.json", payload, "application/json")},
+        )
+        assert r.status_code == 200
+        assert r.json()["edges_added"] >= 1
+
+        # Retrieve the edge and verify metadata survived
+        r2 = client.get("/api/graph/edges?source=meta_src&target=meta_tgt")
+        assert r2.status_code == 200
+        edges = r2.json()["edges"]
+        assert len(edges) >= 1
+        props = edges[0].get("properties", {})
+        assert props.get("label") == "important", (
+            "Edge metadata dropped during import — add_edges() 'properties'/'metadata' fallback not working"
+        )
 
     def test_import_unsupported_format(self, client):
         r = client.post(
