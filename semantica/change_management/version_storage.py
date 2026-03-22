@@ -52,8 +52,6 @@ def _snapshot_collections(snapshot: Dict[str, Any]) -> tuple[List[Any], List[Any
 
     return list(entities or []), list(relationships or [])
 
-
-
 def create_graph_snapshot_record(
     version_id: str,
     graph_uri: str,

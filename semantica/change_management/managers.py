@@ -152,6 +152,8 @@ class TemporalVersionManager(BaseVersionManager):
             "timestamp": change_entry.timestamp,
             "author": change_entry.author,
             "description": change_entry.description,
+            # Store both key shapes during the migration window so older
+            # readers and newer ContextGraph restore paths both work.
             "nodes": entities.copy(),
             "edges": relationships.copy(),
             "entities": entities.copy(),
@@ -159,13 +161,9 @@ class TemporalVersionManager(BaseVersionManager):
             "metadata": options.get("metadata", {}),
         }
 
-        # Compute and add checksum
         snapshot["checksum"] = compute_checksum(snapshot)
-
-        # Store snapshot
         self.storage.save(snapshot)
         self.storage.assign_version_to_unlabeled_mutations(version_label)
-
         self.logger.info(f"Created snapshot '{version_label}' by {author}")
         return snapshot
 
@@ -180,8 +178,8 @@ class TemporalVersionManager(BaseVersionManager):
         has_legacy_schema = "entities" in graph or "relationships" in graph
         if not (has_node_schema or has_legacy_schema):
             raise ValidationError(
-                "Graph dictionary is missing required schema keys. "
-                "Must contain 'nodes'/'edges' or 'entities'/'relationships'."
+                "Graph dictionary must contain 'nodes'/'edges' or "
+                "'entities'/'relationships'"
             )
 
         entities = graph.get("nodes")
@@ -553,12 +551,10 @@ class OntologyVersionManager(BaseVersionManager):
         Returns:
             dict: Ontology version snapshot
         """
-        # Validate inputs
         change_entry = ChangeLogEntry(
             timestamp=datetime.now().isoformat(), author=author, description=description
         )
 
-        # Create snapshot
         snapshot = {
             "label": version_label,
             "timestamp": change_entry.timestamp,
@@ -570,15 +566,9 @@ class OntologyVersionManager(BaseVersionManager):
             "metadata": options.get("metadata", {}),
         }
 
-        # Compute and add checksum
         snapshot["checksum"] = compute_checksum(snapshot)
-
-        # Store snapshot
         self.storage.save(snapshot)
-
-        # Also store in memory for compatibility
         self.versions[version_label] = snapshot
-
         self.logger.info(f"Created ontology snapshot '{version_label}' by {author}")
         return snapshot
 

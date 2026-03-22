@@ -7,6 +7,70 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- **Snapshot Schema Compatibility Fix** (PR #393 by @ZohaibHassan16, reviewed by @KaifAhmad1, follow-up fixes by OpenAI Codex):
+  - Fixed silent snapshot restore failures caused by the `ContextGraph` `nodes`/`edges` schema not matching the version manager's legacy `entities`/`relationships` expectations
+  - Updated temporal snapshot handling to accept both `nodes`/`edges` and `entities`/`relationships`
+  - Preserved both schema shapes in stored snapshots to maintain backward compatibility during migration
+  - Fixed temporal diffing and detailed comparison paths so new-format and mixed-format snapshots compare correctly
+  - Fixed version metadata counts so `entity_count` and `relationship_count` remain accurate for both snapshot schemas
+  - Restored ontology snapshot compatibility fields removed during the PR follow-up iteration
+  - Added regression coverage for new-format snapshot creation, metadata counts, and mixed-schema diffing
+
+- **ContextGraph Traversal Fallbacks for DecisionQuery & DecisionRecorder** (PR #386 by @ZohaibHassan16, reviewed and fixed by @KaifAhmad1):
+  - Added native `ContextGraph` fallback execution paths to all 7 `DecisionQuery` methods (`_find_precedents_basic`, `find_by_category`, `find_by_entity`, `find_by_time_range`, `multi_hop_reasoning`, `trace_decision_path`, `find_similar_exceptions`) — resolves issue #379 where hardcoded Cypher queries broke in-memory usage
+  - Added native `ContextGraph` fallback paths to 4 `DecisionRecorder` methods (`link_entities`, `record_exception`, `link_precedents`, `_store_decision_node`, `_store_exception_node`) using `add_node` / `add_edge` primitives
+  - Implemented undirected BFS in `multi_hop_reasoning` fallback — traverses both outgoing and incoming edges so decisions are reachable from linked entities (matches Cypher `(start)-[*1..N]-(d:Decision)` semantics)
+  - Fixed `isinstance(graph_store, ContextGraph)` guards → `type(graph_store) is ContextGraph` — prevents `Mock(spec=ContextGraph)` from triggering fallback branches and breaking 2 existing tests
+  - Fixed `add_node(properties=metadata)` call in `_store_decision_node` and `_store_exception_node` — changed to `**metadata` so all decision fields are stored flat and remain readable via `_dict_to_decision`; previous form silently nested every field under a `"properties"` key
+  - Fixed spurious `properties={}` keyword argument in all `add_edge` fallback calls — argument did not match the actual `add_edge(**properties)` signature
+  - Fixed tz-aware / naive `datetime` mismatch in `find_by_time_range` fallback — strips `tzinfo` from aware bounds when stored timestamps are naive, preventing `TypeError` at comparison time
+  - Hoisted `find_edges()` calls out of the BFS `while` loop in `trace_decision_path` — edges are now fetched once per call instead of once per visited node, eliminating O(nodes × total_edges) repeated full-graph scans
+  - Removed duplicate `from ..embeddings import EmbeddingGenerator` import in `decision_query.py`
+  - Added `tests/context/test_decision_query_fallback.py` with 14 tests: full integration test covering the complete fallback flow end-to-end, plus 13 targeted unit tests covering each `DecisionQuery` and `DecisionRecorder` fallback method individually, tz-aware/naive datetime mixing, and `Mock` guard correctness
+
+- **ContextGraph Thread Safety & Pagination** (PR #385, Issues #378 #376 by @ZohaibHassan16, review & fixes by @KaifAhmad1):
+  - `ContextGraph`: added `threading.RLock` (`self._lock`) to `__init__`; all mutation paths (`add_nodes`, `add_edges`, `add_node`, `add_edge`, `save_to_file`, `load_from_file`, `link_graph`) and all read/query paths (`find_nodes`, `find_edges`, `find_node`, `find_active_nodes`, `get_neighbors`, `query`, `stats`, `density`) now protected with `with self._lock:` to prevent race-condition corruption under concurrent FastAPI workers
+  - `find_nodes` and `find_edges` gained native `skip`/`limit` pagination parameters so the explorer layer never loads the full collection into memory to slice it
+  - `GraphSession` (`session.py`): introduced session-level `RLock` wrapping all graph access; all 8 lazy analytics properties (`centrality`, `community`, `connectivity`, `path_finder`, `node_embedder`, `similarity`, `link_predictor`, `validator`) initialised under the lock (thread-safe double-checked); `get_nodes()` and `get_edges()` delegate pagination to the graph layer when no in-memory filter is needed
+  - `pyproject.toml`: removed duplicate entry and added missing comma in the `all` optional-dependency array that caused `ERROR Failed to parse pyproject.toml: Unclosed array` in CI
+  - **Fixes applied post-review (by @KaifAhmad1)**:
+    - Fixed `/api/graph/search` returning empty `content` and `properties` — `ContextGraph.query()` wraps results in `node.to_dict()` which uses a `"properties"` envelope, but `_node_dict_to_response` expected a flat `{id, type, content, metadata}` shape; `session.search()` now normalises the envelope before returning
+    - Fixed edge metadata silently dropped on import — `add_edges()` read only from the `"properties"` key, but edges produced by `find_edges()` and `build_graph_dict()` use `"metadata"`; fixed with `edge.get("properties") or edge.get("metadata", {})` fallback
+    - Fixed `POST /api/enrich/links` blocking the asyncio event loop — the O(n) `score_link` scoring loop ran inline in the `async` handler; wrapped in `asyncio.to_thread(_score_all)`
+    - Removed merge-artifact dead code in `session.py`: duplicate `self.annotations` assignment, duplicate un-locked property set, and double-query logic in `get_nodes()`/`get_edges()` that recomputed results outside the lock and threw away the correctly-paginated result computed inside it
+    - Removed merge-artifact dead code in `enrich.py`: unreachable second `predict_links` implementation block after early `return`, and duplicate `nodes, _` fetch in `detect_duplicates`
+
+- **Knowledge Explorer API Backend** (PR #384, Issue #377 by @ZohaibHassan16, review & fixes by @KaifAhmad1):
+  - Added `semantica.explorer` package — a full FastAPI backend for the Semantica Knowledge Explorer dashboard
+  - `app.py`: `create_app(session)` factory with CORS middleware, custom exception handlers (`KeyError→404`, `ValueError→422`), and HTML5 static-file fallback routing; generic `Exception` handler correctly re-raises `HTTPException` so dependency-injection 503s are not swallowed
+  - `session.py`: `GraphSession` — thread-safe container wrapping a `ContextGraph` with 8 lazily-initialised analytics components (`CentralityCalculator`, `CommunityDetector`, `ConnectivityAnalyzer`, `PathFinder`, `NodeEmbedder`, `SimilarityCalculator`, `LinkPredictor`, `GraphValidator`); all lazy properties initialised under `RLock` to prevent double-instantiation under concurrent requests; shared `build_graph_dict(node_ids=None)` method eliminates duplication across route files; `from_file(path)` classmethod loads from JSON
+  - `ws.py`: `ConnectionManager` — thread-safe WebSocket manager with `connect()`, `disconnect()`, `broadcast(event_type, data)`, and `send_personal()` support; safe disconnection cleanup during broadcast
+  - `dependencies.py`: `get_session(request)` and `get_ws_manager(request)` FastAPI `Depends`-compatible callables; `get_session` raises `HTTP 503` when no session is attached
+  - 7 modular route files, all using `asyncio.to_thread` for sync graph operations:
+    - `routes/graph.py`: `GET /api/graph/nodes` (type/keyword filter, pagination), `GET /api/graph/node/{id}`, `GET /api/graph/node/{id}/neighbors` (BFS, depth 1–5), `GET /api/graph/edges` (type/source/target filter), `GET /api/graph/node/{id}/path` (BFS or Dijkstra — algorithm param now correctly dispatched), `POST /api/graph/search`, `GET /api/graph/stats`
+    - `routes/analytics.py`: `GET /api/analytics` (centrality, community, connectivity — comma-separated metrics param), `GET /api/analytics/validation`
+    - `routes/decisions.py`: `GET /api/decisions` (category filter, pagination), `GET /api/decisions/{id}`, `GET /api/decisions/{id}/chain` (BFS causal chain up to 5 hops), `GET /api/decisions/{id}/precedents` (category + scenario keyword ranking), `GET /api/decisions/{id}/compliance` (in-graph check over `violates`/`non_compliant`/`breaches` edges — no longer a stub)
+    - `routes/temporal.py`: `GET /api/temporal/snapshot` (ISO-8601 `at` param), `GET /api/temporal/diff` (added/removed node sets between two timestamps), `GET /api/temporal/patterns` (graceful fallback when `TemporalPatternDetector` unavailable, with warning log for unexpected errors)
+    - `routes/enrich.py`: `POST /api/enrich/extract` (NLP entity/relation extraction), `POST /api/enrich/links` (per-node link prediction via `score_link` against all non-adjacent candidates — fixed from broken `predict_links` call), `POST /api/enrich/dedup` (duplicate detection — fixed missing `asyncio.to_thread` that was blocking the event loop), `POST /api/reason` (forward/backward inference via `Reasoner`)
+    - `routes/export_import.py`: `POST /api/export` (12 formats: JSON, Turtle, RDF-XML, N-Triples, CSV, GraphML, GEXF, OWL, Cypher, AQL, YAML — temp file always cleaned up via `try/finally`), `POST /api/import` (JSON/JSON-LD multipart upload with WebSocket progress events)
+    - `routes/annotations.py`: `GET /api/annotations`, `POST /api/annotations` (validates node exists; `add_annotation` mutates dict in-place so no extra roundtrip), `DELETE /api/annotations/{id}`
+  - `schemas.py`: 28 Pydantic v2 request/response models covering all endpoint shapes including pagination, temporal, enrichment, compliance, and annotation types
+  - `__init__.py`: `semantica-explorer` CLI entry point — `--graph`, `--host`, `--port`, `--no-browser` args; validates graph file exists; checks for `uvicorn`; opens browser after 1.5 s delay
+  - `pyproject.toml`: added `[project.optional-dependencies] explorer` group (`fastapi`, `uvicorn[standard]`, `websockets`, `python-multipart`); registered `semantica-explorer` script entry point; fixed missing comma in `all` extra that broke `pip install semantica[all]`
+  - **Fixes applied post-review (by @KaifAhmad1)**:
+    - Fixed `predict_links` endpoint — was calling `predictor.predict_links(graph_dict, node_id, top_n=...)` with wrong type (`dict` as `graph_store`), wrong positional arg (`node_id` as `node_labels`), and wrong kwarg (`top_n` vs `top_k`); rewrote to iterate all non-adjacent candidate nodes and call `predictor.score_link(session.graph, source, candidate)` directly
+    - Fixed `detect_duplicates` endpoint — `session.get_nodes()` was called directly in an `async def` handler without `asyncio.to_thread`, blocking the event loop
+    - Fixed temp file leak in `export_graph` — file was not deleted on exception from `export_fn` or `open()`; wrapped in `try/finally`; moved `import os` to module level
+    - Fixed `pyproject.toml` `all` extra — two consecutive strings with no comma between them caused a TOML syntax error
+    - Fixed generic `Exception` handler swallowing `HTTPException(503)` raised by `get_session`
+    - Fixed compliance endpoint — imported `PolicyEngine` then discarded it, always returning `compliant=True`; replaced with in-graph edge scan
+    - Fixed `temporal_patterns` bare `except Exception` silently hiding bugs — split into `ImportError` (silent graceful) and `Exception` (warning log)
+    - Fixed all 8 lazy analytics properties to initialise under `_lock` (thread-safe double-checked)
+    - Fixed `find_path` ignoring the `algorithm` query param — now dispatches to `dijkstra_shortest_path` or `bfs_shortest_path`
+    - Removed unnecessary `get_annotations()` round-trip in `create_annotation`
+    - Removed `import traceback` unused import in `app.py`
+    - Deduplicated `_build_graph_dict` (was copied identically in `graph.py`, `analytics.py`, `export_import.py`) into `GraphSession.build_graph_dict()`
+  - 49 integration tests in `tests/explorer/test_explorer_api.py` using `starlette.testclient.TestClient` — all passing; covers health, nodes, edges, search, stats, decisions, causal chains, precedents, compliance (including violation detection), temporal snapshots/diff/patterns, analytics, reasoning, entity extraction, link prediction, deduplication, annotations, export (JSON + node-subset), and import (JSON + edges + unsupported format)
 - **Reasoning Dead Code Removal** (PR #387, Issue #382 by @ZohaibHassan16):
   - Removed lines 357–358 in `semantica/reasoning/reasoner.py` that silently overwrote the sophisticated `_match_pattern` regex (which handles pre-bound variable embedding, repeated-variable backreferences via `(?P=var)`, and non-greedy named capture groups) with a simpler `re.escape`-based pattern, making all the prior logic unreachable dead code
   - Removed duplicate unreachable `return None` on line 368 (syntactically dead, appearing immediately after another `return None` in the same branch)
