@@ -303,6 +303,9 @@ class ContextGraph:
         self.kg_components = {}
         self._analytics_cache = {}
         
+        self.mutation_callback = self.config.get("mutation_callback", None)
+        self._suspend_mutation_callback = False
+        
         enable_advanced = self.config.get("advanced_analytics", True)
         
         if KG_AVAILABLE and enable_advanced:
@@ -468,6 +471,12 @@ class ContextGraph:
                 return
             node.properties.update(attributes)
             node.metadata.update(attributes)
+
+
+        if getattr(self, "mutation_callback", None) and not getattr(
+            self, "_suspend_mutation_callback", False
+        ):
+            self.mutation_callback("UPDATE_NODE", node_id, node.to_dict())
 
     def get_edge_data(self, source_id: str, target_id: str) -> Dict[str, Any]:
         with self._lock:
@@ -996,6 +1005,18 @@ class ContextGraph:
             max_edges = n * (n - 1) 
             return len(self.edges) / max_edges
 
+    def clear(self) -> None:
+        """Fully reset the graph state and indexes."""
+        with self._lock:
+            self.nodes.clear()
+            self.edges.clear()
+            self._adjacency.clear()
+            self.node_type_index.clear()
+            self.edge_type_index.clear()
+            self._linked_graphs.clear()
+            self._unresolved_links.clear()
+        self.logger.debug("Graph state fully cleared.")
+
     # --- Internal Helpers ---
 
     def _normalize_timestamp(self, timestamp_value) -> datetime:
@@ -1042,8 +1063,16 @@ class ContextGraph:
             else:
                 # Use 'unknown' as fallback for invalid node_type
                 self.node_type_index['unknown'].add(node.node_id)
-            return True
 
+        if getattr(self, "mutation_callback", None) and not getattr(
+            self, "_suspend_mutation_callback", False
+        ):
+            try:
+                self.mutation_callback("ADD_NODE", node.node_id, node.to_dict())
+            except Exception as e:
+                self.logger.warning(f"Audit trail callback failed for node {node.node_id}: {e}")
+        return True
+    
     def _add_internal_edge(self, edge: ContextEdge) -> bool:
         """Internal method to add an edge."""
         with self._lock:
@@ -1060,7 +1089,20 @@ class ContextGraph:
             self.edges.append(edge)
             self.edge_type_index[edge.edge_type].append(edge)
             self._adjacency[edge.source_id].append(edge)
-            return True
+
+        if getattr(self, "mutation_callback", None) and not getattr(
+            self, "_suspend_mutation_callback", False
+        ):
+            import json
+
+            edge_id = json.dumps([edge.source_id, edge.edge_type, edge.target_id])
+            try:
+                self.mutation_callback("ADD_EDGE", edge_id, edge.to_dict())
+            except Exception as e:
+                self.logger.warning(
+                    f"Audit trail callback failed for edge {edge_id}: {e}"
+                )
+        return True
 
     # --- Builder Methods (Legacy/Utility) ---
 
@@ -1339,8 +1381,7 @@ class ContextGraph:
     def from_dict(self, graph_dict: Dict[str, Any]) -> None:
         """Load graph from dictionary format."""
         # Clear existing graph
-        self.nodes.clear()
-        self.edges.clear()
+        self.clear()
 
         # Add nodes — restore validity windows if present
         for node_data in graph_dict.get("nodes", []):

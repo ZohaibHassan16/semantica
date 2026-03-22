@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- **Audit Trail, Named Tags, and Rollback Protection** (PR #394 by @ZohaibHassan16, reviewed by @KaifAhmad1, follow-up fixes by OpenAI Codex):
+  - Added mutation-level audit tracking for `ContextGraph` node and edge changes via `TemporalVersionManager.attach_to_graph()` and persistent mutation logging backends
+  - Added named version tags in both in-memory and SQLite storage so human-readable tags can point to saved snapshots
+  - Added rollback protection to `restore_snapshot()` so destructive graph restores require explicit confirmation
+  - Added `get_node_history()` for per-entity audit inspection and `diff()` as a Git-like alias over version comparisons
+  - Preserved backward compatibility for snapshot payloads and diff outputs by supporting both `nodes`/`edges` and `entities`/`relationships`
+  - Fixed mixed-schema snapshot comparison and version metadata counts after the audit-trail feature landed on top of PR #393
+  - Fixed restore replay so rollback does not generate synthetic mutation events in the audit log
+  - Added version-label assignment for previously unlabeled mutations when a snapshot is created
+  - Resolved merge conflicts against updated `main` in `managers.py`, `version_storage.py`, `context_graph.py`, and `test_managers.py`
+  - Added and updated regression coverage for audit history, rollback safety, version-label persistence, and snapshot compatibility
+
 - **Snapshot Schema Compatibility Fix** (PR #393 by @ZohaibHassan16, reviewed by @KaifAhmad1, follow-up fixes by OpenAI Codex):
   - Fixed silent snapshot restore failures caused by the `ContextGraph` `nodes`/`edges` schema not matching the version manager's legacy `entities`/`relationships` expectations
   - Updated temporal snapshot handling to accept both `nodes`/`edges` and `entities`/`relationships`
