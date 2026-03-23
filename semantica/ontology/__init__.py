@@ -156,7 +156,8 @@ from .property_generator import PropertyGenerator
 from .registry import MethodRegistry, method_registry
 from .requirements_spec import RequirementsSpec, RequirementsSpecManager
 from .reuse_manager import ReuseDecision, ReuseManager
-from .version_manager import OntologyVersion, VersionManager
+# VersionManager and OntologyVersion moved to change_management module
+# Import them directly from there: from semantica.change_management import VersionManager, OntologyVersion
 from semantica.ingest import OntologyData, OntologyIngestor
 from .methods import ingest_ontology
 
@@ -184,8 +185,7 @@ __all__ = [
     # Management
     "ReuseManager",
     "ReuseDecision",
-    "VersionManager",
-    "OntologyVersion",
+    # VersionManager and OntologyVersion moved to change_management module
     "NamespaceManager",
     "NamingConventions",
     "ModuleManager",

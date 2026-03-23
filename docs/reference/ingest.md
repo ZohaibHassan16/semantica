@@ -14,7 +14,7 @@ The **Ingest Module** is the entry point for loading data into Semantica. It pro
 - **File Systems**: Local files, cloud storage (S3, GCS, Azure)
 - **Web Content**: Websites, RSS feeds, APIs
 - **Streams**: Real-time data from Kafka, RabbitMQ, etc.
-- **Databases**: SQL and NoSQL databases
+- **Databases**: SQL, NoSQL, and cloud data warehouses including Snowflake
 - **Repositories**: Git repositories (GitHub, GitLab)
 - **Email**: IMAP, POP3 servers
 - **MCP**: Model Context Protocol servers
@@ -72,7 +72,7 @@ The **Ingest Module** is the entry point for loading data into Semantica. It pro
 
     ---
 
-    Ingest tables and query results from SQL databases
+    Ingest tables and query results from SQL, NoSQL, and cloud data warehouses including Snowflake
 
 </div>
 
@@ -173,7 +173,7 @@ Handles IMAP and POP3 servers.
 
 ### DBIngestor
 
-Handles SQL databases.
+Handles SQL and NoSQL databases including Snowflake.
 
 **Methods:**
 
@@ -181,6 +181,16 @@ Handles SQL databases.
 |--------|-------------|
 | `ingest_database(conn)` | Export tables |
 | `execute_query(sql)` | Run custom SQL |
+| `connect_snowflake(account, user, password, warehouse)` | Connect to Snowflake |
+| `ingest_snowflake_table(table_name)` | Ingest Snowflake table |
+| `execute_snowflake_query(sql)` | Run Snowflake SQL |
+
+**Supported Databases:**
+- **PostgreSQL**, **MySQL**, **SQLite**
+- **Microsoft SQL Server**, **Oracle**
+- **Snowflake** (Cloud Data Warehouse)
+- **MongoDB**, **Cassandra** (NoSQL)
+- **BigQuery**, **Redshift** (Cloud Data Warehouses)
 
 ### MCPIngestor
 
@@ -258,6 +268,64 @@ ingestor.monitor(
 )
 ```
 
+### Snowflake Data Warehouse Integration
+
+```python
+from semantica.ingest import DBIngestor
+
+# 1. Connect to Snowflake
+ingestor = DBIngestor()
+ingestor.connect_snowflake(
+    account="your_account.snowflakecomputing.com",
+    user="your_username",
+    password="your_password",
+    warehouse="ANALYTICS_WH",
+    database="PRODUCTION_DB",
+    schema="PUBLIC"
+)
+
+# 2. Ingest entire table
+data = ingestor.ingest_snowflake_table("CUSTOMERS")
+
+# 3. Or run custom query
+results = ingestor.execute_snowflake_query("""
+    SELECT 
+        CUSTOMER_ID, 
+        NAME, 
+        EMAIL, 
+        CREATED_AT 
+    FROM CUSTOMERS 
+    WHERE CREATED_AT > '2024-01-01'
+""")
+
+# 4. Process with pipeline
+for row in results:
+    pipeline.process(row)
+```
+
+!!! info "Comprehensive Snowflake Guide"
+    For detailed Snowflake integration including authentication methods, advanced features, and best practices, see the **[Snowflake Integration Guide](../integrations/snowflake.md)**.
+
+### Multi-Database Integration
+
+```python
+from semantica.ingest import DBIngestor
+
+ingestor = DBIngestor()
+
+# Connect to multiple databases
+connections = {
+    "snowflake": ingestor.connect_snowflake(...),
+    "postgres": ingestor.connect_database("postgresql://..."),
+    "mysql": ingestor.connect_database("mysql://...")
+}
+
+# Ingest from all sources
+for name, conn in connections.items():
+    data = ingestor.ingest_database(conn)
+    print(f"Ingested {len(data)} records from {name}")
+```
+
 ---
 
 ## Best Practices
@@ -271,6 +339,7 @@ ingestor.monitor(
 
 ## See Also
 
+- **[Snowflake Integration Guide](../integrations/snowflake.md)** - Comprehensive Snowflake integration with authentication, advanced features, and best practices
 - [Parse Module](parse.md) - Processes the raw data ingested here
 - [Split Module](split.md) - Chunks the ingested content
 - [Utils Module](utils.md) - Validation helpers

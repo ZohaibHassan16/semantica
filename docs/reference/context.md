@@ -1,114 +1,553 @@
 # Context Module Reference
 
-> **The central nervous system for intelligent agents, managing memory, knowledge graphs, and context retrieval.**
+> **The intelligent brain for AI agents, providing memory, decision tracking, and knowledge organization with easy-to-use interfaces that make building smart agents simple and effective.**
 
 ---
 
-## 🎯 System Overview
+## 🎯 Overview
 
-The **Context Module** provides agents with a persistent, searchable, and structured memory system. It is built on a **Synchronous Architecture 2.0**, ensuring predictable state management and compatibility with modern vector stores and graph databases.
+The **Context Module** gives your AI agents the ability to **remember**, **learn**, and **make smarter decisions** through intelligent memory management and knowledge organization. It's designed to be both powerful for production use and simple enough for rapid development.
 
 ### Key Capabilities
 
 <div class="grid cards" markdown>
 
--   :material-brain:{ .lg .middle } **Hierarchical Memory**
+-   :material-brain:{ .lg .middle } **Smart Memory**
 
     ---
 
-    Mimics human memory with a fast, token-limited Short-Term buffer and infinite Long-Term vector storage.
+    Human-like memory that stores conversations, learns from experience, and retrieves relevant information when needed.
 
--   :material-graph-outline:{ .lg .middle } **GraphRAG**
-
-    ---
-
-    Combines unstructured vector search with structured knowledge graph traversal for deep contextual understanding.
-
--   :material-scale-balance:{ .lg .middle } **Hybrid Retrieval**
+-   :material-graph-outline:{ .lg .middle } **Decision Intelligence**
 
     ---
 
-    Intelligently blends Keyword (BM25), Vector (Dense), and Graph (Relational) scores for optimal relevance.
+    Track decisions, learn from past choices, and make consistent, improving decisions over time.
 
--   :material-lightning-bolt:{ .lg .middle } **Token Management**
-
-    ---
-
-    Automatic FIFO and importance-based pruning to keep context within LLM window limits.
-
--   :material-link-variant:{ .lg .middle } **Entity Linking**
+-   :material-lightbulb:{ .lg .middle } **Easy-to-Use API**
 
     ---
 
-    Resolves ambiguities by linking text mentions to unique entities in the knowledge graph.
+    Simple methods that make complex features accessible without overwhelming complexity.
+
+-   :material-search:{ .lg .middle } **Smart Retrieval**
+
+    ---
+
+    Find relevant information quickly using hybrid search that understands context and relationships.
+
+-   :material-account-tree:{ .lg .middle } **Knowledge Organization**
+
+    ---
+
+    Build intelligent knowledge graphs that understand relationships and context.
+
+-   :material-trending-up:{ .lg .middle } **Learning & Analytics**
+
+    ---
+
+    Get insights about agent performance, decision patterns, and knowledge growth.
+
+-   :material-security:{ .lg .middle } **Production Ready**
+
+    ---
+
+    Scalable, reliable, and tested for real-world applications.
 
 </div>
 
-!!! tip "When to Use"
-    - **Memory Persistence**: Enabling agents to remember user preferences and history.
-    - **Complex Retrieval**: When simple vector search fails to capture relationships.
-    - **Knowledge Graph**: Building a structured world model from unstructured text.
+!!! tip "Perfect For"
+    - **AI Agents** that need to remember conversations and learn from decisions
+    - **Chatbots** that become smarter with every interaction
+    - **Decision Systems** that need to track choices and learn from patterns
+    - **Knowledge Management** that organizes information intelligently
+    - **Production Applications** that require reliable, scalable solutions
 
 ---
 
-## 🏗️ Architecture Components
+## 🤖 AgentContext - Your Agent's Brain
 
-### AgentContext (The Orchestrator)
-The high-level facade that unifies all context operations. It routes data to the appropriate subsystems (Memory, Graph, Vector Store) and manages the lifecycle of context.
+The main interface that makes your agent intelligent. It handles memory, decisions, and knowledge organization automatically.
 
-#### **Constructor Parameters**
-
-- `` `vector_store` `` (Required): The backing vector database instance (e.g., FAISS, Weaviate)
-- `` `knowledge_graph` `` (Optional): The graph store instance for structured knowledge
-- `` `token_limit` `` (Default: `` `2000` ``): The maximum number of tokens allowed in short-term memory before pruning occurs
-- `` `short_term_limit` `` (Default: `` `10` ``): The maximum number of distinct memory items in short-term memory
-- `` `hybrid_alpha` `` (Default: `` `0.5` ``): The weighting factor for retrieval (`` `0.0` `` = Pure Vector, `` `1.0` `` = Pure Graph)
-- `` `use_graph_expansion` `` (Default: `` `True` ``): Whether to fetch neighbors of retrieved nodes from the graph
-
-#### **Core Methods**
-
-| Method | Description |
-|--------|-------------|
-| `store(content, ...)` | Writes information to memory. Handles auto-detection, write-through to vector store, and entity extraction. |
-| `retrieve(query, ...)` | Fetches relevant context using hybrid search (Vector + Graph) and reranking. |
-| `query_with_reasoning(query, llm_provider, ...)` | **GraphRAG with multi-hop reasoning**: Retrieves context, builds reasoning paths, and generates LLM-based natural language responses grounded in the knowledge graph. |
-
-#### **Code Example**
+### Quick Start
 ```python
 from semantica.context import AgentContext
 from semantica.vector_store import VectorStore
 
-# 1. Initialize
-vs = VectorStore(backend="faiss", dimension=768)
-context = AgentContext(
-    vector_store=vs,
-    token_limit=2000
+# Create your intelligent agent
+agent = AgentContext(vector_store=VectorStore(backend="inmemory", dimension=384))
+
+# Your agent can now remember things
+memory_id = agent.store("User asked about Python programming")
+print(f"Agent remembered: {memory_id}")
+
+# And find information when needed
+results = agent.retrieve("Python tutorials")
+print(f"Agent found {len(results)} relevant memories")
+```
+
+### Easy Decision Learning
+```python
+# Your agent learns from its decisions
+decision_id = agent.record_decision(
+    category="content_recommendation",
+    scenario="User wants Python tutorial",
+    reasoning="User mentioned being a beginner",
+    outcome="recommended_basics",
+    confidence=0.85
 )
 
-# 2. Store Memory
-context.store(
-    "User is working on a React project.",
-    conversation_id="session_1",
-    user_id="user_123"
+# Your agent can now find similar past decisions
+similar_decisions = agent.find_precedents("Python tutorial", limit=3)
+print(f"Agent found {len(similar_decisions)} similar past decisions")
+```
+
+### Getting Smarter Over Time
+```python
+# Enable all learning features
+smart_agent = AgentContext(
+    vector_store=vector_store,
+    decision_tracking=True,    # Learn from decisions
+    graph_expansion=True,      # Find related information
+    advanced_analytics=True,   # Understand patterns
+    kg_algorithms=True,        # Advanced analysis
+    vector_store_features=True
 )
 
-# 3. Retrieve Context
-results = context.retrieve("What is the user building?")
+# Get insights about your agent's learning
+insights = smart_agent.get_context_insights()
+print(f"Total decisions learned: {insights.get('total_decisions', 0)}")
+print(f"Decision categories: {list(insights.get('categories', {}).keys())}")
+```
 
-# 4. Query with Reasoning (GraphRAG)
+### Core Methods
+
+| Method | What It Does | When to Use |
+|--------|-------------|------------|
+| `store(content, ...)` | Remember information | Store conversations, facts, user preferences |
+| `retrieve(query, ...)` | Find relevant memories | Search for information when needed |
+| `record_decision(category, scenario, reasoning, outcome, confidence, ...)` | Learn from decisions | Track choices and improve over time |
+| `find_precedents(scenario, category, ...)` | Find similar decisions | Make consistent choices based on experience |
+| `get_context_insights()` | Understand performance | Get analytics about your agent |
+
+### Advanced Features
+```python
+# Enable all features for maximum intelligence
+agent = AgentContext(
+    vector_store=vector_store,
+    knowledge_graph=ContextGraph(advanced_analytics=True),
+    decision_tracking=True,
+    graph_expansion=True,
+    advanced_analytics=True,
+    kg_algorithms=True,
+    vector_store_features=True
+)
+
+# Query with multi-hop reasoning (GraphRAG)
 from semantica.llms import Groq
 import os
 
-llm_provider = Groq(
-    model="llama-3.1-8b-instant",
-    api_key=os.getenv("GROQ_API_KEY")
+llm = Groq(model="llama-3.1-8b-instant", api_key=os.getenv("GROQ_API_KEY"))
+
+result = agent.query_with_reasoning(
+    query="What technologies work well together?",
+    llm_provider=llm,
+    max_hops=2
 )
 
-result = context.query_with_reasoning(
-    query="What IPs are associated with security alerts?",
+print(f"Response: {result['response']}")
+print(f"Reasoning: {result['reasoning_path']}")
+```
+
+---
+
+## 🏗️ ContextGraph - Knowledge Organization
+
+When you need to organize complex information and understand relationships, ContextGraph helps you build intelligent knowledge networks.
+
+### Easy Knowledge Graph Building
+```python
+from semantica.context import ContextGraph
+
+# Create a knowledge graph
+knowledge = ContextGraph(advanced_analytics=True)
+
+# Add things you want to remember (nodes)
+knowledge.add_node("Python", "language", properties={"popularity": "high"})
+knowledge.add_node("Programming", "concept", properties={"type": "skill"})
+knowledge.add_node("FastAPI", "framework", properties={"language": "Python"})
+
+# Connect related things (edges)
+knowledge.add_edge("Python", "Programming", "related_to")
+knowledge.add_edge("Python", "FastAPI", "supports")
+knowledge.add_edge("FastAPI", "Programming", "used_for")
+```
+
+### Easy Decision Management
+```python
+# Record decisions in your knowledge graph
+from semantica.context.decision_models import Decision
+from datetime import datetime
+
+decision = Decision(
+    decision_id="tech_choice_001",
+    category="technology_choice",
+    scenario="Framework selection for web API",
+    reasoning="FastAPI provides better performance for Python APIs",
+    outcome="selected_fastapi",
+    confidence=0.92,
+    timestamp=datetime.now(),
+    decision_maker="system",
+    metadata={"entities": ["Python", "FastAPI", "web_project"]}
+)
+knowledge.add_decision(decision)
+
+# Or use the convenience method for quick decisions
+decision_id = knowledge.add_decision_simple(
+    category="technology_choice",
+    scenario="Framework selection for web API",
+    reasoning="FastAPI provides better performance for Python APIs",
+    outcome="selected_fastapi",
+    confidence=0.92,
+    entities=["Python", "FastAPI", "web_project"]
+)
+
+# Find similar decisions easily
+similar = knowledge.find_precedents_by_scenario(
+    scenario="web framework",
+    category="technology_choice",
+    limit=3
+)
+
+print(f"Found {len(similar)} similar decisions")
+```
+
+### Smart Analytics
+```python
+# Understand decision impact
+impact = knowledge.analyze_decision_impact(decision_id)
+print(f"This decision influenced {impact.get('total_influenced', 0)} other decisions")
+
+# Get decision summary
+summary = knowledge.get_decision_summary()
+print(f"Total decisions: {summary.get('total_decisions', 0)}")
+print(f"Categories: {list(summary.get('categories', {}).keys())}")
+
+# Trace decision chains
+chains = knowledge.trace_decision_chain(decision_id)
+print(f"Decision chain has {len(chains)} connections")
+
+# Check if decisions follow rules
+compliance = knowledge.check_decision_rules({
+    "category": "loan_approval",
+    "scenario": "Mortgage application",
+    "reasoning": "Good credit score, stable income",
+    "outcome": "approved",
+    "confidence": 0.95
+})
+
+if compliance.get("compliant", False):
+    print("✅ Decision follows all rules")
+else:
+    print(f"❌ Rule violations: {compliance.get('violations', [])}")
+```
+
+### Graph Analytics Made Simple
+```python
+# Get overview of your knowledge graph
+summary = knowledge.get_graph_summary()
+print(f"Knowledge graph has {summary.get('nodes', 0)} concepts")
+print(f"And {summary.get('edges', 0)} relationships")
+
+# Find related concepts
+related = knowledge.find_related_nodes("Python", how_many=5)
+for concept_id, similarity in related:
+    print(f"Related to {concept_id}: {similarity:.2f}")
+
+# Understand which concepts are most important
+importance = knowledge.get_node_importance("Python")
+print(f"Python importance score: {importance.get('degree', 0)}")
+```
+
+### Core Methods
+
+| Method | What It Does | When to Use |
+|--------|-------------|------------|
+| `add_node(node_id, node_type, properties)` | Add concepts to remember | Build knowledge base |
+| `add_edge(source, target, relation)` | Connect related concepts | Show relationships |
+| `add_decision(category, scenario, reasoning, outcome, confidence, ...)` | Record decisions | Track choices and learn |
+| `add_decision_simple(category, scenario, reasoning, outcome, confidence, ...)` | Easy decision recording | Quick decision tracking |
+| `find_precedents(decision_id, limit)` | Find precedents by ID | Get connected decisions |
+| `find_precedents_by_scenario(scenario, category, ...)` | Find similar decisions | Make consistent choices |
+| `analyze_decision_impact(decision_id)` | Understand decision influence | See how decisions affect others |
+| `get_decision_summary()` | Get decision statistics | Understand decision patterns |
+| `trace_decision_chain(decision_id)` | Trace decision connections | Understand decision relationships |
+| `check_decision_rules(decision_data)` | Validate decisions | Ensure compliance |
+| `get_graph_summary()` | Get graph overview | Understand knowledge structure |
+| `find_related_nodes(node_id, how_many)` | Find related concepts | Discover connections |
+| `get_node_importance(node_id)` | Measure concept importance | Identify key concepts |
+
+---
+
+## 🔄 Using Both Together - Complete Intelligence
+
+### Your Smart Agent System
+```python
+from semantica.context import AgentContext, ContextGraph
+from semantica.vector_store import VectorStore
+
+# Create the components
+vector_store = VectorStore(backend="inmemory", dimension=384)
+knowledge = ContextGraph(advanced_analytics=True)
+
+# Create your intelligent agent
+agent = AgentContext(
+    vector_store=vector_store,
+    knowledge_graph=knowledge,  # Add knowledge graph
+    decision_tracking=True,
+    graph_expansion=True,
+    advanced_analytics=True
+)
+
+# Your agent works like this:
+# 1. Store information in memory
+agent.store("User wants to learn web development with Python")
+agent.store("User is a beginner programmer")
+agent.store("User prefers hands-on tutorials")
+
+# 2. Find relevant information
+results = agent.retrieve("Python web development tutorials")
+print(f"Found {len(results)} relevant memories")
+
+# 3. Make smart decisions
+decision_id = agent.record_decision(
+    category="content_recommendation",
+    scenario="Python web development learning path",
+    reasoning="Beginner needs hands-on Python web tutorial",
+    outcome="recommended_flask_tutorial",
+    confidence=0.89
+)
+
+# 4. Learn and improve over time
+insights = agent.get_context_insights()
+print(f"Agent insights: {insights}")
+
+# 5. Access advanced features when needed
+graph_summary = agent.graph_builder.get_graph_summary()
+node_importance = agent.graph_builder.get_node_importance("Python")
+```
+
+---
+
+## 🎯 Real-World Applications
+
+### 🏦 Banking - Smart Loan Decisions
+```python
+# Track loan decisions and learn from patterns
+bank_agent = AgentContext(vector_store=bank_vector_store, decision_tracking=True)
+
+# Store customer information
+bank_agent.store("Customer has credit score 750, stable employment")
+bank_agent.store("Customer is first-time homebuyer")
+
+# Make loan decision
+loan_decision = bank_agent.record_decision(
+    category="loan_approval",
+    scenario="First-time homebuyer mortgage",
+    reasoning="Good credit score, stable income, 20% down payment",
+    outcome="approved",
+    confidence=0.94
+)
+
+# Find similar loan decisions for consistency
+similar_loans = bank_agent.find_precedents("homebuyer", category="loan_approval")
+print(f"Found {len(similar_loans)} similar loan decisions")
+```
+
+### 🏥 Healthcare - Patient Care Decisions
+```python
+# Track patient care decisions
+health_agent = AgentContext(vector_store=medical_vector_store, decision_tracking=True)
+
+# Store patient information
+health_agent.store("Patient has hypertension, type 2 diabetes")
+health_agent.store("Patient allergic to penicillin")
+
+# Make treatment decision
+treatment_decision = health_agent.record_decision(
+    category="treatment_plan",
+    scenario="Hypertension with diabetes",
+    reasoning="ACE inhibitors safe for diabetic patients",
+    outcome="prescribed_ace_inhibitor",
+    confidence=0.91
+)
+
+# Find similar treatment cases
+similar_cases = health_agent.find_precedents("hypertension", category="treatment_plan")
+```
+
+### 🛒 E-commerce - Smart Recommendations
+```python
+# Track recommendation decisions
+ecommerce_graph = ContextGraph()
+
+# Build user-product knowledge
+ecommerce_graph.add_node("user_123", "user", {"segment": "premium"})
+ecommerce_graph.add_node("laptop_xyz", "product", {"category": "electronics"})
+ecommerce_graph.add_edge("user_123", "laptop_xyz", "viewed")
+
+# Make recommendation decision
+from semantica.context.decision_models import Decision
+from datetime import datetime
+
+rec_decision = Decision(
+    decision_id="rec_001",
+    category="product_recommendation",
+    scenario="Laptop recommendation for premium user",
+    reasoning="User prefers high-performance electronics",
+    outcome="recommended_gaming_laptop",
+    confidence=0.87,
+    timestamp=datetime.now(),
+    decision_maker="recommendation_system",
+    metadata={"entities": ["user_123", "laptop_xyz"]}
+)
+ecommerce_graph.add_decision(rec_decision)
+
+# Or use the convenience method
+rec_decision_id = ecommerce_graph.add_decision_simple(
+    category="product_recommendation",
+    scenario="Laptop recommendation for premium user",
+    reasoning="User prefers high-performance electronics",
+    outcome="recommended_gaming_laptop",
+    confidence=0.87,
+    entities=["user_123", "laptop_xyz"]
+)
+
+# Find similar recommendations
+similar_recs = ecommerce_graph.find_precedents_by_scenario(
+    scenario="laptop recommendation",
+    limit=5
+)
+```
+
+---
+
+## ⚙️ Configuration Options
+
+### Simple Setup (Most Common)
+```python
+# Just memory and basic learning
+agent = AgentContext(vector_store=vector_store)
+```
+
+### Smart Setup (Recommended)
+```python
+# Memory + decision learning
+agent = AgentContext(
+    vector_store=vector_store,
+    decision_tracking=True,
+    graph_expansion=True
+)
+```
+
+### Complete Setup (Maximum Power)
+```python
+# Everything enabled
+agent = AgentContext(
+    vector_store=vector_store,
+    knowledge_graph=ContextGraph(advanced_analytics=True),
+    decision_tracking=True,
+    graph_expansion=True,
+    advanced_analytics=True,
+    kg_algorithms=True,
+    vector_store_features=True
+)
+```
+
+### ContextGraph Options
+```python
+# Basic knowledge graph
+graph = ContextGraph()
+
+# Advanced knowledge graph
+graph = ContextGraph(
+    advanced_analytics=True,      # Enable smart algorithms
+    centrality_analysis=True,     # Find important concepts
+    community_detection=True,     # Find groups of related concepts
+    node_embeddings=True          # Understand concept similarity
+)
+```
+
+---
+
+## 📊 Data Structures
+
+### MemoryItem - The Basic Memory Unit
+```python
+@dataclass
+class MemoryItem:
+    content: str              # The actual text content
+    timestamp: datetime       # When it was created
+    metadata: Dict            # Tags like user_id, conversation_id
+    embedding: List[float]    # Vector representation
+    entities: List[Dict]      # Entities found in content
+```
+
+### Decision - The Decision Unit
+```python
+@dataclass
+class Decision:
+    decision_id: str         # Unique decision identifier
+    category: str            # Decision category (approval, rejection, etc.)
+    scenario: str            # Decision scenario description
+    reasoning: str           # Decision reasoning and explanation
+    outcome: str             # Decision outcome
+    confidence: float        # Confidence score (0-1)
+    decision_maker: str      # Decision maker identifier
+    timestamp: datetime      # When decision was made
+    entities: List[str]      # Related entities
+    metadata: Dict           # Additional decision metadata
+```
+
+### Graph Node - Knowledge Concept
+```python
+{
+    "id": "node_unique_id",
+    "type": "concept",
+    "properties": {
+        "content": "Description of the node",
+        "weight": 1.0,
+        "importance": 0.85
+    }
+}
+```
+
+### Graph Edge - Knowledge Relationship
+```python
+{
+    "source_id": "origin_node",
+    "target_id": "destination_node",
+    "type": "related_to",
+    "weight": 0.8,
+    "properties": {
+        "similarity": 0.75,
+        "confidence": 0.9
+    }
+}
+```
+
+---
+
+## 🚀 Advanced Features
+
+### GraphRAG with Multi-Hop Reasoning
+```python
+# Query with reasoning and LLM integration
+result = agent.query_with_reasoning(
+    query="What technologies work well together?",
     llm_provider=llm_provider,
-    max_results=10,
-    max_hops=2
+    max_hops=2,
+    max_results=10
 )
 
 print(f"Response: {result['response']}")
@@ -116,407 +555,96 @@ print(f"Reasoning Path: {result['reasoning_path']}")
 print(f"Confidence: {result['confidence']:.3f}")
 ```
 
----
-
-### AgentMemory (The Storage Engine)
-Manages the storage and lifecycle of memory items. It implements the **Hierarchical Memory** pattern.
-
-#### **Features & Functions**
-*   **Short-Term Memory (Working Memory)**
-    *   *Structure*: An in-memory list of recent `MemoryItem` objects.
-    *   *Purpose*: Provides immediate context for the ongoing conversation.
-    *   *Pruning Logic*:
-        *   **FIFO**: Removes the oldest items first when limits are reached.
-        *   **Token-Aware**: Calculates token counts to ensure the total buffer size stays under `token_limit`.
-*   **Long-Term Memory (Episodic Memory)**
-    *   *Structure*: Vector embeddings stored in the `vector_store`.
-    *   *Purpose*: Persists history indefinitely for semantic retrieval.
-    *   *Synchronization*: Automatically syncs with Short-term memory during `store()` operations.
-*   **Retention Policy**
-    *   *Time-Based*: Can automatically delete memories older than `retention_days`.
-    *   *Count-Based*: Can limit the total number of memories to `max_memories`.
-
-#### **Key Methods**
-
-| Method | Description |
-|--------|-------------|
-| `store_vectors()` | Handles the low-level interaction with concrete Vector Store implementations. |
-| `_prune_short_term_memory()` | Internal algorithm that enforces token and count limits. |
-| `get_conversation_history()` | Retrieves a chronological list of interactions for a specific session. |
-
-#### **Code Example**
+### Production Integration
 ```python
-# Accessing via AgentContext
-memory = context.memory
-
-# Get conversation history
-history = memory.get_conversation_history("session_1")
-for item in history:
-    print(f"[{item.timestamp}] {item.content}")
-
-# Get statistics
-stats = memory.get_statistics()
-print(f"Stored Memories: {stats['total_memories']}")
-```
-
----
-
-### ContextGraph (The Knowledge Structure)
-Manages the structured relationships between entities. It provides the "World Model" for the agent.
-
-#### **Features & Functions**
-*   **Dictionary-Based Interface**
-    *   *Design*: Uses standard Python dictionaries for nodes and edges, removing dependencies on complex interface classes.
-    *   *Benefit*: simpler serialization and easier integration with external APIs.
-*   **Graph Traversal**
-    *   *Adjacency List*: optimized internal structure for fast neighbor lookups.
-    *   *Multi-Hop Search*: Can traverse `k` hops from a starting node to find indirect connections.
-*   **Node & Edge Types**
-    *   *Typed Schema*: Supports distinct types for nodes (e.g., "Person", "Concept") and edges (e.g., "KNOWS", "RELATED_TO").
-
-#### **Key Methods**
-
-| Method | Description |
-|--------|-------------|
-| `add_nodes(nodes)` | Bulk adds nodes using a list of dictionaries. |
-| `add_edges(edges)` | Bulk adds edges using a list of dictionaries. |
-| `get_neighbors(node_id, hops)` | Returns connected nodes within a specified distance. |
-| `query(query_str)` | Performs keyword-based search specifically on graph nodes. |
-
-#### **Code Example**
-```python
-from semantica.context import ContextGraph
-
-graph = ContextGraph()
-
-# Add Nodes
-graph.add_nodes([
-    {
-        "id": "Python", 
-        "type": "Language", 
-        "properties": {"paradigm": "OO"}
-    },
-    {
-        "id": "FastAPI", 
-        "type": "Framework", 
-        "properties": {"language": "Python"}
-    }
-])
-
-# Add Edges
-graph.add_edges([
-    {
-        "source_id": "FastAPI", 
-        "target_id": "Python", 
-        "type": "WRITTEN_IN"
-    }
-])
-
-# Find Neighbors
-neighbors = graph.get_neighbors("FastAPI", hops=1)
-```
-
----
-
-### Production Graph Store Integration
-
-For production environments, you can replace the in-memory `ContextGraph` with a persistent `GraphStore` (Neo4j, FalkorDB) by passing it to the `knowledge_graph` parameter.
-
-```python
-from semantica.context import AgentContext
+# Use with persistent graph stores
 from semantica.graph_store import GraphStore
 
-# 1. Initialize Persistent Graph Store (Neo4j)
-gs = GraphStore(
+# Neo4j integration
+neo4j_store = GraphStore(
     backend="neo4j",
     uri="bolt://localhost:7687",
     user="neo4j",
     password="password"
 )
 
-# 2. Initialize Agent Context with Persistent Graph
-context = AgentContext(
-    vector_store=vs,      # Your VectorStore instance
-    knowledge_graph=gs,   # Your persistent GraphStore
-    use_graph_expansion=True
+# Production agent with persistent storage
+production_agent = AgentContext(
+    vector_store=vector_store,
+    knowledge_graph=neo4j_store,
+    decision_tracking=True,
+    advanced_analytics=True
 )
+```
 
-# Now all graph operations (store, retrieve, build_graph) use Neo4j directly.
+### Analytics and Insights
+```python
+# Get comprehensive insights
+insights = agent.get_context_insights()
+print(f"Total decisions: {insights.get('total_decisions', 0)}")
+print(f"Decision categories: {list(insights.get('categories', {}).keys())}")
+print(f"Most common outcome: {insights.get('most_common_outcome', 'N/A')}")
+
+# Graph analytics
+graph_insights = agent.graph_builder.get_graph_summary()
+node_importance = agent.graph_builder.get_node_importance("key_concept")
 ```
 
 ---
 
-### ContextRetriever (The Search Engine)
-The retrieval logic that powers the `retrieve()` command. It implements the **Hybrid Retrieval** algorithm.
+## 📚 Need More Help?
 
-#### **Retrieval Strategy**
-1.  **Short-Term Check**: Scans the in-memory buffer for immediate, exact-match relevance.
-2.  **Vector Search**: Queries the `vector_store` for semantically similar long-term memories.
-3.  **Graph Expansion**:
-    *   Identifies entities in the query.
-    *   Finds those entities in the `ContextGraph`.
-    *   Traverses edges to find related concepts that might not match keywords (e.g., finding "Python" when searching for "Coding").
-4.  **Hybrid Scoring**:
-    *   Formula: `Final_Score = (Vector_Score * (1 - α)) + (Graph_Score * α)`
-    *   Allows tuning the balance between semantic similarity and structural relevance.
+### For Beginners
+- Start with **AgentContext** for most applications
+- Use basic **store/retrieve** for memory management
+- Add **decision tracking** to enable learning
+- Enable features gradually as needed
 
-#### **Code Example**
-```python
-# The retriever is automatically used by AgentContext.retrieve()
-# But can be accessed directly if needed:
+### For Advanced Users
+- Add **ContextGraph** for knowledge organization
+- Use **analytics** to understand patterns
+- Implement **policies** for consistent decisions
+- Use **persistence** for state management
 
-retriever = context.retriever
+### For Production
+- Enable **all features** for maximum intelligence
+- Use **save/load** for state persistence
+- **Monitor performance** with insights and health checks
+- **Test thoroughly** before deployment
 
-# Perform a manual retrieval
-results = retriever.retrieve(
-    query="web frameworks",
-    max_results=5
-)
-```
+### Examples and Tutorials
+- Look at the **real-world examples** above for your specific use case
+- Check **configuration options** to customize your agent
+- Start simple and add power as needed
 
 ---
 
-### GraphRAG with Multi-Hop Reasoning
-
-The `query_with_reasoning()` method extends traditional retrieval by performing multi-hop graph traversal and generating natural language responses using LLMs. This enables deeper understanding of relationships and context-aware answer generation.
-
-#### **How It Works**
-
-1. **Context Retrieval**: Retrieves relevant context using hybrid search (vector + graph)
-2. **Entity Extraction**: Extracts entities from query and retrieved context
-3. **Multi-Hop Reasoning**: Traverses knowledge graph up to N hops to find related entities
-4. **Reasoning Path Construction**: Builds reasoning chains showing entity relationships
-5. **LLM Response Generation**: Generates natural language response grounded in graph context
-
-#### **Key Features**
-
-- **Multi-Hop Reasoning**: Traverses graph up to configurable hops (default: 2)
-- **Reasoning Trace**: Shows entity relationship paths used in reasoning
-- **Grounded Responses**: LLM generates answers citing specific graph entities
-- **Multiple LLM Providers**: Supports Groq, OpenAI, HuggingFace, and LiteLLM (100+ LLMs)
-- **Fallback Handling**: Returns context with reasoning path if LLM unavailable
-
-#### **Method Signature**
-
-```python
-def query_with_reasoning(
-    self,
-    query: str,
-    llm_provider: Any,  # LLM provider from semantica.llms
-    max_results: int = 10,
-    max_hops: int = 2,
-    **kwargs
-) -> Dict[str, Any]:
-```
-
-**Parameters:**
-- `query` (str): User query
-- `llm_provider`: LLM provider instance (from `semantica.llms`)
-- `max_results` (int): Maximum context results to retrieve (default: 10)
-- `max_hops` (int): Maximum graph traversal hops (default: 2)
-- `**kwargs`: Additional retrieval options
-
-**Returns:**
-- `response` (str): Generated natural language answer
-- `reasoning_path` (str): Multi-hop reasoning trace
-- `sources` (List[Dict]): Retrieved context items used
-- `confidence` (float): Overall confidence score
-- `num_sources` (int): Number of sources retrieved
-- `num_reasoning_paths` (int): Number of reasoning paths found
-
-#### **Code Example**
-
-```python
-from semantica.context import AgentContext
-from semantica.llms import Groq
-from semantica.vector_store import VectorStore
-import os
-
-# Initialize context
-context = AgentContext(
-    vector_store=VectorStore(backend="faiss"),
-    knowledge_graph=kg
-)
-
-# Configure LLM provider
-llm_provider = Groq(
-    model="llama-3.1-8b-instant",
-    api_key=os.getenv("GROQ_API_KEY")
-)
-
-# Query with reasoning
-result = context.query_with_reasoning(
-    query="What IPs are associated with security alerts?",
-    llm_provider=llm_provider,
-    max_results=10,
-    max_hops=2
-)
-
-# Access results
-print(f"Response: {result['response']}")
-print(f"\nReasoning Path: {result['reasoning_path']}")
-print(f"Confidence: {result['confidence']:.3f}")
-```
-
-#### **Using Different LLM Providers**
-
-```python
-# Groq
-from semantica.llms import Groq
-llm = Groq(model="llama-3.1-8b-instant", api_key=os.getenv("GROQ_API_KEY"))
-
-# OpenAI
-from semantica.llms import OpenAI
-llm = OpenAI(model="gpt-4", api_key=os.getenv("OPENAI_API_KEY"))
-
-# LiteLLM (100+ providers)
-from semantica.llms import LiteLLM
-llm = LiteLLM(model="anthropic/claude-sonnet-4-20250514")
-
-# Use with query_with_reasoning
-result = context.query_with_reasoning(
-    query="Your question here",
-    llm_provider=llm,
-    max_hops=3
-)
-```
-
-!!! tip "When to Use"
-    - **Complex Queries**: When simple retrieval doesn't capture relationships
-    - **Explainable AI**: When you need to show reasoning paths
-    - **Multi-Hop Questions**: "What IPs are associated with alerts that affect users?"
-    - **Grounded Responses**: When you need answers citing specific graph entities
+**Happy building intelligent agents!** 🎯
 
 ---
 
-### EntityLinker (The Connector)
-Resolves text mentions to unique entities and assigns URIs.
+## 📚 See Also
 
-#### **Key Methods**
-
-| Method | Description |
-|--------|-------------|
-| `link_entities(source, target, type)` | Creates a link between two entities. |
-| `assign_uri(entity_name, type)` | Generates a consistent URI for an entity. |
-
-#### **Code Example**
-```python
-from semantica.context import EntityLinker
-
-linker = EntityLinker(knowledge_graph=graph)
-
-# Link two entities
-linker.link_entities(
-    source_entity_id="Python",
-    target_entity_id="Programming",
-    link_type="IS_A",
-    confidence=0.95
-)
-```
-
----
-
-## ⚙️ Configuration
-
-### Environment Variables
-
-```bash
-# Global token limit
-export CONTEXT_TOKEN_LIMIT=2000
-```
-
-### YAML Configuration
-
-```yaml
-context:
-  short_term_limit: 10
-  retrieval:
-    hybrid_alpha: 0.5  # 0.0=Vector, 1.0=Graph
-    max_expansion_hops: 2
-```
-
----
-
-## 📝 Data Structures
-
-### MemoryItem
-The fundamental unit of storage.
-```python
-@dataclass
-class MemoryItem:
-    content: str              # The actual text content
-    timestamp: datetime       # When it was created
-    metadata: Dict            # Arbitrary tags (user_id, source, etc.)
-    embedding: List[float]    # The vector representation
-    entities: List[Dict]      # Entities found in this content
-```
-
-### Graph Node (Dict Format)
-```python
-{
-    "id": "node_unique_id",
-    "type": "concept",
-    "properties": {
-        "content": "Description of the node",
-        "weight": 1.0
-    }
-}
-```
-
-### Graph Edge (Dict Format)
-```python
-{
-    "source_id": "origin_node",
-    "target_id": "destination_node",
-    "type": "related_to",
-    "weight": 0.8
-}
-```
-
----
-
-## 🧩 Advanced Usage
-
-### Method Registry (Extensibility)
-Register custom implementations for graph building, memory management, or retrieval.
-
-#### **Code Example**
-```python
-from semantica.context import registry
-
-def custom_graph_builder(entities, relationships):
-    # Custom logic to build graph
-    return "my_graph_structure"
-
-# Register the new method
-registry.register("graph", "custom_builder", custom_graph_builder)
-```
-
-### Configuration Manager
-Programmatically manage configuration settings.
-
-#### **Code Example**
-```python
-from semantica.context.config import context_config
-
-# Update configuration at runtime
-context_config.set("retention_days", 60)
-
-## See Also
 - [Vector Store](vector_store.md) - The long-term storage backend
 - [Graph Store](graph_store.md) - The knowledge graph backend
+- [KG Algorithms](kg.md) - Knowledge graph algorithms and analytics
 - [Reasoning](reasoning.md) - Uses context for logic
 
 ## Cookbook
 
-Interactive tutorials to learn context management and GraphRAG:
+Interactive tutorials to learn context management, GraphRAG, and decision tracking:
 
 - **[Context Module](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/introduction/19_Context_Module.ipynb)**: Practical guide to the context module for AI agents
-  - **Topics**: Agent memory, context graph, hybrid retrieval, entity linking
+  - **Topics**: Agent memory, context graph, hybrid retrieval, entity linking, decision tracking
   - **Difficulty**: Intermediate
-  - **Use Cases**: Building stateful AI agents, persistent memory systems
+  - **Use Cases**: Building stateful AI agents, persistent memory systems, decision management
 
 - **[Advanced Context Engineering](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/advanced/11_Advanced_Context_Engineering.ipynb)**: Build a production-grade memory system for AI agents
-  - **Topics**: Agent memory, GraphRAG, entity injection, lifecycle management, persistent stores
+  - **Topics**: Agent memory, GraphRAG, entity injection, lifecycle management, persistent stores, decision analytics
   - **Difficulty**: Advanced
-  - **Use Cases**: Production agent systems, advanced memory management
+  - **Use Cases**: Production agent systems, advanced memory management, decision analysis
+
+- **[Decision Tracking with KG Algorithms](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/advanced/12_Decision_Tracking_KG.ipynb)**: Advanced decision tracking and analytics
+  - **Topics**: Decision lifecycle, precedent search, causal analysis, KG algorithms, policy compliance
+  - **Difficulty**: Advanced
+  - **Use Cases**: Banking decisions, healthcare decisions, legal precedent analysis

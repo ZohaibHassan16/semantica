@@ -41,7 +41,7 @@ class LLMOntologyGenerator:
 
         try:
             result = self.provider.generate_structured(
-                prompt, model=self.model or options.get("model"), temperature=options.get("temperature", 0.2)
+                prompt, model=self.model or options.get("model"), temperature=options.get("temperature")
             )
         except Exception as e:
             self.progress.update_tracking(tracking_id, message="LLM generation failed")

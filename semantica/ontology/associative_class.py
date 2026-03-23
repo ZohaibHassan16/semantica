@@ -208,6 +208,7 @@ class AssociativeClassBuilder:
         person_class: str,
         organization_class: str,
         role_class: Optional[str] = None,
+        name: str = "Position",
         **options,
     ) -> AssociativeClass:
         """
@@ -243,15 +244,20 @@ class AssociativeClassBuilder:
         if role_class:
             connects.append(role_class)
 
+        temporal = options.pop("temporal", True)
+        user_props = options.pop("properties", {})
+
+        merged_props = {
+            "startDate": "xsd:date",
+            "endDate": "xsd:date",
+            **user_props,
+        }
+
         return self.create_associative_class(
-            name=options.get("name", "Position"),
+            name=name,
             connects=connects,
-            temporal=options.get("temporal", True),
-            properties={
-                "startDate": "xsd:date",
-                "endDate": "xsd:date",
-                **options.get("properties", {}),
-            },
+            temporal=temporal,
+            properties= merged_props,
             **options,
         )
 
@@ -282,15 +288,18 @@ class AssociativeClassBuilder:
             )
             ```
         """
+
+        user_props = options.pop("properties", {})
+        merged_props = {
+            "startDate": "xsd:dateTime",
+            "endDate": "xsd:dateTime",
+            **user_props,
+        }
         return self.create_associative_class(
             name=name,
             connects=connects,
             temporal=True,
-            properties={
-                "startDate": "xsd:dateTime",
-                "endDate": "xsd:dateTime",
-                **options.get("properties", {}),
-            },
+            properties=merged_props,
             **options,
         )
 

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "semantica"
-version = "0.2.4"
+version = "0.3.0"
 description = "🧠 Semantica - An Open Source Framework for building Semantic Layers and Knowledge Engineering"
 readme = "README.md"
 license = { text = "MIT" }
@@ -15,7 +15,7 @@ maintainers = [{ name = "Hawksight AI", email = "semantica-dev@users.noreply.git
 requires-python = ">=3.8"
 
 classifiers = [
-  "Development Status :: 3 - Alpha",
+  "Development Status :: 5 - Production/Stable",
   "Intended Audience :: Developers",
   "Intended Audience :: Science/Research",
   "License :: OSI Approved :: MIT License",
@@ -39,6 +39,7 @@ keywords = [
 dependencies = [
   "numpy>=1.21.0",
   "pandas>=1.3.0",
+  "scipy>=1.9.0",
   "scikit-learn>=1.0.0",
   "umap-learn>=0.5.0",
   "spacy>=3.4.0",
@@ -76,7 +77,8 @@ dependencies = [
   "toml>=0.10.0",
   "python-dotenv>=0.20.0",
   "loguru>=0.6.0",
-  "structlog>=22.1.0"
+  "structlog>=22.1.0",
+  "gensim>=4.3.0"
 ]
 
 # ---------------- OPTIONAL DEPENDENCIES ----------------
@@ -99,6 +101,14 @@ llm-all = [
 # ---- Document Parsing ----
 parse-docling = ["docling>=1.0.0"]
 
+# ---- Database Connectors ----
+db-snowflake = ["snowflake-connector-python>=3.0.0", "cryptography>=3.4.0"]
+db-arrow = ["pyarrow>=10.0.0"]
+
+db-all = [
+  "semantica[db-snowflake,db-arrow]"
+]
+
 # ---- Embedding / Models ----
 models-huggingface = [
   "transformers>=4.20.0",
@@ -112,6 +122,17 @@ graph-amazon-neptune = ["boto3>=1.24.0", "neo4j>=5.0.0"]
 
 graph-all = [
   "semantica[graph-neo4j,graph-falkordb,graph-amazon-neptune]"
+]
+
+# ---- Vector Store Backends ----
+vectorstore-qdrant = ["qdrant-client>=1.0.0"]
+vectorstore-weaviate = ["weaviate-client>=4.0.0"]
+vectorstore-pinecone = ["pinecone-client>=3.0.0"]
+vectorstore-milvus = ["pymilvus>=2.0.0"]
+vectorstore-pgvector = ["psycopg[binary,pool]>=3.0.0", "pgvector>=0.2.0"]
+
+vectorstore-all = [
+  "semantica[vectorstore-qdrant,vectorstore-weaviate,vectorstore-pinecone,vectorstore-milvus,vectorstore-pgvector]"
 ]
 
 # ---- Infra / Queues / Workers ----
@@ -135,8 +156,8 @@ monitoring = [
   "prometheus-client>=0.14.0",
   "opentelemetry-api>=1.30.0,<2.0.0",
   "opentelemetry-sdk>=1.30.0,<2.0.0",
-  "opentelemetry-semantic-conventions>=0.58b0,<0.61b0",
-  "opentelemetry-instrumentation>=0.58b0,<0.61b0"
+  "opentelemetry-semantic-conventions>=0.58b0,<0.62",
+  "opentelemetry-instrumentation>=0.58b0,<0.62"
 ]
 
 # ---- Visualization ----
@@ -151,6 +172,9 @@ gpu = [
   "faiss-gpu>=1.7.0",
   "cupy>=10.0.0"
 ]
+
+# ---- Agentic Framework Integrations ----
+agno = ["agno>=1.0.0"]
 
 # ---- Splitting / Chunking ----
 split-tiktoken = ["tiktoken>=0.5.0"]
@@ -175,9 +199,22 @@ dev = [
   "ipykernel>=6.15.0"
 ]
 
-# ---- Everything ----
+# Explorer Dashboard
+explorer = [
+  "fastapi>=0.100.0",
+  "uvicorn[standard]>=0.22.0",
+  "websockets>=11.0",
+  "python-multipart>=0.0.6"
+]
+explorer-lite = [
+  "streamlit>=1.25.0",
+  "streamlit-agraph>=0.0.45"
+]
+
+# Everything
 all = [
-  "semantica[dev,viz,gpu,infra,cloud,monitoring,llm-all,models-huggingface,split-all,graph-all,parse-docling]"
+  "semantica[dev,viz,gpu,infra,cloud,monitoring,llm-all,models-huggingface,split-all,graph-all,vectorstore-all,parse-docling,explorer]",
+  "semantica[dev,viz,gpu,infra,cloud,monitoring,llm-all,models-huggingface,split-all,graph-all,vectorstore-all,parse-docling,agno]"
 ]
 
 # ---------------- ENTRYPOINTS ----------------
@@ -185,11 +222,12 @@ all = [
 semantica = "semantica.cli:main"
 semantica-server = "semantica.server:main"
 semantica-worker = "semantica.worker:main"
+semantica-explorer = "semantica.explorer:main"
 
 # ---------------- TOOLING ----------------
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["semantica*"]
+include = ["semantica*", "integrations*"]
 
 [tool.black]
 line-length = 88
@@ -199,3 +237,6 @@ profile = "black"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+markers = [
+    "integration: marks tests that require external services or API keys (deselect with '-m not integration')",
+]

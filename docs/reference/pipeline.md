@@ -131,7 +131,7 @@ The **Pipeline Module** provides a robust orchestration engine for building, exe
 ### Types
 
 - `Pipeline` — Pipeline definition dataclass
-- `PipelineStep` — Pipeline step definition dataclass
+- `PipelineStep` — Pipeline step definition dataclass, Supports `delta_mode` (bool), `base_version_id` (str), and            `target_version_id` (str) for incremental processing.
 - `StepStatus` — Enum: `pending`, `running`, `completed`, `failed`, `skipped`
 - `ExecutionResult` — Execution result dataclass
 - `PipelineStatus` — Enum: `pending`, `running`, `paused`, `completed`, `failed`, `stopped`
@@ -401,6 +401,47 @@ builder = (
 pipeline = builder.build(name="RAGPipeline")
 engine = ExecutionEngine(max_workers=4)
 result = engine.execute_pipeline(pipeline, data={"path": "document.pdf"})
+```
+
+---
+
+### Incremental / Delta-Aware Pipeline
+
+Use `delta_mode` to process only the differences between two graph versions, drastically reducing compute costs for large datasets.
+
+```python
+from semantica.pipeline import PipelineBuilder, ExecutionEngine
+
+builder = (
+    PipelineBuilder()
+    # Adding delta_mode=True tells the execution engine to intercept this step,
+    # compute the diff between v1 and v2, and pass ONLY the delta payload to the handler.
+    .add_step(
+        "validate_diff",
+        "validation",
+        delta_mode=True,
+        base_version_id="v1",
+        target_version_id="v2",
+        handler=diff_validator
+    )
+    .add_step(
+        "alert_on_removals",
+        "alerting",
+        dependencies=["validate_diff"],
+        handler=alert_handler
+    )
+)
+
+pipeline = builder.build(name="IncrementalJob")
+engine = ExecutionEngine()
+
+# Execution requires version_manager and triplet_store injected via options
+# so the engine can resolve URIs and compute the graph differences natively.
+result = engine.execute_pipeline(
+    pipeline,
+    version_manager=my_version_manager,
+    triplet_store=my_triplet_store
+)
 ```
 
 ---

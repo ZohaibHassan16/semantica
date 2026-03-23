@@ -9,13 +9,10 @@ import importlib
 PARENT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, PARENT_DIR)
 
-# Force reload modules
+# Import modules
 import semantica.utils.exceptions
-importlib.reload(semantica.utils.exceptions)
 import semantica.semantic_extract.methods
-importlib.reload(semantica.semantic_extract.methods)
 import semantica.semantic_extract.triplet_extractor
-importlib.reload(semantica.semantic_extract.triplet_extractor)
 
 from semantica.semantic_extract.methods import extract_entities_llm, extract_relations_llm, extract_triplets_llm
 from semantica.semantic_extract.triplet_extractor import TripletExtractor, Triplet

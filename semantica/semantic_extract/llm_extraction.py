@@ -93,7 +93,7 @@ class LLMExtraction:
             **config: Configuration options:
                 - model: Model name (default depends on provider)
                 - api_key: API key (from environment if not provided)
-                - temperature: Temperature for generation
+                - temperature: Temperature for generation (None = use model's default)
         """
         self.logger = get_logger("llm_extraction")
         self.config = config
@@ -104,7 +104,7 @@ class LLMExtraction:
 
         self.provider_name = provider
         self.model = config.get("model")
-        self.temperature = config.get("temperature", 0.3)
+        self.temperature = config.get("temperature")  # None = use model default
 
         # Initialize provider using new system
         try:

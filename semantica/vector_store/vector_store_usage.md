@@ -1,6 +1,46 @@
 # Vector Store Module Usage Guide
 
-This comprehensive guide demonstrates how to use the vector store module for vector storage and retrieval, supporting multiple vector store backends (FAISS, Weaviate, Qdrant, Milvus), hybrid search combining vector similarity and metadata filtering, metadata management, and namespace isolation.
+This comprehensive guide demonstrates how to use the vector store module for vector storage and retrieval, supporting multiple vector store backends (FAISS, Weaviate, Qdrant, Pinecone, Milvus), hybrid search combining vector similarity and metadata filtering, metadata management, namespace isolation, and enhanced decision tracking capabilities.
+
+## Quick Imports
+
+```python
+# Core vector store classes
+from semantica.vector_store import VectorStore, HybridSearch, MetadataFilter
+
+# Decision tracking classes
+from semantica.vector_store import DecisionEmbeddingPipeline, HybridSimilarityCalculator, DecisionContext
+
+# Convenience functions
+from semantica.vector_store.decision_vector_methods import (
+    quick_decision, find_precedents, explain, similar_to,
+    batch_decisions, filter_decisions, search_by_entities,
+    set_global_vector_store
+)
+
+# Store adapters
+from semantica.vector_store import FAISSStore, WeaviateStore, QdrantStore, PineconeStore, MilvusStore
+
+# Utility classes
+from semantica.vector_store import VectorManager, NamespaceManager, MetadataStore
+```
+
+## Quick Example
+
+```python
+# Simple vector store setup
+vector_store = VectorStore(backend="inmemory", dimension=384)
+
+# Store vectors
+vectors = [[0.1, 0.2, 0.3, 0.4] for _ in range(10)]
+metadata = [{"category": "document", "source": "test"} for _ in range(10)]
+vector_ids = vector_store.store_vectors(vectors, metadata)
+
+# Search vectors
+query_vector = [0.1, 0.2, 0.3, 0.4]
+results = vector_store.search_vectors(query_vector, k=5)
+print(f"Found {len(results)} similar vectors")
+```
 
 ## Table of Contents
 
@@ -14,7 +54,10 @@ This comprehensive guide demonstrates how to use the vector store module for vec
 8. [Store Backends](#store-adapters)
 9. [Algorithms and Methods](#algorithms-and-methods)
 10. [Configuration](#configuration)
-11. [Advanced Examples](#advanced-examples)
+11. [Complete Examples](#complete-examples)
+12. [Decision Tracking](#decision-tracking)
+13. [Hybrid Similarity for Decisions](#hybrid-similarity-for-decisions)
+14. [Convenience Functions](#convenience-functions)
 
 ## Basic Usage
 
@@ -93,6 +136,27 @@ results = search.search(
 print(f"Found {len(results)} results")
 for result in results[:5]:
     print(f"ID: {result['id']}, Score: {result['score']:.3f}")
+```
+
+## Quick Decision Tracking Example
+
+```python
+# Set up decision tracking
+from semantica.vector_store.decision_vector_methods import set_global_vector_store, quick_decision, find_precedents
+
+set_global_vector_store(vector_store)
+
+# Record a decision
+decision_id = quick_decision(
+    scenario="Credit limit increase request",
+    reasoning="Good payment history",
+    outcome="approved",
+    confidence=0.85
+)
+
+# Find similar decisions
+precedents = find_precedents("Credit limit increase", limit=5)
+print(f"Found {len(precedents)} similar decisions")
 ```
 
 ## Vector Storage Operations
@@ -754,6 +818,39 @@ results = store.search(
 print(f"Found {len(results)} results")
 ```
 
+### Pinecone Store
+
+```python
+from semantica.vector_store import PineconeStore
+import numpy as np
+
+# Create Pinecone store
+store = PineconeStore(api_key="your-api-key")
+
+# Connect
+store.connect()
+
+# Create index
+store.create_index("my-index", dimension=768, metric="cosine")
+
+# Upsert vectors
+vectors = [np.random.rand(768).tolist() for _ in range(100)]
+ids = [f"vec_{i}" for i in range(100)]
+metadata = [{"category": "science"} for _ in range(100)]
+store.upsert_vectors(vectors, ids, metadata=metadata, namespace="my-namespace")
+
+# Search
+query_vector = np.random.rand(768).tolist()
+results = store.search_vectors(
+    query_vector,
+    k=10,
+    filter={"category": {"$eq": "science"}},
+    namespace="my-namespace"
+)
+
+print(f"Found {len(results)} results")
+```
+
 ### Milvus Store
 
 ```python
@@ -1025,6 +1122,381 @@ vectors = manager.get_namespace_vectors("user1")
 - `search_by_metadata(metadata_filters, vectors, metadata, **options)`: Search by metadata
 - `search_hybrid(query_vector, metadata_filters, vectors, metadata, **options)`: Hybrid search
 
+## Decision Tracking
+
+The enhanced vector store provides comprehensive decision tracking capabilities with hybrid search, explainable AI, and KG algorithm integration.
+
+### Decision Embedding Pipeline
+
+```python
+from semantica.vector_store import DecisionEmbeddingPipeline, VectorStore
+import numpy as np
+
+# Initialize vector store and pipeline
+vector_store = VectorStore(backend="inmemory", dimension=384)
+pipeline = DecisionEmbeddingPipeline(
+    vector_store=vector_store,
+    semantic_weight=0.7,
+    structural_weight=0.3,
+    use_graph_features=True
+)
+
+# Process a decision
+decision_data = {
+    "scenario": "Credit limit increase for premium customer",
+    "reasoning": "Excellent payment history and high credit score",
+    "outcome": "approved",
+    "confidence": 0.92,
+    "entities": ["customer_123", "premium_segment", "credit_card"],
+    "category": "credit_approval",
+    "amount": 50000,
+    "risk_level": "low"
+}
+
+# Generate embeddings
+embeddings = pipeline.generate_decision_embeddings(decision_data)
+print(f"Semantic embedding: {len(embeddings['semantic'])} dimensions")
+print(f"Structural embedding: {len(embeddings['structural'])} dimensions")
+print(f"Combined embedding: {len(embeddings['combined'])} dimensions")
+```
+
+### Batch Decision Processing
+
+```python
+# Process multiple decisions
+decisions = [
+    {
+        "scenario": "Credit limit increase request",
+        "reasoning": "Good payment history",
+        "outcome": "approved",
+        "confidence": 0.85,
+        "entities": ["customer_456"],
+        "category": "credit_approval"
+    },
+    {
+        "scenario": "Fraud detection alert",
+        "reasoning": "Suspicious transaction pattern",
+        "outcome": "blocked",
+        "confidence": 0.95,
+        "entities": ["transaction_789", "customer_456"],
+        "category": "fraud_detection"
+    }
+]
+
+# Batch process decisions
+batch_results = pipeline.process_decision_batch(decisions, batch_size=2)
+print(f"Processed {len(batch_results)} decisions")
+
+for result in batch_results:
+    print(f"Decision ID: {result['decision_id']}")
+    print(f"Vector ID: {result['vector_id']}")
+    print(f"Embedding dimensions: {len(result['combined_embedding'])}")
+```
+
+### Decision Vector Operations
+
+```python
+from semantica.vector_store.decision_vector_methods import (
+    store_decision, search_decisions, get_decision_embeddings,
+    filter_decisions, batch_decisions
+)
+
+# Store a decision
+decision_id = store_decision(
+    scenario="Loan application assessment",
+    reasoning="Stable income but high debt-to-income ratio",
+    outcome="approved_with_conditions",
+    confidence=0.82,
+    entities=["applicant_555", "loan_mortgage"],
+    category="risk_assessment",
+    vector_store=vector_store
+)
+
+# Search decisions
+results = search_decisions(
+    query="Loan assessment with conditions",
+    limit=5,
+    vector_store=vector_store
+)
+
+# Filter decisions by criteria
+filtered = filter_decisions(
+    category="risk_assessment",
+    confidence_min=0.8,
+    outcome="approved",
+    vector_store=vector_store
+)
+
+print(f"Found {len(results)} decisions")
+print(f"Filtered {len(filtered)} decisions")
+```
+
+## Hybrid Similarity for Decisions
+
+The `HybridSimilarityCalculator` provides enhanced similarity calculations combining semantic and structural embeddings.
+
+### Basic Hybrid Similarity
+
+```python
+from semantica.vector_store import HybridSimilarityCalculator
+import numpy as np
+
+# Initialize calculator
+calculator = HybridSimilarityCalculator(
+    semantic_weight=0.7,
+    structural_weight=0.3,
+    similarity_metric="cosine"
+)
+
+# Calculate similarity between decisions
+semantic1 = np.random.rand(384)
+semantic2 = np.random.rand(384)
+structural1 = np.random.rand(128)
+structural2 = np.random.rand(128)
+
+similarity = calculator.calculate_hybrid_similarity(
+    semantic1, semantic2, structural1, structural2
+)
+
+print(f"Hybrid similarity: {similarity:.3f}")
+```
+
+### Batch Similarity Calculation
+
+```python
+# Calculate similarities for multiple decision pairs
+decision_pairs = [
+    (semantic1, semantic2, structural1, structural2),
+    (semantic3, semantic4, structural3, structural4),
+    (semantic5, semantic6, structural5, structural6)
+]
+
+similarities = calculator.calculate_batch_similarity(decision_pairs)
+print(f"Batch similarities: {similarities}")
+
+# Calculate similarity matrix
+semantic_embeddings = [semantic1, semantic2, semantic3]
+structural_embeddings = [structural1, structural2, structural3]
+
+similarity_matrix = calculator.calculate_similarity_matrix(
+    semantic_embeddings, structural_embeddings
+)
+
+print(f"Similarity matrix: {similarity_matrix.shape}")
+```
+
+### Additional Similarity Metrics
+
+```python
+# Try different similarity metrics
+metrics = ["cosine", "pearson", "euclidean", "dot_product"]
+
+for metric in metrics:
+    calculator = HybridSimilarityCalculator(
+        semantic_weight=0.6,
+        structural_weight=0.4,
+        similarity_metric=metric
+    )
+    
+    similarity = calculator.calculate_hybrid_similarity(
+        semantic1, semantic2, structural1, structural2
+    )
+    
+    print(f"{metric}: {similarity:.3f}")
+```
+
+### Context-Enhanced Similarity
+
+```python
+# Calculate similarity with context enhancement
+context_info = {
+    "shared_entities": ["customer", "credit"],
+    "entity_weights": {"customer": 0.8, "credit": 0.6},
+    "relationship_strength": 0.7
+}
+
+enhanced_similarity = calculator.calculate_context_enhanced_similarity(
+    semantic1, semantic2, structural1, structural2, context_info
+)
+
+print(f"Context-enhanced similarity: {enhanced_similarity:.3f}")
+```
+
+## Convenience Functions
+
+The vector store module provides convenient one-liner functions for common decision tracking operations.
+
+### Quick Decision Operations
+
+```python
+from semantica.vector_store.decision_vector_methods import (
+    quick_decision, find_precedents, explain, similar_to,
+    set_global_vector_store, get_global_vector_store
+)
+
+# Set global vector store (once per application)
+set_global_vector_store(vector_store)
+
+# Quick decision recording
+decision_id = quick_decision(
+    scenario="Credit limit increase request",
+    reasoning="Good payment history",
+    outcome="approved"
+)
+
+print(f"Quick decision recorded: {decision_id}")
+```
+
+### Finding Precedents
+
+```python
+# Find decision precedents
+precedents = find_precedents(
+    query="Credit limit increase",
+    limit=5,
+    filters={"category": "credit_approval"},
+    use_hybrid_search=True
+)
+
+print(f"Found {len(precedents)} precedents")
+for precedent in precedents:
+    print(f"Score: {precedent['score']:.3f}")
+    print(f"Outcome: {precedent['outcome']}")
+```
+
+### Decision Explanation
+
+```python
+# Explain a decision
+explanation = explain(
+    decision_id,
+    include_paths=True,
+    include_confidence=True,
+    include_weights=True
+)
+
+print(f"Decision explanation:")
+print(f"Scenario: {explanation['scenario']}")
+print(f"Reasoning: {explanation['reasoning']}")
+print(f"Outcome: {explanation['outcome']}")
+print(f"Confidence: {explanation['confidence']}")
+```
+
+### Finding Similar Decisions
+
+```python
+# Find similar decisions
+similar = similar_to(
+    query="High-risk credit assessment",
+    limit=10,
+    semantic_weight=0.8,
+    structural_weight=0.2
+)
+
+print(f"Found {len(similar)} similar decisions")
+for decision in similar:
+    print(f"Category: {decision['category']}")
+    print(f"Risk level: {decision.get('risk_level', 'unknown')}")
+```
+
+### Batch Operations
+
+```python
+# Batch process decisions
+batch_data = [
+    {"scenario": f"Decision {i}", "reasoning": f"Reason {i}", "outcome": "approved"}
+    for i in range(10)
+]
+
+batch_results = batch_decisions(batch_data)
+print(f"Batch processed {len(batch_results)} decisions")
+
+# Filter decisions
+high_confidence = filter_decisions(confidence_min=0.8)
+credit_decisions = filter_decisions(category="credit_approval")
+
+print(f"High confidence decisions: {len(high_confidence)}")
+print(f"Credit decisions: {len(credit_decisions)}")
+```
+
+### Entity-Based Search
+
+```python
+from semantica.vector_store.decision_vector_methods import search_by_entities
+
+# Search decisions by entities
+entity_decisions = search_by_entities(
+    entities=["customer_123", "premium_segment"],
+    limit=5
+)
+
+print(f"Found {len(entity_decisions)} decisions for entities")
+```
+
+### Decision Context
+
+```python
+from semantica.vector_store.decision_vector_methods import get_decision_context
+
+# Get comprehensive decision context
+context = get_decision_context(
+    decision_id,
+    depth=2,
+    include_entities=True,
+    include_policies=True
+)
+
+print(f"Decision context with {len(context.related_entities)} entities")
+print(f"Related relationships: {len(context.related_relationships)}")
+```
+
+### Real-World Examples
+
+```python
+# Banking decision workflow
+banking_decision = quick_decision(
+    scenario="Mortgage application approval",
+    reasoning="Strong credit score (750), stable employment, 20% down payment",
+    outcome="approved",
+    confidence=0.94,
+    entities=["applicant_001", "mortgage_30yr", "property_main"],
+    category="mortgage_approval",
+    loan_amount=350000,
+    credit_score=750
+)
+
+# Find similar mortgage decisions
+mortgage_precedents = find_precedents(
+    query="Mortgage with good credit",
+    limit=5,
+    filters={"category": "mortgage_approval"}
+)
+
+# Explain the decision
+mortgage_explanation = explain(banking_decision)
+print(f"Mortgage decision: {mortgage_explanation['outcome']}")
+
+# Insurance decision workflow
+insurance_decision = quick_decision(
+    scenario="Auto insurance claim approval",
+    reasoning="Clear liability, reasonable repair costs, no prior claims",
+    outcome="approved",
+    confidence=0.96,
+    entities=["claim_auto_001", "driver_safe", "policy_active"],
+    category="auto_insurance",
+    claim_amount=2500
+)
+
+# Find similar insurance claims
+insurance_precedents = find_precedents(
+    query="Auto claim with clear liability",
+    limit=5,
+    filters={"category": "auto_insurance"}
+)
+
+print(f"Found {len(insurance_precedents)} similar insurance claims")
+```
+
 #### HybridSearch Methods
 
 - `search(query_vector, vectors, metadata, vector_ids, k, metadata_filter, **options)`: Perform hybrid search
@@ -1127,7 +1599,7 @@ vector_store:
   milvus_port: 19530
 ```
 
-## Advanced Examples
+## Complete Examples
 
 ### Complete Vector Store Pipeline
 

@@ -583,6 +583,13 @@ class GraphStore:
             neptune_config.update(self.config)
             self._store_backend = AmazonNeptuneStore(**neptune_config)
 
+        elif self.backend == "age" or self.backend == "apache_age":
+            from .age_store import ApacheAgeStore
+
+            age_config = graph_store_config.get_age_config()
+            age_config.update(self.config)
+            self._store_backend = ApacheAgeStore(**age_config)
+
         else:
             raise ValidationError(f"Unknown backend: {self.backend}")
 

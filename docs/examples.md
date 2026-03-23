@@ -332,7 +332,7 @@ from semantica.reasoning import Reasoner
 context = AgentContext(
     vector_store=vs, 
     knowledge_graph=kg,
-    use_graph_expansion=True,
+    graph_expansion=True,
     hybrid_alpha=0.7
 )
 

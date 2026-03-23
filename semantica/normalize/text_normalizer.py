@@ -562,15 +562,19 @@ class SpecialCharacterProcessor:
         Returns:
             str: Text with normalized punctuation marks
         """
-        # Normalize quotes
-        text = re.sub(r'["""]', '"', text)
-        text = re.sub(r"[''']", "'", text)
+        # Replace common smart punctuation with ASCII equivalents
+        replacements = {
+            "\u2018": "'",   # Left single quotation mark
+            "\u2019": "'",   # Right single quotation mark
+            "\u201C": '"',   # Left double quotation mark
+            "\u201D": '"',   # Right double quotation mark
+            "\u2013": "-",   # En dash
+            "\u2014": "--",  # Em dash
+            "\u2026": "...", # Ellipsis
+        }
 
-        # Normalize dashes
-        text = re.sub(r"[–—]", "-", text)
-
-        # Normalize ellipsis
-        text = text.replace("…", "...")
+        for old, new in replacements.items():
+            text = text.replace(old, new)
 
         return text
 

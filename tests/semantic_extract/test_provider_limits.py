@@ -120,6 +120,184 @@ class TestProviderLimits:
             assert gen_config["top_k"] == 10
             assert gen_config["candidate_count"] == 2
 
+class TestTemperatureParameter:
+    """Test that temperature=None omits the parameter from API calls."""
+
+    def test_openai_temperature_none_omitted(self):
+        """Verify temperature is NOT in kwargs when None."""
+        from semantica.semantic_extract.providers import OpenAIProvider
+
+        with patch.object(OpenAIProvider, '_init_client', return_value=None):
+            provider = OpenAIProvider(api_key="fake")
+            mock_client = MagicMock()
+            mock_response = MagicMock()
+            mock_response.choices[0].message.content = "result"
+            mock_client.chat.completions.create.return_value = mock_response
+            provider.client = mock_client
+
+            provider.generate("prompt")  # No temperature
+
+            call_kwargs = mock_client.chat.completions.create.call_args[1]
+            assert "temperature" not in call_kwargs
+
+    def test_openai_temperature_explicit_included(self):
+        """Verify temperature IS in kwargs when explicitly set."""
+        from semantica.semantic_extract.providers import OpenAIProvider
+
+        with patch.object(OpenAIProvider, '_init_client', return_value=None):
+            provider = OpenAIProvider(api_key="fake")
+            mock_client = MagicMock()
+            mock_response = MagicMock()
+            mock_response.choices[0].message.content = "result"
+            mock_client.chat.completions.create.return_value = mock_response
+            provider.client = mock_client
+
+            provider.generate("prompt", temperature=0.5)
+
+            call_kwargs = mock_client.chat.completions.create.call_args[1]
+            assert call_kwargs["temperature"] == 0.5
+
+    def test_groq_temperature_none_omitted(self):
+        """Verify temperature is NOT in kwargs when None for Groq."""
+        from semantica.semantic_extract.providers import GroqProvider
+
+        with patch.object(GroqProvider, '_init_client', return_value=None):
+            provider = GroqProvider(api_key="fake")
+            mock_client = MagicMock()
+            mock_response = MagicMock()
+            mock_response.choices[0].message.content = "result"
+            mock_client.chat.completions.create.return_value = mock_response
+            provider.client = mock_client
+
+            provider.generate("prompt")  # No temperature
+
+            call_kwargs = mock_client.chat.completions.create.call_args[1]
+            assert "temperature" not in call_kwargs
+
+    def test_groq_temperature_explicit_included(self):
+        """Verify temperature IS in kwargs when explicitly set for Groq."""
+        from semantica.semantic_extract.providers import GroqProvider
+
+        with patch.object(GroqProvider, '_init_client', return_value=None):
+            provider = GroqProvider(api_key="fake")
+            mock_client = MagicMock()
+            mock_response = MagicMock()
+            mock_response.choices[0].message.content = "result"
+            mock_client.chat.completions.create.return_value = mock_response
+            provider.client = mock_client
+
+            provider.generate("prompt", temperature=0.7)
+
+            call_kwargs = mock_client.chat.completions.create.call_args[1]
+            assert call_kwargs["temperature"] == 0.7
+
+    def test_gemini_temperature_none_omitted(self):
+        """Verify generation_config is None or empty when temperature not set for Gemini."""
+        from semantica.semantic_extract.providers import GeminiProvider
+
+        with patch.object(GeminiProvider, '_init_client', return_value=None):
+            provider = GeminiProvider(api_key="fake")
+            mock_model = MagicMock()
+            mock_response = MagicMock()
+            mock_response.text = "result"
+            mock_model.generate_content.return_value = mock_response
+            provider.client = mock_model
+
+            provider.generate("prompt")  # No temperature
+
+            call_kwargs = mock_model.generate_content.call_args[1]
+            gen_config = call_kwargs.get("generation_config")
+            # When no config params set, config is None or empty dict
+            assert gen_config is None or "temperature" not in gen_config
+
+    def test_gemini_temperature_explicit_included(self):
+        """Verify temperature IS in generation_config when explicitly set for Gemini."""
+        from semantica.semantic_extract.providers import GeminiProvider
+
+        with patch.object(GeminiProvider, '_init_client', return_value=None):
+            provider = GeminiProvider(api_key="fake")
+            mock_model = MagicMock()
+            mock_response = MagicMock()
+            mock_response.text = "result"
+            mock_model.generate_content.return_value = mock_response
+            provider.client = mock_model
+
+            provider.generate("prompt", temperature=0.8)
+
+            call_kwargs = mock_model.generate_content.call_args[1]
+            gen_config = call_kwargs["generation_config"]
+            assert gen_config["temperature"] == 0.8
+
+    def test_ollama_temperature_none_omitted(self):
+        """Verify options is None or has no temperature when None for Ollama."""
+        from semantica.semantic_extract.providers import OllamaProvider
+
+        with patch.object(OllamaProvider, '_init_client', return_value=None):
+            provider = OllamaProvider()
+            mock_client = MagicMock()
+            mock_response = {"response": "result"}
+            mock_client.generate.return_value = mock_response
+            provider.client = mock_client
+
+            provider.generate("prompt")  # No temperature
+
+            call_kwargs = mock_client.generate.call_args[1]
+            options = call_kwargs.get("options")
+            # When no options params set, options is None or empty dict
+            assert options is None or "temperature" not in options
+
+    def test_ollama_temperature_explicit_included(self):
+        """Verify temperature IS in options when explicitly set for Ollama."""
+        from semantica.semantic_extract.providers import OllamaProvider
+
+        with patch.object(OllamaProvider, '_init_client', return_value=None):
+            provider = OllamaProvider()
+            mock_client = MagicMock()
+            mock_response = {"response": "result"}
+            mock_client.generate.return_value = mock_response
+            provider.client = mock_client
+
+            provider.generate("prompt", temperature=0.3)
+
+            call_kwargs = mock_client.generate.call_args[1]
+            options = call_kwargs.get("options", {})
+            assert options["temperature"] == 0.3
+
+    def test_deepseek_temperature_none_omitted(self):
+        """Verify temperature is NOT in kwargs when None for DeepSeek."""
+        from semantica.semantic_extract.providers import DeepSeekProvider
+
+        with patch.object(DeepSeekProvider, '_init_client', return_value=None):
+            provider = DeepSeekProvider(api_key="fake")
+            mock_client = MagicMock()
+            mock_response = MagicMock()
+            mock_response.choices[0].message.content = "result"
+            mock_client.chat.completions.create.return_value = mock_response
+            provider.client = mock_client
+
+            provider.generate("prompt")  # No temperature
+
+            call_kwargs = mock_client.chat.completions.create.call_args[1]
+            assert "temperature" not in call_kwargs
+
+    def test_deepseek_temperature_explicit_included(self):
+        """Verify temperature IS in kwargs when explicitly set for DeepSeek."""
+        from semantica.semantic_extract.providers import DeepSeekProvider
+
+        with patch.object(DeepSeekProvider, '_init_client', return_value=None):
+            provider = DeepSeekProvider(api_key="fake")
+            mock_client = MagicMock()
+            mock_response = MagicMock()
+            mock_response.choices[0].message.content = "result"
+            mock_client.chat.completions.create.return_value = mock_response
+            provider.client = mock_client
+
+            provider.generate("prompt", temperature=0.9)
+
+            call_kwargs = mock_client.chat.completions.create.call_args[1]
+            assert call_kwargs["temperature"] == 0.9
+
+
 class TestChunkingDefaults:
     """Test that chunking defaults have been increased."""
 

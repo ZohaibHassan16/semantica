@@ -138,6 +138,9 @@ class GraphStoreConfig:
             "AWS_ACCESS_KEY_ID": "neptune_access_key",
             "AWS_SECRET_ACCESS_KEY": "neptune_secret_key",
             "AWS_SESSION_TOKEN": "neptune_session_token",
+            # Apache AGE settings
+            "GRAPH_STORE_AGE_CONNECTION_STRING": "age_connection_string",
+            "GRAPH_STORE_AGE_GRAPH_NAME": "age_graph_name",
         }
 
         for env_var, config_key in env_mappings.items():
@@ -199,6 +202,9 @@ class GraphStoreConfig:
             "neptune_access_key": None,
             "neptune_secret_key": None,
             "neptune_session_token": None,
+            # Apache AGE defaults
+            "age_connection_string": "host=localhost dbname=agedb user=postgres password=postgres",
+            "age_graph_name": "semantica",
         }
 
         for key, default_value in defaults.items():
@@ -313,6 +319,18 @@ class GraphStoreConfig:
             "access_key": self._config.get("neptune_access_key"),
             "secret_key": self._config.get("neptune_secret_key"),
             "session_token": self._config.get("neptune_session_token"),
+        }
+
+    def get_age_config(self) -> Dict[str, Any]:
+        """
+        Get Apache AGE-specific configuration.
+
+        Returns:
+            Apache AGE configuration dictionary
+        """
+        return {
+            "connection_string": self._config.get("age_connection_string"),
+            "graph_name": self._config.get("age_graph_name"),
         }
 
     def reset(self) -> None:

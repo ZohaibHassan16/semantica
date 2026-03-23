@@ -113,25 +113,41 @@ from .entity_resolver import EntityResolver
 from .graph_analyzer import GraphAnalyzer
 from .graph_builder import GraphBuilder
 from .graph_validator import GraphValidator
+from .link_predictor import LinkPredictor
+from .node_embeddings import NodeEmbedder
+from .path_finder import PathFinder
+from .kg_provenance import GraphBuilderWithProvenance, AlgorithmTrackerWithProvenance
 from .provenance_tracker import ProvenanceTracker
-from .registry import MethodRegistry, method_registry
+from .registry import MethodRegistry, method_registry, AlgorithmRegistry, algorithm_registry
 from .seed_manager import SeedManager
+from .similarity_calculator import SimilarityCalculator
 from .temporal_query import (
     TemporalGraphQuery,
     TemporalPatternDetector,
     TemporalVersionManager,
 )
+from .temporal_model import BiTemporalFact, TemporalBound
 
 __all__ = [
     # Core Classes
     "GraphBuilder",
+    "GraphBuilderWithProvenance",
     "EntityResolver",
     "GraphAnalyzer",
     "GraphValidator",
     "TemporalGraphQuery",
     "TemporalPatternDetector",
     "TemporalVersionManager",
+    "TemporalBound",
+    "BiTemporalFact",
+    "AlgorithmTrackerWithProvenance",
     "ProvenanceTracker",
+    # Enhanced Graph Algorithms
+    "NodeEmbedder",
+    "SimilarityCalculator",
+    "PathFinder",
+    "LinkPredictor",
+    # Existing Analysis Classes
     "CentralityCalculator",
     "CommunityDetector",
     "ConnectivityAnalyzer",
@@ -139,6 +155,8 @@ __all__ = [
     # Registry and Configuration
     "MethodRegistry",
     "method_registry",
+    "AlgorithmRegistry",
+    "algorithm_registry",
     "KGConfig",
     "kg_config",
 ]

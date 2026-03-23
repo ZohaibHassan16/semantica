@@ -1380,11 +1380,11 @@ result = semantica.build_knowledge_base(["document.pdf"])
 ## 🚀 Performance
 
 ### Benchmarks
-- **Processing Speed**: 1000+ documents per minute
+- **Processing Speed**: Optimized for high-throughput document processing
 - **Memory Usage**: Optimized for large-scale processing
-- **Accuracy**: 95%+ entity extraction accuracy
+- **Accuracy**: High accuracy entity extraction
 - **Scalability**: Horizontal scaling support
-- **Latency**: Sub-second query response times
+- **Latency**: Fast query response times
 
 ### Optimization
 - **Parallel Processing**: Multi-threaded and multi-process support

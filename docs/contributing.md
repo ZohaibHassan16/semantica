@@ -1,126 +1,130 @@
-# Contributing to Semantica
+﻿# Contributing
 
-Thank you for your interest in contributing to Semantica!
-
-!!! tip "Quick Start"
-    New to contributing? Check out issues labeled [`good-first-issue`](https://github.com/Hawksight-AI/semantica/labels/good-first-issue)
+**Help us build Semantica! Every contribution makes the project better.**
 
 ---
 
-## 📚 Essential Links
+## Getting Started
 
-- **[Contributing Guide](https://github.com/Hawksight-AI/semantica/blob/main/CONTRIBUTING.md)** - Complete contribution guidelines
-- **[Code of Conduct](https://github.com/Hawksight-AI/semantica/blob/main/CODE_OF_CONDUCT.md)** - Community standards
-- **[Security Policy](https://github.com/Hawksight-AI/semantica/blob/main/SECURITY.md)** - Report vulnerabilities
-- **[GitHub Issues](https://github.com/Hawksight-AI/semantica/issues)** - Bug reports and features
+### Quick Start
+1. **Fork** the repository
+2. **Create** a feature branch
+3. **Make** your changes
+4. **Test** your changes
+5. **Submit** a pull request
+
+### First Contribution?
+Look for issues labeled [`good-first-issue`](https://github.com/Hawksight-AI/semantica/labels/good-first-issue) for beginner-friendly tasks.
 
 ---
 
-## 🎯 Ways to Contribute
+## Ways to Contribute
 
-### Code Contributions
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Submit a pull request
-
-See the [Contributing Guide](https://github.com/Hawksight-AI/semantica/blob/main/CONTRIBUTING.md) for detailed instructions.
+### Code
+- **Fix bugs** - Resolve reported issues
+- **Add features** - Implement new functionality
+- **Improve performance** - Optimize existing code
+- **Refactor** - Clean up code structure
 
 ### Documentation
+- **Fix typos** - Correct spelling and grammar
+- **Improve guides** - Make documentation clearer
+- **Add examples** - Provide practical code examples
+- **Update API docs** - Keep reference current
 
-- Fix typos and improve clarity
-- Add examples and tutorials
-- Update API documentation
-- Translate documentation
+### Testing
+- **Write tests** - Add test coverage
+- **Fix tests** - Resolve test failures
+- **Report issues** - Identify bugs through testing
+
+### Community
+- **Help others** - Answer questions in issues
+- **Share knowledge** - Write tutorials and guides
+- **Provide feedback** - Review pull requests
+
+---
+
+## Reporting Issues
 
 ### Bug Reports
-
-Report bugs on [GitHub Issues](https://github.com/Hawksight-AI/semantica/issues) with:
-- Description of the problem
-- Steps to reproduce
-- Expected vs actual behavior
-- Environment details
+When reporting bugs, include:
+- **Description** - What happened
+- **Steps to reproduce** - How to trigger the issue
+- **Expected behavior** - What should happen
+- **Environment** - Your setup details
 
 ### Feature Requests
-
-Suggest features on [GitHub Issues](https://github.com/Hawksight-AI/semantica/issues) with:
-- Use case description
-- Proposed solution
-- Benefits to the community
+When suggesting features, include:
+- **Use case** - Why you need this feature
+- **Proposed solution** - How it should work
+- **Benefits** - How it helps the community
 
 ---
 
-## ✍️ Documentation Style Guide
+## Pull Request Guidelines
 
-### Writing Guidelines
+### Before Submitting
+- **Test** your changes thoroughly
+- **Document** new features with examples
+- **Update** relevant documentation
+- **Follow** the existing code style
 
-- Use clear, concise language
-- Include working code examples
-- Test all examples before submitting
-- Follow existing documentation structure
-- Use proper markdown formatting
+### Pull Request Checklist
+- [ ] Code follows project style
+- [ ] Tests pass locally
+- [ ] Documentation is updated
+- [ ] Commit messages are clear
+- [ ] No merge conflicts
 
-### API Documentation Format
+---
 
-```python
-def function_name(
-    param1: str,
-    param2: int = 0
-) -> ReturnType:
-    """Brief description.
-    
-    Args:
-        param1: Description of param1
-        param2: Description of param2 (default: 0)
-    
-    Returns:
-        Description of return value
-    
-    Raises:
-        ValueError: When and why this is raised
-    
-    Example:
-        >>> result = function_name("test", 5)
-        >>> print(result)
-        expected_output
-    """
+## Development Setup
+
+### Local Development
+```bash
+# Clone your fork
+git clone https://github.com/your-username/semantica.git
+cd semantica
+
+# Install in development mode
+pip install -e .[dev]
+
+# Run tests
+pytest
 ```
 
----
-
-## 📁 Documentation Structure
-
-```
-docs/
-├── index.md              # Homepage
-├── getting-started.md    # Getting started
-├── concepts.md          # Core concepts
-├── modules.md           # Module overview
-├── use-cases.md         # Use cases
-├── examples.md          # Examples
-├── cookbook/            # Tutorials
-└── reference/           # API reference
-```
+### Code Style
+We use standard Python formatting:
+- **Black** for code formatting
+- **isort** for import sorting
+- **flake8** for linting
 
 ---
 
-## 🛠️ Documentation Tools
+## Community Guidelines
 
-- **[MkDocs](https://www.mkdocs.org/)** - Documentation generator
-- **[Material for MkDocs](https://squidfunk.github.io/mkdocs-material/)** - Theme
-- **[mkdocstrings](https://mkdocstrings.github.io/)** - API docs from docstrings
-- **[Mermaid](https://mermaid.js.org/)** - Diagrams
+### Code of Conduct
+Please follow our [Code of Conduct](https://github.com/Hawksight-AI/semantica/blob/main/CODE_OF_CONDUCT.md).
+
+### Communication
+- **Be respectful** - Treat everyone with kindness
+- **Be helpful** - Assist others when you can
+- **Be patient** - Allow time for reviews
+- **Be constructive** - Provide helpful feedback
 
 ---
 
-## 🤝 Getting Help
+## Recognition
+
+All contributors are recognized in:
+- **GitHub contributors** - Automatic recognition
+- **Release notes** - Notable contributions
+- **Community highlights** - Outstanding work
+
+---
+
+## Need Help?
 
 - **[GitHub Issues](https://github.com/Hawksight-AI/semantica/issues)** - Ask questions
-- **Documentation** - Check existing docs for examples
-- **Pull Requests** - Review other contributors' PRs
-
----
-
-!!! success "Thank You!"
-    Every contribution helps make Semantica better! 🎉
+- **[Discussions](https://github.com/Hawksight-AI/semantica/discussions)** - Community chat
+- **[Code of Conduct](https://github.com/Hawksight-AI/semantica/blob/main/CODE_OF_CONDUCT.md)** - Community standards

@@ -8,6 +8,7 @@ from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 from semantica.export import (
+    ArrowExporter,
     JSONExporter,
     CSVExporter,
     RDFExporter,
@@ -254,6 +255,41 @@ class TestExportModule(unittest.TestCase):
         
         generator.generate_report(self.kg, str(output_path), format="html")
         self.assertTrue(output_path.exists())
+
+    def test_arrow_exporter(self):
+        """Test Arrow exporter basic functionality."""
+        try:
+            import pyarrow as pa
+            import pyarrow.ipc as ipc
+            
+            exporter = ArrowExporter()
+            output_path = Path(self.test_dir) / "entities.arrow"
+            
+            # Test export_entities
+            exporter.export_entities(self.entities, str(output_path))
+            self.assertTrue(output_path.exists())
+            
+            # Verify Arrow file
+            with pa.OSFile(str(output_path), 'rb') as source:
+                with ipc.open_file(source) as reader:
+                    table = reader.read_all()
+                    self.assertEqual(table.num_rows, 2)
+                    self.assertIn('id', table.column_names)
+                    self.assertIn('text', table.column_names)
+                    self.assertIn('type', table.column_names)
+            
+            # Test export_knowledge_graph
+            base_path = Path(self.test_dir) / "kg_arrow"
+            exporter.export_knowledge_graph(self.kg, str(base_path))
+            
+            entities_path = Path(self.test_dir) / "kg_arrow_entities.arrow"
+            rels_path = Path(self.test_dir) / "kg_arrow_relationships.arrow"
+            
+            self.assertTrue(entities_path.exists())
+            self.assertTrue(rels_path.exists())
+            
+        except ImportError:
+            print("Skipping Arrow test due to missing pyarrow")
 
     def test_registry(self):
         def dummy_method(data, path, **kwargs):

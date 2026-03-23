@@ -96,8 +96,7 @@ extra_css:
   - css/custom.css
 
 # Custom JavaScript
-extra_javascript:
-  - js/version-selector.js
+extra_javascript: []
 
 # Navigation
 nav:
@@ -107,6 +106,7 @@ nav:
     - installation.md
     - quickstart.md
   - Docs:
+    - Change Management: reference/change_management.md
     - Conflicts: reference/conflicts.md
     - Context: reference/context.md
     - Core: reference/core.md
@@ -122,6 +122,7 @@ nav:
     - Ontology: reference/ontology.md
     - Parse: reference/parse.md
     - Pipeline: reference/pipeline.md
+    - Provenance: reference/provenance.md
     - Reasoning: reference/reasoning.md
     - Seed: reference/seed.md
     - Semantic Extract: reference/semantic_extract.md
@@ -132,25 +133,18 @@ nav:
     - Visualization: reference/visualization.md
   - Guides:
     - concepts.md
-    - deep-dive.md
     - modules.md
-    - glossary.md
     - use-cases.md
     - examples.md
-    - Code Examples: CodeExamples.md
-    - learning-more.md
+    - glossary.md
   - Integrations:
+    - Agno: integrations/agno.md
     - Docling: integrations/docling.md
+    - Snowflake: integrations/snowflake.md
   - Cookbook: cookbook.md
   - Resources:
-    - community-projects.md
     - community.md
     - contributing.md
-    - architecture.md
-    - governance.md
-    - citation.md
-    - Changelog: changelog.md
-    - Release Guide: release-guide.md
     - faq.md
     - license.md
 

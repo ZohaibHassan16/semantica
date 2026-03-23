@@ -359,9 +359,14 @@ class FeedParser:
 
             return parser.parse(date_string)
         except (ImportError, OSError):
+            # If dateutil isn't available, fall through to raising ValueError
             pass
+        except Exception as e:
+            # If dateutil fails to parse, raise ValueError to signal invalid input
+            raise ValueError(f"Invalid date format: {date_string}") from e
 
-        return None
+        # No known formats matched and dateutil is unavailable; raise ValueError
+        raise ValueError(f"Invalid date format: {date_string}")
 
     def validate_feed(self, feed_data: FeedData) -> bool:
         """

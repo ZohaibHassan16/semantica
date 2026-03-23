@@ -1,306 +1,266 @@
 # Contributing to Semantica
 
-Thank you for your interest in contributing to Semantica! This document provides guidelines and instructions for contributing to the project.
+Thank you for your interest in contributing! Every contribution, no matter how small, is valuable. 🎉
 
-## Table of Contents
+⭐ **Give us a Star** • 🍴 **[Fork Semantica](https://github.com/Hawksight-AI/semantica/fork)** • 💬 **Join our [Discord](https://discord.gg/sV34vps5hH)**
 
-- [Code of Conduct](#code-of-conduct)
-- [Getting Started](#getting-started)
-- [Development Setup](#development-setup)
-- [Code Style Guidelines](#code-style-guidelines)
-- [Testing Requirements](#testing-requirements)
-- [Commit Message Conventions](#commit-message-conventions)
-- [Pull Request Process](#pull-request-process)
-- [Documentation Standards](#documentation-standards)
-- [Types of Contributions](#types-of-contributions)
-- [Getting Help](#getting-help)
+> **New to contributing?** Start with a [`good first issue`](https://github.com/Hawksight-AI/semantica/labels/good%20first%20issue) or join our [Discord](https://discord.gg/sV34vps5hH) community.
 
-## Code of Conduct
+---
 
-This project adheres to a [Code of Conduct](CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code. Please report unacceptable behavior to the maintainers.
+## 🚀 Quick Start
 
-## Getting Started
+1. Find a [`good first issue`](https://github.com/Hawksight-AI/semantica/labels/good%20first%20issue)
+2. [Fork Semantica](https://github.com/Hawksight-AI/semantica/fork) & clone the repository
+3. Make your changes
+4. Submit a pull request!
 
-1. **Fork the repository** on GitHub
-2. **Clone your fork** locally:
-   ```bash
-   git clone https://github.com/your-username/semantica.git
-   cd semantica
-   ```
-3. **Add the upstream remote**:
-   ```bash
-   git remote add upstream https://github.com/Hawksight-AI/semantica.git
-   ```
+**Need help?** Join [Discord](https://discord.gg/sV34vps5hH) or [GitHub Discussions](https://github.com/Hawksight-AI/semantica/discussions)
 
-## Development Setup
+---
 
-### Prerequisites
+## 🎯 Ways to Contribute
 
-- Python 3.8 or higher (3.9+ recommended)
-- pip package manager
-- Git
+### 💻 Code
 
-### Installation
+**What you can do:**
+- Fix bugs
+- Add new features
+- Improve code quality (add type hints, docstrings, improve error messages)
+- Optimize performance
 
-1. **Create a virtual environment** (recommended):
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   ```
+**Where:** `semantica/` directory
 
-2. **Install the project in editable mode with dev dependencies**:
-   ```bash
-   pip install -e ".[dev]"
-   ```
+**Good first issues:** Add docstrings, type hints, or improve error messages
 
-3. **Install pre-commit hooks**:
-   ```bash
-   pre-commit install
-   ```
+---
 
-### Verify Installation
+### 📝 Documentation
+
+**What you can do:**
+- Fix typos and grammar errors
+- Improve clarity and readability
+- Add code examples and tutorials
+- Create new cookbook notebooks
+- Improve API documentation (docstrings)
+- Create troubleshooting guides
+- Update installation instructions
+- Add missing documentation
+
+**Where:** `README.md`, `docs/`, `cookbook/`, docstrings in code
+
+**Good first issues:** Fix typos, add examples, create cookbook tutorials, improve docstrings
+
+**Documentation formatting:**
+- Use clear, concise language
+- Include code examples where helpful
+- Follow markdown best practices
+- Use proper headings hierarchy
+- Add links to related sections
+- Include screenshots for UI-related docs
+
+---
+
+### 🧪 Testing
+
+**What you can do:**
+- Add unit tests
+- Improve test coverage
+- Add integration tests
+
+**Where:** `tests/` directory
+
+**Good first issues:** Add tests for specific functions or classes
+
+---
+
+### 🐛 Bug Reports
+
+**What:** Report bugs you find
+
+**How:** Use the [bug report template](https://github.com/Hawksight-AI/semantica/issues/new?template=bug_report.md)
+
+**Include:** Description, steps to reproduce, expected vs actual behavior, environment details
+
+---
+
+### 💡 Feature Requests
+
+**What:** Suggest new features or improvements
+
+**How:** Use the [feature request template](https://github.com/Hawksight-AI/semantica/issues/new?template=feature_request.md)
+
+**Include:** Problem statement, proposed solution, use cases
+
+---
+
+### 🎨 Cookbook & Examples
+
+**What:** Create tutorials and examples
+
+**Where:** `cookbook/` directory
+
+**Examples:** Create new notebooks, add examples, improve existing tutorials
+
+---
+
+### 💬 Community Support
+
+**What:** Help others in the community
+
+**Where:** [Discord](https://discord.gg/sV34vps5hH), [GitHub Discussions](https://github.com/Hawksight-AI/semantica/discussions)
+
+**Examples:** Answer questions, review PRs, share your projects
+
+---
+
+### 🎓 Educational Content
+
+**What:** Create educational materials
+
+**Examples:** Blog posts, video tutorials, talks, workshops, case studies
+
+---
+
+### 🔧 Other Contributions
+
+- **Design & Graphics:** Logos, diagrams, visualizations
+- **Tools & Integrations:** CLI tools, integrations with other frameworks
+- **Infrastructure:** CI/CD improvements, Docker optimization
+- **Security:** Report security vulnerabilities (privately)
+
+---
+
+## 📋 Getting Started
+
+### 1. Fork & Clone
+
+First, [fork Semantica](https://github.com/Hawksight-AI/semantica/fork) on GitHub, then:
 
 ```bash
-python -c "import semantica; print(semantica.__version__)"
-pytest --version
-black --version
+git clone https://github.com/your-username/semantica.git
+cd semantica
+git remote add upstream https://github.com/Hawksight-AI/semantica.git
 ```
 
-## Code Style Guidelines
-
-We use several tools to maintain code quality and consistency:
-
-### Formatting
-
-- **Black**: Code formatting (line length: 88)
-  ```bash
-  black semantica/
-  ```
-
-- **isort**: Import sorting
-  ```bash
-  isort semantica/
-  ```
-
-### Linting
-
-- **flake8**: Style guide enforcement
-  ```bash
-  flake8 semantica/
-  ```
-
-- **mypy**: Static type checking
-  ```bash
-  mypy semantica/
-  ```
-
-### Running All Checks
+### 2. Set Up Environment
 
 ```bash
-# Format code
-black semantica/ tests/
+# Create virtual environment
+python -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
 
-# Sort imports
-isort semantica/ tests/
+# Install dev dependencies
+pip install -e ".[dev]"
 
-# Lint
-flake8 semantica/ tests/
-
-# Type check
-mypy semantica/
+# Install pre-commit hooks (optional)
+pre-commit install
 ```
 
-Or use pre-commit hooks (automatically runs on commit):
-```bash
-pre-commit run --all-files
-```
-
-## Testing Requirements
-
-### Running Tests
+### 3. Create Branch
 
 ```bash
-# Run all tests
-pytest
-
-# Run with coverage
-pytest --cov=semantica --cov-report=html
-
-# Run specific test file
-pytest tests/test_specific.py
-
-# Run with verbose output
-pytest -v
+git checkout -b feature/your-feature-name
+# or
+git checkout -b fix/bug-description
 ```
 
-### Test Coverage
+### 4. Make Changes
 
-- Minimum coverage: **80%**
-- Critical modules: **90%+**
-- Coverage reports are generated in `htmlcov/`
+- Follow code style (see below)
+- Add tests for new features
+- Update documentation
 
-### Writing Tests
+### 5. Run Checks
 
-- Follow pytest conventions
-- Use descriptive test names
-- Include docstrings for complex tests
-- Test both success and failure cases
-- Use fixtures for common setup
-
-Example:
-```python
-def test_entity_extraction():
-    """Test basic entity extraction functionality."""
-    from semantica.semantic_extract import NamedEntityRecognizer
-    
-    ner = NamedEntityRecognizer()
-    entities = ner.extract("Apple Inc. was founded by Steve Jobs.")
-    
-    assert len(entities) > 0
-    assert any(e.text == "Apple Inc." for e in entities)
+```bash
+pytest                          # Run tests
+black semantica/ tests/        # Format code
+isort semantica/ tests/         # Sort imports
+flake8 semantica/ tests/        # Lint
 ```
 
-## Commit Message Conventions
+Or use pre-commit hooks: `pre-commit run --all-files`
 
-We follow [Conventional Commits](https://www.conventionalcommits.org/) specification:
+### 6. Commit & Push
 
-### Format
-
-```
-<type>(<scope>): <subject>
-
-<body>
-
-<footer>
+```bash
+git commit -m "feat(module): add new feature"
+git push origin feature/your-feature-name
 ```
 
-### Types
+Then create a pull request on GitHub!
 
-- `feat`: New feature
-- `fix`: Bug fix
-- `docs`: Documentation changes
-- `style`: Code style changes (formatting, etc.)
-- `refactor`: Code refactoring
-- `test`: Adding or updating tests
-- `chore`: Maintenance tasks
-- `perf`: Performance improvements
-- `ci`: CI/CD changes
+---
 
-### Examples
+## 📐 Code Style
+
+We use automated tools:
+
+| Tool     | Purpose                    | Command                    |
+|----------|----------------------------|----------------------------|
+| **Black** | Code formatting            | `black semantica/ tests/` |
+| **isort** | Import sorting             | `isort semantica/ tests/` |
+| **flake8** | Style enforcement          | `flake8 semantica/ tests/` |
+| **mypy** | Type checking              | `mypy semantica/`          |
+
+**Run all:** `black semantica/ tests/ && isort semantica/ tests/ && flake8 semantica/ tests/ && mypy semantica/`
+
+---
+
+## 🧪 Testing
+
+```bash
+pytest                          # Run all tests
+pytest --cov=semantica         # With coverage
+pytest tests/test_file.py      # Specific file
+```
+
+**Coverage goal:** 80% minimum, 90%+ for critical modules
+
+---
+
+## 📝 Commit Messages
+
+Use [Conventional Commits](https://www.conventionalcommits.org/):
 
 ```
 feat(kg): add temporal graph support
-
-Add support for temporal knowledge graphs with version tracking
-and time-based queries.
-
-Closes #123
+fix(parse): handle empty PDF files
+docs(readme): add installation guide
+test(extract): add unit tests
 ```
 
-```
-fix(parse): handle empty PDF files gracefully
+**Types:** `feat`, `fix`, `docs`, `test`, `refactor`, `perf`, `style`, `chore`
 
-Previously, empty PDF files would cause a crash. Now they return
-an empty document with appropriate warnings.
+---
 
-Fixes #456
-```
+## ✅ PR Checklist
 
-## Pull Request Process
-
-### Before Submitting
-
-1. **Update your fork**:
-   ```bash
-   git fetch upstream
-   git checkout main
-   git merge upstream/main
-   ```
-
-2. **Create a feature branch**:
-   ```bash
-   git checkout -b feature/your-feature-name
-   # or
-   git checkout -b fix/bug-description
-   ```
-
-3. **Make your changes** and commit following our conventions
-
-4. **Run all checks**:
-   ```bash
-   pytest
-   black semantica/ tests/
-   isort semantica/ tests/
-   flake8 semantica/ tests/
-   mypy semantica/
-   ```
-
-5. **Push to your fork**:
-   ```bash
-   git push origin feature/your-feature-name
-   ```
-
-### PR Checklist
+Before submitting:
 
 - [ ] Code follows style guidelines
 - [ ] Tests pass locally
-- [ ] New tests added for new features
+- [ ] New tests added (if applicable)
 - [ ] Documentation updated
 - [ ] Commit messages follow conventions
 - [ ] No merge conflicts
-- [ ] PR description is clear and complete
 
-### PR Description Template
+---
 
-```markdown
-## Description
-Brief description of changes
+## 📖 Documentation Standards
 
-## Type of Change
-- [ ] Bug fix
-- [ ] New feature
-- [ ] Breaking change
-- [ ] Documentation update
+### Code Documentation (Docstrings)
 
-## Related Issues
-Closes #123
-Related to #456
+**Format:** Use Google-style docstrings
 
-## Testing
-- [ ] Tests pass locally
-- [ ] Added new tests
-- [ ] Updated existing tests
-
-## Checklist
-- [ ] Code follows style guidelines
-- [ ] Self-review completed
-- [ ] Comments added for complex code
-- [ ] Documentation updated
-- [ ] No new warnings generated
-```
-
-## Documentation Standards
-
-### Code Documentation
-
-- Use Google-style docstrings
-- Include type hints
-- Document all public functions and classes
-- Include examples for complex functions
-
-Example:
 ```python
-def extract_entities(
-    text: str,
-    model: str = "transformer",
-    confidence_threshold: float = 0.7
-) -> List[Entity]:
+def extract_entities(text: str, model: str = "transformer") -> List[Entity]:
     """Extract named entities from text.
     
     Args:
         text: Input text to process
         model: NER model to use (default: "transformer")
-        confidence_threshold: Minimum confidence score (default: 0.7)
     
     Returns:
         List of extracted Entity objects
@@ -309,92 +269,98 @@ def extract_entities(
         ValueError: If text is empty or model is invalid
     
     Example:
-        >>> ner = NamedEntityRecognizer()
+        >>> from semantica.semantic_extract import NERExtractor
+        >>> ner = NERExtractor(method="ml", model="en_core_web_sm")
         >>> entities = ner.extract("Apple Inc. was founded in 1976.")
         >>> len(entities)
         2
     """
-    ...
 ```
 
-### Documentation Files
+### Markdown Documentation Formatting
 
-- Update relevant documentation in `docs/`
-- Add examples to cookbook if applicable
-- Update API reference if adding new public APIs
-- Keep README.md up to date
+**General Guidelines:**
+- Use clear headings (H1 for title, H2 for main sections, H3 for subsections)
+- Keep paragraphs short and focused
+- Use bullet points for lists
+- Add code blocks with syntax highlighting
+- Include links to related documentation
 
-## Types of Contributions
+**Code Blocks:**
+- Use triple backticks with language identifier: ` ```python `, ` ```bash `
+- Include comments in code examples
+- Show expected output when helpful
 
-### 💻 Code Contributions
+**Examples:**
 
-- **Bug Fixes**: Resolving issues reported in the issue tracker.
-- **New Features**: Implementing new capabilities (please discuss via an issue first!).
-- **Refactoring**: Improving code structure and maintainability without changing behavior.
-- **Algorithm Optimization**: Improving the efficiency of graph algorithms and vector search.
+```markdown
+## Section Title
 
-#### ⚡ Performance and Latency
-We deeply value efficiency. Contributions that make Semantica faster and lighter are highly appreciated!
+Brief introduction paragraph.
 
-- **Latency Reduction**: Optimize critical paths and RAG pipeline response times.
-- **Memory Optimization**: Reduce graph/vector processing memory footprint.
-- **Throughput**: Improve operations per second (bulk ingestion, parallel queries).
-- **Benchmarks**: Add performance benchmarks to track regressions.
-- **Async/Concurrency**: Enhance asynchronous execution and concurrency.
+### Subsection
 
-### 📚 Documentation Contributions
+- Bullet point 1
+- Bullet point 2
 
-- Fix typos and grammar
-- Improve clarity
-- Add examples
-- Create tutorials
-- Translate documentation
+**Code example:**
 
-### Testing Contributions
+```python
+from semantica import SomeClass
 
-- Add test coverage
-- Improve test quality
-- Add integration tests
-- Performance benchmarks
+instance = SomeClass()
+result = instance.method()
+```
 
-### Other Contributions
+**Note:** Additional context or warnings.
+```
 
-- Answer questions in discussions
-- Help with issues
-- Review pull requests
-- Share use cases
-- Report bugs
-- Suggest features
+**Best Practices:**
+- Start with an overview/introduction
+- Use consistent terminology
+- Include "See also" links
+- Add examples for complex concepts
+- Keep formatting consistent across docs
 
-## Getting Help
+---
 
-### Communication Channels
+## 🆘 Getting Help
 
-- **GitHub Discussions**: General questions and discussions
-- **GitHub Issues**: Bug reports and feature requests
-- **Discord**: Real-time chat and community support
+- 💬 [Discord](https://discord.gg/sV34vps5hH) - Real-time chat
+- 💭 [GitHub Discussions](https://github.com/Hawksight-AI/semantica/discussions) - Q&A
+- 🐛 [GitHub Issues](https://github.com/Hawksight-AI/semantica/issues) - Bug reports
 
-### Before Asking for Help
+**Before asking:** Check existing documentation, search issues/discussions, review cookbook examples
 
-1. Check existing documentation
-2. Search GitHub issues and discussions
-3. Review code examples in cookbook
-4. Check FAQ in documentation
+---
 
-### Asking Good Questions
+## 🏆 Recognition
 
-- Provide context and environment details
-- Include code examples
-- Show what you've tried
-- Include error messages and logs
-- Be specific about what you need
-
-## Recognition
-
-Contributors are recognized in:
+All contributors are recognized in:
 - [CONTRIBUTORS.md](CONTRIBUTORS.md)
 - GitHub contributors page
-- Release notes for significant contributions
+- Release notes
 
-Thank you for contributing to Semantica! 🎉
+We follow the [all-contributors](https://allcontributors.org) specification!
 
+---
+
+## 📜 Code of Conduct
+
+This project follows a [Code of Conduct](CODE_OF_CONDUCT.md). Be respectful and inclusive.
+
+---
+
+## 📚 Resources
+
+- [README.md](README.md) - Project overview
+- [Cookbook](cookbook/) - Tutorials and examples
+- [Documentation](docs/) - Comprehensive guides
+
+---
+
+**Thank you for contributing!** 🚀
+
+Every contribution matters - whether it's a single line of code, a typo fix, a helpful answer, or a bug report. We appreciate you! 🙏
+
+⭐ **Give us a Star** • 🍴 **[Fork Semantica](https://github.com/Hawksight-AI/semantica/fork)** • 💬 **Join our [Discord](https://discord.gg/sV34vps5hH)**

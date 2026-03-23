@@ -1,8 +1,16 @@
 """
-Provenance Tracker Module
+Provenance Tracker Module (Enhanced with Unified Backend)
 
 This module provides comprehensive source tracking for document chunks,
 maintaining data lineage and traceability throughout the chunking process.
+
+IMPORTANT: This module now uses the unified semantica.provenance.ProvenanceManager
+backend for enhanced W3C PROV-O compliance and audit-grade tracking. All existing
+APIs remain 100% backward compatible.
+
+For new code, consider using the unified API:
+    >>> from semantica.provenance import ProvenanceManager
+    >>> prov_mgr = ProvenanceManager()
 
 Key Features:
     - Chunk source tracking
@@ -11,9 +19,11 @@ Key Features:
     - Chunk linking and relationships
     - Provenance export
     - Version tracking support
+    - W3C PROV-O compliance (when using unified backend)
+    - Audit-grade integrity verification
 
 Main Classes:
-    - ProvenanceTracker: Main provenance tracking coordinator
+    - ProvenanceTracker: Main provenance tracking coordinator (backward compatible wrapper)
     - ProvenanceInfo: Provenance information representation dataclass
 
 Example Usage:
@@ -36,6 +46,13 @@ from ..utils.logging import get_logger
 from ..utils.progress_tracker import get_progress_tracker
 from .semantic_chunker import Chunk
 
+# Import unified provenance manager
+try:
+    from ..provenance import ProvenanceManager as UnifiedProvenanceManager
+    UNIFIED_AVAILABLE = True
+except ImportError:
+    UNIFIED_AVAILABLE = False
+
 
 @dataclass
 class ProvenanceInfo:
@@ -53,7 +70,12 @@ class ProvenanceInfo:
 
 
 class ProvenanceTracker:
-    """Provenance tracker for chunk source tracking."""
+    """
+    Provenance tracker for chunk source tracking (Enhanced with Unified Backend).
+    
+    This class now wraps semantica.provenance.ProvenanceManager for enhanced
+    W3C PROV-O compliance while maintaining 100% API compatibility.
+    """
 
     def __init__(self, **config):
         """
@@ -63,6 +85,7 @@ class ProvenanceTracker:
             **config: Configuration options:
                 - store_metadata: Store chunk metadata (default: True)
                 - track_versions: Track version history (default: False)
+                - storage_path: Path to SQLite database (optional)
         """
         self.logger = get_logger("provenance_tracker")
         self.config = config
@@ -74,9 +97,22 @@ class ProvenanceTracker:
         self.store_metadata = config.get("store_metadata", True)
         self.track_versions = config.get("track_versions", False)
 
-        # In-memory store (could be replaced with database)
-        self._provenance_store: Dict[str, ProvenanceInfo] = {}
-        self._chunk_registry: Dict[str, str] = {}  # chunk_id -> provenance_id
+        # Determine whether to use unified backend
+        use_unified = config.get("use_unified", True) and UNIFIED_AVAILABLE
+        
+        if use_unified:
+            # Use unified provenance manager
+            storage_path = config.get("storage_path")
+            self._unified_manager = UnifiedProvenanceManager(storage_path=storage_path)
+            self._use_unified = True
+            self.logger.debug("Chunk provenance tracker initialized with unified backend")
+        else:
+            # Fallback to legacy in-memory storage
+            self._unified_manager = None
+            self._use_unified = False
+            self._provenance_store: Dict[str, ProvenanceInfo] = {}
+            self._chunk_registry: Dict[str, str] = {}  # chunk_id -> provenance_id
+            self.logger.debug("Chunk provenance tracker initialized with legacy backend")
 
     def track_chunk(
         self,
@@ -106,6 +142,43 @@ class ProvenanceTracker:
                 chunk.id = chunk_id
             except AttributeError:
                 pass  # Chunk might be immutable
+        
+        if self._use_unified:
+            # Delegate to unified manager
+            try:
+                chunk_metadata = {**chunk.metadata, **metadata, "chunk_size": len(chunk.text)} if self.store_metadata else metadata
+                self._unified_manager.track_chunk(
+                    chunk_id=chunk_id,
+                    source_document=source_document,
+                    source_path=source_path,
+                    start_index=chunk.start_index,
+                    end_index=chunk.end_index,
+                    parent_chunk_id=parent_chunk_id,
+                    **chunk_metadata
+                )
+                return chunk_id  # Return chunk_id for compatibility
+            except Exception as e:
+                self.logger.warning(f"Unified tracking failed, using fallback: {e}")
+                return self._track_chunk_legacy(chunk, source_document, source_path, parent_chunk_id, **metadata)
+        else:
+            return self._track_chunk_legacy(chunk, source_document, source_path, parent_chunk_id, **metadata)
+    
+    def _track_chunk_legacy(
+        self,
+        chunk: Chunk,
+        source_document: str,
+        source_path: Optional[str] = None,
+        parent_chunk_id: Optional[str] = None,
+        **metadata,
+    ) -> str:
+        """Legacy chunk tracking implementation."""
+        chunk_id = getattr(chunk, "id", None)
+        if not chunk_id:
+            chunk_id = str(uuid4())
+            try:
+                chunk.id = chunk_id
+            except AttributeError:
+                pass
         
         provenance_id = str(uuid4())
 
@@ -214,6 +287,31 @@ class ProvenanceTracker:
         Returns:
             ProvenanceInfo: Provenance information or None
         """
+        if self._use_unified:
+            try:
+                prov = self._unified_manager.get_provenance(chunk_id)
+                if prov:
+                    # Convert to ProvenanceInfo for backward compatibility
+                    return ProvenanceInfo(
+                        chunk_id=chunk_id,
+                        source_document=prov.get("source_document", ""),
+                        source_path=prov.get("source_location"),
+                        start_index=prov.get("start_index", 0),
+                        end_index=prov.get("end_index", 0),
+                        parent_chunk_id=prov.get("parent_entity_id"),
+                        metadata=prov.get("metadata", {}),
+                        version=prov.get("version", "1.0"),
+                        timestamp=prov.get("timestamp")
+                    )
+                return None
+            except Exception as e:
+                self.logger.warning(f"Unified retrieval failed, using fallback: {e}")
+                return self._get_provenance_legacy(chunk_id)
+        else:
+            return self._get_provenance_legacy(chunk_id)
+    
+    def _get_provenance_legacy(self, chunk_id: str) -> Optional[ProvenanceInfo]:
+        """Legacy get provenance implementation."""
         provenance_id = self._chunk_registry.get(chunk_id)
         if provenance_id:
             return self._provenance_store.get(provenance_id)
@@ -245,11 +343,38 @@ class ProvenanceTracker:
         Returns:
             list: Lineage chain (oldest to newest)
         """
+        if self._use_unified:
+            try:
+                lineage_entries = self._unified_manager.trace_lineage(chunk_id)
+                # Convert to ProvenanceInfo list for backward compatibility
+                return [
+                    ProvenanceInfo(
+                        chunk_id=entry.entity_id,
+                        source_document=entry.source_document,
+                        source_path=entry.source_location,
+                        start_index=entry.start_index or 0,
+                        end_index=entry.end_index or 0,
+                        parent_chunk_id=entry.parent_entity_id,
+                        metadata=entry.metadata,
+                        version=entry.version,
+                        timestamp=entry.timestamp
+                    )
+                    for entry in lineage_entries
+                    if entry.entity_type == "chunk"
+                ]
+            except Exception as e:
+                self.logger.warning(f"Unified lineage retrieval failed, using fallback: {e}")
+                return self._get_chunk_lineage_legacy(chunk_id)
+        else:
+            return self._get_chunk_lineage_legacy(chunk_id)
+    
+    def _get_chunk_lineage_legacy(self, chunk_id: str) -> List[ProvenanceInfo]:
+        """Legacy get chunk lineage implementation."""
         lineage = []
         current_chunk_id = chunk_id
 
         while current_chunk_id:
-            provenance = self.get_provenance(current_chunk_id)
+            provenance = self._get_provenance_legacy(current_chunk_id)
             if not provenance:
                 break
 

@@ -122,6 +122,7 @@ Author: Semantica Contributors
 License: MIT
 """
 
+from .age_store import ApacheAgeStore
 from .amazon_neptune import (
     AmazonNeptuneStore,
     NeptuneAuthTokenManager,
@@ -172,6 +173,8 @@ __all__ = [
     "Neo4jStore",
     "Neo4jDriver",
     "Neo4jTransaction",
+    # Apache AGE
+    "ApacheAgeStore",
     # Amazon Neptune
     "AmazonNeptuneStore",
     "NeptuneAuthTokenManager",

@@ -1,6 +1,6 @@
 # License
 
-Semantica is released under the MIT License.
+**Semantica is open source under the MIT License.**
 
 ---
 
@@ -34,45 +34,52 @@ SOFTWARE.
 
 ## What This Means
 
-### You Can:
-- ✅ Use commercially
-- ✅ Modify the source code
-- ✅ Distribute the software
-- ✅ Use in private/proprietary projects
-- ✅ Sublicense it
+### ✅ You Can
+- **Use commercially** - Free for business use
+- **Modify** - Change the source code
+- **Distribute** - Share with others
+- **Sublicense** - Use in your own projects
+- **Private use** - Use in proprietary software
 
-### You Must:
-- ✅ Include copyright notice
-- ✅ Include license text
+### ✅ You Must
+- **Include copyright** - Keep the copyright notice
+- **Include license** - Share the MIT license text
 
-### You Cannot:
-- ❌ Hold authors liable
-- ❌ Use authors' names for endorsement
+### ❌ No Warranty
+- **No liability** - Authors not responsible for damages
+- **No endorsement** - Can't use authors' names for promotion
 
 ---
 
 ## Commercial Use
 
-**Semantica is free for commercial use.** No attribution required (though appreciated)!
+**Semantica is completely free for commercial use.** No attribution required (though appreciated!).
 
 ---
 
-## Third-Party Licenses
+## Third-Party Dependencies
 
-Key dependencies:
-- Python (PSF), NumPy (BSD), Pandas (BSD)
-- spaCy (MIT), Transformers (Apache 2.0), RDFLib (BSD)
-
-See `LICENSE` file for complete list.
+Semantica uses open-source libraries with compatible licenses:
+- **Python** (PSF License)
+- **NumPy, Pandas** (BSD License)
+- **spaCy** (MIT License)
+- **Transformers** (Apache 2.0)
+- **RDFLib** (BSD License)
 
 ---
 
 ## Contributing
 
-By contributing, you agree your contributions will be licensed under MIT.
+By contributing to Semantica, you agree that your contributions will be licensed under the same MIT License.
 
 ---
 
-**Questions?** [Open an issue](https://github.com/Hawksight-AI/semantica/issues)
+## Questions?
 
-**Semantica is 100% open source and free!** 🎉
+- **[GitHub Issues](https://github.com/Hawksight-AI/semantica/issues)** - License questions
+- **[Contributing Guide](contributing.md)** - How to contribute
+- **[Community](community.md)** - Get in touch
+
+---
+
+**Semantica is open source and free for everyone!** 🎉

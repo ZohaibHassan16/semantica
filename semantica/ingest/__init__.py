@@ -170,6 +170,7 @@ from .web_ingestor import (
 )
 
 from .ontology_ingestor import OntologyData, OntologyIngestor
+from .snowflake_ingestor import SnowflakeConnector, SnowflakeData, SnowflakeIngestor
 
 __all__ = [
     # File ingestion
@@ -224,6 +225,10 @@ __all__ = [
     # Ontology ingestion
     "OntologyIngestor",
     "OntologyData",
+    # Snowflake ingestion
+    "SnowflakeIngestor",
+    "SnowflakeData",
+    "SnowflakeConnector",
     # Registry and Methods
     "MethodRegistry",
     "method_registry",

@@ -1,214 +1,101 @@
 # Getting Started
 
-## Welcome to Semantica
+## Overview
 
-**Semantica** is a comprehensive knowledge graph and semantic processing framework designed for building production-ready semantic AI applications.
+**Semantica** is a semantic intelligence layer that bridges the gap between raw data and trustworthy AI. It transforms unstructured data into explainable, auditable knowledge graphs perfect for high-stakes domains.
 
-### 🎯 What You'll Learn
-- What Semantica is and why it's useful
-- How to install and configure the framework
-- Understanding the framework architecture
-- Key concepts and terminology
-- Next steps for getting started
-
----
-
-## 🚀 What is Semantica?
-
-Semantica is a powerful, production-ready framework for:
-
-- **Building Knowledge Graphs**: Transform unstructured data into structured knowledge graphs.
-- **Semantic Processing**: Extract entities, relationships, and meaning from text, images, and audio.
-- **GraphRAG**: Next-generation retrieval augmented generation using knowledge graphs.
-- **Temporal Analysis**: Time-aware knowledge graphs for tracking changes over time.
-- **Multi-Modal Processing**: Handle text, images, audio, and structured data.
-- **Enterprise Features**: Quality assurance, conflict resolution, ontology generation, and more.
+### What You Can Build
+- **GraphRAG Systems** - Enhanced retrieval with semantic reasoning
+- **AI Agents** - Trustworthy agents with explainable memory
+- **Knowledge Graphs** - Production-ready semantic databases
+- **Compliance-Ready AI** - Auditable systems with full provenance
 
 ---
 
-## 💡 Use Cases
+## Installation
 
-| Domain | Application |
-| :--- | :--- |
-| **Cybersecurity** | Threat intelligence and analysis |
-| **Healthcare** | Medical research and patient data analysis |
-| **Finance** | Fraud detection and financial analysis |
-| **Supply Chain** | Optimization and risk management |
-| **Research** | Knowledge management and literature review |
-| **AI Systems** | Multi-agent memory and reasoning |
+```bash
+pip install semantica
+```
 
----
+Or with all features:
 
-## 📦 Installation & Setup
+```bash
+pip install semantica[all]
+```
 
-### Prerequisites
-Before installing Semantica, ensure you have:
-- **Python 3.8** or higher
-- **pip** package manager
-- (Optional) Virtual environment for isolation
-
-### Installation Methods
-
-=== "PyPI (Stable)"
-    ```bash
-    pip install semantica
-    ```
-
-=== "Source (Dev)"
-    ```bash
-    git clone https://github.com/Hawksight-AI/semantica.git
-    cd semantica
-    pip install -e .
-    ```
-
-=== "Extras"
-    ```bash
-    pip install semantica[all]           # Install all optional dependencies
-    pip install semantica[gpu]           # Install GPU support
-    pip install semantica[visualization] # Install visualization tools
-    ```
-
-### Verify Installation
+Verify installation:
 
 ```python
 import semantica
-print(semantica.__version__)
+print(f"Semantica {semantica.__version__} installed!")
 ```
 
 ---
 
-## 🏗️ Understanding Semantica's Architecture
+## Quick Start
 
-Semantica uses a **modular architecture** where each module handles a specific aspect of semantic processing. This design gives you flexibility and control over your pipeline.
-
-### Primary Approach: Individual Modules
-
-The recommended approach is to use individual modules directly. Each module can be imported and used independently:
-
-- **`semantica.ingest`**: Data ingestion from files, web, databases
-- **`semantica.parse`**: Document parsing and text extraction
-- **`semantica.semantic_extract`**: Entity and relationship extraction
-- **`semantica.kg`**: Knowledge graph construction
-- **`semantica.embeddings`**: Vector embedding generation
-- **`semantica.vector_store`**: Vector database operations
-
-**Benefits of the modular approach:**
-- **Full control**: Customize each step of your pipeline
-- **Flexibility**: Mix and match modules as needed
-- **Transparency**: Clear understanding of what each step does
-- **Easy debugging**: Isolate issues to specific modules
-
-**Quick Example:**
 ```python
-from semantica.ingest import FileIngestor
-from semantica.parse import DocumentParser
-from semantica.semantic_extract import NERExtractor, RelationExtractor
+from semantica.semantic_extract import NERExtractor
 from semantica.kg import GraphBuilder
 
-# Each module is used independently
-ingestor = FileIngestor()
-parser = DocumentParser()
-ner = NERExtractor()
-builder = GraphBuilder()
+# Extract entities
+ner = NERExtractor(method="ml", model="en_core_web_sm")
+entities = ner.extract("Apple Inc. was founded by Steve Jobs in 1976.")
+
+# Build knowledge graph
+kg = GraphBuilder().build({"entities": entities, "relationships": []})
+print(f"Built KG with {len(kg.get('entities', []))} entities")
 ```
 
-**For detailed examples, see:**
-- **[Welcome to Semantica Cookbook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/introduction/01_Welcome_to_Semantica.ipynb)**: Comprehensive introduction to all modules and architecture
-  - **Topics**: Framework overview, all modules, architecture, configuration
-  - **Difficulty**: Beginner
-  - **Time**: 30-45 minutes
-  - **Use Cases**: First-time users, understanding the framework structure
-
-### Alternative Approach: Orchestration Class
-
-For complex workflows, you can use the `` `Semantica` `` class for orchestration. This class coordinates multiple modules and provides lifecycle management.
-
-**When to use orchestration:**
-- Complex multi-step workflows spanning multiple modules
-- Need lifecycle management (initialization, shutdown)
-- Want centralized configuration
-- Building applications with multiple components
-
-!!! tip "Getting Started"
-    For beginners, start with individual modules to understand how each component works. As you build more complex applications, consider using the orchestration class for workflow management. See the [Core Module Reference](reference/core.md) for orchestration details.
-
-## ⚙️ Configuration
-
-Semantica modules can be configured individually or through environment variables. Configuration options vary by module, allowing you to customize behavior for your specific needs.
-
-### Environment Variables
-
-Common configuration via environment variables:
-
-```bash
-export OPENAI_API_KEY=your_openai_key
-export EMBEDDING_MODEL=all-MiniLM-L6-v2
-export EMBEDDING_DEVICE=cuda
-```
-
-### Module-Specific Configuration
-
-Each module accepts configuration parameters when instantiated. For example, the NER extractor can be configured with different methods, providers, and thresholds.
-
-### Config File (`config.yaml`)
-
-For centralized configuration, you can use a YAML config file to manage settings across multiple modules:
-
-```yaml
-api_keys:
-  openai: your_key_here
-
-embedding:
-  provider: openai
-  model: text-embedding-3-large
-
-knowledge_graph:
-  backend: networkx
-  temporal: true
-```
-
-**For detailed configuration examples, see:**
-- **[Welcome to Semantica Cookbook](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/introduction/01_Welcome_to_Semantica.ipynb)**: Configuration examples for all modules
-- **[Core Module Reference](reference/core.md)**: Complete configuration documentation
+**What this does:**
+- Extracts entities (people, organizations, dates) from text
+- Builds a knowledge graph from extracted entities
+- Outputs the number of entities found
 
 ---
 
-## ⏭️ Next Steps
+## Core Architecture
 
-Now that you understand the basics, here are recommended next steps:
+Semantica uses a **modular architecture** - use only what you need:
 
-### 🍳 Interactive Tutorials (Cookbook)
+### 1️⃣ Input Layer - Data Ingestion
+```python
+from semantica.ingest import FileIngestor
+documents = FileIngestor().ingest_directory("docs/")
+```
 
-Get hands-on experience with these interactive Jupyter notebooks:
+### 2️⃣ Semantic Layer - Intelligence Engine
+```python
+from semantica.semantic_extract import NERExtractor, RelationExtractor
+entities = NERExtractor().extract(text)
+relationships = RelationExtractor().extract(text, entities)
+```
 
-1. **[Welcome to Semantica](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/introduction/01_Welcome_to_Semantica.ipynb)**: Comprehensive introduction to all Semantica modules
-   - **Topics**: Framework overview, all modules, architecture, configuration
-   - **Difficulty**: Beginner
-   - **Time**: 30-45 minutes
-   - **Use Cases**: First-time users, understanding the framework structure
+### 3️⃣ Output Layer - Knowledge Assets
+```python
+from semantica.kg import GraphBuilder
+kg = GraphBuilder().build_graph(entities, relationships)
+```
 
-2. **[Your First Knowledge Graph](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/introduction/08_Your_First_Knowledge_Graph.ipynb)**: Build your first knowledge graph from a document
-   - **Topics**: Entity extraction, relationship extraction, graph construction, visualization
-   - **Difficulty**: Beginner
-   - **Time**: 20-30 minutes
-   - **Use Cases**: Learning the basics, quick start
+---
 
-3. **[Data Ingestion](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/introduction/02_Data_Ingestion.ipynb)**: Learn to ingest from multiple sources
-   - **Topics**: File, web, feed, stream, database ingestion
-   - **Difficulty**: Beginner
-   - **Time**: 15-20 minutes
-   - **Use Cases**: Loading data from various sources
+## Next Steps
 
-4. **[Document Parsing](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/introduction/03_Document_Parsing.ipynb)**: Parse various document formats
-   - **Topics**: PDF, DOCX, HTML, JSON parsing
-   - **Difficulty**: Beginner
-   - **Time**: 15-20 minutes
-   - **Use Cases**: Extracting text from different file formats
+### 🍳 Interactive Tutorials
+1. **[Welcome to Semantica](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/introduction/01_Welcome_to_Semantica.ipynb)** - Complete framework overview
+2. **[Your First Knowledge Graph](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/introduction/08_Your_First_Knowledge_Graph.ipynb)** - Hands-on graph building
+3. **[GraphRAG Complete](https://github.com/Hawksight-AI/semantica/blob/main/cookbook/use_cases/advanced_rag/01_GraphRAG_Complete.ipynb)** - Production-ready RAG
 
-### 📚 Documentation
+### 📚 Learn More
+- **[Core Concepts](concepts.md)** - Deep dive into knowledge graphs & ontologies
+- **[Cookbook](cookbook.md)** - 14 domain-specific tutorials
+- **[API Reference](reference/core.md)** - Complete technical documentation
 
-- **[Quick Start Guide](quickstart.md)**: Step-by-step tutorial to build your first knowledge graph
-- **[Core Concepts](concepts.md)**: Deep dive into knowledge graphs, ontologies, and semantic reasoning
-- **[API Reference](reference/core.md)**: Complete technical documentation for all modules
-- **[Examples](examples.md)**: Real-world examples and use cases
-- **[Cookbook](cookbook.md)**: Full list of interactive Jupyter notebooks
+---
+
+## Need Help?
+
+- **[💬 Discord Community](https://discord.gg/sV34vps5hH)** - Get help from the community
+- **[🐛 Issues](https://github.com/Hawksight-AI/semantica/issues)** - Report bugs or request features
+- **[📖 Documentation](https://semantica.readthedocs.io/)** - Full documentation site

@@ -5,24 +5,44 @@ This module provides comprehensive connectivity analysis capabilities for the
 Semantica framework, enabling analysis of graph connectivity, path finding,
 and structural properties.
 
+Supported Algorithms:
+    - Connectivity analysis: Determine if graph is connected or disconnected
+    - Connected components detection: Find all connected components using DFS
+    - Shortest path calculation: BFS-based shortest path finding
+    - Bridge edge identification: Find critical edges whose removal disconnects graph
+    - Graph density calculation: Measure graph connectivity and sparsity
+    - Degree statistics: Analyze node degree distributions
+
 Key Features:
-    - Graph connectivity analysis (connected/disconnected)
-    - Connected components detection (DFS-based)
-    - Shortest path calculation (BFS-based)
-    - Bridge edge identification (edges whose removal disconnects graph)
-    - Connectivity metrics (density, degree statistics)
-    - Graph structure classification
+    - Comprehensive connectivity analysis with multiple metrics
+    - Connected components detection and analysis
+    - Bridge edge identification for network robustness
+    - Shortest path calculation with source/target options
+    - Graph density and degree statistics
+    - Graph structure classification and properties
     - NetworkX integration with fallback implementations
+    - Scalable algorithms for large graphs
 
 Main Classes:
-    - ConnectivityAnalyzer: Main connectivity analysis engine
+    - ConnectivityAnalyzer: Comprehensive connectivity analysis engine
+
+Methods:
+    - analyze_connectivity(): Main interface for connectivity analysis
+    - find_connected_components(): Detect and analyze connected components
+    - calculate_shortest_paths(): Find shortest paths between nodes
+    - identify_bridges(): Find critical bridge edges
+    - calculate_graph_density(): Compute graph density metrics
+    - analyze_degree_statistics(): Analyze node degree distributions
+    - classify_graph_structure(): Classify graph by structural properties
 
 Example Usage:
     >>> from semantica.kg import ConnectivityAnalyzer
     >>> analyzer = ConnectivityAnalyzer()
     >>> connectivity = analyzer.analyze_connectivity(graph)
+    >>> components = analyzer.find_connected_components(graph)
     >>> paths = analyzer.calculate_shortest_paths(graph, source="A", target="B")
     >>> bridges = analyzer.identify_bridges(graph)
+    >>> density = analyzer.calculate_graph_density(graph)
 
 Author: Semantica Contributors
 License: MIT
@@ -374,10 +394,19 @@ class ConnectivityAnalyzer:
         elif hasattr(graph, "get_relationships"):
             relationships = graph.get_relationships()
         elif isinstance(graph, dict):
-            relationships = graph.get("relationships", [])
+            relationships = graph.get("relationships", graph.get("edges", []))
 
         # Build adjacency
         for rel in relationships:
+            # Handle tuple/list edges (e.g., from NetworkX)
+            if isinstance(rel, (tuple, list)) and len(rel) >= 2:
+                source, target = str(rel[0]), str(rel[1])
+                if source and target:
+                    if target not in adjacency[source]:
+                        adjacency[source].append(target)
+                    if source not in adjacency[target]:
+                        adjacency[target].append(source)
+                continue
             source = rel.get("source") or rel.get("subject")
             target = rel.get("target") or rel.get("object")
 

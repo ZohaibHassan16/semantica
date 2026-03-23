@@ -78,6 +78,12 @@ class PipelineValidator:
         if not self.progress_tracker.enabled:
             self.progress_tracker.enabled = True
 
+    def validate(
+        self, pipeline: Union["Pipeline", "PipelineBuilder"], **options
+    ) -> ValidationResult:
+        """Alias for validate_pipeline."""
+        return self.validate_pipeline(pipeline, **options)
+
     def validate_pipeline(
         self, pipeline: Union["Pipeline", "PipelineBuilder"], **options
     ) -> ValidationResult:
@@ -266,7 +272,7 @@ class PipelineValidator:
                 for dep in step.dependencies:
                     if dep not in step_names:
                         errors.append(
-                            f"Step '{step.name}' depends on missing step: {dep}"
+                            f"Missing dependency '{dep}' for step '{step.name}'"
                         )
 
             # Check for unreachable steps

@@ -234,7 +234,8 @@ class BulkLoader:
 
             self.logger.info(
                 f"Bulk load completed: {loaded_count}/{total_triplets} triplets loaded "
-                f"in {elapsed:.2f}s ({loaded_count / elapsed:.0f} triplets/sec)"
+                f"in {elapsed:.2f}s ({loaded_count / elapsed:.0f} triplets/sec)" if elapsed > 0 else
+                f"in {elapsed:.2f}s (0 triplets/sec)"
             )
 
             self.progress_tracker.stop_tracking(

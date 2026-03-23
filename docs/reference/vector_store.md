@@ -1,12 +1,12 @@
 # Vector Store
 
-> **Unified vector database interface supporting FAISS, Weaviate, Qdrant, and Milvus with Hybrid Search.**
+> **Unified vector database interface supporting FAISS, Weaviate, Qdrant, Pinecone, and Milvus with Hybrid Search.**
 
 ---
 
 ## 🎯 Overview
 
-The **Vector Store Module** provides a unified interface for storing and searching vector embeddings. It supports multiple backends (FAISS, Weaviate, Qdrant, Milvus) and enables semantic search, RAG, and similarity matching.
+The **Vector Store Module** provides a unified interface for storing and searching vector embeddings. It supports multiple backends (FAISS, Weaviate, Qdrant, Pinecone, Milvus) and enables semantic search, RAG, and similarity matching.
 
 ### What is a Vector Store?
 
@@ -18,7 +18,7 @@ A **vector store** is a database optimized for storing and searching high-dimens
 
 ### Why Use the Vector Store Module?
 
-- **Multiple Backends**: Switch between FAISS (local), Weaviate, Qdrant, and Milvus
+- **Multiple Backends**: Switch between FAISS (local), Weaviate, Qdrant, Pinecone, and Milvus
 - **Unified Interface**: Same API regardless of backend
 - **Hybrid Search**: Combine vector similarity with metadata filtering
 - **Performance**: Optimized for high-throughput search operations
@@ -38,8 +38,8 @@ A **vector store** is a database optimized for storing and searching high-dimens
 -   :material-database:{ .lg .middle } **Multi-Backend Support**
 
     ---
-
-    Seamlessly switch between FAISS (Local), Weaviate, Qdrant, and Milvus
+    
+    Seamlessly switch between FAISS (Local), Weaviate, Qdrant, Pinecone, and Milvus
 
 -   :material-magnify-plus:{ .lg .middle } **Hybrid Search**
 

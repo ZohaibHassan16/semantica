@@ -4,18 +4,40 @@ Centrality Calculator Module
 This module provides comprehensive centrality measure calculations for knowledge
 graphs, helping identify the most important or influential nodes in the graph.
 
-Key Features:
-    - Degree centrality: Measures node connectivity
-    - Betweenness centrality: Measures node importance as a bridge
+Supported Algorithms:
+    - Degree centrality: Measures node connectivity based on number of connections
+    - Betweenness centrality: Measures node importance as a bridge between communities
     - Closeness centrality: Measures average distance to all other nodes
     - Eigenvector centrality: Measures influence based on connections to important nodes
-    - Centrality ranking and statistics
+    - PageRank: Importance based on link structure (Google's algorithm)
+
+Key Features:
+    - Multiple centrality algorithms with different theoretical foundations
+    - Centrality ranking and statistical analysis
+    - Configurable parameters for iterative algorithms
+    - Batch calculation of all centrality measures
+    - Sparse matrix operations for large-scale graphs
+    - Graph compatibility with NetworkX and custom formats
+
+Main Classes:
+    - CentralityCalculator: Comprehensive centrality calculation engine
+
+Methods:
+    - calculate_degree_centrality(): Calculate degree-based node importance
+    - calculate_betweenness_centrality(): Calculate bridge-based node importance
+    - calculate_closeness_centrality(): Calculate distance-based node importance
+    - calculate_eigenvector_centrality(): Calculate influence-based node importance
+    - calculate_pagerank(): Calculate PageRank scores for nodes
+    - calculate_all_centrality(): Calculate all supported centrality measures
+    - get_top_nodes(): Get top-k nodes by centrality score
 
 Example Usage:
     >>> from semantica.kg import CentralityCalculator
     >>> calculator = CentralityCalculator()
     >>> centrality = calculator.calculate_degree_centrality(graph)
     >>> all_centrality = calculator.calculate_all_centrality(graph)
+    >>> pagerank_scores = calculator.calculate_pagerank(graph, damping_factor=0.85)
+    >>> top_nodes = calculator.get_top_nodes(centrality, top_k=10)
 
 Author: Semantica Contributors
 License: MIT
@@ -23,6 +45,9 @@ License: MIT
 
 from collections import defaultdict, deque
 from typing import Any, Dict, List, Optional
+
+import numpy as np
+from scipy import sparse
 
 from ..utils.logging import get_logger
 from ..utils.progress_tracker import get_progress_tracker
@@ -41,6 +66,7 @@ class CentralityCalculator:
         - betweenness: Importance as a bridge between nodes
         - closeness: Average distance to all other nodes
         - eigenvector: Influence based on connections to important nodes
+        - pagerank: Importance based on link structure (Google's algorithm)
 
     Example Usage:
         >>> calculator = CentralityCalculator()
@@ -71,6 +97,7 @@ class CentralityCalculator:
             "betweenness",
             "closeness",
             "eigenvector",
+            "pagerank",
         ]
 
         self.calculation_config = config.get("calculation_config", {})
@@ -121,20 +148,23 @@ class CentralityCalculator:
             >>> top_node = result["rankings"][0]["node"]
             >>> top_score = result["rankings"][0]["score"]
         """
-        # Track centrality calculation
-        tracking_id = self.progress_tracker.start_tracking(
-            file=None,
-            module="kg",
-            submodule="CentralityCalculator",
-            message="Calculating degree centrality",
-        )
+        # Track centrality calculation (only if progress tracker is available)
+        tracking_id = None
+        if hasattr(self, 'progress_tracker') and self.progress_tracker:
+            tracking_id = self.progress_tracker.start_tracking(
+                file=None,
+                module="kg",
+                submodule="CentralityCalculator",
+                message="Calculating degree centrality",
+            )
 
         try:
             self.logger.info("Calculating degree centrality")
 
-            self.progress_tracker.update_tracking(
-                tracking_id, message="Processing graph structure..."
-            )
+            if tracking_id:
+                self.progress_tracker.update_tracking(
+                    tracking_id, message="Processing graph structure..."
+                )
             # Use NetworkX if available for faster calculation
             if self.use_networkx:
                 try:
@@ -160,26 +190,29 @@ class CentralityCalculator:
                         "max_degree": max_degree,
                         "total_nodes": nx_graph.number_of_nodes(),
                     }
-                    self.progress_tracker.stop_tracking(
-                        tracking_id,
-                        status="completed",
-                        message=f"Calculated degree centrality for {nx_graph.number_of_nodes()} nodes",
-                    )
+                    if tracking_id:
+                        self.progress_tracker.stop_tracking(
+                            tracking_id,
+                            status="completed",
+                            message=f"Calculated degree centrality for {nx_graph.number_of_nodes()} nodes",
+                        )
                     return result
                 except Exception as e:
                     self.logger.warning(
                         f"NetworkX calculation failed: {e}, using basic implementation"
                     )
 
-            self.progress_tracker.update_tracking(
-                tracking_id, message="Building adjacency list..."
-            )
+            if tracking_id:
+                self.progress_tracker.update_tracking(
+                    tracking_id, message="Building adjacency list..."
+                )
             # Basic implementation using adjacency list
             adjacency = self._build_adjacency(graph)
 
-            self.progress_tracker.update_tracking(
-                tracking_id, message="Calculating degrees..."
-            )
+            if tracking_id:
+                self.progress_tracker.update_tracking(
+                    tracking_id, message="Calculating degrees..."
+                )
             # Calculate raw degrees (number of connections per node)
             degrees = {}
             max_degree = 0
@@ -189,9 +222,10 @@ class CentralityCalculator:
                 degrees[node] = degree
                 max_degree = max(max_degree, degree)
 
-            self.progress_tracker.update_tracking(
-                tracking_id, message="Normalizing centrality scores..."
-            )
+            if tracking_id:
+                self.progress_tracker.update_tracking(
+                    tracking_id, message="Normalizing centrality scores..."
+                )
             # Calculate normalized centrality scores
             # Normalization: degree / (n - 1) where n is number of nodes
             centrality = {}
@@ -215,17 +249,19 @@ class CentralityCalculator:
                 "max_degree": max_degree,
                 "total_nodes": num_nodes,
             }
-            self.progress_tracker.stop_tracking(
-                tracking_id,
-                status="completed",
-                message=f"Calculated degree centrality for {num_nodes} nodes",
-            )
+            if tracking_id:
+                self.progress_tracker.stop_tracking(
+                    tracking_id,
+                    status="completed",
+                    message=f"Calculated degree centrality for {num_nodes} nodes",
+                )
             return result
 
         except Exception as e:
-            self.progress_tracker.stop_tracking(
-                tracking_id, status="failed", message=str(e)
-            )
+            if tracking_id:
+                self.progress_tracker.stop_tracking(
+                    tracking_id, status="failed", message=str(e)
+                )
             raise
 
     def calculate_betweenness_centrality(self, graph):
@@ -491,10 +527,19 @@ class CentralityCalculator:
         elif hasattr(graph, "get_relationships"):
             relationships = graph.get_relationships()
         elif isinstance(graph, dict):
-            relationships = graph.get("relationships", [])
+            relationships = graph.get("relationships", graph.get("edges", []))
 
         # Build adjacency
         for rel in relationships:
+            # Handle tuple/list edges (e.g., from NetworkX)
+            if isinstance(rel, (tuple, list)) and len(rel) >= 2:
+                source, target = str(rel[0]), str(rel[1])
+                if source and target:
+                    if target not in adjacency[source]:
+                        adjacency[source].append(target)
+                    if source not in adjacency[target]:
+                        adjacency[target].append(source)
+                continue
             source = rel.get("source") or rel.get("subject")
             target = rel.get("target") or rel.get("object")
 
@@ -577,3 +622,162 @@ class CentralityCalculator:
                                 paths[neighbor].append(new_path)
 
         return paths
+
+    def calculate_pagerank(
+        self,
+        graph: Any,
+        node_labels: Optional[List[str]] = None,
+        relationship_types: Optional[List[str]] = None,
+        max_iterations: int = 20,
+        damping_factor: float = 0.85,
+        tolerance: float = 1e-6,
+        # Aliases used by some callers
+        alpha: Optional[float] = None,
+        max_iter: Optional[int] = None,
+    ) -> Dict[str, float]:
+        """
+        Calculate PageRank scores for nodes in the graph.
+        
+        PageRank is an algorithm used by Google to rank web pages in their search
+        engine results. It works by counting the number and quality of links to
+        a page to determine a rough estimate of how important the website is.
+        
+        Args:
+            graph: Graph object (NetworkX or similar)
+            node_labels: List of node labels to include (None for all)
+            relationship_types: List of relationship types to consider (None for all)
+            max_iterations: Maximum number of iterations for convergence
+            damping_factor: Probability of continuing random walk (0.85 is typical)
+            tolerance: Convergence tolerance for PageRank values
+            
+        Returns:
+            Dictionary mapping node IDs to PageRank scores
+            
+        Raises:
+            ValueError: If graph is empty or parameters are invalid
+            RuntimeError: If PageRank calculation fails
+        """
+        # Apply parameter aliases
+        if alpha is not None:
+            damping_factor = alpha
+        if max_iter is not None:
+            max_iterations = max_iter
+
+        try:
+            self.logger.info("Calculating PageRank scores")
+
+            # Filter nodes by labels if specified
+            nodes = self._filter_nodes_by_labels(graph, node_labels)
+            if not nodes:
+                raise ValueError("No nodes found matching the specified criteria")
+            
+            # Build adjacency matrix for filtered nodes
+            node_index = {node: i for i, node in enumerate(nodes)}
+            n = len(nodes)
+            
+            # Create sparse adjacency matrix
+            row_indices = []
+            col_indices = []
+            data = []
+            
+            for node in nodes:
+                source_idx = node_index[node]
+                neighbors = self._get_filtered_neighbors(graph, node, relationship_types)
+                
+                # Distribute PageRank equally among neighbors
+                if neighbors:
+                    weight = 1.0 / len(neighbors)
+                    for neighbor in neighbors:
+                        if neighbor in node_index:  # Only include filtered nodes
+                            target_idx = node_index[neighbor]
+                            row_indices.append(target_idx)
+                            col_indices.append(source_idx)
+                            data.append(weight)
+            
+            # Create sparse matrix
+            adjacency = sparse.csr_matrix((data, (row_indices, col_indices)), shape=(n, n))
+            
+            # Initialize PageRank values
+            pagerank = np.ones(n) / n
+            
+            # Power iteration method
+            for iteration in range(max_iterations):
+                prev_pagerank = pagerank.copy()
+                
+                # PageRank formula: PR = (1 - d) * 1/n + d * A * PR
+                pagerank = (1 - damping_factor) / n + damping_factor * adjacency.dot(prev_pagerank)
+                
+                # Check convergence
+                diff = np.linalg.norm(pagerank - prev_pagerank)
+                if diff < tolerance:
+                    self.logger.info(f"PageRank converged after {iteration + 1} iterations")
+                    break
+            else:
+                self.logger.warning(f"PageRank did not converge after {max_iterations} iterations")
+            
+            # Convert to dictionary
+            scores = {}
+            for node, idx in node_index.items():
+                scores[node] = float(pagerank[idx])
+
+            rankings = sorted(scores.items(), key=lambda x: x[1], reverse=True)
+            result = {"centrality": scores, "rankings": rankings}
+
+            self.logger.info(f"Calculated PageRank for {len(scores)} nodes")
+            return result
+            
+        except Exception as e:
+            self.logger.error(f"PageRank calculation failed: {str(e)}")
+            raise RuntimeError(f"PageRank calculation failed: {str(e)}")
+    
+    def _filter_nodes_by_labels(self, graph: Any, node_labels: Optional[List[str]]) -> List[str]:
+        """Filter nodes by specified labels."""
+        if node_labels is None:
+            return list(graph.nodes()) if hasattr(graph, 'nodes') else []
+        
+        filtered_nodes = []
+        for node in graph.nodes():
+            if hasattr(graph, 'nodes'):
+                node_data = graph.nodes[node]
+                if isinstance(node_data, dict):
+                    node_label = node_data.get('label') or node_data.get('type')
+                    if node_label in node_labels:
+                        filtered_nodes.append(node)
+                else:
+                    # Fallback - include all nodes if no label information
+                    filtered_nodes.append(node)
+        
+        return filtered_nodes
+    
+    def _get_filtered_neighbors(
+        self, 
+        graph: Any, 
+        node: str, 
+        relationship_types: Optional[List[str]]
+    ) -> List[str]:
+        """Get neighbors filtered by relationship types."""
+        if hasattr(graph, 'neighbors'):
+            _raw = list(graph.neighbors(node))
+            neighbors = [n.get("id") if isinstance(n, dict) else n for n in _raw]
+        elif hasattr(graph, 'get_neighbors'):
+            neighbors = graph.get_neighbors(node)
+            if neighbors and isinstance(neighbors[0], dict):
+                neighbors = [
+                    n.get("id") for n in neighbors
+                    if isinstance(n, dict) and n.get("id")
+                ]
+        else:
+            neighbors = []
+        
+        # Filter by relationship types if specified
+        if relationship_types is not None and hasattr(graph, 'get_edge_data'):
+            filtered_neighbors = []
+            for neighbor in neighbors:
+                edge_data = graph.get_edge_data(node, neighbor)
+                if edge_data and isinstance(edge_data, dict):
+                    edge_type = edge_data.get('type') or edge_data.get('relationship')
+                    if edge_type in relationship_types:
+                        filtered_neighbors.append(neighbor)
+            return filtered_neighbors
+        
+        return neighbors
