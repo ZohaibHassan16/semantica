@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- **Temporal Awareness in Context Graph** (PR #399 by @KaifAhmad1):
+  - Added `valid_from` and `valid_until` fields to the `Decision` dataclass and `record_decision()` — decisions now carry explicit validity windows; superseded decisions remain in the graph (history is immutable)
+  - Added `include_superseded=False` and `as_of=None` parameters to `find_precedents_by_scenario()` — defaults exclude expired decisions; `as_of` enables point-in-time precedent queries
+  - Added `ContextGraph.state_at(timestamp)` — returns a serializable point-in-time snapshot of all nodes, edges, and decisions whose validity windows include `timestamp`; source graph is never mutated
+  - Stamped `recorded_at` on causal relationship edges created via `add_causal_relationship()` — enables transaction-time filtering
+  - Added `CausalChainAnalyzer.trace_at_time(event_id, at_time)` — reconstructs a causal chain using only edges recorded up to `at_time` (transaction time); returns an empty list when `at_time` predates all facts, never raises
+  - Added `AgentContext.checkpoint(label)`, `diff_checkpoints(label1, label2)`, and `flush_checkpoint(label)` — named in-memory context snapshots with structured diffs (`decisions_added`, `decisions_removed`, `relationships_added`, `relationships_removed`) and optional persistence via `TemporalVersionManager`
+  - **Review fixes applied in the same PR**:
+    - Fixed `max_depth` error message in `trace_at_time` to match actual bound (1–100)
+    - Fixed Cypher `at_time` query parameter to RFC3339 UTC (`Z` suffix) for unambiguous external DB comparisons
+    - `_normalize_temporal_input` now raises `ValueError` on unparseable strings instead of silently returning raw input
+    - Replaced `datetime.now()` with `datetime.utcnow()` for all `recorded_at` and checkpoint timestamps — aligns with codebase convention and avoids wrong local time on Windows
+    - `flush_checkpoint` wraps `TemporalVersionManager()` construction in a `try/except` and re-raises as `RuntimeError` with a clear actionable message
+  - Added 7 new tests (93 total across context modules, 0 failures)
+
 - **spaCy Runtime Fallback for NER Benchmarks**:
     - Hardened `NERExtractor` spaCy initialization so installed-but-broken spaCy environments no longer crash during extractor construction.
     - Updated ML entity extraction fallback behavior to catch runtime spaCy initialization failures, not just missing-model errors.
