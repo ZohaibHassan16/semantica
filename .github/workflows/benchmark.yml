@@ -42,7 +42,7 @@ jobs:
         env:
           BENCHMARK_REAL_LIBS: "1"
         run: |
-          python benchmarks/benchmarks_runner.py
+          python benchmarks/benchmarks_runner.py --strict
           # Optional: Compare to baseline (requires previous run artifact)
           # pytest-benchmark --storage file://benchmarks/results --benchmark-compare
 

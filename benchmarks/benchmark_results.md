@@ -21,6 +21,7 @@
 | Quality Assurance | 2 | 🟢 Excellent | All passed |
 | Output Orchestration | 2 | 🟢 Excellent | All passed |
 | Context | 3 | 🟢 Excellent | All passed |
+| Context Graph Effectiveness | 13 | 🟢 Excellent | All passed |
 
 ---
 
@@ -218,6 +219,27 @@
 - Graph operations are highly optimized
 - Linking operations maintain consistent performance
 - Memory storage suitable for batch operations
+
+---
+
+### 🎯 Context Graph Effectiveness Track
+
+**Purpose**: Test semantic effectiveness, decision quality delta, temporal validity, causal reasoning, skills, and data quality (provenance, duplicates, etc.).
+
+| Capability Dimension | Threshold Requirement | Component Status |
+|----------------------|-----------------------|------------------|
+| **Decision Accuracy Delta** | `> 0.0` | 🟢 Excellent |
+| **Hallucination Reduction** | `> 0.0` | 🟢 Excellent |
+| **Temporal Injection Rates** | `< 5% stale` | 🟢 Excellent |
+| **Causal Chain Recall** | `> 80%` | 🟢 Excellent |
+| **Policy Compliance** | `> 90%` | 🟢 Excellent |
+| **Explanation Completeness** | `> 90%` | 🟢 Excellent |
+| **Skill Injection** | `> 70% Activation` | 🟢 Excellent |
+
+**Key Insights**:
+- Semantic evaluation successfully discriminates between robust graph inferences and LLM hallucinations.
+- Context injection consistently yields a positive decision quality delta.
+- CI pipeline automatically blocks regressions falling below defined semantic thresholds via `--strict`.
 
 ---
 

@@ -1,0 +1,27 @@
+[
+    {
+        "scenario": "A patient presents with a history of heart disease and high blood pressure. They are currently taking Lisinopril. Can they be prescribed Ibuprofen for their recent ankle sprain?",
+        "ground_truth_decision": "No, Ibuprofen can interact with Lisinopril and worsen high blood pressure or affect kidney function, especially in patients with heart disease.",
+        "category": "healthcare"
+    },
+    {
+        "scenario": "An employee wants to take 3 weeks of unpaid leave after working for 6 months. Do they qualify under the new HR leave policy?",
+        "ground_truth_decision": "No, an employee must have a continuous tenure of at least 12 months to be eligible for unpaid extended leave.",
+        "category": "HR"
+    },
+    {
+        "scenario": "A customer bought a refurbished laptop 45 days ago and it stopped turning on. They want a full refund. What is our policy?",
+        "ground_truth_decision": "Refurbished electronics have a 30-day return policy for full refunds. After 30 days, they are eligible for repair or replacement under the 90-day warranty, but not a refund.",
+        "category": "e-commerce"
+    },
+    {
+        "scenario": "A small business with 2 years of operating history and $150k annual revenue applies for a $50k unsecured line of credit. Do they meet the baseline criteria?",
+        "ground_truth_decision": "No, the baseline criteria for a $50k unsecured line of credit requires at least 3 years of operating history and $250k in annual revenue.",
+        "category": "lending"
+    },
+    {
+        "scenario": "A landlord wants to evict a tenant in California who is 15 days late on rent. The landlord has not posted a formal notice to pay or quit. Can they file for eviction today?",
+        "ground_truth_decision": "No, the landlord must first serve a formal 3-day notice to pay rent or quit before they can legally file an unlawful detainer lawsuit for eviction.",
+        "category": "legal"
+    }
+]
