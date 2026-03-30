@@ -5,6 +5,7 @@ This module provides the REST API server for the Semantica framework
 using FastAPI and uvicorn.
 """
 
+import logging
 import uvicorn
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
@@ -52,6 +53,39 @@ async def build_kb(request: BuildRequest):
         return {"status": "accepted", "message": "Knowledge base construction initiated"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+# Explorer API Routers (Loaded gracefully if semantica[explorer] is installed)
+
+try:
+    from .explorer.routes import (
+        analytics,
+        annotations,
+        decisions,
+        enrich,
+        export_import,
+        graph,
+        temporal,
+        vocabulary,
+    )
+    
+    app.include_router(analytics.router)
+    app.include_router(annotations.router)
+    app.include_router(decisions.router)
+    app.include_router(enrich.router)
+    app.include_router(export_import.router)
+    app.include_router(graph.router)
+    app.include_router(temporal.router)
+    app.include_router(vocabulary.router)
+    
+    logging.info("Explorer API routes successfully mounted.")
+
+except ImportError as exc:
+    logging.warning(
+        f"Explorer API routes not mounted. To enable the Knowledge Explorer, "
+        f"install the required dependencies: pip install semantica[explorer]. "
+        f"Details: {exc}"
+    )
 
 def main():
     """Server entry point."""
