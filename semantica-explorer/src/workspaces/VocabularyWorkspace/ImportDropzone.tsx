@@ -2,25 +2,26 @@ import React, { useCallback, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { UploadCloud, CheckCircle2, Loader2 } from 'lucide-react';
 import { useImportVocabulary } from './queries';
+import type { ImportResponse } from './types'; 
 
 export const ImportDropzone: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
-  const [isSuccess, setIsSuccess] = useState(false);
+  const [importResult, setImportResult] = useState<ImportResponse | null>(null);
   const importMutation = useImportVocabulary();
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     if (acceptedFiles.length > 0) {
       const selectedFile = acceptedFiles[0];
       setFile(selectedFile);
-      setIsSuccess(false);
+      setImportResult(null);
 
       importMutation.mutate(selectedFile, {
-        onSuccess: () => {
-          setIsSuccess(true);
+        onSuccess: (data) => {
+          setImportResult(data); 
           setTimeout(() => {
             setFile(null);
-            setIsSuccess(false);
-          }, 3000);
+            setImportResult(null);
+          }, 4000); 
         },
         onError: (err) => {
           console.error("Upload failed:", err);
@@ -60,10 +61,13 @@ export const ImportDropzone: React.FC = () => {
             <Loader2 className="animate-spin" size={24} style={{ marginBottom: '8px' }} />
             <span style={{ fontSize: '14px' }}>Uploading {file?.name}...</span>
           </div>
-        ) : isSuccess ? (
+        ) : importResult ? (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', color: '#10b981' }}>
             <CheckCircle2 size={24} style={{ marginBottom: '8px' }} />
-            <span style={{ fontSize: '14px' }}>Import Successful!</span>
+            <span style={{ fontSize: '14px', fontWeight: 500 }}>Import Successful!</span>
+            <span style={{ fontSize: '12px', marginTop: '4px', color: '#059669' }}>
+              Added {importResult.nodes_added} concepts & {importResult.edges_added} links.
+            </span>
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', color: '#6b7280' }}>

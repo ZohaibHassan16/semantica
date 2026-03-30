@@ -1,8 +1,6 @@
 // queries.ts
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import type { VocabularyScheme, ConceptNode } from './types';
-
-
+import type { VocabularyScheme, ConceptNode, ImportResponse } from './types';
 
 const fetchSchemes = async (): Promise<VocabularyScheme[]> => {
   const res = await fetch('/api/vocabulary/schemes');
@@ -16,7 +14,8 @@ const fetchHierarchy = async (schemeUri: string): Promise<ConceptNode[]> => {
   return res.json();
 };
 
-const importVocabulary = async (file: File): Promise<void> => {
+// Updated to return the ImportResponse
+const importVocabulary = async (file: File): Promise<ImportResponse> => {
   const formData = new FormData();
   formData.append('file', file);
   const res = await fetch('/api/vocabulary/import', {
@@ -24,9 +23,8 @@ const importVocabulary = async (file: File): Promise<void> => {
     body: formData,
   });
   if (!res.ok) throw new Error('Failed to import vocabulary');
+  return res.json(); 
 };
-
-
 
 export const useVocabularies = () => {
   return useQuery({ 

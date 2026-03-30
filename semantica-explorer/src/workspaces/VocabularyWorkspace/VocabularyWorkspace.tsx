@@ -42,9 +42,15 @@ export const VocabularyWorkspace: React.FC = () => {
       </div>
 
       <div style={{ flex: 1, borderRight: '1px solid #e5e7eb', padding: '16px', backgroundColor: 'white', display: 'flex', flexDirection: 'column' }}>
-        <h2 style={{ fontSize: '1.2rem', fontWeight: 'bold', marginBottom: '16px' }}>
+        <h2 style={{ fontSize: '1.2rem', fontWeight: 'bold', marginBottom: selectedScheme?.description ? '4px' : '16px' }}>
           {selectedScheme ? selectedScheme.label : "Select a Vocabulary"}
         </h2>
+        
+        {selectedScheme?.description && (
+          <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '16px' }}>
+            {selectedScheme.description}
+          </p>
+        )}
         
         {selectedScheme ? (
           isLoadingTree ? (
