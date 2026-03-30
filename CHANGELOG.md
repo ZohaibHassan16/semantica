@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- **SKOS Vocabulary REST API & Hierarchy Engine** (PR #426 by @ZohaibHassan16):
+  - Added `semantica/explorer/routes/vocabulary.py` with three endpoints: `GET /api/vocabulary/schemes` returns all `skos:ConceptScheme` nodes as `VocabularyScheme` dicts; `GET /api/vocabulary/hierarchy?scheme=<uri>` returns the full broader/narrower concept tree for a scheme using an O(V+E) in-memory adjacency-list algorithm with cycle detection via a visited set; `POST /api/vocabulary/import` accepts `.ttl`, `.rdf`, and `.owl` uploads, delegates parsing to `rdf_parser.parse_skos_file`, and ingests results into the active `GraphSession` via `add_nodes`/`add_edges`. Invalid files return HTTP 422.
+  - Added `VocabularyScheme` and `ConceptNode` Pydantic models to `semantica/explorer/schemas.py`. `ConceptNode` is self-referential (`children: Optional[List['ConceptNode']]`) to support arbitrarily deep hierarchy trees.
+  - All session calls offloaded via `asyncio.to_thread` to keep the event loop unblocked.
+  - Added `tests/explorer/test_vocabulary.py` — 16 tests covering all three endpoints: scheme listing, metadata envelope fallback, empty graph, `broader`/`narrower`/`topConceptOf`/`hasTopConcept` edge directions, flat schemes, missing query params, cyclic edge safety, `.rdf`/`.owl` format paths, and invalid file 422 response. 99 total explorer tests passing, 0 regressions.
+  - Depends on `semantica/explorer/utils/rdf_parser.py` introduced in PR #425.
+
 - **SKOS Vocabulary Module** (PR #319 by @KaifAhmad1):
   - **Namespace helpers** (`semantica/ontology/namespace_manager.py`): Added `get_skos_uri(local_name)` — returns the full `http://www.w3.org/2004/02/skos/core#<local_name>` URI for any SKOS term. Added `build_concept_scheme_uri(name)` — slugifies a human-readable vocabulary name (spaces/special chars → hyphens, lower-cased) and anchors the result at the configured base URI as `<base>/vocab/<slug>`.
   - **Triplet-store SKOS helpers** (`semantica/triplet_store/triplet_store.py`): Added `add_skos_concept(concept_uri, scheme_uri, pref_label, alt_labels, broader, narrower, related, definition, notation)` — assembles and stores all required SKOS triples (auto-declares the `skos:ConceptScheme`, asserts `rdf:type skos:Concept`, `skos:inScheme`, `skos:prefLabel`, and all optional predicates) via the existing `add_triplets()` API; no new storage paths introduced. Added `get_skos_concepts(scheme_uri=None)` — issues a SPARQL `SELECT` via `execute_query()` and collapses multi-valued `altLabel`/`broader`/`narrower`/`related` bindings into structured concept dicts; optional `scheme_uri` restricts results to one vocabulary.
