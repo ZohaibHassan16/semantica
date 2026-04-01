@@ -109,6 +109,7 @@ from collections import defaultdict, deque
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 import threading
+import itertools
 from typing import Any, Dict, List, Optional, Set, Tuple, Union
 import uuid
 
@@ -779,26 +780,27 @@ class ContextGraph:
     def find_nodes(
         self, node_type: Optional[str] = None, skip: int = 0, limit: Optional[int] = None
     ) -> List[Dict[str, Any]]:
-        """Find nodes, optionally filtered by type."""
+        """Find nodes lazily"""
         with self._lock:
             if node_type:
-                node_ids = self.node_type_index.get(node_type, set())
-                nodes = [self.nodes[nid] for nid in node_ids]
+                # Sets are unordered, sort IDs for deterministic pagination
+                raw_ids = sorted(self.node_type_index.get(node_type, set()))
+                source = (self.nodes[nid] for nid in raw_ids if nid in self.nodes)
             else:
-                nodes = list(self.nodes.values())
+                source = self.nodes.values()
 
-            results = [
+            gen = (
                 {
                     "id": n.node_id,
                     "type": n.node_type,
                     "content": n.content,
                     "metadata": {**(getattr(n, "metadata", {}) or {}), **(getattr(n, "properties", {}) or {})},
                 }
-                for n in nodes
-            ]
-            if limit is not None:
-                return results[skip: skip + limit]
-            return results[skip:]
+                for n in source
+            )
+            stop = skip + limit if limit is not None else None
+    
+            return list(itertools.islice(gen, skip, stop))
 
     def find_active_nodes(
         self,
@@ -807,46 +809,30 @@ class ContextGraph:
         skip: int = 0,
         limit: Optional[int] = None,
     ) -> List[Dict[str, Any]]:
-        """
-        Find nodes that are currently active within their validity window.
-
-        Nodes without ``valid_from``/``valid_until`` are always considered active.
-
-        Args:
-            node_type: Optional node type filter.
-            at_time: Point in time to evaluate validity (defaults to ``datetime.utcnow()``).
-            skip: Items to skip
-            limit: Max items to return
-
-        Returns:
-            List of active node dicts (same format as :meth:`find_nodes`).
-        """
+        """Find active nodes lazily."""
         now = at_time or datetime.utcnow()
         with self._lock:
             if node_type:
-                node_ids = self.node_type_index.get(node_type, set())
-                nodes_iter = [self.nodes[nid] for nid in node_ids if nid in self.nodes]
+                raw_ids = sorted(self.node_type_index.get(node_type, set()))
+                source = (self.nodes[nid] for nid in raw_ids if nid in self.nodes)
             else:
-                nodes_iter = list(self.nodes.values())
+                source = self.nodes.values()
 
-            result = []
-            for node in nodes_iter:
-                if node.is_active(now):
-                    result.append(
-                        {
-                            "id": node.node_id,
-                            "type": node.node_type,
-                            "content": node.content,
+            def _active(nodes_iter):
+                for n in nodes_iter:
+                    if n.is_active(now):
+                        yield {
+                            "id": n.node_id,
+                            "type": n.node_type,
+                            "content": n.content,
                             "metadata": {
-                                **(getattr(node, "metadata", {}) or {}),
-                                **(getattr(node, "properties", {}) or {}),
+                                **(getattr(n, "metadata", {}) or {}),
+                                **(getattr(n, "properties", {}) or {}),
                             },
                         }
-                    )
-            
-            if limit is not None:
-                return result[skip: skip + limit]
-            return result[skip:]
+
+            stop = skip + limit if limit is not None else None
+            return list(itertools.islice(_active(source), skip, stop))
 
     def link_graph(
         self,
@@ -981,14 +967,11 @@ class ContextGraph:
     def find_edges(
         self, edge_type: Optional[str] = None, skip: int = 0, limit: Optional[int] = None
     ) -> List[Dict[str, Any]]:
-        """Find edges, optionally filtered by type."""
+        """Find edges lazily."""
         with self._lock:
-            if edge_type:
-                edges = self.edge_type_index.get(edge_type, [])
-            else:
-                edges = self.edges
-
-            results = [
+            source = self.edge_type_index.get(edge_type, []) if edge_type else self.edges
+            
+            gen = (
                 {
                     "source": e.source_id,
                     "target": e.target_id,
@@ -996,12 +979,10 @@ class ContextGraph:
                     "weight": e.weight,
                     "metadata": e.metadata,
                 }
-                for e in edges
-            ]
-            
-            if limit is not None:
-                return results[skip: skip + limit]
-            return results[skip:]
+                for e in source
+            )
+            stop = skip + limit if limit is not None else None
+            return list(itertools.islice(gen, skip, stop))
 
     def stats(self) -> Dict[str, Any]:
         """Get graph statistics."""
