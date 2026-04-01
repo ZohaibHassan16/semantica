@@ -302,10 +302,10 @@ class TextCleaner:
 
         # Remove potential script tags
         text = re.sub(
-            r"<script[^>]*>.*?</script>", "", text, flags=re.IGNORECASE | re.DOTALL
+            r"<script[^>]*>.*?</script(?:\s[^>]*)?>", "", text, flags=re.IGNORECASE | re.DOTALL
         )
         text = re.sub(
-            r"<iframe[^>]*>.*?</iframe>", "", text, flags=re.IGNORECASE | re.DOTALL
+            r"<iframe[^>]*>.*?</iframe(?:\s[^>]*)?>", "", text, flags=re.IGNORECASE | re.DOTALL
         )
 
         # Remove javascript: URLs

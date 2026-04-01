@@ -5,13 +5,15 @@ Export & import routes.
 import asyncio
 import io
 import json
-import json
+import logging
 import os
 import tempfile
 from typing import Optional
 
 from fastapi import APIRouter, Depends, File, UploadFile
 from fastapi.responses import Response
+
+logger = logging.getLogger(__name__)
 
 from ..dependencies import get_session, get_ws_manager
 from ..schemas import ExportRequest
@@ -229,7 +231,8 @@ async def import_file(
                 "detail": f"File type not supported yet: {filename}",
             }
     except Exception as exc:
-        result = {"status": "error", "detail": str(exc)}
+        logger.exception("Import failed")
+        result = {"status": "error", "detail": "An internal error occurred during import"}
 
     await ws.broadcast("import_completed", result)
     return result

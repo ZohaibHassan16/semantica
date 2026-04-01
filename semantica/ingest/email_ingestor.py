@@ -392,7 +392,7 @@ class EmailParser:
         # Extract URLs from text using regex
         import re
 
-        url_pattern = r"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+"
+        url_pattern = r"https?://(?:[a-zA-Z0-9\-._~!$&'()*+,;=:@/?#\[\]]|%[0-9a-fA-F]{2})+"
         text_links = re.findall(url_pattern, email_content)
         links.extend(text_links)
 
