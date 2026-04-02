@@ -419,9 +419,11 @@ class TripletStore:
         if graphs is not None:
             options["graphs"] = graphs
 
+        enable_named_graphs = self.config.get("enable_named_graphs", True)
         options.setdefault(
             "supports_named_graphs",
-            self.backend_type in self.NAMED_GRAPH_CAPABLE_BACKENDS,
+            enable_named_graphs
+            and self.backend_type in self.NAMED_GRAPH_CAPABLE_BACKENDS,
         )
 
         return self.query_engine.execute_query(query, self._store_backend, **options)

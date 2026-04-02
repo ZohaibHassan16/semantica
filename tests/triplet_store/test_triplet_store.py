@@ -184,6 +184,25 @@ class TestTripletStore(unittest.TestCase):
             supports_named_graphs=True,
         )
 
+    @patch('semantica.triplet_store.blazegraph_store.BlazegraphStore')
+    def test_execute_query_respects_enable_named_graphs_flag(self, mock_blazegraph_store):
+        mock_backend_instance = MagicMock()
+        mock_blazegraph_store.return_value = mock_backend_instance
+
+        store = TripletStore(backend="blazegraph", enable_named_graphs=False)
+        store.query_engine = MagicMock()
+        store.query_engine.execute_query.return_value = QueryEngine()
+
+        query = "SELECT ?s WHERE { ?s ?p ?o }"
+        store.execute_query(query, graph="http://example.org/graph/default")
+
+        store.query_engine.execute_query.assert_called_once_with(
+            query,
+            store._store_backend,
+            graph="http://example.org/graph/default",
+            supports_named_graphs=False,
+        )
+
     def test_query_engine_injects_from_before_where(self):
         engine = QueryEngine(enable_optimization=False, enable_caching=False)
         query = "SELECT ?s ?p ?o WHERE { ?s ?p ?o }"
@@ -245,6 +264,32 @@ class TestTripletStore(unittest.TestCase):
 
         self.assertNotEqual(graph_a_result.bindings, graph_b_result.bindings)
         self.assertEqual(len(default_result.bindings), 2)
+
+    def test_query_engine_avoids_duplicate_dataset_clauses_for_same_graph(self):
+        engine = QueryEngine(enable_optimization=False, enable_caching=False)
+        query = "SELECT ?s WHERE { GRAPH ?g { ?s ?p ?o } }"
+
+        prepared = engine.prepare_query(
+            query,
+            graph="http://example.org/graph/a",
+            graphs=["http://example.org/graph/a", "http://example.org/graph/b"],
+        )
+
+        self.assertEqual(prepared.count("FROM <http://example.org/graph/a>"), 1)
+        self.assertEqual(prepared.count("FROM NAMED <http://example.org/graph/a>"), 0)
+        self.assertIn("FROM NAMED <http://example.org/graph/b>", prepared)
+
+    def test_query_engine_uses_default_graph_uri_alias(self):
+        engine = QueryEngine(
+            enable_optimization=False,
+            enable_caching=False,
+            default_graph_uri="http://example.org/graph/default",
+        )
+        query = "SELECT ?s WHERE { ?s ?p ?o }"
+
+        prepared = engine.prepare_query(query)
+
+        self.assertIn("FROM <http://example.org/graph/default>", prepared)
 
     def test_query_engine_fallback_when_named_graphs_unsupported(self):
         engine = QueryEngine(enable_optimization=False, enable_caching=False)

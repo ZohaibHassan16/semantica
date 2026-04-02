@@ -110,6 +110,7 @@ class TripletStoreConfig:
         env_mappings = {
             "TRIPLET_STORE_DEFAULT_STORE": "default_store",
             "TRIPLET_STORE_DEFAULT_GRAPH": "default_graph",
+            "TRIPLET_STORE_DEFAULT_GRAPH_URI": "default_graph_uri",
             "TRIPLET_STORE_DEFAULT_NAMED_GRAPHS": "default_graphs",
             "TRIPLET_STORE_BATCH_SIZE": "batch_size",
             "TRIPLET_STORE_ENABLE_CACHING": "enable_caching",
@@ -170,6 +171,7 @@ class TripletStoreConfig:
         defaults = {
             "default_store": None,
             "default_graph": None,
+            "default_graph_uri": None,
             "default_graphs": [],
             "batch_size": 1000,
             "enable_caching": True,

@@ -7,6 +7,7 @@ knowledge graphs and ontologies with comprehensive change tracking.
 
 import os
 import tempfile
+from unittest.mock import MagicMock
 import pytest
 from semantica.change_management import (
     TemporalVersionManager,
@@ -179,6 +180,41 @@ class TestTemporalVersionManager:
         assert len(versions) == 1
         assert versions[0]["entity_count"] == 2
         assert versions[0]["relationship_count"] == 1
+
+    def test_prune_versions_sanitizes_graph_uri_in_drop_query(self):
+        """Ensure DROP GRAPH query uses sanitized URI encoding for unsafe characters."""
+        manager = TemporalVersionManager()
+        triplet_store = MagicMock()
+
+        manager.storage.save(
+            {
+                "label": "old-v1",
+                "timestamp": "2024-01-01T00:00:00",
+                "author": "test@example.com",
+                "description": "old",
+                "checksum": "x",
+                "entities": [],
+                "relationships": [],
+                "graph_uri": "http://example.org/graph> } ; DROP ALL ; #",
+            }
+        )
+        manager.storage.save(
+            {
+                "label": "new-v2",
+                "timestamp": "2025-01-01T00:00:00",
+                "author": "test@example.com",
+                "description": "new",
+                "checksum": "y",
+                "entities": [],
+                "relationships": [],
+                "graph_uri": "http://example.org/graph/new",
+            }
+        )
+
+        manager.prune_versions(keep_last_n=1, triplet_store=triplet_store)
+
+        query = triplet_store.execute_query.call_args[0][0]
+        assert "DROP SILENT GRAPH <http://example.org/graph%3E%20%7D%20%3B%20DROP%20ALL%20%3B%20%23>" == query
     
     def test_get_version(self):
         """Test retrieving specific version."""

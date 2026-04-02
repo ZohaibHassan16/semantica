@@ -237,7 +237,11 @@ class QueryEngine:
         if not query:
             return ""
 
-        resolved_graph = graph or self.config.get("default_graph")
+        resolved_graph = (
+            graph
+            or self.config.get("default_graph")
+            or self.config.get("default_graph_uri")
+        )
         resolved_graphs = graphs
         if resolved_graphs is None:
             resolved_graphs = self.config.get("default_graphs")
@@ -246,7 +250,7 @@ class QueryEngine:
             resolved_graphs = [resolved_graphs]
         resolved_graphs = [g for g in (resolved_graphs or []) if g]
 
-        if resolved_graph and resolved_graph not in resolved_graphs:
+        if resolved_graph and resolved_graph in resolved_graphs:
             # Preserve graph as default dataset while avoiding duplicate URIs in FROM NAMED.
             resolved_graphs = [g for g in resolved_graphs if g != resolved_graph]
 
