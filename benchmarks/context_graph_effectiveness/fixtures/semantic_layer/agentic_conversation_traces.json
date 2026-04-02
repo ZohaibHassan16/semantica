@@ -1,0 +1,167 @@
+{
+  "description": "Multi-turn agentic conversation traces for testing semantic metric consistency across turns. Used for Track 25 — Agentic Semantic Consistency.",
+  "traces": [
+    {
+      "id": "trace_001",
+      "domain": "finance",
+      "turns": [
+        {
+          "turn": 1,
+          "user": "What is our total revenue metric definition?",
+          "expected_metric": "total_revenue",
+          "expected_definition_key": "sum(amount) for completed orders",
+          "gold_entities": ["total_revenue", "amount", "completed"]
+        },
+        {
+          "turn": 2,
+          "user": "Using that definition, should we approve the Q1 deal worth $120,000?",
+          "expected_metric": "total_revenue",
+          "expected_decision": "approve",
+          "policy_threshold": 100000,
+          "gold_entities": ["total_revenue", "Q1", "120000"]
+        },
+        {
+          "turn": 3,
+          "user": "Recalculate using the new discounted revenue definition — does the decision change?",
+          "expected_metric": "total_revenue",
+          "new_expression": "sum(amount * (1 - discount_rate)) for completed orders",
+          "expected_consistency": "metric_definition_updated_cleanly",
+          "gold_entities": ["total_revenue", "discount_rate"]
+        }
+      ],
+      "consistency_check": "total_revenue definition must remain consistent unless explicitly updated"
+    },
+    {
+      "id": "trace_002",
+      "domain": "customer_success",
+      "turns": [
+        {
+          "turn": 1,
+          "user": "What is the LTV:CAC ratio definition?",
+          "expected_metric": "ltv_cac_ratio",
+          "expected_definition_key": "customer_lifetime_value / customer_acquisition_cost",
+          "gold_entities": ["ltv_cac_ratio", "customer_lifetime_value", "customer_acquisition_cost"]
+        },
+        {
+          "turn": 2,
+          "user": "Our LTV:CAC is 2.8. Should we continue investing in the paid channel?",
+          "expected_metric": "ltv_cac_ratio",
+          "observed_value": 2.8,
+          "policy_threshold": 3.0,
+          "expected_decision": "reject",
+          "gold_entities": ["ltv_cac_ratio", "paid channel", "2.8"]
+        },
+        {
+          "turn": 3,
+          "user": "LTV improved to $600. Does that change the ratio and the decision?",
+          "expected_metric": "ltv_cac_ratio",
+          "updated_ltv": 600,
+          "expected_consistency": "ratio_recalculated_with_same_formula",
+          "gold_entities": ["ltv_cac_ratio", "600", "customer_lifetime_value"]
+        },
+        {
+          "turn": 4,
+          "user": "Is the viability threshold still 3.0 per our policy?",
+          "expected_metric": "ltv_cac_ratio",
+          "expected_threshold": 3.0,
+          "expected_consistency": "threshold_unchanged_across_turns",
+          "gold_entities": ["ltv_cac_ratio", "3.0", "viability threshold"]
+        }
+      ],
+      "consistency_check": "ltv_cac_ratio formula and threshold must not drift across turns"
+    },
+    {
+      "id": "trace_003",
+      "domain": "growth",
+      "turns": [
+        {
+          "turn": 1,
+          "user": "Define churn rate for our enterprise segment.",
+          "expected_metric": "churn_rate",
+          "expected_definition_key": "churned_customers / distinct_customers in 90-day window",
+          "gold_entities": ["churn_rate", "enterprise", "90 days"]
+        },
+        {
+          "turn": 2,
+          "user": "Churn is at 15%. Should we trigger the retention campaign policy?",
+          "expected_metric": "churn_rate",
+          "observed_value": 0.15,
+          "policy_threshold": 0.08,
+          "expected_decision": "approve_retention_campaign",
+          "gold_entities": ["churn_rate", "15%", "retention campaign"]
+        },
+        {
+          "turn": 3,
+          "user": "We tightened the churn window to 60 days. Re-evaluate with the same threshold.",
+          "expected_metric": "churn_rate",
+          "updated_window": 60,
+          "expected_consistency": "window_update_applied_threshold_stable",
+          "gold_entities": ["churn_rate", "60 days", "retention campaign"]
+        }
+      ],
+      "consistency_check": "churn_rate threshold must remain 0.08 unless policy explicitly updated"
+    },
+    {
+      "id": "trace_004",
+      "domain": "operations",
+      "turns": [
+        {
+          "turn": 1,
+          "user": "What is our average order value (AOV) definition?",
+          "expected_metric": "average_order_value",
+          "expected_definition_key": "sum(amount) / count(distinct order_id) for completed orders",
+          "gold_entities": ["average_order_value", "AOV", "completed orders"]
+        },
+        {
+          "turn": 2,
+          "user": "AOV is $62. Does the upsell trigger apply?",
+          "expected_metric": "average_order_value",
+          "observed_value": 62.0,
+          "policy_threshold": 75.0,
+          "expected_decision": "approve_upsell",
+          "gold_entities": ["average_order_value", "62", "upsell"]
+        },
+        {
+          "turn": 3,
+          "user": "We added a minimum order filter of $10. Recalculate.",
+          "expected_metric": "average_order_value",
+          "filter_added": {"field": "amount", "operator": ">", "value": 10},
+          "expected_consistency": "filter_update_noted_formula_base_stable",
+          "gold_entities": ["average_order_value", "10", "filter"]
+        }
+      ],
+      "consistency_check": "AOV formula base must not change without explicit governance update"
+    },
+    {
+      "id": "trace_005",
+      "domain": "finance",
+      "turns": [
+        {
+          "turn": 1,
+          "user": "What is our refund rate governance definition?",
+          "expected_metric": "refund_rate",
+          "expected_definition_key": "count(refunded_orders) / count(distinct order_id)",
+          "gold_entities": ["refund_rate", "refunded_orders", "order_id"]
+        },
+        {
+          "turn": 2,
+          "user": "Refund rate is 9% in APAC. Does vendor penalty apply?",
+          "expected_metric": "refund_rate",
+          "observed_value": 0.09,
+          "policy_threshold": 0.08,
+          "expected_decision": "apply_vendor_penalty",
+          "gold_entities": ["refund_rate", "9%", "APAC", "vendor penalty"]
+        },
+        {
+          "turn": 3,
+          "user": "We changed refund rate to use amount-based rather than count-based. Is the penalty still triggered?",
+          "expected_metric": "refund_rate",
+          "updated_expression": "sum(refund_amount) / sum(order_amount)",
+          "expected_consistency": "expression_change_flagged_as_governance_update",
+          "gold_entities": ["refund_rate", "amount-based", "vendor penalty"]
+        }
+      ],
+      "consistency_check": "expression restatements must be flagged as governance updates, not silent overwrites"
+    }
+  ]
+}

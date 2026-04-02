@@ -97,3 +97,36 @@ def qa_dataset():
         
     with open(fixture_path, "r") as f:
         return json.load(f)
+
+
+# ── Semantic Layer fixtures (Tracks 21–25) ─────────────────────────────────
+
+_SL_FIXTURES = Path(__file__).parent / "fixtures" / "semantic_layer"
+
+def _load_sl(name: str):
+    with open(_SL_FIXTURES / name, encoding="utf-8") as f:
+        return json.load(f)
+
+
+@pytest.fixture(scope="session")
+def jaffle_shop_dataset():
+    """Governed metric definitions and NL queries (Jaffle Shop / dbt MetricFlow)."""
+    return _load_sl("jaffle_shop_metrics.json")
+
+
+@pytest.fixture(scope="session")
+def metric_change_dataset():
+    """Before/after metric change pairs with gold impact labels."""
+    return _load_sl("metric_change_pairs.json")
+
+
+@pytest.fixture(scope="session")
+def hybrid_metric_graph_dataset():
+    """Hybrid metric + causal chain + temporal records."""
+    return _load_sl("hybrid_metric_graph.json")
+
+
+@pytest.fixture(scope="session")
+def agentic_traces_dataset():
+    """Multi-turn conversation traces for semantic consistency testing."""
+    return _load_sl("agentic_conversation_traces.json")

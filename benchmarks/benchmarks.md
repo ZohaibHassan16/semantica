@@ -1,7 +1,8 @@
 # Semantica Benchmark Suite
 ### Methodology, Metrics, Formulas & Datasets
-> Conference-grade reference for evaluating Knowledge Graph–augmented decision intelligence.  
-> Covers 20 effectiveness tracks + throughput benchmarks. All metrics computed from live API calls — no hardcoded values.
+> Conference-grade reference for evaluating Knowledge Graph–augmented decision intelligence  
+> and the Semantic Layer pillar. Covers **25 effectiveness tracks** + throughput benchmarks.  
+> All metrics computed from live API calls — no hardcoded values.
 
 ---
 
@@ -17,6 +18,7 @@
    - Tracks 9–12: Conflict · Dedup · Embedding · Change
    - Tracks 13–16: Skill · Extraction · Context · Integrity
    - Tracks 17–20: Multi-hop · Abductive · Entity · SES
+   - Tracks 21–25: Semantic Layer Pillar
 6. [Threshold Reference Table](#6-threshold-reference-table)
 7. [Datasets — Provenance & Theory](#7-datasets--provenance--theory)
 8. [Throughput Suite](#8-throughput-suite)
@@ -729,6 +731,125 @@ $$\text{SES} = \frac{1}{|C|} \sum_{i \in C} c_i \geq 0.70$$
 | Regression floor ≥ 0.50 | Absolute | Below this = multiple components broken |
 
 **Domain minimum test:** SES is computed per domain (lending, healthcare, legal, HR) using domain-specific decisions from the dataset. Each domain must independently meet ≥ 0.60.
+
+---
+
+---
+
+## Tracks 21–25 — Semantic Layer Pillar
+
+> **Why a Semantic Layer pillar?**  
+> Standard KG-RAG benchmarks (RAGAS, BEIR, MetaQA) measure retrieval quality on flat corpora. They cannot measure whether an LLM respects governed metric definitions, whether a policy threshold survives a multi-turn conversation, or whether a metric redefinition correctly propagates to downstream decisions. These are the unique value propositions of a **Semantic Layer + Context Graph + Decision Intelligence** stack. Industry benchmarks (dbt 2025, AtScale 2025) show semantic layers lift LLM business-query accuracy from ~40% to 83%+. The SES formula is updated to weight this pillar at 30%.
+
+$$\text{SES}_\text{v2} = 0.7 \times \underbrace{\text{ContextGraphScore}}_{\text{Tracks 1–20}} + 0.3 \times \underbrace{\text{SemanticLayerScore}}_{\text{Tracks 21–25}}$$
+
+New SES baseline: **≥ 0.72** (raised from 0.70 to reflect semantic layer value-add).
+
+---
+
+### Track 21 — Semantic Metric Exactness
+
+**Module:** `ContextGraph` (metric nodes) · **Dataset:** Jaffle Shop governed metrics (dbt MetricFlow format, 8 metrics, 15 NL queries, 8 dimension conformance tests)
+
+**Theory:** A semantic layer defines a single source of truth for every business metric. The benchmark verifies that metric nodes stored in `ContextGraph` are retrievable by their exact canonical name, that common aliases resolve correctly, and that dimension queries respect grain constraints. This mirrors the core guarantee of dbt MetricFlow / AtScale: "the LTV you query is always the same LTV that was defined by the data team."
+
+$$\text{MetricExactness@1} = \frac{|\{q : \text{returned metric} = \text{governed metric}\}|}{N} \geq 0.85$$
+
+$$\text{DimensionConformanceRate} = \frac{|\{d : \text{dimension} \in \text{allowed\_dims} \wedge \text{dimension} \neq \text{grain}\}|}{|D|} \geq 0.90$$
+
+| Metric | Formula | Threshold | Evidence |
+|--------|---------|-----------|---------|
+| `metric_exactness_at_1` | governed metric retrieved exactly | ≥ 0.85 | dbt 83% accuracy lift (2025) |
+| `dimension_conformance_rate` | valid dimension queries / total | ≥ 0.90 | Semantic layer grain rules |
+| `metric_alias_resolution_rate` | aliases → canonical name | ≥ 0.80 | Business glossary coverage |
+| `metric_node_storage_fidelity` | all fields survive round-trip | == 1.0 | Binary correctness |
+| `semantic_layer_coverage` | NL queries with governed metric | ≥ 0.90 | Layer completeness |
+
+**Alias resolution:** Common business terms ("LTV", "AOV", "churn") must map to the exact canonical metric name, not a nearest-neighbour approximation.
+
+**Grain constraint:** A metric with `grain = customer_id` cannot be sliced by `order_id` — this violates the fan-out invariant. Track 21 verifies these violations are detectable.
+
+---
+
+### Track 22 — NL-to-Governed-Decision Accuracy *(extends Track 2)*
+
+**Theory:** End-to-end pipeline: natural-language decision request → governed metric lookup → context graph → LLM → compliant, grounded decision. The `GovernedDecisionDelta` must be positive and the `SemanticHallucinationRate` near-zero — the LLM must not fabricate metric values or definitions.
+
+This extends Track 2 (Decision Quality) with metric-level governance:
+
+$$\text{GovernedDecisionDelta} = \text{Acc}_{\text{semantic+graph}} - \text{Acc}_{\text{baseline}} > 0.35$$
+
+$$\text{SemanticHallucinationRate} = \frac{|\text{NER}(O) \setminus \text{governed\_entities}|}{|\text{NER}(O)|} \leq 0.05$$
+
+> Track 22 shares the `real_llm` gate with Track 2. Non-LLM structural tests (metric node retrieval, policy conformance) are run unconditionally.
+
+---
+
+### Track 23 — Metric-Graph Hybrid Reasoning
+
+**Module:** `ContextGraph` (metric + causal + policy nodes) · **Dataset:** `hybrid_metric_graph.json` — 8 records mixing metric observations, causal chains, and policy nodes
+
+**Theory:** Real enterprise questions mix metric context with causal reasoning ("Why did revenue drop 12%?") and policy context ("Which escalation policy applies?"). Track 23 verifies that `ContextGraph` correctly encodes this three-way structure and that BFS traversal from the metric node reaches both the gold root cause and the gold applicable policy.
+
+$$\text{HybridRecall} = \frac{|\text{Reach}_k(\text{metric\_node}) \cap (\text{causal\_nodes} \cup \text{policy\_nodes})|}{|\text{causal\_nodes} \cup \text{policy\_nodes}|} \geq 0.75$$
+
+$$\text{PolicyMetricCompliance} = \frac{|\{r : \text{observed\_value} \mathbin{\text{op}} \text{threshold} = \text{gold\_compliant}\}|}{N} \geq 0.85$$
+
+| Metric | Threshold |
+|--------|-----------|
+| `hybrid_recall` | ≥ 0.75 |
+| `policy_metric_compliance` | ≥ 0.85 |
+| `causal_root_accuracy` | ≥ 0.70 |
+| `metric_policy_linkage_rate` | ≥ 0.90 |
+| `hybrid_graph_coverage` | ≥ 0.80 |
+
+**Graph structure per record:**
+```
+MetricNode ──CAUSED──► CausalChain (3–4 nodes)
+MetricNode ──GOVERNED_BY──► PolicyNode
+MetricNode ──VALID_DURING──► TemporalWindow
+```
+
+---
+
+### Track 24 — Governance Impact & Change Propagation
+
+**Module:** `ContextGraph`, `VersionManager` · **Dataset:** `metric_change_pairs.json` — 8 metric change types with gold impact labels and a 21-decision policy registry
+
+**Theory:** When a metric definition changes (expression restatement, filter tightening, window change, threshold raise), downstream decisions that reference that metric must be flagged as potentially impacted. Decisions referencing *other* metrics must not be flagged (drift = 0). This is a hard auditability requirement for GDPR/SOX-regulated systems.
+
+$$\text{MetricChangeImpactScore} = \frac{|\text{flagged} \cap \text{affected\_gold}|}{|\text{affected\_gold}|} \geq 0.95$$
+
+$$\text{DecisionDriftRate} = \frac{|\text{flagged} \cap \text{unaffected\_gold}|}{|\text{unaffected\_gold}|} \leq 0.02$$
+
+| Metric | Threshold | Basis |
+|--------|-----------|-------|
+| `metric_change_impact_score` | ≥ 0.95 | Hard auditability SLA (GDPR/SOX) |
+| `decision_drift_rate` | ≤ 0.02 | Production SLA — wrong decisions near-zero |
+| `change_type_coverage` | ≥ 0.80 | All change types testable |
+| `impact_precision` | ≥ 0.85 | Flagged decisions actually impacted |
+
+**Change types tested:** expression restatement · filter addition/broadening/exclusion · time window addition/tightening · threshold raise
+
+---
+
+### Track 25 — Agentic Semantic Consistency
+
+**Module:** `ContextGraph` (multi-turn) · **Dataset:** `agentic_conversation_traces.json` — 5 traces (3–4 turns each) across finance, customer success, growth, operations domains
+
+**Theory:** In a multi-turn agentic workflow, metric definitions and policy thresholds must remain consistent across turns unless explicitly updated by governance. Silent drift — where the LLM uses a different formula or threshold in turn 3 than it did in turn 1 — produces inconsistent decisions that cannot be audited. Track 25 measures this structurally via graph node metadata comparisons.
+
+$$\text{CrossTurnMetricConsistency} = 1 - \frac{|\{(t_i, t_j) : \text{expr}(t_i) \neq \text{expr}(t_j), \text{no explicit update}\}|}{T} \geq 0.90$$
+
+$$\text{ThresholdStabilityRate} = \frac{|\text{traces where threshold unchanged across turns}|}{|\text{traces}|} \geq 0.95$$
+
+| Metric | Threshold | Basis |
+|--------|-----------|-------|
+| `cross_turn_metric_consistency` | ≥ 0.90 | Governed decision production SLA |
+| `threshold_stability_rate` | ≥ 0.95 | Policy immutability SLA |
+| `explicit_update_detection_rate` | ≥ 0.80 | Governance audit trail |
+| `decision_consistency_rate` | ≥ 0.85 | Same inputs → same decision |
+| `trace_buildability_rate` | == 1.0 | Binary correctness |
 
 ---
 

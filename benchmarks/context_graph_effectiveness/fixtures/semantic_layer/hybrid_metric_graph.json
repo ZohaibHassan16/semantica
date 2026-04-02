@@ -1,0 +1,135 @@
+{
+  "description": "Hybrid records combining governed metric queries with causal chain and temporal context. Used for Track 23 — Metric-Graph Hybrid Reasoning.",
+  "records": [
+    {
+      "id": "hm001",
+      "query": "Why did total revenue drop 12% last quarter and what policy applies?",
+      "metric": {"name": "total_revenue", "observed_value": 0.88, "baseline_value": 1.0, "delta": -0.12},
+      "causal_nodes": ["discount_policy_change", "supply_shortage", "competitor_pricing"],
+      "causal_edges": [
+        {"from": "supply_shortage",         "to": "order_count_drop",     "type": "CAUSED"},
+        {"from": "order_count_drop",        "to": "revenue_drop",         "type": "CAUSED"},
+        {"from": "discount_policy_change",  "to": "margin_compression",   "type": "CAUSED"},
+        {"from": "margin_compression",      "to": "revenue_drop",         "type": "CAUSED"}
+      ],
+      "policy_nodes": ["minimum_revenue_policy", "escalation_policy"],
+      "temporal_window": {"valid_from": "2025-10-01", "valid_until": "2025-12-31"},
+      "gold_causal_root": "supply_shortage",
+      "gold_policy_applicable": "escalation_policy",
+      "supports_hybrid_recall": true
+    },
+    {
+      "id": "hm002",
+      "query": "Is our LTV:CAC ratio above the viability threshold given recent CAC increases?",
+      "metric": {"name": "ltv_cac_ratio", "observed_value": 2.8, "policy_threshold": 3.0, "compliant": false},
+      "causal_nodes": ["paid_ads_cost_increase", "cac_rise", "ltv_stable"],
+      "causal_edges": [
+        {"from": "paid_ads_cost_increase",  "to": "cac_rise",             "type": "CAUSED"},
+        {"from": "cac_rise",                "to": "ltv_cac_below_threshold", "type": "CAUSED"}
+      ],
+      "policy_nodes": ["channel_investment_policy", "budget_freeze_policy"],
+      "temporal_window": {"valid_from": "2025-01-01", "valid_until": "2026-03-31"},
+      "gold_causal_root": "paid_ads_cost_increase",
+      "gold_policy_applicable": "channel_investment_policy",
+      "supports_hybrid_recall": true
+    },
+    {
+      "id": "hm003",
+      "query": "What caused the spike in churn rate for enterprise customers in Q4 and which retention policy applies?",
+      "metric": {"name": "churn_rate", "observed_value": 0.15, "baseline_value": 0.08, "segment": "enterprise"},
+      "causal_nodes": ["pricing_increase", "product_outage_nov", "competitor_migration"],
+      "causal_edges": [
+        {"from": "pricing_increase",       "to": "customer_dissatisfaction", "type": "CAUSED"},
+        {"from": "product_outage_nov",     "to": "customer_dissatisfaction", "type": "CAUSED"},
+        {"from": "customer_dissatisfaction","to": "churn_rate_increase",     "type": "CAUSED"},
+        {"from": "competitor_migration",   "to": "churn_rate_increase",      "type": "CAUSED"}
+      ],
+      "policy_nodes": ["retention_campaign_policy", "sla_compensation_policy"],
+      "temporal_window": {"valid_from": "2025-10-01", "valid_until": "2025-12-31"},
+      "gold_causal_root": "pricing_increase",
+      "gold_policy_applicable": "retention_campaign_policy",
+      "supports_hybrid_recall": true
+    },
+    {
+      "id": "hm004",
+      "query": "Why is average order value declining and does it trigger the upsell policy?",
+      "metric": {"name": "average_order_value", "observed_value": 62.0, "policy_threshold": 75.0, "compliant": false},
+      "causal_nodes": ["coupon_abuse", "product_mix_shift", "economic_downturn"],
+      "causal_edges": [
+        {"from": "coupon_abuse",      "to": "order_amount_reduction", "type": "CAUSED"},
+        {"from": "product_mix_shift", "to": "order_amount_reduction", "type": "CAUSED"},
+        {"from": "order_amount_reduction", "to": "aov_decline",       "type": "CAUSED"}
+      ],
+      "policy_nodes": ["upsell_trigger_policy", "discount_cap_policy"],
+      "temporal_window": {"valid_from": "2025-07-01", "valid_until": "2025-09-30"},
+      "gold_causal_root": "coupon_abuse",
+      "gold_policy_applicable": "upsell_trigger_policy",
+      "supports_hybrid_recall": true
+    },
+    {
+      "id": "hm005",
+      "query": "New customer acquisition dropped — what is the causal chain and growth policy implication?",
+      "metric": {"name": "new_customer_count", "observed_value": 145, "policy_threshold": 200, "compliant": false},
+      "causal_nodes": ["ad_budget_cut", "channel_saturation", "brand_awareness_drop"],
+      "causal_edges": [
+        {"from": "ad_budget_cut",         "to": "channel_saturation",  "type": "CAUSED"},
+        {"from": "channel_saturation",    "to": "acquisition_slowdown","type": "CAUSED"},
+        {"from": "brand_awareness_drop",  "to": "acquisition_slowdown","type": "CAUSED"}
+      ],
+      "policy_nodes": ["growth_kpi_policy", "budget_reallocation_policy"],
+      "temporal_window": {"valid_from": "2025-01-01", "valid_until": "2025-06-30"},
+      "gold_causal_root": "ad_budget_cut",
+      "gold_policy_applicable": "growth_kpi_policy",
+      "supports_hybrid_recall": true
+    },
+    {
+      "id": "hm006",
+      "query": "Refund rate is above threshold — what drove it and does vendor penalty apply?",
+      "metric": {"name": "refund_rate", "observed_value": 0.09, "baseline_value": 0.05, "delta": 0.04},
+      "causal_nodes": ["product_quality_issue", "shipping_damage", "misleading_description"],
+      "causal_edges": [
+        {"from": "product_quality_issue",  "to": "customer_complaints",  "type": "CAUSED"},
+        {"from": "shipping_damage",        "to": "customer_complaints",  "type": "CAUSED"},
+        {"from": "customer_complaints",    "to": "refund_rate_increase", "type": "CAUSED"}
+      ],
+      "policy_nodes": ["vendor_penalty_policy", "quality_escalation_policy"],
+      "temporal_window": {"valid_from": "2025-04-01", "valid_until": "2025-06-30"},
+      "gold_causal_root": "product_quality_issue",
+      "gold_policy_applicable": "vendor_penalty_policy",
+      "supports_hybrid_recall": true
+    },
+    {
+      "id": "hm007",
+      "query": "Revenue target missed — trace the causal chain and identify applicable escalation policy",
+      "metric": {"name": "total_revenue", "observed_value": 420000, "policy_threshold": 500000, "compliant": false},
+      "causal_nodes": ["sales_team_turnover", "pipeline_shrinkage", "deal_slippage"],
+      "causal_edges": [
+        {"from": "sales_team_turnover",  "to": "pipeline_shrinkage", "type": "CAUSED"},
+        {"from": "pipeline_shrinkage",   "to": "deal_slippage",      "type": "CAUSED"},
+        {"from": "deal_slippage",        "to": "revenue_miss",       "type": "CAUSED"}
+      ],
+      "policy_nodes": ["revenue_escalation_policy", "forecast_adjustment_policy"],
+      "temporal_window": {"valid_from": "2025-01-01", "valid_until": "2025-12-31"},
+      "gold_causal_root": "sales_team_turnover",
+      "gold_policy_applicable": "revenue_escalation_policy",
+      "supports_hybrid_recall": true
+    },
+    {
+      "id": "hm008",
+      "query": "Customer LTV improved — what drove it and does the segment upgrade policy trigger?",
+      "metric": {"name": "customer_lifetime_value", "observed_value": 1100, "policy_threshold": 1000, "compliant": true},
+      "causal_nodes": ["product_expansion", "higher_retention", "upsell_program"],
+      "causal_edges": [
+        {"from": "product_expansion",  "to": "usage_increase",   "type": "CAUSED"},
+        {"from": "upsell_program",     "to": "usage_increase",   "type": "CAUSED"},
+        {"from": "usage_increase",     "to": "ltv_improvement",  "type": "CAUSED"},
+        {"from": "higher_retention",   "to": "ltv_improvement",  "type": "CAUSED"}
+      ],
+      "policy_nodes": ["segment_upgrade_policy"],
+      "temporal_window": {"valid_from": "2025-06-01", "valid_until": "2025-12-31"},
+      "gold_causal_root": "product_expansion",
+      "gold_policy_applicable": "segment_upgrade_policy",
+      "supports_hybrid_recall": true
+    }
+  ]
+}

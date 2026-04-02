@@ -41,7 +41,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - Track 18 — Abductive & Deductive Reasoning: COPA `find_explanations()` coverage ≥ 0.60/0.55 (cause/effect); WIQA Rete deductive chain recall ≥ 0.65.
     - Track 19 — Entity Linking & Graph Validation: `EntityResolver` fuzzy precision ≥ 0.80, recall ≥ 0.75; `GraphValidator` false-positive rate < 0.05.
     - Track 20 — Composite SES Score: Semantica Effectiveness Score = mean of 8 live components (retrieval hit rate, causal recall, temporal precision, policy compliance, dedup F1, provenance completeness, context relevance, NER F1 proxy); SES ≥ 0.70 overall, ≥ 0.60 per domain (lending, healthcare, legal, HR); regression floor ≥ 0.50.
-  - **Final result: 142 passed, 32 skipped, 0 failed** across all 20 tracks.
+  - **Semantic Layer Pillar — Tracks 21–25** (Jaffle Shop governed metric fixtures; all tests use `ContextGraph` direct API; Track 22 is real-LLM gated):
+    - Track 21 — Semantic Metric Exactness: `ContextGraph` stores 8 Jaffle Shop governed metrics; NL query → canonical metric name resolution; alias resolution; dimension conformance (grain-aware); 6 tests, all passing.
+    - Track 22 — NL-to-Governed-Decision (real LLM, `SEMANTICA_REAL_LLM=1`): governed_decision_delta > 0.35 (semantic layer lifts LLM metric accuracy ≥ 35pp over baseline); semantic_hallucination_rate ≤ 0.05; skipped in normal CI.
+    - Track 23 — Metric-Graph Hybrid Reasoning: metric node + causal chain + policy nodes stored and traversed via BFS; `hybrid_recall ≥ 0.75`; `causal_root_accuracy ≥ 0.70`; `metric_policy_linkage_rate ≥ 0.90`; 6 tests, all passing.
+    - Track 24 — Governance Impact & Change Propagation: 8 before/after metric change records; 21-entry policy decision registry; `metric_change_impact_score ≥ 0.95` (GDPR/SOX auditability SLA); `decision_drift_rate ≤ 0.02` (production SLA); 4 tests passing, 1 skipped (VersionManager optional).
+    - Track 25 — Agentic Semantic Consistency: 5 multi-turn traces; detects silent metric definition drift across turns; `cross_turn_metric_consistency ≥ 0.90`; `threshold_stability_rate ≥ 0.95`; `trace_buildability_rate == 1.0`; 5 tests, all passing.
+  - **New fixtures** (`fixtures/semantic_layer/`): `jaffle_shop_metrics.json` (8 governed metrics, 15 NL queries, 8 conformance tests), `metric_change_pairs.json` (8 change records, 21-decision registry), `hybrid_metric_graph.json` (8 hybrid records with causal chains), `agentic_conversation_traces.json` (5 multi-turn traces).
+  - **Updated SES formula**: `SES_v2 = 0.7 × ContextGraphScore (Tracks 1–20) + 0.3 × SemanticLayerScore (Tracks 21–25)`; new composite baseline ≥ 0.72.
+  - **Final result: 163 passed, 33 skipped, 0 failed** across all 25 tracks.
   - **Bug fixes applied during implementation** (all found via review by @KaifAhmad1):
     - Removed `if False else 0.0` guard in stale injection test — rate now uses computed value.
     - `future_count` no longer discarded; feeds `future_injection_rate` directly.
