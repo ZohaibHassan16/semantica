@@ -443,12 +443,6 @@ class RelationExtractor:
                     if verbose_mode and method_name == "llm":
                         import sys
                         print(f"    [RelationExtractor] Processing with {method_name}...", flush=True, file=sys.stdout)
-                        print(f"    [RelationExtractor Debug] method_options keys: {list(method_options.keys())}", flush=True, file=sys.stdout)
-                        if "api_key" in method_options:
-                            masked = method_options["api_key"][:4] + "..." if method_options["api_key"] else "None"
-                            print(f"    [RelationExtractor Debug] api_key present: {masked}", flush=True, file=sys.stdout)
-                        else:
-                            print(f"    [RelationExtractor Debug] api_key NOT present", flush=True, file=sys.stdout)
                     
                     relations = method_func(text, entities, **method_options)
                     
