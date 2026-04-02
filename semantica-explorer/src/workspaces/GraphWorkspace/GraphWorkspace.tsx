@@ -1,138 +1,192 @@
 /**
  * src/workspaces/GraphWorkspace/GraphWorkspace.tsx
  */
-
 import { useState, useCallback } from "react";
 import { GraphCanvas } from "./GraphCanvas";
 import { useLoadGraph, useReloadGraph } from "./useLoadGraph";
 import { graph } from "../../store/graphStore";
 
-// ─── Node Properties Side Panel ────────────────────────────────────────────
+const HUD_CSS = `
+  .palantir-bg {
+    background: radial-gradient(ellipse at center, #0d1117 0%, #010409 100%);
+  }
+  .palantir-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(88, 166, 255, 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(88, 166, 255, 0.05) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 1;
+  }
+  .palantir-vignette {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, transparent 30%, rgba(1, 4, 9, 0.85) 100%);
+    pointer-events: none;
+    z-index: 2;
+  }
+  .glass-header {
+    background: linear-gradient(180deg, rgba(13,17,23,0.85) 0%, rgba(13,17,23,0) 100%);
+    border-bottom: 1px solid rgba(88,166,255,0.1);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+  .glass-hud {
+    background: linear-gradient(135deg, rgba(13,17,23,0.75), rgba(22,27,34,0.6));
+    backdrop-filter: blur(16px) saturate(1.2);
+    -webkit-backdrop-filter: blur(16px) saturate(1.2);
+    border-left: 1px solid rgba(88,166,255,0.2);
+    box-shadow: -8px 0 32px rgba(0,0,0,0.5), inset 1px 0 0 rgba(255,255,255,0.05);
+  }
+  .hud-scrollbar::-webkit-scrollbar { width: 4px; }
+  .hud-scrollbar::-webkit-scrollbar-track { background: transparent; }
+  .hud-scrollbar::-webkit-scrollbar-thumb { background: rgba(88, 166, 255, 0.3); border-radius: 4px; }
+`;
+
 function NodePanel({ nodeId }: { nodeId: string }) {
   if (!nodeId) {
     return (
-      <aside style={panelStyle}>
-        <p style={{ color: "#8b949e", fontSize: 13, marginTop: 20, textAlign: "center" }}>
-          Click a node to inspect its properties.
+      <div style={{ padding: "32px 24px", textAlign: "center" }}>
+        <p style={{ color: "#8b949e", fontSize: 14, margin: 0 }}>
+          Select a node to view details
         </p>
-      </aside>
+      </div>
     );
   }
 
-  // Read directly from the graphology singleton! 
-  // We NEVER put the 50k nodes into React state to do this lookup.
   const attrs = graph.getNodeAttributes(nodeId);
 
   return (
-    <aside style={panelStyle}>
-      <h3 style={{ margin: "0 0 12px", color: "#e6edf3", fontSize: 16 }}>
-        {String(attrs?.label ?? nodeId)}
-      </h3>
-      
-      <div style={{ marginBottom: 16 }}>
-        <span style={{ 
-          background: attrs?.color || "#6c8ebf", 
-          color: "#fff", 
-          padding: "2px 8px", 
-          borderRadius: 12, 
-          fontSize: 11, 
-          fontWeight: "bold" 
-        }}>
-          {attrs?.nodeType || "Entity"}
-        </span>
+    <aside style={{ padding: 24 }}>
+      <div style={{ borderBottom: "1px solid rgba(88, 166, 255, 0.2)", paddingBottom: 16, marginBottom: 20 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
+          <span style={{ 
+            background: attrs?.color || "#6c8ebf", 
+            boxShadow: `0 0 10px ${attrs?.color || "#6c8ebf"}`,
+            width: 8, height: 8, borderRadius: "50%", display: "inline-block" 
+          }} />
+          <span style={{ color: attrs?.color || "#6c8ebf", fontSize: 12, fontWeight: 600 }}>
+            {attrs?.nodeType || "Entity"}
+          </span>
+        </div>
+        <h3 style={{ margin: 0, color: "#ffffff", fontSize: 20, fontWeight: 600 }}>
+          {String(attrs?.label ?? nodeId)}
+        </h3>
       </div>
 
-      <table style={{ width: "100%", fontSize: 12, borderCollapse: "collapse" }}>
-        <tbody>
-          {/* Render standard attributes safely */}
-          {Object.entries(attrs?.properties || {}).map(([k, v]) => (
-            <tr key={k} style={{ borderBottom: "1px solid #21262d" }}>
-              <td style={{ color: "#8b949e", padding: "6px 8px 6px 0", fontWeight: 600 }}>{k}</td>
-              <td style={{ color: "#e6edf3", padding: "6px 0", wordBreak: "break-word" }}>
-                {typeof v === "object" ? JSON.stringify(v) : String(v)}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        {Object.entries(attrs?.properties || {}).map(([k, v]) => (
+          <div key={k} style={{ background: "rgba(0,0,0,0.2)", padding: "10px 14px", borderRadius: 6, border: "1px solid rgba(255,255,255,0.05)" }}>
+            <div style={{ color: "rgba(88, 166, 255, 0.7)", fontSize: 11, marginBottom: 4 }}>
+              {k}
+            </div>
+            <div style={{ color: "#e6edf3", fontSize: 13, fontFamily: "monospace", wordBreak: "break-word" }}>
+              {typeof v === "object" ? JSON.stringify(v) : String(v)}
+            </div>
+          </div>
+        ))}
+      </div>
     </aside>
   );
 }
 
-// ─── Main Workspace Component ──────────────────────────────────────────────
 export function GraphWorkspace() {
-  // THE ONLY REACT STATE FOR THE GRAPH
   const [selectedNodeId, setSelectedNodeId] = useState<string>("");
   const [isLayoutRunning, setIsLayoutRunning] = useState(false);
-
   const reload = useReloadGraph();
 
-  // Stable callback to prevent unnecessary re-renders
   const handleNodeClick = useCallback((nodeId: string) => {
     setSelectedNodeId(nodeId);
   }, []);
 
-  // Fetch data into the mutable singleton
   const { data: summary, isLoading, isError, error } = useLoadGraph({
     enabled: true,
     onGraphReady: () => {
-      // Auto-start the ForceAtlas2 layout once data finishes downloading
       setIsLayoutRunning(true);
     },
   });
 
   return (
-    <div style={rootStyle}>
-      {/* ── Toolbar ─────────────────────────────────────────────────── */}
-      <header style={headerStyle}>
-        <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
-          <h2 style={{ margin: 0, fontSize: 16, color: "#e6edf3" }}>Graph Explorer</h2>
-          
-          {isLoading && <span style={{ color: "#8b949e", fontSize: 13 }}>Fetching graph data...</span>}
-          {summary && (
-            <span style={{ color: "#8b949e", fontSize: 13 }}>
-              {summary.nodeCount.toLocaleString()} nodes · {summary.edgeCount.toLocaleString()} edges
-            </span>
-          )}
-          {isError && (
-            <span style={{ color: "#f85149", fontSize: 13 }}>Error: {(error as Error).message}</span>
-          )}
-        </div>
 
-        <div style={{ display: "flex", gap: 8 }}>
-          <button
-            onClick={() => setIsLayoutRunning((v) => !v)}
-            style={btnStyle(isLayoutRunning ? "#388bfd" : "#21262d", isLayoutRunning ? "#fff" : "#e6edf3")}
-            disabled={isLoading}
-          >
-            {isLayoutRunning ? "⏸ Pause Layout" : "▶ Run Layout"}
-          </button>
-          <button onClick={reload} style={btnStyle("#21262d", "#e6edf3")} disabled={isLoading}>
-            ↺ Reload Graph
-          </button>
-        </div>
-      </header>
+    <div className="palantir-bg" style={{ position: "relative", width: "100%", height: "100%", overflow: "hidden" }}>
+      <style>{HUD_CSS}</style>
 
-      {/* ── Main Layout ──────────────────────────────────────────────── */}
-      <main style={mainStyle}>
-        {/* WebGL Canvas Area */}
-        <div style={{ flex: 1, minWidth: 0, height: "100%", position: "relative" }}>
-          <GraphCanvas
-            onNodeClick={handleNodeClick}
-            isLayoutRunning={isLayoutRunning}
-          />
-        </div>
+      <div className="palantir-grid" />
+      <div className="palantir-vignette" />
 
-        {/* Right Side Panel */}
-        <NodePanel nodeId={selectedNodeId} />
-      </main>
+      <div style={{ position: "absolute", inset: 0, zIndex: 3 }}>
+        <GraphCanvas
+          onNodeClick={handleNodeClick}
+          selectedNodeId={selectedNodeId}
+          isLayoutRunning={isLayoutRunning}
+        />
+      </div>
+
+      <div style={{ position: "absolute", inset: 0, pointerEvents: "none", zIndex: 10 }}>
+        
+        <header className="glass-header" style={{ pointerEvents: "auto", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 24px" }}>
+          <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
+            <h2 style={{ margin: 0, fontSize: 18, color: "#ffffff", fontWeight: 600 }}>Graph Explorer</h2>
+            
+            {isLoading && <span style={{ color: "rgba(88,166,255,0.8)", fontSize: 13 }}>Loading data...</span>}
+            {summary && (
+              <span style={{ background: "rgba(88,166,255,0.1)", color: "#58a6ff", padding: "4px 10px", borderRadius: 4, fontSize: 12, border: "1px solid rgba(88,166,255,0.2)" }}>
+                {summary.nodeCount.toLocaleString()} nodes · {summary.edgeCount.toLocaleString()} edges
+              </span>
+            )}
+            {isError && (
+              <span style={{ color: "#ff7b72", fontSize: 13 }}>Error: {(error as Error).message}</span>
+            )}
+          </div>
+
+          <div style={{ display: "flex", gap: 12 }}>
+            <button
+              onClick={() => setIsLayoutRunning((v) => !v)}
+              style={btnStyle(isLayoutRunning ? "rgba(56, 139, 253, 0.15)" : "rgba(255,255,255,0.05)", isLayoutRunning ? "#58a6ff" : "#e6edf3")}
+              disabled={isLoading}
+            >
+              <span style={{ display: "inline-block", width: 8, height: 8, borderRadius: "50%", background: isLayoutRunning ? "#58a6ff" : "#8b949e", marginRight: 8 }} />
+              {isLayoutRunning ? "Pause Layout" : "Run Layout"}
+            </button>
+            <button onClick={reload} style={btnStyle("rgba(255,255,255,0.05)", "#e6edf3")} disabled={isLoading}>
+              ↺ Reload
+            </button>
+          </div>
+        </header>
+
+        <div 
+          className="glass-hud hud-scrollbar" 
+          style={{ 
+            pointerEvents: "auto", 
+            position: "absolute", 
+            right: 0, 
+            top: 60, 
+            bottom: 0, 
+            width: 360, 
+            overflowY: "auto",
+            transition: "transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
+            transform: selectedNodeId ? "translateX(0)" : "translateX(100%)"
+          }}
+        >
+          <NodePanel nodeId={selectedNodeId} />
+        </div>
+        
+      </div>
     </div>
   );
 }
 
-// ─── Inline Styles ──────────────────────────────────────────────────────────
-const rootStyle: React.CSSProperties = { display: "flex", flexDirection: "column", width: "100%", height: "100%", background: "#0d1117", overflow: "hidden" };
-const headerStyle: React.CSSProperties = { display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 16px", background: "#161b22", borderBottom: "1px solid #30363d", flexShrink: 0 };
-const mainStyle: React.CSSProperties = { display: "flex", flex: 1, overflow: "hidden" };
-const panelStyle: React.CSSProperties = { width: 320, flexShrink: 0, background: "#161b22", borderLeft: "1px solid #30363d", padding: 16, overflowY: "auto" };
-const btnStyle = (bg: string, color: string): React.CSSProperties => ({ background: bg, color, border: "1px solid #30363d", borderRadius: 6, padding: "6px 14px", cursor: "pointer", fontSize: 13, transition: "all 0.15s", fontWeight: 500 });
+const btnStyle = (bg: string, color: string): React.CSSProperties => ({ 
+  background: bg, 
+  color, 
+  border: "1px solid rgba(255,255,255,0.1)", 
+  borderRadius: 4, 
+  padding: "8px 16px", 
+  cursor: "pointer", 
+  fontSize: 13, 
+  fontWeight: 500,
+  transition: "all 0.2s",
+  backdropFilter: "blur(4px)"
+});

@@ -1,7 +1,30 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-// ADDED 'graph' to the import below so we can check node existence
 import { batchMergeEdges, batchMergeNodes, clearGraph, graph } from "../../store/graphStore";
 import type { EdgeAttributes, NodeAttributes } from "../../store/graphStore";
+
+// colors and hasher
+const CYBER_PALETTE = [
+  "#58a6ff", 
+  "#3fb950", 
+  "#d2a8ff", 
+  "#f0883e", 
+  "#ff7b72", 
+  "#79c0ff", 
+  "#d29922", 
+  "#bc8cff", 
+  "#56d364", 
+  "#f778ba"  
+];
+
+
+const hashCategory = (str: string): number => {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = (hash << 5) - hash + str.charCodeAt(i);
+    hash |= 0; 
+  }
+  return Math.abs(hash);
+};
 
 interface ApiNode {
   id: string;
@@ -71,8 +94,6 @@ async function fetchAllNodes(signal: AbortSignal): Promise<number> {
     const nodesToMerge = data.nodes.map((n) => {
       const x = n.properties?.x ?? (Math.random() * 1000 - 500);
       const y = n.properties?.y ?? (Math.random() * 1000 - 500);
-      const size = n.properties?.size ?? 5;
-      const color = n.properties?.color ?? "#6c8ebf";
 
       return {
         id: n.id,
@@ -80,8 +101,6 @@ async function fetchAllNodes(signal: AbortSignal): Promise<number> {
           label: n.content || n.id,
           x,
           y,
-          size,
-          color,
           nodeType: n.type,
           content: n.content,
           valid_from: n.valid_from,
@@ -136,7 +155,6 @@ async function fetchAllEdges(signal: AbortSignal): Promise<number> {
       return graph.hasNode(e.source) && graph.hasNode(e.target);
     });
 
-    // FIXED: Map over `validEdges` instead of `data.edges`
     const edgesToMerge = validEdges.map((e) => ({
       source: e.source,
       target: e.target,
@@ -191,6 +209,33 @@ export function useLoadGraph(options: UseLoadGraphOptions = {}) {
 
       const nodeCount = await fetchAllNodes(signal);
       const edgeCount = await fetchAllEdges(signal);
+
+      // Sizing and color mapper
+      const maxDegree = graph.nodes().reduce((max, node) => Math.max(max, graph.degree(node)), 1);
+
+      graph.updateEachNodeAttributes((node, attr) => {
+        const categoryStr = String(attr.nodeType || attr.properties?.community || attr.properties?.category || "default");
+        const colorIndex = hashCategory(categoryStr) % CYBER_PALETTE.length;
+        
+       
+        const degree = graph.degree(node);
+        const minSize = 2;  
+        const maxSize = 25; 
+        
+        // Flatten the power low curve to prevent giant graphs
+        // from consuming the screen
+
+        const sizeRatio = Math.log(degree + 1) / Math.log(maxDegree + 1);
+        const dynamicSize = minSize + (maxSize - minSize) * sizeRatio;
+
+        return {
+          ...attr,
+          color: CYBER_PALETTE[colorIndex],
+          size: dynamicSize,
+          borderColor: "#0d1117", 
+          borderSize: 0.5,
+        };
+      });
 
       const summary: GraphLoadSummary = {
         nodeCount,

@@ -1,13 +1,14 @@
 /**
  * src/workspaces/GraphWorkspace/GraphCanvas.tsx
  */
-import { useEffect, useRef, useCallback } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import Sigma from "sigma";
 import FA2Layout from "graphology-layout-forceatlas2/worker";
 import { graph } from "../../store/graphStore";
 
 export interface GraphCanvasProps {
   onNodeClick: (nodeId: string) => void;
+  selectedNodeId: string; 
   isLayoutRunning: boolean;
   className?: string;
 }
@@ -32,11 +33,13 @@ const SIGMA_SETTINGS = {
   webGLTarget: "webgl2" as const,
 };
 
-export function GraphCanvas({ onNodeClick, isLayoutRunning, className }: GraphCanvasProps) {
+export function GraphCanvas({ onNodeClick, selectedNodeId, isLayoutRunning, className }: GraphCanvasProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const sigmaRef = useRef<Sigma | null>(null);
   const fa2Ref = useRef<FA2Layout | null>(null);
 
+
+  const [hoveredNode, setHoveredNode] = useState<string | null>(null);
   useEffect(() => {
     if (!containerRef.current || sigmaRef.current) return;
 
@@ -49,20 +52,19 @@ export function GraphCanvas({ onNodeClick, isLayoutRunning, className }: GraphCa
       }
     });
     resizeObserver.observe(containerRef.current);
-  
 
+    // Click Events
     sigma.on("clickNode", ({ node }) => {
       onNodeClick(node);
-      graph.setNodeAttribute(node, "highlighted", true);
-      graph.forEachNode((n) => {
-        if (n !== node) graph.setNodeAttribute(n, "highlighted", false);
-      });
     });
 
     sigma.on("clickStage", () => {
       onNodeClick("");
-      graph.forEachNode((n) => graph.setNodeAttribute(n, "highlighted", false));
     });
+
+    // Hover Events
+    sigma.on("enterNode", ({ node }) => setHoveredNode(node));
+    sigma.on("leaveNode", () => setHoveredNode(null));
 
     return () => {
       resizeObserver.disconnect();
@@ -70,6 +72,75 @@ export function GraphCanvas({ onNodeClick, isLayoutRunning, className }: GraphCa
       sigmaRef.current = null;
     };
   }, [onNodeClick]);
+
+
+
+  useEffect(() => {
+    const sigma = sigmaRef.current;
+    if (!sigma) return;
+
+  
+    const activeNode = hoveredNode || selectedNodeId;
+    
+
+    const isValidActiveNode = activeNode && graph.hasNode(activeNode);
+    
+   
+    const activeNeighbors = isValidActiveNode ? new Set(graph.neighbors(activeNode)) : new Set();
+
+    if (!isValidActiveNode) {
+     
+      sigma.setSetting("nodeReducer", undefined);
+      
+      sigma.setSetting("edgeReducer", (edge, data) => ({
+        ...data,
+        color: "#161b22",
+        size: Math.max(0.5, (data.size || 1) * 0.5),
+        zIndex: 0,
+      }));
+    } else {
+      sigma.setSetting("nodeReducer", (node, data) => {
+        const isFocused = node === activeNode;
+        const isNeighbor = activeNeighbors.has(node);
+
+        if (isFocused || isNeighbor) {
+          return {
+            ...data,
+            zIndex: isFocused ? 2 : 1,
+            borderColor: isFocused ? "#ffffff" : data.borderColor,
+            borderSize: isFocused ? 2 : data.borderSize,
+          };
+        }
+
+        // Mute all other nodes into the background
+        return {
+          ...data,
+          color: "#1c2128", 
+          borderColor: "#0d1117",
+          label: "",
+          zIndex: 0,
+        };
+      });
+
+      sigma.setSetting("edgeReducer", (edge, data) => {
+
+        if (graph.hasExtremity(edge, activeNode)) {
+          return {
+            ...data,
+            color: "#58a6ff",
+            size: (data.size || 1) * 2, 
+            zIndex: 1,
+          };
+        }
+      
+        return { ...data, hidden: true };
+      });
+    }
+
+    sigma.refresh();
+  }, [hoveredNode, selectedNodeId]); 
+
+
 
   useEffect(() => {
     if (isLayoutRunning) {
@@ -87,17 +158,18 @@ export function GraphCanvas({ onNodeClick, isLayoutRunning, className }: GraphCa
     };
   }, [isLayoutRunning]);
 
+
   const handleFitView = useCallback(() => {
     sigmaRef.current?.getCamera().animatedReset({ duration: 500 });
   }, []);
 
   return (
     <div style={{ position: "relative", width: "100%", height: "100%" }}>
-      <div ref={containerRef} className={className} style={{ width: "100%", height: "100%", background: "#0d1117" }} />
+      <div ref={containerRef} className={className} style={{ width: "100%", height: "100%", background: "transparent" }} />
       <button
         onClick={handleFitView}
         style={{
-          position: "absolute", bottom: 16, right: 16, padding: "8px 16px",
+          position: "absolute", bottom: 24, left: 24, padding: "8px 16px", 
           background: "#1f6feb", color: "#fff", border: "none", borderRadius: 6,
           cursor: "pointer", fontWeight: 600, zIndex: 10,
         }}
