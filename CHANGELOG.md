@@ -7,6 +7,52 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- **Context Graph Effectiveness Benchmark Suite — 20 Tracks** (PR #418 by @ZohaibHassan16, extended by @KaifAhmad1):
+  - **Infrastructure**: `benchmarks/context_graph_effectiveness/` with `conftest.py` (session-scoped dataset fixtures for 28 real-world corpora), `thresholds.py` (54 evidence-based pass/fail thresholds with `check_thresholds()` CI helper), `benchmarks_runner.py` extended with `--effectiveness` flag running the full suite as plain pytest.
+  - **28 real-world fixture datasets** committed under `benchmarks/context_graph_effectiveness/fixtures/` — zero network access at test time:
+    - Decision intelligence: German Credit (200), IBM HR Attrition (300), CUAD legal (100), TREC Clinical Trials 2022 (50), LEDGAR (100), Credit Risk (200), HR Promotion (300), `decision_intelligence_dataset.json` (60 cross-domain records with boundary/conflicting/overturned-precedent/no-policy record types).
+    - Retrieval: MetaQA 1/2/3-hop (450 total), WebQSP (200), `retrieval_eval_dataset.json` (70 labelled queries with `relevant_node_ids` / `irrelevant_node_ids`).
+    - Causal: ATOMIC 500 cause-effect pairs (CC BY 4.0), e-CARE 200 causal QA records.
+    - Temporal: TimeQA 150 temporal Q&A pairs.
+    - Provenance: FEVER 200 claim+evidence pairs (CC BY 4.0).
+    - Deduplication: DBLP-ACM 2,224 gold pairs, Amazon-Google 1,300 pairs, Abt-Buy 1,076 pairs (all Magellan/Leipzig, research open).
+    - NLP extraction: CoNLL-2003 NER 50 sentences, ACE 2005 RE+Event 60 sentences.
+    - Multi-hop QA: HotpotQA 30 records (CC BY SA 4.0), 2WikiMultihopQA 15 records (Apache 2.0).
+    - Commonsense reasoning: COPA 30 pairs (BSD), WIQA 20 what-if process chains.
+    - Knowledge graph triples: WN18RR ~100 triples (WordNet), FB15k-237 ~85 triples (Freebase, CC BY 4.0).
+  - **20 test tracks — all metrics computed from live API calls, no hardcoded values**:
+    - Track 1 — Core Graph Retrieval: `ContextRetriever` on MetaQA/WebQSP; Hit@1, 2/3-hop recall, MRR, citation groundedness; hybrid alpha sweep ($\alpha=0.5$ best); thresholds anchored to published KG-RAG baselines.
+    - Track 2 — Decision Quality *(real LLM, gated)*: `AgentContext` on 60-record cross-domain dataset; `decision_accuracy_delta` and `hallucination_rate_delta` both must be > 0; lightweight regex NER cross-referenced against injected context for hallucination detection; `claude-haiku-4-5` via `SEMANTICA_REAL_LLM=1`.
+    - Track 3 — Causal Chain Quality: `CausalChainAnalyzer` on ATOMIC+e-CARE; recall ≥ 0.80, precision ≥ 0.85; four topology tests (linear, diamond, branching, cycle).
+    - Track 4 — Decision Intelligence: `PolicyEngine` compliance evaluation; `policy_compliance_hit_rate` ≥ 0.90; causal influence score ordering verified.
+    - Track 5 — Temporal Validity: `TemporalGraphRetriever`+`TemporalQueryRewriter` on TimeQA; stale/future injection rates < 0.05; temporal precision ≥ 0.90; rewriter accuracy ≥ 0.85 (16/19 intent types).
+    - Track 6 — KG Algorithm Quality: community NMI ≥ 0.80 (Louvain), link predictor AUC ≥ 0.70, semantic coherence delta > 0, hash-fallback stability == 1.0; embedding cosine normalised to [0,1] — tests updated accordingly.
+    - Track 7 — Reasoning Quality: Rete precision ≥ 0.95, all 13 Allen interval relations correctly classified, explanation completeness ≥ 0.90.
+    - Track 8 — Provenance Integrity: `ProvenanceTracker` on FEVER; 4-hop lineage completeness == 1.0 (manual `parent_entity_id` chain walk); checksum integrity == 1.0.
+    - Track 9 — Conflict Resolution: `ConflictDetector`+`ConflictResolver` on value/type/temporal/logical conflicts; recall ≥ 0.85, precision ≥ 0.90; VOTING/HIGHEST_CONFIDENCE/MOST_RECENT strategies verified.
+    - Track 10 — Deduplication Quality: `SimilarityCalculator.calculate_similarity()` pair-wise on DBLP-ACM/Amazon-Google/Abt-Buy gold pairs; F1 ≥ 0.85; threshold anchored to DeepMatcher published score of 0.98.
+    - Track 11 — Embedding Quality: `NodeEmbedder`, `GraphEmbeddingManager`; semantic coherence delta > 0, hash-fallback stable, batch/single consistency < 0.01.
+    - Track 12 — Change Management: `VersionManager`; snapshot fidelity == 1.0, version diff correctness == 1.0, 50-snapshot overhead < 5 s.
+    - Track 13 — Skill Injection *(real LLM, gated)*: 6 skill types (temporal, causal, policy, precedent, uncertainty, escalation); activation rate ≥ 0.70 detected via regex patterns in LLM output.
+    - Track 14 — Semantic Extraction: `NERExtractor(method="pattern")` on CoNLL-2003; entity-span F1 (overlap matching) ≥ 0.60; `RelationExtractor` entity-pair detection ≥ 0.60; event detection recall ≥ 0.65; KG triplet node-addition accuracy ≥ 0.70.
+    - Track 15 — Context Quality Metrics: CRS ≥ 0.70, CNR < 0.30, SCR ≥ 2.0 (signal-to-context ratio), redundancy score ≥ 0.80; monotonicity invariant verified structurally.
+    - Track 16 — Graph Structural Integrity: WN18RR/FB15k-237 triple retrieval ≥ 0.95, relation type coverage ≥ 0.90; integrity invariants: no dangling edges, temporal consistency, cycle detection, contradiction detection.
+    - Track 17 — Extended Multi-hop: HotpotQA bridge recall ≥ 0.65, comparison recall ≥ 0.70; 2WikiMultihop 4-hop chain recall ≥ 0.60; all tests use direct BFS via `get_neighbor_ids()` (not `ContextRetriever`).
+    - Track 18 — Abductive & Deductive Reasoning: COPA `find_explanations()` coverage ≥ 0.60/0.55 (cause/effect); WIQA Rete deductive chain recall ≥ 0.65.
+    - Track 19 — Entity Linking & Graph Validation: `EntityResolver` fuzzy precision ≥ 0.80, recall ≥ 0.75; `GraphValidator` false-positive rate < 0.05.
+    - Track 20 — Composite SES Score: Semantica Effectiveness Score = mean of 8 live components (retrieval hit rate, causal recall, temporal precision, policy compliance, dedup F1, provenance completeness, context relevance, NER F1 proxy); SES ≥ 0.70 overall, ≥ 0.60 per domain (lending, healthcare, legal, HR); regression floor ≥ 0.50.
+  - **Final result: 142 passed, 32 skipped, 0 failed** across all 20 tracks.
+  - **Bug fixes applied during implementation** (all found via review by @KaifAhmad1):
+    - Removed `if False else 0.0` guard in stale injection test — rate now uses computed value.
+    - `future_count` no longer discarded; feeds `future_injection_rate` directly.
+    - Causal recall/precision computed from `retrieved_ancestors ∩ true_ancestors` sets, not hardcoded 1.0.
+    - `multi_source_boost` reads actual scores from `_rank_and_merge` return value.
+    - Silent `if embedder: assert ...` vacuous passes replaced with `pytest.skip()`.
+    - `hybrid_similarity.py`: scipy imports wrapped in `try/except` with numpy fallbacks — fixes Windows 11 import cascade that caused `ContextGraph` to fail everywhere.
+  - **Documentation**:
+    - `benchmarks/benchmarks.md` — complete rewrite with LaTeX metric formulas, theoretical background per track, dataset provenance with conference citations, research paper reporting guidance, comparison table against published baselines (DeepMatcher, KG-RAG, MetaQA, DPR, TimeQA, Louvain), and ablation study design for decision intelligence.
+    - `benchmarks/benchmark_results.md` — updated with genuine measured results for all 20 tracks; per-track metric tables, threshold rationale, and key implementation notes.
+
 - **Security: CodeQL Alert Remediation** (PR by @KaifAhmad1, branch `security-enhancement`):
   - **Clear-text logging of sensitive information** (#6, #7 — CWE-312/359/532): Removed debug `print` blocks in `semantica/semantic_extract/relation_extractor.py` and `semantica/semantic_extract/triplet_extractor.py` that accessed and logged `method_options["api_key"]` (even partially masked). No sensitive data is now written to stdout in verbose mode.
   - **Incomplete URL substring sanitization** (#8 — CWE-20): Replaced `"http://a.com" in urls` in `tests/ingest/test_web_ingestor.py` with `any(url == "http://a.com" for url in urls)` — explicit exact equality per element, eliminating the ambiguous substring check that could match attacker-controlled URLs at arbitrary positions.
