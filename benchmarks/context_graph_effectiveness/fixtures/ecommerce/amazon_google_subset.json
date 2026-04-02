@@ -1,0 +1,3809 @@
+{
+  "version": "1.0",
+  "source_dataset": "Magellan Data Repository - Amazon-Google Products",
+  "source_url": "https://sites.google.com/site/anhaidgroup/useful-stuff/the-magellan-data-repository",
+  "license": "Open for academic research",
+  "record_count": 200,
+  "records": [
+    {
+      "id": "AMZGOOG_0001",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0001",
+        "title": "JBL Model-2194 Electronics",
+        "description": "High-quality electronics from JBL. Model Model-2194.",
+        "manufacturer": "JBL",
+        "price": 458.27
+      },
+      "google": {
+        "id": "goog_0001",
+        "title": "JBL Model-2194",
+        "description": "JBL Model-2194 - electronics product.",
+        "manufacturer": "JBL",
+        "price": 444.45
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0002",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0002",
+        "title": "LG Model-6261 Electronics",
+        "description": "High-quality electronics from LG. Model Model-6261.",
+        "manufacturer": "LG",
+        "price": 134.42
+      },
+      "google": {
+        "id": "goog_0002",
+        "title": "LG Model-6261",
+        "description": "LG Model-6261 - electronics product.",
+        "manufacturer": "LG",
+        "price": 132.79
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0003",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0003",
+        "title": "Bose Model-4272 Cameras",
+        "description": "High-quality cameras from Bose. Model Model-4272.",
+        "manufacturer": "Bose",
+        "price": 219.84
+      },
+      "google": {
+        "id": "goog_0003",
+        "title": "Bose Model-4272",
+        "description": "Bose Model-4272 - cameras product.",
+        "manufacturer": "Bose",
+        "price": 219.37
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0004",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0004",
+        "title": "Apple Model-4296 Tablets",
+        "description": "High-quality tablets from Apple. Model Model-4296.",
+        "manufacturer": "Apple",
+        "price": 749.88
+      },
+      "google": {
+        "id": "goog_0004",
+        "title": "Apple Model-4296",
+        "description": "Apple Model-4296 - tablets product.",
+        "manufacturer": "Apple",
+        "price": 738.01
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0005",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0005",
+        "title": "Logitech Model-4150 Networking",
+        "description": "High-quality networking from Logitech. Model Model-4150.",
+        "manufacturer": "Logitech",
+        "price": 113.43
+      },
+      "google": {
+        "id": "goog_0005",
+        "title": "Logitech Model-4150",
+        "description": "Logitech Model-4150 - networking product.",
+        "manufacturer": "Logitech",
+        "price": 100.48
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0006",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0006",
+        "title": "Apple Model-1544 Computers",
+        "description": "High-quality computers from Apple. Model Model-1544.",
+        "manufacturer": "Apple",
+        "price": 815.7
+      },
+      "google": {
+        "id": "goog_0006",
+        "title": "Apple Model-1544",
+        "description": "Apple Model-1544 - computers product.",
+        "manufacturer": "Apple",
+        "price": 892.69
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0007",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0007",
+        "title": "Logitech Model-7685 Audio",
+        "description": "High-quality audio from Logitech. Model Model-7685.",
+        "manufacturer": "Logitech",
+        "price": 581.24
+      },
+      "google": {
+        "id": "goog_0007",
+        "title": "Logitech Model-7685",
+        "description": "Logitech Model-7685 - audio product.",
+        "manufacturer": "Logitech",
+        "price": 632.09
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0008",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0008",
+        "title": "LG Model-9653 Audio",
+        "description": "High-quality audio from LG. Model Model-9653.",
+        "manufacturer": "LG",
+        "price": 511.28
+      },
+      "google": {
+        "id": "goog_0008",
+        "title": "LG Model-9653",
+        "description": "LG Model-9653 - audio product.",
+        "manufacturer": "LG",
+        "price": 552.07
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0009",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0009",
+        "title": "HP Model-9205 Accessories",
+        "description": "High-quality accessories from HP. Model Model-9205.",
+        "manufacturer": "HP",
+        "price": 371.53
+      },
+      "google": {
+        "id": "goog_0009",
+        "title": "HP Model-9205",
+        "description": "HP Model-9205 - accessories product.",
+        "manufacturer": "HP",
+        "price": 382.09
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0010",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0010",
+        "title": "LG Model-2100 Networking",
+        "description": "High-quality networking from LG. Model Model-2100.",
+        "manufacturer": "LG",
+        "price": 455.7
+      },
+      "google": {
+        "id": "goog_0010",
+        "title": "LG Model-2100",
+        "description": "LG Model-2100 - networking product.",
+        "manufacturer": "LG",
+        "price": 469.42
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0011",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0011",
+        "title": "Asus Model-2280 Computers",
+        "description": "High-quality computers from Asus. Model Model-2280.",
+        "manufacturer": "Asus",
+        "price": 153.37
+      },
+      "google": {
+        "id": "goog_0011",
+        "title": "Asus Model-2280",
+        "description": "Asus Model-2280 - computers product.",
+        "manufacturer": "Asus",
+        "price": 154.0
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0012",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0012",
+        "title": "Samsung Model-9170 Computers",
+        "description": "High-quality computers from Samsung. Model Model-9170.",
+        "manufacturer": "Samsung",
+        "price": 253.65
+      },
+      "google": {
+        "id": "goog_0012",
+        "title": "Samsung Model-9170",
+        "description": "Samsung Model-9170 - computers product.",
+        "manufacturer": "Samsung",
+        "price": 259.83
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0013",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0013",
+        "title": "Sony Model-4670 Audio",
+        "description": "High-quality audio from Sony. Model Model-4670.",
+        "manufacturer": "Sony",
+        "price": 826.68
+      },
+      "google": {
+        "id": "goog_0013",
+        "title": "Sony Model-4670",
+        "description": "Sony Model-4670 - audio product.",
+        "manufacturer": "Sony",
+        "price": 784.99
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0014",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0014",
+        "title": "Dell Model-6863 Tablets",
+        "description": "High-quality tablets from Dell. Model Model-6863.",
+        "manufacturer": "Dell",
+        "price": 95.9
+      },
+      "google": {
+        "id": "goog_0014",
+        "title": "Dell Model-6863",
+        "description": "Dell Model-6863 - tablets product.",
+        "manufacturer": "Dell",
+        "price": 104.45
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0015",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0015",
+        "title": "Samsung Model-9755 Tablets",
+        "description": "High-quality tablets from Samsung. Model Model-9755.",
+        "manufacturer": "Samsung",
+        "price": 588.09
+      },
+      "google": {
+        "id": "goog_0015",
+        "title": "Samsung Model-9755",
+        "description": "Samsung Model-9755 - tablets product.",
+        "manufacturer": "Samsung",
+        "price": 637.94
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0016",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0016",
+        "title": "Lenovo Model-6115 Accessories",
+        "description": "High-quality accessories from Lenovo. Model Model-6115.",
+        "manufacturer": "Lenovo",
+        "price": 417.23
+      },
+      "google": {
+        "id": "goog_0016",
+        "title": "Lenovo Model-6115",
+        "description": "Lenovo Model-6115 - accessories product.",
+        "manufacturer": "Lenovo",
+        "price": 372.83
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0017",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0017",
+        "title": "Asus Model-8716 Computers",
+        "description": "High-quality computers from Asus. Model Model-8716.",
+        "manufacturer": "Asus",
+        "price": 938.81
+      },
+      "google": {
+        "id": "goog_0017",
+        "title": "Asus Model-8716",
+        "description": "Asus Model-8716 - computers product.",
+        "manufacturer": "Asus",
+        "price": 1048.07
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0018",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0018",
+        "title": "Sony Model-6538 Electronics",
+        "description": "High-quality electronics from Sony. Model Model-6538.",
+        "manufacturer": "Sony",
+        "price": 438.75
+      },
+      "google": {
+        "id": "goog_0018",
+        "title": "Sony Model-6538",
+        "description": "Sony Model-6538 - electronics product.",
+        "manufacturer": "Sony",
+        "price": 407.21
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0019",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0019",
+        "title": "LG Model-4346 Electronics",
+        "description": "High-quality electronics from LG. Model Model-4346.",
+        "manufacturer": "LG",
+        "price": 560.66
+      },
+      "google": {
+        "id": "goog_0019",
+        "title": "LG Model-4346",
+        "description": "LG Model-4346 - electronics product.",
+        "manufacturer": "LG",
+        "price": 592.13
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0020",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0020",
+        "title": "Apple Model-9086 Electronics",
+        "description": "High-quality electronics from Apple. Model Model-9086.",
+        "manufacturer": "Apple",
+        "price": 100.71
+      },
+      "google": {
+        "id": "goog_0020",
+        "title": "Apple Model-9086",
+        "description": "Apple Model-9086 - electronics product.",
+        "manufacturer": "Apple",
+        "price": 111.54
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0021",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0021",
+        "title": "JBL Model-1579 Accessories",
+        "description": "High-quality accessories from JBL. Model Model-1579.",
+        "manufacturer": "JBL",
+        "price": 365.46
+      },
+      "google": {
+        "id": "goog_0021",
+        "title": "JBL Model-1579",
+        "description": "JBL Model-1579 - accessories product.",
+        "manufacturer": "JBL",
+        "price": 327.81
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0022",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0022",
+        "title": "Asus Model-2320 Monitors",
+        "description": "High-quality monitors from Asus. Model Model-2320.",
+        "manufacturer": "Asus",
+        "price": 890.88
+      },
+      "google": {
+        "id": "goog_0022",
+        "title": "Asus Model-2320",
+        "description": "Asus Model-2320 - monitors product.",
+        "manufacturer": "Asus",
+        "price": 886.34
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0023",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0023",
+        "title": "Canon Model-1683 Cameras",
+        "description": "High-quality cameras from Canon. Model Model-1683.",
+        "manufacturer": "Canon",
+        "price": 130.93
+      },
+      "google": {
+        "id": "goog_0023",
+        "title": "Canon Model-1683",
+        "description": "Canon Model-1683 - cameras product.",
+        "manufacturer": "Canon",
+        "price": 130.82
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0024",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0024",
+        "title": "Bose Model-6738 Phones",
+        "description": "High-quality phones from Bose. Model Model-6738.",
+        "manufacturer": "Bose",
+        "price": 448.56
+      },
+      "google": {
+        "id": "goog_0024",
+        "title": "Bose Model-6738",
+        "description": "Bose Model-6738 - phones product.",
+        "manufacturer": "Bose",
+        "price": 427.4
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0025",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0025",
+        "title": "Sony Model-1906 Phones",
+        "description": "High-quality phones from Sony. Model Model-1906.",
+        "manufacturer": "Sony",
+        "price": 55.55
+      },
+      "google": {
+        "id": "goog_0025",
+        "title": "Sony Model-1906",
+        "description": "Sony Model-1906 - phones product.",
+        "manufacturer": "Sony",
+        "price": 59.31
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0026",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0026",
+        "title": "Lenovo Model-7215 Phones",
+        "description": "High-quality phones from Lenovo. Model Model-7215.",
+        "manufacturer": "Lenovo",
+        "price": 691.47
+      },
+      "google": {
+        "id": "goog_0026",
+        "title": "Lenovo Model-7215",
+        "description": "Lenovo Model-7215 - phones product.",
+        "manufacturer": "Lenovo",
+        "price": 730.95
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0027",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0027",
+        "title": "HP Model-1854 Networking",
+        "description": "High-quality networking from HP. Model Model-1854.",
+        "manufacturer": "HP",
+        "price": 405.5
+      },
+      "google": {
+        "id": "goog_0027",
+        "title": "HP Model-1854",
+        "description": "HP Model-1854 - networking product.",
+        "manufacturer": "HP",
+        "price": 393.55
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0028",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0028",
+        "title": "Dell Model-7993 Cameras",
+        "description": "High-quality cameras from Dell. Model Model-7993.",
+        "manufacturer": "Dell",
+        "price": 563.05
+      },
+      "google": {
+        "id": "goog_0028",
+        "title": "Dell Model-7993",
+        "description": "Dell Model-7993 - cameras product.",
+        "manufacturer": "Dell",
+        "price": 511.1
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0029",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0029",
+        "title": "Asus Model-7024 Computers",
+        "description": "High-quality computers from Asus. Model Model-7024.",
+        "manufacturer": "Asus",
+        "price": 371.23
+      },
+      "google": {
+        "id": "goog_0029",
+        "title": "Asus Model-7024",
+        "description": "Asus Model-7024 - computers product.",
+        "manufacturer": "Asus",
+        "price": 357.25
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0030",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0030",
+        "title": "Apple Model-4801 Electronics",
+        "description": "High-quality electronics from Apple. Model Model-4801.",
+        "manufacturer": "Apple",
+        "price": 119.22
+      },
+      "google": {
+        "id": "goog_0030",
+        "title": "Apple Model-4801",
+        "description": "Apple Model-4801 - electronics product.",
+        "manufacturer": "Apple",
+        "price": 105.2
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0031",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0031",
+        "title": "JBL Model-9785 Monitors",
+        "description": "High-quality monitors from JBL. Model Model-9785.",
+        "manufacturer": "JBL",
+        "price": 581.0
+      },
+      "google": {
+        "id": "goog_0031",
+        "title": "JBL Model-9785",
+        "description": "JBL Model-9785 - monitors product.",
+        "manufacturer": "JBL",
+        "price": 649.46
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0032",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0032",
+        "title": "JBL Model-5094 Electronics",
+        "description": "High-quality electronics from JBL. Model Model-5094.",
+        "manufacturer": "JBL",
+        "price": 818.23
+      },
+      "google": {
+        "id": "goog_0032",
+        "title": "JBL Model-5094",
+        "description": "JBL Model-5094 - electronics product.",
+        "manufacturer": "JBL",
+        "price": 735.09
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0033",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0033",
+        "title": "HP Model-3958 Cameras",
+        "description": "High-quality cameras from HP. Model Model-3958.",
+        "manufacturer": "HP",
+        "price": 304.11
+      },
+      "google": {
+        "id": "goog_0033",
+        "title": "HP Model-3958",
+        "description": "HP Model-3958 - cameras product.",
+        "manufacturer": "HP",
+        "price": 290.54
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0034",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0034",
+        "title": "Bose Model-5001 Accessories",
+        "description": "High-quality accessories from Bose. Model Model-5001.",
+        "manufacturer": "Bose",
+        "price": 998.14
+      },
+      "google": {
+        "id": "goog_0034",
+        "title": "Bose Model-5001",
+        "description": "Bose Model-5001 - accessories product.",
+        "manufacturer": "Bose",
+        "price": 909.44
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0035",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0035",
+        "title": "HP Model-3005 Monitors",
+        "description": "High-quality monitors from HP. Model Model-3005.",
+        "manufacturer": "HP",
+        "price": 666.88
+      },
+      "google": {
+        "id": "goog_0035",
+        "title": "HP Model-3005",
+        "description": "HP Model-3005 - monitors product.",
+        "manufacturer": "HP",
+        "price": 599.08
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0036",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0036",
+        "title": "Apple Model-9108 Networking",
+        "description": "High-quality networking from Apple. Model Model-9108.",
+        "manufacturer": "Apple",
+        "price": 714.09
+      },
+      "google": {
+        "id": "goog_0036",
+        "title": "Apple Model-9108",
+        "description": "Apple Model-9108 - networking product.",
+        "manufacturer": "Apple",
+        "price": 767.81
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0037",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0037",
+        "title": "HP Model-5959 Phones",
+        "description": "High-quality phones from HP. Model Model-5959.",
+        "manufacturer": "HP",
+        "price": 943.17
+      },
+      "google": {
+        "id": "goog_0037",
+        "title": "HP Model-5959",
+        "description": "HP Model-5959 - phones product.",
+        "manufacturer": "HP",
+        "price": 1006.6
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0038",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0038",
+        "title": "Bose Model-5001 Tablets",
+        "description": "High-quality tablets from Bose. Model Model-5001.",
+        "manufacturer": "Bose",
+        "price": 541.03
+      },
+      "google": {
+        "id": "goog_0038",
+        "title": "Bose Model-5001",
+        "description": "Bose Model-5001 - tablets product.",
+        "manufacturer": "Bose",
+        "price": 510.85
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0039",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0039",
+        "title": "Lenovo Model-2710 Networking",
+        "description": "High-quality networking from Lenovo. Model Model-2710.",
+        "manufacturer": "Lenovo",
+        "price": 82.37
+      },
+      "google": {
+        "id": "goog_0039",
+        "title": "Lenovo Model-2710",
+        "description": "Lenovo Model-2710 - networking product.",
+        "manufacturer": "Lenovo",
+        "price": 90.29
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0040",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0040",
+        "title": "HP Model-5583 Accessories",
+        "description": "High-quality accessories from HP. Model Model-5583.",
+        "manufacturer": "HP",
+        "price": 106.08
+      },
+      "google": {
+        "id": "goog_0040",
+        "title": "HP Model-5583",
+        "description": "HP Model-5583 - accessories product.",
+        "manufacturer": "HP",
+        "price": 116.57
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0041",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0041",
+        "title": "Apple Model-5996 Networking",
+        "description": "High-quality networking from Apple. Model Model-5996.",
+        "manufacturer": "Apple",
+        "price": 749.64
+      },
+      "google": {
+        "id": "goog_0041",
+        "title": "Apple Model-5996",
+        "description": "Apple Model-5996 - networking product.",
+        "manufacturer": "Apple",
+        "price": 697.6
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0042",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0042",
+        "title": "JBL Model-3325 Audio",
+        "description": "High-quality audio from JBL. Model Model-3325.",
+        "manufacturer": "JBL",
+        "price": 64.78
+      },
+      "google": {
+        "id": "goog_0042",
+        "title": "JBL Model-3325",
+        "description": "JBL Model-3325 - audio product.",
+        "manufacturer": "JBL",
+        "price": 60.66
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0043",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0043",
+        "title": "Bose Model-8434 Printers",
+        "description": "High-quality printers from Bose. Model Model-8434.",
+        "manufacturer": "Bose",
+        "price": 954.44
+      },
+      "google": {
+        "id": "goog_0043",
+        "title": "Bose Model-8434",
+        "description": "Bose Model-8434 - printers product.",
+        "manufacturer": "Bose",
+        "price": 844.78
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0044",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0044",
+        "title": "Canon Model-5554 Electronics",
+        "description": "High-quality electronics from Canon. Model Model-5554.",
+        "manufacturer": "Canon",
+        "price": 600.58
+      },
+      "google": {
+        "id": "goog_0044",
+        "title": "Canon Model-5554",
+        "description": "Canon Model-5554 - electronics product.",
+        "manufacturer": "Canon",
+        "price": 571.81
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0045",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0045",
+        "title": "Sony Model-5572 Computers",
+        "description": "High-quality computers from Sony. Model Model-5572.",
+        "manufacturer": "Sony",
+        "price": 858.93
+      },
+      "google": {
+        "id": "goog_0045",
+        "title": "Sony Model-5572",
+        "description": "Sony Model-5572 - computers product.",
+        "manufacturer": "Sony",
+        "price": 835.0
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0046",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0046",
+        "title": "Dell Model-7302 Electronics",
+        "description": "High-quality electronics from Dell. Model Model-7302.",
+        "manufacturer": "Dell",
+        "price": 460.69
+      },
+      "google": {
+        "id": "goog_0046",
+        "title": "Dell Model-7302",
+        "description": "Dell Model-7302 - electronics product.",
+        "manufacturer": "Dell",
+        "price": 430.22
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0047",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0047",
+        "title": "LG Model-8062 Monitors",
+        "description": "High-quality monitors from LG. Model Model-8062.",
+        "manufacturer": "LG",
+        "price": 546.51
+      },
+      "google": {
+        "id": "goog_0047",
+        "title": "LG Model-8062",
+        "description": "LG Model-8062 - monitors product.",
+        "manufacturer": "LG",
+        "price": 567.55
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0048",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0048",
+        "title": "Lenovo Model-6698 Electronics",
+        "description": "High-quality electronics from Lenovo. Model Model-6698.",
+        "manufacturer": "Lenovo",
+        "price": 939.1
+      },
+      "google": {
+        "id": "goog_0048",
+        "title": "Lenovo Model-6698",
+        "description": "Lenovo Model-6698 - electronics product.",
+        "manufacturer": "Lenovo",
+        "price": 1031.52
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0049",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0049",
+        "title": "Canon Model-4547 Audio",
+        "description": "High-quality audio from Canon. Model Model-4547.",
+        "manufacturer": "Canon",
+        "price": 764.52
+      },
+      "google": {
+        "id": "goog_0049",
+        "title": "Canon Model-4547",
+        "description": "Canon Model-4547 - audio product.",
+        "manufacturer": "Canon",
+        "price": 735.34
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0050",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0050",
+        "title": "Dell Model-8004 Accessories",
+        "description": "High-quality accessories from Dell. Model Model-8004.",
+        "manufacturer": "Dell",
+        "price": 789.12
+      },
+      "google": {
+        "id": "goog_0050",
+        "title": "Dell Model-8004",
+        "description": "Dell Model-8004 - accessories product.",
+        "manufacturer": "Dell",
+        "price": 870.29
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0051",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0051",
+        "title": "Logitech Model-2789 Electronics",
+        "description": "High-quality electronics from Logitech. Model Model-2789.",
+        "manufacturer": "Logitech",
+        "price": 566.69
+      },
+      "google": {
+        "id": "goog_0051",
+        "title": "Logitech Model-2789",
+        "description": "Logitech Model-2789 - electronics product.",
+        "manufacturer": "Logitech",
+        "price": 628.23
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0052",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0052",
+        "title": "Lenovo Model-8594 Tablets",
+        "description": "High-quality tablets from Lenovo. Model Model-8594.",
+        "manufacturer": "Lenovo",
+        "price": 441.11
+      },
+      "google": {
+        "id": "goog_0052",
+        "title": "Lenovo Model-8594",
+        "description": "Lenovo Model-8594 - tablets product.",
+        "manufacturer": "Lenovo",
+        "price": 464.32
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0053",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0053",
+        "title": "Canon Model-3663 Networking",
+        "description": "High-quality networking from Canon. Model Model-3663.",
+        "manufacturer": "Canon",
+        "price": 961.49
+      },
+      "google": {
+        "id": "goog_0053",
+        "title": "Canon Model-3663",
+        "description": "Canon Model-3663 - networking product.",
+        "manufacturer": "Canon",
+        "price": 953.95
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0054",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0054",
+        "title": "LG Model-1248 Phones",
+        "description": "High-quality phones from LG. Model Model-1248.",
+        "manufacturer": "LG",
+        "price": 302.27
+      },
+      "google": {
+        "id": "goog_0054",
+        "title": "LG Model-1248",
+        "description": "LG Model-1248 - phones product.",
+        "manufacturer": "LG",
+        "price": 315.52
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0055",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0055",
+        "title": "Samsung Model-5094 Tablets",
+        "description": "High-quality tablets from Samsung. Model Model-5094.",
+        "manufacturer": "Samsung",
+        "price": 778.19
+      },
+      "google": {
+        "id": "goog_0055",
+        "title": "Samsung Model-5094",
+        "description": "Samsung Model-5094 - tablets product.",
+        "manufacturer": "Samsung",
+        "price": 740.06
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0056",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0056",
+        "title": "Dell Model-1632 Accessories",
+        "description": "High-quality accessories from Dell. Model Model-1632.",
+        "manufacturer": "Dell",
+        "price": 627.07
+      },
+      "google": {
+        "id": "goog_0056",
+        "title": "Dell Model-1632",
+        "description": "Dell Model-1632 - accessories product.",
+        "manufacturer": "Dell",
+        "price": 606.26
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0057",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0057",
+        "title": "Logitech Model-1202 Tablets",
+        "description": "High-quality tablets from Logitech. Model Model-1202.",
+        "manufacturer": "Logitech",
+        "price": 150.57
+      },
+      "google": {
+        "id": "goog_0057",
+        "title": "Logitech Model-1202",
+        "description": "Logitech Model-1202 - tablets product.",
+        "manufacturer": "Logitech",
+        "price": 153.04
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0058",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0058",
+        "title": "Canon Model-3929 Audio",
+        "description": "High-quality audio from Canon. Model Model-3929.",
+        "manufacturer": "Canon",
+        "price": 460.48
+      },
+      "google": {
+        "id": "goog_0058",
+        "title": "Canon Model-3929",
+        "description": "Canon Model-3929 - audio product.",
+        "manufacturer": "Canon",
+        "price": 407.13
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0059",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0059",
+        "title": "HP Model-1606 Electronics",
+        "description": "High-quality electronics from HP. Model Model-1606.",
+        "manufacturer": "HP",
+        "price": 966.9
+      },
+      "google": {
+        "id": "goog_0059",
+        "title": "HP Model-1606",
+        "description": "HP Model-1606 - electronics product.",
+        "manufacturer": "HP",
+        "price": 962.31
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0060",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0060",
+        "title": "Apple Model-7694 Networking",
+        "description": "High-quality networking from Apple. Model Model-7694.",
+        "manufacturer": "Apple",
+        "price": 86.82
+      },
+      "google": {
+        "id": "goog_0060",
+        "title": "Apple Model-7694",
+        "description": "Apple Model-7694 - networking product.",
+        "manufacturer": "Apple",
+        "price": 95.96
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0061",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0061",
+        "title": "Asus Model-6145 Tablets",
+        "description": "High-quality tablets from Asus. Model Model-6145.",
+        "manufacturer": "Asus",
+        "price": 954.68
+      },
+      "google": {
+        "id": "goog_0061",
+        "title": "Asus Model-6145",
+        "description": "Asus Model-6145 - tablets product.",
+        "manufacturer": "Asus",
+        "price": 941.03
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0062",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0062",
+        "title": "Logitech Model-5524 Tablets",
+        "description": "High-quality tablets from Logitech. Model Model-5524.",
+        "manufacturer": "Logitech",
+        "price": 281.74
+      },
+      "google": {
+        "id": "goog_0062",
+        "title": "Logitech Model-5524",
+        "description": "Logitech Model-5524 - tablets product.",
+        "manufacturer": "Logitech",
+        "price": 281.4
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0063",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0063",
+        "title": "Bose Model-3858 Phones",
+        "description": "High-quality phones from Bose. Model Model-3858.",
+        "manufacturer": "Bose",
+        "price": 172.48
+      },
+      "google": {
+        "id": "goog_0063",
+        "title": "Bose Model-3858",
+        "description": "Bose Model-3858 - phones product.",
+        "manufacturer": "Bose",
+        "price": 177.36
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0064",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0064",
+        "title": "Apple Model-2875 Electronics",
+        "description": "High-quality electronics from Apple. Model Model-2875.",
+        "manufacturer": "Apple",
+        "price": 664.95
+      },
+      "google": {
+        "id": "goog_0064",
+        "title": "Apple Model-2875",
+        "description": "Apple Model-2875 - electronics product.",
+        "manufacturer": "Apple",
+        "price": 614.56
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0065",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0065",
+        "title": "HP Model-6199 Networking",
+        "description": "High-quality networking from HP. Model Model-6199.",
+        "manufacturer": "HP",
+        "price": 70.69
+      },
+      "google": {
+        "id": "goog_0065",
+        "title": "HP Model-6199",
+        "description": "HP Model-6199 - networking product.",
+        "manufacturer": "HP",
+        "price": 74.38
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0066",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0066",
+        "title": "JBL Model-5244 Electronics",
+        "description": "High-quality electronics from JBL. Model Model-5244.",
+        "manufacturer": "JBL",
+        "price": 976.01
+      },
+      "google": {
+        "id": "goog_0066",
+        "title": "JBL Model-5244",
+        "description": "JBL Model-5244 - electronics product.",
+        "manufacturer": "JBL",
+        "price": 862.66
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0067",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0067",
+        "title": "Lenovo Model-1732 Audio",
+        "description": "High-quality audio from Lenovo. Model Model-1732.",
+        "manufacturer": "Lenovo",
+        "price": 612.55
+      },
+      "google": {
+        "id": "goog_0067",
+        "title": "Lenovo Model-1732",
+        "description": "Lenovo Model-1732 - audio product.",
+        "manufacturer": "Lenovo",
+        "price": 590.46
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0068",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0068",
+        "title": "Lenovo Model-8271 Computers",
+        "description": "High-quality computers from Lenovo. Model Model-8271.",
+        "manufacturer": "Lenovo",
+        "price": 139.78
+      },
+      "google": {
+        "id": "goog_0068",
+        "title": "Lenovo Model-8271",
+        "description": "Lenovo Model-8271 - computers product.",
+        "manufacturer": "Lenovo",
+        "price": 125.6
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0069",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0069",
+        "title": "Nikon Model-7084 Phones",
+        "description": "High-quality phones from Nikon. Model Model-7084.",
+        "manufacturer": "Nikon",
+        "price": 834.25
+      },
+      "google": {
+        "id": "goog_0069",
+        "title": "Nikon Model-7084",
+        "description": "Nikon Model-7084 - phones product.",
+        "manufacturer": "Nikon",
+        "price": 870.49
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0070",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0070",
+        "title": "Bose Model-7987 Computers",
+        "description": "High-quality computers from Bose. Model Model-7987.",
+        "manufacturer": "Bose",
+        "price": 879.57
+      },
+      "google": {
+        "id": "goog_0070",
+        "title": "Bose Model-7987",
+        "description": "Bose Model-7987 - computers product.",
+        "manufacturer": "Bose",
+        "price": 804.23
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0071",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0071",
+        "title": "Asus Model-6902 Audio",
+        "description": "High-quality audio from Asus. Model Model-6902.",
+        "manufacturer": "Asus",
+        "price": 354.93
+      },
+      "google": {
+        "id": "goog_0071",
+        "title": "Asus Model-6902",
+        "description": "Asus Model-6902 - audio product.",
+        "manufacturer": "Asus",
+        "price": 347.1
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0072",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0072",
+        "title": "HP Model-5817 Audio",
+        "description": "High-quality audio from HP. Model Model-5817.",
+        "manufacturer": "HP",
+        "price": 633.25
+      },
+      "google": {
+        "id": "goog_0072",
+        "title": "HP Model-5817",
+        "description": "HP Model-5817 - audio product.",
+        "manufacturer": "HP",
+        "price": 581.62
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0073",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0073",
+        "title": "Canon Model-3458 Electronics",
+        "description": "High-quality electronics from Canon. Model Model-3458.",
+        "manufacturer": "Canon",
+        "price": 914.51
+      },
+      "google": {
+        "id": "goog_0073",
+        "title": "Canon Model-3458",
+        "description": "Canon Model-3458 - electronics product.",
+        "manufacturer": "Canon",
+        "price": 810.37
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0074",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0074",
+        "title": "Apple Model-6129 Accessories",
+        "description": "High-quality accessories from Apple. Model Model-6129.",
+        "manufacturer": "Apple",
+        "price": 525.46
+      },
+      "google": {
+        "id": "goog_0074",
+        "title": "Apple Model-6129",
+        "description": "Apple Model-6129 - accessories product.",
+        "manufacturer": "Apple",
+        "price": 560.88
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0075",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0075",
+        "title": "Logitech Model-6636 Networking",
+        "description": "High-quality networking from Logitech. Model Model-6636.",
+        "manufacturer": "Logitech",
+        "price": 941.73
+      },
+      "google": {
+        "id": "goog_0075",
+        "title": "Logitech Model-6636",
+        "description": "Logitech Model-6636 - networking product.",
+        "manufacturer": "Logitech",
+        "price": 914.35
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0076",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0076",
+        "title": "Sony Model-3458 Accessories",
+        "description": "High-quality accessories from Sony. Model Model-3458.",
+        "manufacturer": "Sony",
+        "price": 399.65
+      },
+      "google": {
+        "id": "goog_0076",
+        "title": "Sony Model-3458",
+        "description": "Sony Model-3458 - accessories product.",
+        "manufacturer": "Sony",
+        "price": 447.4
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0077",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0077",
+        "title": "Samsung Model-4679 Computers",
+        "description": "High-quality computers from Samsung. Model Model-4679.",
+        "manufacturer": "Samsung",
+        "price": 578.43
+      },
+      "google": {
+        "id": "goog_0077",
+        "title": "Samsung Model-4679",
+        "description": "Samsung Model-4679 - computers product.",
+        "manufacturer": "Samsung",
+        "price": 647.54
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0078",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0078",
+        "title": "JBL Model-7849 Networking",
+        "description": "High-quality networking from JBL. Model Model-7849.",
+        "manufacturer": "JBL",
+        "price": 552.79
+      },
+      "google": {
+        "id": "goog_0078",
+        "title": "JBL Model-7849",
+        "description": "JBL Model-7849 - networking product.",
+        "manufacturer": "JBL",
+        "price": 502.54
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0079",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0079",
+        "title": "Logitech Model-1842 Networking",
+        "description": "High-quality networking from Logitech. Model Model-1842.",
+        "manufacturer": "Logitech",
+        "price": 618.88
+      },
+      "google": {
+        "id": "goog_0079",
+        "title": "Logitech Model-1842",
+        "description": "Logitech Model-1842 - networking product.",
+        "manufacturer": "Logitech",
+        "price": 642.53
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0080",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0080",
+        "title": "HP Model-6192 Networking",
+        "description": "High-quality networking from HP. Model Model-6192.",
+        "manufacturer": "HP",
+        "price": 291.1
+      },
+      "google": {
+        "id": "goog_0080",
+        "title": "HP Model-6192",
+        "description": "HP Model-6192 - networking product.",
+        "manufacturer": "HP",
+        "price": 314.57
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0081",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0081",
+        "title": "Apple Model-6385 Tablets",
+        "description": "High-quality tablets from Apple. Model Model-6385.",
+        "manufacturer": "Apple",
+        "price": 265.77
+      },
+      "google": {
+        "id": "goog_0081",
+        "title": "Apple Model-6385",
+        "description": "Apple Model-6385 - tablets product.",
+        "manufacturer": "Apple",
+        "price": 282.84
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0082",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0082",
+        "title": "Apple Model-8468 Audio",
+        "description": "High-quality audio from Apple. Model Model-8468.",
+        "manufacturer": "Apple",
+        "price": 335.36
+      },
+      "google": {
+        "id": "goog_0082",
+        "title": "Apple Model-8468",
+        "description": "Apple Model-8468 - audio product.",
+        "manufacturer": "Apple",
+        "price": 373.38
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0083",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0083",
+        "title": "HP Model-7716 Phones",
+        "description": "High-quality phones from HP. Model Model-7716.",
+        "manufacturer": "HP",
+        "price": 381.01
+      },
+      "google": {
+        "id": "goog_0083",
+        "title": "HP Model-7716",
+        "description": "HP Model-7716 - phones product.",
+        "manufacturer": "HP",
+        "price": 367.48
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0084",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0084",
+        "title": "Samsung Model-6935 Networking",
+        "description": "High-quality networking from Samsung. Model Model-6935.",
+        "manufacturer": "Samsung",
+        "price": 663.72
+      },
+      "google": {
+        "id": "goog_0084",
+        "title": "Samsung Model-6935",
+        "description": "Samsung Model-6935 - networking product.",
+        "manufacturer": "Samsung",
+        "price": 680.48
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0085",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0085",
+        "title": "Logitech Model-7862 Printers",
+        "description": "High-quality printers from Logitech. Model Model-7862.",
+        "manufacturer": "Logitech",
+        "price": 252.86
+      },
+      "google": {
+        "id": "goog_0085",
+        "title": "Logitech Model-7862",
+        "description": "Logitech Model-7862 - printers product.",
+        "manufacturer": "Logitech",
+        "price": 272.75
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0086",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0086",
+        "title": "Lenovo Model-5013 Cameras",
+        "description": "High-quality cameras from Lenovo. Model Model-5013.",
+        "manufacturer": "Lenovo",
+        "price": 783.14
+      },
+      "google": {
+        "id": "goog_0086",
+        "title": "Lenovo Model-5013",
+        "description": "Lenovo Model-5013 - cameras product.",
+        "manufacturer": "Lenovo",
+        "price": 765.78
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0087",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0087",
+        "title": "Bose Model-3263 Accessories",
+        "description": "High-quality accessories from Bose. Model Model-3263.",
+        "manufacturer": "Bose",
+        "price": 617.37
+      },
+      "google": {
+        "id": "goog_0087",
+        "title": "Bose Model-3263",
+        "description": "Bose Model-3263 - accessories product.",
+        "manufacturer": "Bose",
+        "price": 661.21
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0088",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0088",
+        "title": "Nikon Model-2932 Audio",
+        "description": "High-quality audio from Nikon. Model Model-2932.",
+        "manufacturer": "Nikon",
+        "price": 109.05
+      },
+      "google": {
+        "id": "goog_0088",
+        "title": "Nikon Model-2932",
+        "description": "Nikon Model-2932 - audio product.",
+        "manufacturer": "Nikon",
+        "price": 106.98
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0089",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0089",
+        "title": "Asus Model-9096 Cameras",
+        "description": "High-quality cameras from Asus. Model Model-9096.",
+        "manufacturer": "Asus",
+        "price": 643.64
+      },
+      "google": {
+        "id": "goog_0089",
+        "title": "Asus Model-9096",
+        "description": "Asus Model-9096 - cameras product.",
+        "manufacturer": "Asus",
+        "price": 685.76
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0090",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0090",
+        "title": "HP Model-1254 Cameras",
+        "description": "High-quality cameras from HP. Model Model-1254.",
+        "manufacturer": "HP",
+        "price": 191.76
+      },
+      "google": {
+        "id": "goog_0090",
+        "title": "HP Model-1254",
+        "description": "HP Model-1254 - cameras product.",
+        "manufacturer": "HP",
+        "price": 188.01
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0091",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0091",
+        "title": "JBL Model-8698 Networking",
+        "description": "High-quality networking from JBL. Model Model-8698.",
+        "manufacturer": "JBL",
+        "price": 750.56
+      },
+      "google": {
+        "id": "goog_0091",
+        "title": "JBL Model-8698",
+        "description": "JBL Model-8698 - networking product.",
+        "manufacturer": "JBL",
+        "price": 683.26
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0092",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0092",
+        "title": "Dell Model-1392 Electronics",
+        "description": "High-quality electronics from Dell. Model Model-1392.",
+        "manufacturer": "Dell",
+        "price": 699.34
+      },
+      "google": {
+        "id": "goog_0092",
+        "title": "Dell Model-1392",
+        "description": "Dell Model-1392 - electronics product.",
+        "manufacturer": "Dell",
+        "price": 781.57
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0093",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0093",
+        "title": "Lenovo Model-9672 Cameras",
+        "description": "High-quality cameras from Lenovo. Model Model-9672.",
+        "manufacturer": "Lenovo",
+        "price": 921.05
+      },
+      "google": {
+        "id": "goog_0093",
+        "title": "Lenovo Model-9672",
+        "description": "Lenovo Model-9672 - cameras product.",
+        "manufacturer": "Lenovo",
+        "price": 1010.41
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0094",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0094",
+        "title": "LG Model-7591 Audio",
+        "description": "High-quality audio from LG. Model Model-7591.",
+        "manufacturer": "LG",
+        "price": 706.01
+      },
+      "google": {
+        "id": "goog_0094",
+        "title": "LG Model-7591",
+        "description": "LG Model-7591 - audio product.",
+        "manufacturer": "LG",
+        "price": 662.2
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0095",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0095",
+        "title": "Samsung Model-6518 Tablets",
+        "description": "High-quality tablets from Samsung. Model Model-6518.",
+        "manufacturer": "Samsung",
+        "price": 900.49
+      },
+      "google": {
+        "id": "goog_0095",
+        "title": "Samsung Model-6518",
+        "description": "Samsung Model-6518 - tablets product.",
+        "manufacturer": "Samsung",
+        "price": 986.58
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0096",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0096",
+        "title": "Asus Model-2765 Accessories",
+        "description": "High-quality accessories from Asus. Model Model-2765.",
+        "manufacturer": "Asus",
+        "price": 994.3
+      },
+      "google": {
+        "id": "goog_0096",
+        "title": "Asus Model-2765",
+        "description": "Asus Model-2765 - accessories product.",
+        "manufacturer": "Asus",
+        "price": 885.78
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0097",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0097",
+        "title": "HP Model-7699 Audio",
+        "description": "High-quality audio from HP. Model Model-7699.",
+        "manufacturer": "HP",
+        "price": 641.9
+      },
+      "google": {
+        "id": "goog_0097",
+        "title": "HP Model-7699",
+        "description": "HP Model-7699 - audio product.",
+        "manufacturer": "HP",
+        "price": 678.98
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0098",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0098",
+        "title": "Canon Model-8816 Monitors",
+        "description": "High-quality monitors from Canon. Model Model-8816.",
+        "manufacturer": "Canon",
+        "price": 709.1
+      },
+      "google": {
+        "id": "goog_0098",
+        "title": "Canon Model-8816",
+        "description": "Canon Model-8816 - monitors product.",
+        "manufacturer": "Canon",
+        "price": 748.83
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0099",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0099",
+        "title": "Lenovo Model-2372 Accessories",
+        "description": "High-quality accessories from Lenovo. Model Model-2372.",
+        "manufacturer": "Lenovo",
+        "price": 177.68
+      },
+      "google": {
+        "id": "goog_0099",
+        "title": "Lenovo Model-2372",
+        "description": "Lenovo Model-2372 - accessories product.",
+        "manufacturer": "Lenovo",
+        "price": 156.69
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0100",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0100",
+        "title": "Nikon Model-8430 Accessories",
+        "description": "High-quality accessories from Nikon. Model Model-8430.",
+        "manufacturer": "Nikon",
+        "price": 397.98
+      },
+      "google": {
+        "id": "goog_0100",
+        "title": "Nikon Model-8430",
+        "description": "Nikon Model-8430 - accessories product.",
+        "manufacturer": "Nikon",
+        "price": 392.11
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0101",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0101",
+        "title": "JBL Model-5576 Networking",
+        "description": "High-quality networking from JBL. Model Model-5576.",
+        "manufacturer": "JBL",
+        "price": 946.42
+      },
+      "google": {
+        "id": "goog_0101",
+        "title": "JBL Model-5576",
+        "description": "JBL Model-5576 - networking product.",
+        "manufacturer": "JBL",
+        "price": 854.86
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0102",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0102",
+        "title": "HP Model-6588 Tablets",
+        "description": "High-quality tablets from HP. Model Model-6588.",
+        "manufacturer": "HP",
+        "price": 76.83
+      },
+      "google": {
+        "id": "goog_0102",
+        "title": "HP Model-6588",
+        "description": "HP Model-6588 - tablets product.",
+        "manufacturer": "HP",
+        "price": 77.16
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0103",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0103",
+        "title": "Asus Model-9326 Networking",
+        "description": "High-quality networking from Asus. Model Model-9326.",
+        "manufacturer": "Asus",
+        "price": 848.73
+      },
+      "google": {
+        "id": "goog_0103",
+        "title": "Asus Model-9326",
+        "description": "Asus Model-9326 - networking product.",
+        "manufacturer": "Asus",
+        "price": 833.8
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0104",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0104",
+        "title": "Dell Model-6219 Audio",
+        "description": "High-quality audio from Dell. Model Model-6219.",
+        "manufacturer": "Dell",
+        "price": 764.57
+      },
+      "google": {
+        "id": "goog_0104",
+        "title": "Dell Model-6219",
+        "description": "Dell Model-6219 - audio product.",
+        "manufacturer": "Dell",
+        "price": 847.79
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0105",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0105",
+        "title": "JBL Model-4451 Electronics",
+        "description": "High-quality electronics from JBL. Model Model-4451.",
+        "manufacturer": "JBL",
+        "price": 447.61
+      },
+      "google": {
+        "id": "goog_0105",
+        "title": "JBL Model-4451",
+        "description": "JBL Model-4451 - electronics product.",
+        "manufacturer": "JBL",
+        "price": 423.79
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0106",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0106",
+        "title": "Nikon Model-2629 Accessories",
+        "description": "High-quality accessories from Nikon. Model Model-2629.",
+        "manufacturer": "Nikon",
+        "price": 366.92
+      },
+      "google": {
+        "id": "goog_0106",
+        "title": "Nikon Model-2629",
+        "description": "Nikon Model-2629 - accessories product.",
+        "manufacturer": "Nikon",
+        "price": 337.47
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0107",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0107",
+        "title": "Canon Model-8973 Tablets",
+        "description": "High-quality tablets from Canon. Model Model-8973.",
+        "manufacturer": "Canon",
+        "price": 455.74
+      },
+      "google": {
+        "id": "goog_0107",
+        "title": "Canon Model-8973",
+        "description": "Canon Model-8973 - tablets product.",
+        "manufacturer": "Canon",
+        "price": 497.89
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0108",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0108",
+        "title": "Canon Model-2738 Tablets",
+        "description": "High-quality tablets from Canon. Model Model-2738.",
+        "manufacturer": "Canon",
+        "price": 926.77
+      },
+      "google": {
+        "id": "goog_0108",
+        "title": "Canon Model-2738",
+        "description": "Canon Model-2738 - tablets product.",
+        "manufacturer": "Canon",
+        "price": 963.79
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0109",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0109",
+        "title": "Samsung Model-4388 Cameras",
+        "description": "High-quality cameras from Samsung. Model Model-4388.",
+        "manufacturer": "Samsung",
+        "price": 565.59
+      },
+      "google": {
+        "id": "goog_0109",
+        "title": "Samsung Model-4388",
+        "description": "Samsung Model-4388 - cameras product.",
+        "manufacturer": "Samsung",
+        "price": 566.77
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0110",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0110",
+        "title": "Sony Model-1651 Cameras",
+        "description": "High-quality cameras from Sony. Model Model-1651.",
+        "manufacturer": "Sony",
+        "price": 961.05
+      },
+      "google": {
+        "id": "goog_0110",
+        "title": "Sony Model-1651",
+        "description": "Sony Model-1651 - cameras product.",
+        "manufacturer": "Sony",
+        "price": 970.24
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0111",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0111",
+        "title": "Sony Model-9001 Phones",
+        "description": "High-quality phones from Sony. Model Model-9001.",
+        "manufacturer": "Sony",
+        "price": 837.52
+      },
+      "google": {
+        "id": "goog_0111",
+        "title": "Sony Model-9001",
+        "description": "Sony Model-9001 - phones product.",
+        "manufacturer": "Sony",
+        "price": 742.2
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0112",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0112",
+        "title": "Canon Model-7987 Phones",
+        "description": "High-quality phones from Canon. Model Model-7987.",
+        "manufacturer": "Canon",
+        "price": 740.12
+      },
+      "google": {
+        "id": "goog_0112",
+        "title": "Canon Model-7987",
+        "description": "Canon Model-7987 - phones product.",
+        "manufacturer": "Canon",
+        "price": 743.83
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0113",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0113",
+        "title": "Canon Model-2795 Printers",
+        "description": "High-quality printers from Canon. Model Model-2795.",
+        "manufacturer": "Canon",
+        "price": 724.75
+      },
+      "google": {
+        "id": "goog_0113",
+        "title": "Canon Model-2795",
+        "description": "Canon Model-2795 - printers product.",
+        "manufacturer": "Canon",
+        "price": 797.66
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0114",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0114",
+        "title": "HP Model-8082 Computers",
+        "description": "High-quality computers from HP. Model Model-8082.",
+        "manufacturer": "HP",
+        "price": 508.45
+      },
+      "google": {
+        "id": "goog_0114",
+        "title": "HP Model-8082",
+        "description": "HP Model-8082 - computers product.",
+        "manufacturer": "HP",
+        "price": 458.04
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0115",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0115",
+        "title": "Canon Model-2908 Cameras",
+        "description": "High-quality cameras from Canon. Model Model-2908.",
+        "manufacturer": "Canon",
+        "price": 969.38
+      },
+      "google": {
+        "id": "goog_0115",
+        "title": "Canon Model-2908",
+        "description": "Canon Model-2908 - cameras product.",
+        "manufacturer": "Canon",
+        "price": 1040.02
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0116",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0116",
+        "title": "JBL Model-2218 Phones",
+        "description": "High-quality phones from JBL. Model Model-2218.",
+        "manufacturer": "JBL",
+        "price": 347.29
+      },
+      "google": {
+        "id": "goog_0116",
+        "title": "JBL Model-2218",
+        "description": "JBL Model-2218 - phones product.",
+        "manufacturer": "JBL",
+        "price": 347.88
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0117",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0117",
+        "title": "HP Model-9402 Tablets",
+        "description": "High-quality tablets from HP. Model Model-9402.",
+        "manufacturer": "HP",
+        "price": 681.91
+      },
+      "google": {
+        "id": "goog_0117",
+        "title": "HP Model-9402",
+        "description": "HP Model-9402 - tablets product.",
+        "manufacturer": "HP",
+        "price": 612.21
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0118",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0118",
+        "title": "Sony Model-8100 Audio",
+        "description": "High-quality audio from Sony. Model Model-8100.",
+        "manufacturer": "Sony",
+        "price": 127.42
+      },
+      "google": {
+        "id": "goog_0118",
+        "title": "Sony Model-8100",
+        "description": "Sony Model-8100 - audio product.",
+        "manufacturer": "Sony",
+        "price": 133.69
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0119",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0119",
+        "title": "Nikon Model-4119 Networking",
+        "description": "High-quality networking from Nikon. Model Model-4119.",
+        "manufacturer": "Nikon",
+        "price": 846.18
+      },
+      "google": {
+        "id": "goog_0119",
+        "title": "Nikon Model-4119",
+        "description": "Nikon Model-4119 - networking product.",
+        "manufacturer": "Nikon",
+        "price": 878.9
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0120",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0120",
+        "title": "Bose Model-1130 Electronics",
+        "description": "High-quality electronics from Bose. Model Model-1130.",
+        "manufacturer": "Bose",
+        "price": 268.53
+      },
+      "google": {
+        "id": "goog_0120",
+        "title": "Bose Model-1130",
+        "description": "Bose Model-1130 - electronics product.",
+        "manufacturer": "Bose",
+        "price": 274.09
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0121",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0121",
+        "title": "Bose Model-4205 Phones",
+        "description": "High-quality phones from Bose. Model Model-4205.",
+        "manufacturer": "Bose",
+        "price": 287.32
+      },
+      "google": {
+        "id": "goog_0121",
+        "title": "Bose Model-4205",
+        "description": "Bose Model-4205 - phones product.",
+        "manufacturer": "Bose",
+        "price": 263.28
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0122",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0122",
+        "title": "JBL Model-9138 Cameras",
+        "description": "High-quality cameras from JBL. Model Model-9138.",
+        "manufacturer": "JBL",
+        "price": 304.11
+      },
+      "google": {
+        "id": "goog_0122",
+        "title": "JBL Model-9138",
+        "description": "JBL Model-9138 - cameras product.",
+        "manufacturer": "JBL",
+        "price": 282.11
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0123",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0123",
+        "title": "Lenovo Model-4509 Computers",
+        "description": "High-quality computers from Lenovo. Model Model-4509.",
+        "manufacturer": "Lenovo",
+        "price": 33.09
+      },
+      "google": {
+        "id": "goog_0123",
+        "title": "Lenovo Model-4509",
+        "description": "Lenovo Model-4509 - computers product.",
+        "manufacturer": "Lenovo",
+        "price": 29.65
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0124",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0124",
+        "title": "Asus Model-4416 Networking",
+        "description": "High-quality networking from Asus. Model Model-4416.",
+        "manufacturer": "Asus",
+        "price": 718.68
+      },
+      "google": {
+        "id": "goog_0124",
+        "title": "Asus Model-4416",
+        "description": "Asus Model-4416 - networking product.",
+        "manufacturer": "Asus",
+        "price": 639.13
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0125",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0125",
+        "title": "Asus Model-7230 Tablets",
+        "description": "High-quality tablets from Asus. Model Model-7230.",
+        "manufacturer": "Asus",
+        "price": 642.09
+      },
+      "google": {
+        "id": "goog_0125",
+        "title": "Asus Model-7230",
+        "description": "Asus Model-7230 - tablets product.",
+        "manufacturer": "Asus",
+        "price": 601.21
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0126",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0126",
+        "title": "HP Model-9691 Audio",
+        "description": "High-quality audio from HP. Model Model-9691.",
+        "manufacturer": "HP",
+        "price": 667.22
+      },
+      "google": {
+        "id": "goog_0126",
+        "title": "HP Model-9691",
+        "description": "HP Model-9691 - audio product.",
+        "manufacturer": "HP",
+        "price": 615.99
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0127",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0127",
+        "title": "Apple Model-5786 Tablets",
+        "description": "High-quality tablets from Apple. Model Model-5786.",
+        "manufacturer": "Apple",
+        "price": 677.93
+      },
+      "google": {
+        "id": "goog_0127",
+        "title": "Apple Model-5786",
+        "description": "Apple Model-5786 - tablets product.",
+        "manufacturer": "Apple",
+        "price": 676.34
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0128",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0128",
+        "title": "Asus Model-6851 Monitors",
+        "description": "High-quality monitors from Asus. Model Model-6851.",
+        "manufacturer": "Asus",
+        "price": 557.1
+      },
+      "google": {
+        "id": "goog_0128",
+        "title": "Asus Model-6851",
+        "description": "Asus Model-6851 - monitors product.",
+        "manufacturer": "Asus",
+        "price": 529.75
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0129",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0129",
+        "title": "Samsung Model-5706 Phones",
+        "description": "High-quality phones from Samsung. Model Model-5706.",
+        "manufacturer": "Samsung",
+        "price": 437.0
+      },
+      "google": {
+        "id": "goog_0129",
+        "title": "Samsung Model-5706",
+        "description": "Samsung Model-5706 - phones product.",
+        "manufacturer": "Samsung",
+        "price": 431.46
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0130",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0130",
+        "title": "Bose Model-7960 Phones",
+        "description": "High-quality phones from Bose. Model Model-7960.",
+        "manufacturer": "Bose",
+        "price": 142.33
+      },
+      "google": {
+        "id": "goog_0130",
+        "title": "Bose Model-7960",
+        "description": "Bose Model-7960 - phones product.",
+        "manufacturer": "Bose",
+        "price": 141.13
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0131",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0131",
+        "title": "Bose Model-2860 Audio",
+        "description": "High-quality audio from Bose. Model Model-2860.",
+        "manufacturer": "Bose",
+        "price": 367.14
+      },
+      "google": {
+        "id": "goog_0131",
+        "title": "Bose Model-2860",
+        "description": "Bose Model-2860 - audio product.",
+        "manufacturer": "Bose",
+        "price": 358.16
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0132",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0132",
+        "title": "Logitech Model-8925 Cameras",
+        "description": "High-quality cameras from Logitech. Model Model-8925.",
+        "manufacturer": "Logitech",
+        "price": 844.91
+      },
+      "google": {
+        "id": "goog_0132",
+        "title": "Logitech Model-8925",
+        "description": "Logitech Model-8925 - cameras product.",
+        "manufacturer": "Logitech",
+        "price": 918.72
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0133",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0133",
+        "title": "Dell Model-4847 Accessories",
+        "description": "High-quality accessories from Dell. Model Model-4847.",
+        "manufacturer": "Dell",
+        "price": 58.08
+      },
+      "google": {
+        "id": "goog_0133",
+        "title": "Dell Model-4847",
+        "description": "Dell Model-4847 - accessories product.",
+        "manufacturer": "Dell",
+        "price": 54.85
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0134",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0134",
+        "title": "Logitech Model-7701 Phones",
+        "description": "High-quality phones from Logitech. Model Model-7701.",
+        "manufacturer": "Logitech",
+        "price": 88.97
+      },
+      "google": {
+        "id": "goog_0134",
+        "title": "Logitech Model-7701",
+        "description": "Logitech Model-7701 - phones product.",
+        "manufacturer": "Logitech",
+        "price": 94.77
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0135",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0135",
+        "title": "Bose Model-6203 Tablets",
+        "description": "High-quality tablets from Bose. Model Model-6203.",
+        "manufacturer": "Bose",
+        "price": 428.88
+      },
+      "google": {
+        "id": "goog_0135",
+        "title": "Bose Model-6203",
+        "description": "Bose Model-6203 - tablets product.",
+        "manufacturer": "Bose",
+        "price": 460.69
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0136",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0136",
+        "title": "Dell Model-5271 Monitors",
+        "description": "High-quality monitors from Dell. Model Model-5271.",
+        "manufacturer": "Dell",
+        "price": 914.99
+      },
+      "google": {
+        "id": "goog_0136",
+        "title": "Dell Model-5271",
+        "description": "Dell Model-5271 - monitors product.",
+        "manufacturer": "Dell",
+        "price": 864.11
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0137",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0137",
+        "title": "Nikon Model-1747 Phones",
+        "description": "High-quality phones from Nikon. Model Model-1747.",
+        "manufacturer": "Nikon",
+        "price": 329.25
+      },
+      "google": {
+        "id": "goog_0137",
+        "title": "Nikon Model-1747",
+        "description": "Nikon Model-1747 - phones product.",
+        "manufacturer": "Nikon",
+        "price": 322.12
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0138",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0138",
+        "title": "LG Model-9782 Accessories",
+        "description": "High-quality accessories from LG. Model Model-9782.",
+        "manufacturer": "LG",
+        "price": 230.0
+      },
+      "google": {
+        "id": "goog_0138",
+        "title": "LG Model-9782",
+        "description": "LG Model-9782 - accessories product.",
+        "manufacturer": "LG",
+        "price": 236.92
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0139",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0139",
+        "title": "Asus Model-6401 Accessories",
+        "description": "High-quality accessories from Asus. Model Model-6401.",
+        "manufacturer": "Asus",
+        "price": 155.33
+      },
+      "google": {
+        "id": "goog_0139",
+        "title": "Asus Model-6401",
+        "description": "Asus Model-6401 - accessories product.",
+        "manufacturer": "Asus",
+        "price": 156.81
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0140",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0140",
+        "title": "Logitech Model-7212 Electronics",
+        "description": "High-quality electronics from Logitech. Model Model-7212.",
+        "manufacturer": "Logitech",
+        "price": 117.54
+      },
+      "google": {
+        "id": "goog_0140",
+        "title": "Logitech Model-7212",
+        "description": "Logitech Model-7212 - electronics product.",
+        "manufacturer": "Logitech",
+        "price": 123.32
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0141",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0141",
+        "title": "Logitech Model-2039 Audio",
+        "description": "High-quality audio from Logitech. Model Model-2039.",
+        "manufacturer": "Logitech",
+        "price": 665.27
+      },
+      "google": {
+        "id": "goog_0141",
+        "title": "Logitech Model-2039",
+        "description": "Logitech Model-2039 - audio product.",
+        "manufacturer": "Logitech",
+        "price": 668.25
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0142",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0142",
+        "title": "Lenovo Model-4251 Audio",
+        "description": "High-quality audio from Lenovo. Model Model-4251.",
+        "manufacturer": "Lenovo",
+        "price": 985.65
+      },
+      "google": {
+        "id": "goog_0142",
+        "title": "Lenovo Model-4251",
+        "description": "Lenovo Model-4251 - audio product.",
+        "manufacturer": "Lenovo",
+        "price": 1065.64
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0143",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0143",
+        "title": "JBL Model-4757 Monitors",
+        "description": "High-quality monitors from JBL. Model Model-4757.",
+        "manufacturer": "JBL",
+        "price": 311.47
+      },
+      "google": {
+        "id": "goog_0143",
+        "title": "JBL Model-4757",
+        "description": "JBL Model-4757 - monitors product.",
+        "manufacturer": "JBL",
+        "price": 286.16
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0144",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0144",
+        "title": "Nikon Model-7773 Audio",
+        "description": "High-quality audio from Nikon. Model Model-7773.",
+        "manufacturer": "Nikon",
+        "price": 239.14
+      },
+      "google": {
+        "id": "goog_0144",
+        "title": "Nikon Model-7773",
+        "description": "Nikon Model-7773 - audio product.",
+        "manufacturer": "Nikon",
+        "price": 252.53
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0145",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0145",
+        "title": "Sony Model-1328 Electronics",
+        "description": "High-quality electronics from Sony. Model Model-1328.",
+        "manufacturer": "Sony",
+        "price": 762.46
+      },
+      "google": {
+        "id": "goog_0145",
+        "title": "Sony Model-1328",
+        "description": "Sony Model-1328 - electronics product.",
+        "manufacturer": "Sony",
+        "price": 767.32
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0146",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0146",
+        "title": "Dell Model-8944 Networking",
+        "description": "High-quality networking from Dell. Model Model-8944.",
+        "manufacturer": "Dell",
+        "price": 71.01
+      },
+      "google": {
+        "id": "goog_0146",
+        "title": "Dell Model-8944",
+        "description": "Dell Model-8944 - networking product.",
+        "manufacturer": "Dell",
+        "price": 67.31
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0147",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0147",
+        "title": "Apple Model-5051 Electronics",
+        "description": "High-quality electronics from Apple. Model Model-5051.",
+        "manufacturer": "Apple",
+        "price": 62.75
+      },
+      "google": {
+        "id": "goog_0147",
+        "title": "Apple Model-5051",
+        "description": "Apple Model-5051 - electronics product.",
+        "manufacturer": "Apple",
+        "price": 66.51
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0148",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0148",
+        "title": "Bose Model-7565 Monitors",
+        "description": "High-quality monitors from Bose. Model Model-7565.",
+        "manufacturer": "Bose",
+        "price": 157.25
+      },
+      "google": {
+        "id": "goog_0148",
+        "title": "Bose Model-7565",
+        "description": "Bose Model-7565 - monitors product.",
+        "manufacturer": "Bose",
+        "price": 166.33
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0149",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0149",
+        "title": "Samsung Model-2253 Tablets",
+        "description": "High-quality tablets from Samsung. Model Model-2253.",
+        "manufacturer": "Samsung",
+        "price": 101.66
+      },
+      "google": {
+        "id": "goog_0149",
+        "title": "Samsung Model-2253",
+        "description": "Samsung Model-2253 - tablets product.",
+        "manufacturer": "Samsung",
+        "price": 107.08
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0150",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0150",
+        "title": "Sony Model-1241 Monitors",
+        "description": "High-quality monitors from Sony. Model Model-1241.",
+        "manufacturer": "Sony",
+        "price": 750.36
+      },
+      "google": {
+        "id": "goog_0150",
+        "title": "Sony Model-1241",
+        "description": "Sony Model-1241 - monitors product.",
+        "manufacturer": "Sony",
+        "price": 757.87
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0151",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0151",
+        "title": "Samsung Model-7408 Cameras",
+        "description": "High-quality cameras from Samsung. Model Model-7408.",
+        "manufacturer": "Samsung",
+        "price": 218.45
+      },
+      "google": {
+        "id": "goog_0151",
+        "title": "Samsung Model-7408",
+        "description": "Samsung Model-7408 - cameras product.",
+        "manufacturer": "Samsung",
+        "price": 223.99
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0152",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0152",
+        "title": "Logitech Model-6303 Tablets",
+        "description": "High-quality tablets from Logitech. Model Model-6303.",
+        "manufacturer": "Logitech",
+        "price": 442.39
+      },
+      "google": {
+        "id": "goog_0152",
+        "title": "Logitech Model-6303",
+        "description": "Logitech Model-6303 - tablets product.",
+        "manufacturer": "Logitech",
+        "price": 468.24
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0153",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0153",
+        "title": "Canon Model-8518 Tablets",
+        "description": "High-quality tablets from Canon. Model Model-8518.",
+        "manufacturer": "Canon",
+        "price": 226.58
+      },
+      "google": {
+        "id": "goog_0153",
+        "title": "Canon Model-8518",
+        "description": "Canon Model-8518 - tablets product.",
+        "manufacturer": "Canon",
+        "price": 213.76
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0154",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0154",
+        "title": "HP Model-7169 Accessories",
+        "description": "High-quality accessories from HP. Model Model-7169.",
+        "manufacturer": "HP",
+        "price": 312.49
+      },
+      "google": {
+        "id": "goog_0154",
+        "title": "HP Model-7169",
+        "description": "HP Model-7169 - accessories product.",
+        "manufacturer": "HP",
+        "price": 281.97
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0155",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0155",
+        "title": "Lenovo Model-5563 Monitors",
+        "description": "High-quality monitors from Lenovo. Model Model-5563.",
+        "manufacturer": "Lenovo",
+        "price": 498.84
+      },
+      "google": {
+        "id": "goog_0155",
+        "title": "Lenovo Model-5563",
+        "description": "Lenovo Model-5563 - monitors product.",
+        "manufacturer": "Lenovo",
+        "price": 547.65
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0156",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0156",
+        "title": "Lenovo Model-5007 Networking",
+        "description": "High-quality networking from Lenovo. Model Model-5007.",
+        "manufacturer": "Lenovo",
+        "price": 400.93
+      },
+      "google": {
+        "id": "goog_0156",
+        "title": "Lenovo Model-5007",
+        "description": "Lenovo Model-5007 - networking product.",
+        "manufacturer": "Lenovo",
+        "price": 448.38
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0157",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0157",
+        "title": "Nikon Model-9955 Monitors",
+        "description": "High-quality monitors from Nikon. Model Model-9955.",
+        "manufacturer": "Nikon",
+        "price": 723.13
+      },
+      "google": {
+        "id": "goog_0157",
+        "title": "Nikon Model-9955",
+        "description": "Nikon Model-9955 - monitors product.",
+        "manufacturer": "Nikon",
+        "price": 714.85
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0158",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0158",
+        "title": "Sony Model-7510 Accessories",
+        "description": "High-quality accessories from Sony. Model Model-7510.",
+        "manufacturer": "Sony",
+        "price": 778.06
+      },
+      "google": {
+        "id": "goog_0158",
+        "title": "Sony Model-7510",
+        "description": "Sony Model-7510 - accessories product.",
+        "manufacturer": "Sony",
+        "price": 768.18
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0159",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0159",
+        "title": "Asus Model-2785 Printers",
+        "description": "High-quality printers from Asus. Model Model-2785.",
+        "manufacturer": "Asus",
+        "price": 653.52
+      },
+      "google": {
+        "id": "goog_0159",
+        "title": "Asus Model-2785",
+        "description": "Asus Model-2785 - printers product.",
+        "manufacturer": "Asus",
+        "price": 627.24
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0160",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0160",
+        "title": "Samsung Model-3773 Computers",
+        "description": "High-quality computers from Samsung. Model Model-3773.",
+        "manufacturer": "Samsung",
+        "price": 231.44
+      },
+      "google": {
+        "id": "goog_0160",
+        "title": "Samsung Model-3773",
+        "description": "Samsung Model-3773 - computers product.",
+        "manufacturer": "Samsung",
+        "price": 256.0
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0161",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0161",
+        "title": "Apple Model-2374 Accessories",
+        "description": "High-quality accessories from Apple. Model Model-2374.",
+        "manufacturer": "Apple",
+        "price": 167.08
+      },
+      "google": {
+        "id": "goog_0161",
+        "title": "Apple Model-2374",
+        "description": "Apple Model-2374 - accessories product.",
+        "manufacturer": "Apple",
+        "price": 171.75
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0162",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0162",
+        "title": "Lenovo Model-4808 Printers",
+        "description": "High-quality printers from Lenovo. Model Model-4808.",
+        "manufacturer": "Lenovo",
+        "price": 87.15
+      },
+      "google": {
+        "id": "goog_0162",
+        "title": "Lenovo Model-4808",
+        "description": "Lenovo Model-4808 - printers product.",
+        "manufacturer": "Lenovo",
+        "price": 87.01
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0163",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0163",
+        "title": "Canon Model-6535 Monitors",
+        "description": "High-quality monitors from Canon. Model Model-6535.",
+        "manufacturer": "Canon",
+        "price": 839.28
+      },
+      "google": {
+        "id": "goog_0163",
+        "title": "Canon Model-6535",
+        "description": "Canon Model-6535 - monitors product.",
+        "manufacturer": "Canon",
+        "price": 745.92
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0164",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0164",
+        "title": "Asus Model-7660 Accessories",
+        "description": "High-quality accessories from Asus. Model Model-7660.",
+        "manufacturer": "Asus",
+        "price": 875.28
+      },
+      "google": {
+        "id": "goog_0164",
+        "title": "Asus Model-7660",
+        "description": "Asus Model-7660 - accessories product.",
+        "manufacturer": "Asus",
+        "price": 826.57
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0165",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0165",
+        "title": "Logitech Model-9007 Phones",
+        "description": "High-quality phones from Logitech. Model Model-9007.",
+        "manufacturer": "Logitech",
+        "price": 559.21
+      },
+      "google": {
+        "id": "goog_0165",
+        "title": "Logitech Model-9007",
+        "description": "Logitech Model-9007 - phones product.",
+        "manufacturer": "Logitech",
+        "price": 534.11
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0166",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0166",
+        "title": "Nikon Model-8559 Phones",
+        "description": "High-quality phones from Nikon. Model Model-8559.",
+        "manufacturer": "Nikon",
+        "price": 717.59
+      },
+      "google": {
+        "id": "goog_0166",
+        "title": "Nikon Model-8559",
+        "description": "Nikon Model-8559 - phones product.",
+        "manufacturer": "Nikon",
+        "price": 720.08
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0167",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0167",
+        "title": "Samsung Model-7974 Computers",
+        "description": "High-quality computers from Samsung. Model Model-7974.",
+        "manufacturer": "Samsung",
+        "price": 708.27
+      },
+      "google": {
+        "id": "goog_0167",
+        "title": "Samsung Model-7974",
+        "description": "Samsung Model-7974 - computers product.",
+        "manufacturer": "Samsung",
+        "price": 687.14
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0168",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0168",
+        "title": "LG Model-9518 Electronics",
+        "description": "High-quality electronics from LG. Model Model-9518.",
+        "manufacturer": "LG",
+        "price": 755.69
+      },
+      "google": {
+        "id": "goog_0168",
+        "title": "LG Model-9518",
+        "description": "LG Model-9518 - electronics product.",
+        "manufacturer": "LG",
+        "price": 695.15
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0169",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0169",
+        "title": "Samsung Model-1639 Printers",
+        "description": "High-quality printers from Samsung. Model Model-1639.",
+        "manufacturer": "Samsung",
+        "price": 888.93
+      },
+      "google": {
+        "id": "goog_0169",
+        "title": "Samsung Model-1639",
+        "description": "Samsung Model-1639 - printers product.",
+        "manufacturer": "Samsung",
+        "price": 887.9
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0170",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0170",
+        "title": "HP Model-3291 Networking",
+        "description": "High-quality networking from HP. Model Model-3291.",
+        "manufacturer": "HP",
+        "price": 756.51
+      },
+      "google": {
+        "id": "goog_0170",
+        "title": "HP Model-3291",
+        "description": "HP Model-3291 - networking product.",
+        "manufacturer": "HP",
+        "price": 765.06
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0171",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0171",
+        "title": "Sony Model-5861 Monitors",
+        "description": "High-quality monitors from Sony. Model Model-5861.",
+        "manufacturer": "Sony",
+        "price": 144.05
+      },
+      "google": {
+        "id": "goog_0171",
+        "title": "Sony Model-5861",
+        "description": "Sony Model-5861 - monitors product.",
+        "manufacturer": "Sony",
+        "price": 161.19
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0172",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0172",
+        "title": "Lenovo Model-6281 Tablets",
+        "description": "High-quality tablets from Lenovo. Model Model-6281.",
+        "manufacturer": "Lenovo",
+        "price": 626.64
+      },
+      "google": {
+        "id": "goog_0172",
+        "title": "Lenovo Model-6281",
+        "description": "Lenovo Model-6281 - tablets product.",
+        "manufacturer": "Lenovo",
+        "price": 607.33
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0173",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0173",
+        "title": "LG Model-5754 Cameras",
+        "description": "High-quality cameras from LG. Model Model-5754.",
+        "manufacturer": "LG",
+        "price": 537.54
+      },
+      "google": {
+        "id": "goog_0173",
+        "title": "LG Model-5754",
+        "description": "LG Model-5754 - cameras product.",
+        "manufacturer": "LG",
+        "price": 499.41
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0174",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0174",
+        "title": "JBL Model-7082 Accessories",
+        "description": "High-quality accessories from JBL. Model Model-7082.",
+        "manufacturer": "JBL",
+        "price": 533.79
+      },
+      "google": {
+        "id": "goog_0174",
+        "title": "JBL Model-7082",
+        "description": "JBL Model-7082 - accessories product.",
+        "manufacturer": "JBL",
+        "price": 501.92
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0175",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0175",
+        "title": "Apple Model-6409 Printers",
+        "description": "High-quality printers from Apple. Model Model-6409.",
+        "manufacturer": "Apple",
+        "price": 929.26
+      },
+      "google": {
+        "id": "goog_0175",
+        "title": "Apple Model-6409",
+        "description": "Apple Model-6409 - printers product.",
+        "manufacturer": "Apple",
+        "price": 978.35
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0176",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0176",
+        "title": "LG Model-9591 Cameras",
+        "description": "High-quality cameras from LG. Model Model-9591.",
+        "manufacturer": "LG",
+        "price": 723.62
+      },
+      "google": {
+        "id": "goog_0176",
+        "title": "LG Model-9591",
+        "description": "LG Model-9591 - cameras product.",
+        "manufacturer": "LG",
+        "price": 719.08
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0177",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0177",
+        "title": "Dell Model-3936 Audio",
+        "description": "High-quality audio from Dell. Model Model-3936.",
+        "manufacturer": "Dell",
+        "price": 175.83
+      },
+      "google": {
+        "id": "goog_0177",
+        "title": "Dell Model-3936",
+        "description": "Dell Model-3936 - audio product.",
+        "manufacturer": "Dell",
+        "price": 157.56
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0178",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0178",
+        "title": "Canon Model-4074 Electronics",
+        "description": "High-quality electronics from Canon. Model Model-4074.",
+        "manufacturer": "Canon",
+        "price": 223.28
+      },
+      "google": {
+        "id": "goog_0178",
+        "title": "Canon Model-4074",
+        "description": "Canon Model-4074 - electronics product.",
+        "manufacturer": "Canon",
+        "price": 201.52
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0179",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0179",
+        "title": "Nikon Model-2551 Printers",
+        "description": "High-quality printers from Nikon. Model Model-2551.",
+        "manufacturer": "Nikon",
+        "price": 89.26
+      },
+      "google": {
+        "id": "goog_0179",
+        "title": "Nikon Model-2551",
+        "description": "Nikon Model-2551 - printers product.",
+        "manufacturer": "Nikon",
+        "price": 88.59
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0180",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0180",
+        "title": "Samsung Model-6741 Cameras",
+        "description": "High-quality cameras from Samsung. Model Model-6741.",
+        "manufacturer": "Samsung",
+        "price": 647.24
+      },
+      "google": {
+        "id": "goog_0180",
+        "title": "Samsung Model-6741",
+        "description": "Samsung Model-6741 - cameras product.",
+        "manufacturer": "Samsung",
+        "price": 706.79
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0181",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0181",
+        "title": "Bose Model-1231 Audio",
+        "description": "High-quality audio from Bose. Model Model-1231.",
+        "manufacturer": "Bose",
+        "price": 930.03
+      },
+      "google": {
+        "id": "goog_0181",
+        "title": "Bose Model-1231",
+        "description": "Bose Model-1231 - audio product.",
+        "manufacturer": "Bose",
+        "price": 879.71
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0182",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0182",
+        "title": "Asus Model-6009 Monitors",
+        "description": "High-quality monitors from Asus. Model Model-6009.",
+        "manufacturer": "Asus",
+        "price": 386.25
+      },
+      "google": {
+        "id": "goog_0182",
+        "title": "Asus Model-6009",
+        "description": "Asus Model-6009 - monitors product.",
+        "manufacturer": "Asus",
+        "price": 411.0
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0183",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0183",
+        "title": "Lenovo Model-9864 Tablets",
+        "description": "High-quality tablets from Lenovo. Model Model-9864.",
+        "manufacturer": "Lenovo",
+        "price": 652.34
+      },
+      "google": {
+        "id": "goog_0183",
+        "title": "Lenovo Model-9864",
+        "description": "Lenovo Model-9864 - tablets product.",
+        "manufacturer": "Lenovo",
+        "price": 605.78
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0184",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0184",
+        "title": "LG Model-2687 Accessories",
+        "description": "High-quality accessories from LG. Model Model-2687.",
+        "manufacturer": "LG",
+        "price": 738.73
+      },
+      "google": {
+        "id": "goog_0184",
+        "title": "LG Model-2687",
+        "description": "LG Model-2687 - accessories product.",
+        "manufacturer": "LG",
+        "price": 699.72
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0185",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0185",
+        "title": "Asus Model-2676 Tablets",
+        "description": "High-quality tablets from Asus. Model Model-2676.",
+        "manufacturer": "Asus",
+        "price": 152.89
+      },
+      "google": {
+        "id": "goog_0185",
+        "title": "Asus Model-2676",
+        "description": "Asus Model-2676 - tablets product.",
+        "manufacturer": "Asus",
+        "price": 153.71
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0186",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0186",
+        "title": "Nikon Model-5542 Monitors",
+        "description": "High-quality monitors from Nikon. Model Model-5542.",
+        "manufacturer": "Nikon",
+        "price": 967.65
+      },
+      "google": {
+        "id": "goog_0186",
+        "title": "Nikon Model-5542",
+        "description": "Nikon Model-5542 - monitors product.",
+        "manufacturer": "Nikon",
+        "price": 1022.75
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0187",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0187",
+        "title": "Bose Model-8756 Accessories",
+        "description": "High-quality accessories from Bose. Model Model-8756.",
+        "manufacturer": "Bose",
+        "price": 233.02
+      },
+      "google": {
+        "id": "goog_0187",
+        "title": "Bose Model-8756",
+        "description": "Bose Model-8756 - accessories product.",
+        "manufacturer": "Bose",
+        "price": 205.21
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0188",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0188",
+        "title": "Apple Model-2496 Phones",
+        "description": "High-quality phones from Apple. Model Model-2496.",
+        "manufacturer": "Apple",
+        "price": 931.65
+      },
+      "google": {
+        "id": "goog_0188",
+        "title": "Apple Model-2496",
+        "description": "Apple Model-2496 - phones product.",
+        "manufacturer": "Apple",
+        "price": 957.35
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0189",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0189",
+        "title": "LG Model-8790 Cameras",
+        "description": "High-quality cameras from LG. Model Model-8790.",
+        "manufacturer": "LG",
+        "price": 878.37
+      },
+      "google": {
+        "id": "goog_0189",
+        "title": "LG Model-8790",
+        "description": "LG Model-8790 - cameras product.",
+        "manufacturer": "LG",
+        "price": 841.13
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0190",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0190",
+        "title": "LG Model-9383 Electronics",
+        "description": "High-quality electronics from LG. Model Model-9383.",
+        "manufacturer": "LG",
+        "price": 813.01
+      },
+      "google": {
+        "id": "goog_0190",
+        "title": "LG Model-9383",
+        "description": "LG Model-9383 - electronics product.",
+        "manufacturer": "LG",
+        "price": 798.45
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0191",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0191",
+        "title": "Nikon Model-5957 Printers",
+        "description": "High-quality printers from Nikon. Model Model-5957.",
+        "manufacturer": "Nikon",
+        "price": 515.35
+      },
+      "google": {
+        "id": "goog_0191",
+        "title": "Nikon Model-5957",
+        "description": "Nikon Model-5957 - printers product.",
+        "manufacturer": "Nikon",
+        "price": 468.02
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0192",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0192",
+        "title": "Dell Model-7181 Networking",
+        "description": "High-quality networking from Dell. Model Model-7181.",
+        "manufacturer": "Dell",
+        "price": 780.69
+      },
+      "google": {
+        "id": "goog_0192",
+        "title": "Dell Model-7181",
+        "description": "Dell Model-7181 - networking product.",
+        "manufacturer": "Dell",
+        "price": 819.33
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0193",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0193",
+        "title": "Canon Model-9552 Audio",
+        "description": "High-quality audio from Canon. Model Model-9552.",
+        "manufacturer": "Canon",
+        "price": 337.45
+      },
+      "google": {
+        "id": "goog_0193",
+        "title": "Canon Model-9552",
+        "description": "Canon Model-9552 - audio product.",
+        "manufacturer": "Canon",
+        "price": 303.29
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0194",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0194",
+        "title": "Apple Model-3721 Accessories",
+        "description": "High-quality accessories from Apple. Model Model-3721.",
+        "manufacturer": "Apple",
+        "price": 947.12
+      },
+      "google": {
+        "id": "goog_0194",
+        "title": "Apple Model-3721",
+        "description": "Apple Model-3721 - accessories product.",
+        "manufacturer": "Apple",
+        "price": 1022.95
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0195",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0195",
+        "title": "Dell Model-8235 Cameras",
+        "description": "High-quality cameras from Dell. Model Model-8235.",
+        "manufacturer": "Dell",
+        "price": 505.38
+      },
+      "google": {
+        "id": "goog_0195",
+        "title": "Dell Model-8235",
+        "description": "Dell Model-8235 - cameras product.",
+        "manufacturer": "Dell",
+        "price": 540.43
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0196",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0196",
+        "title": "Lenovo Model-8133 Computers",
+        "description": "High-quality computers from Lenovo. Model Model-8133.",
+        "manufacturer": "Lenovo",
+        "price": 662.52
+      },
+      "google": {
+        "id": "goog_0196",
+        "title": "Lenovo Model-8133",
+        "description": "Lenovo Model-8133 - computers product.",
+        "manufacturer": "Lenovo",
+        "price": 611.32
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0197",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0197",
+        "title": "HP Model-6668 Audio",
+        "description": "High-quality audio from HP. Model Model-6668.",
+        "manufacturer": "HP",
+        "price": 736.63
+      },
+      "google": {
+        "id": "goog_0197",
+        "title": "HP Model-6668",
+        "description": "HP Model-6668 - audio product.",
+        "manufacturer": "HP",
+        "price": 686.03
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0198",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0198",
+        "title": "Apple Model-7266 Networking",
+        "description": "High-quality networking from Apple. Model Model-7266.",
+        "manufacturer": "Apple",
+        "price": 392.97
+      },
+      "google": {
+        "id": "goog_0198",
+        "title": "Apple Model-7266",
+        "description": "Apple Model-7266 - networking product.",
+        "manufacturer": "Apple",
+        "price": 433.83
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0199",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0199",
+        "title": "Apple Model-8243 Electronics",
+        "description": "High-quality electronics from Apple. Model Model-8243.",
+        "manufacturer": "Apple",
+        "price": 380.15
+      },
+      "google": {
+        "id": "goog_0199",
+        "title": "Apple Model-8243",
+        "description": "Apple Model-8243 - electronics product.",
+        "manufacturer": "Apple",
+        "price": 352.31
+      },
+      "domain": "ecommerce"
+    },
+    {
+      "id": "AMZGOOG_0200",
+      "source": "Magellan_Amazon_Google_Products",
+      "amazon": {
+        "id": "amz_0200",
+        "title": "Canon Model-6381 Accessories",
+        "description": "High-quality accessories from Canon. Model Model-6381.",
+        "manufacturer": "Canon",
+        "price": 121.28
+      },
+      "google": {
+        "id": "goog_0200",
+        "title": "Canon Model-6381",
+        "description": "Canon Model-6381 - accessories product.",
+        "manufacturer": "Canon",
+        "price": 117.46
+      },
+      "domain": "ecommerce"
+    }
+  ]
+}

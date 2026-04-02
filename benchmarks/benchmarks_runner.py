@@ -5,6 +5,42 @@ import sys
 from datetime import datetime
 
 
+def run_effectiveness_suite(strict: bool = False) -> int:
+    """
+    Run the Context Graph Effectiveness benchmark suite (pytest-based, no
+    pytest-benchmark fixture).  Uses pytest directly — does NOT use
+    --benchmark-only which would skip these tests entirely.
+
+    Args:
+        strict: If True, exit(1) on any threshold failure.
+
+    Returns:
+        pytest exit code (0 = all passed/skipped, non-zero = failures).
+    """
+    print("\n" + "=" * 60)
+    print("  Context Graph Effectiveness Suite")
+    print("=" * 60)
+
+    cmd = [
+        sys.executable, "-m", "pytest",
+        "benchmarks/context_graph_effectiveness/",
+        "-p", "no:typeguard",
+        "-p", "no:langsmith",
+        "-m", "not real_llm",       # skip real-LLM tests in normal CI
+        "-v", "--tb=short",
+        "--no-header",
+    ]
+
+    result = subprocess.run(cmd)
+    if result.returncode != 0:
+        print("\n[EFFECTIVENESS] One or more effectiveness tests FAILED.")
+        if strict:
+            sys.exit(result.returncode)
+    else:
+        print("\n[EFFECTIVENESS] All effectiveness tests PASSED.")
+    return result.returncode
+
+
 def run_benchmarks():
     """
     Master Runner for Semantica Benchmarks.
@@ -13,7 +49,15 @@ def run_benchmarks():
     parser.add_argument(
         "--strict", action="store_true", help="Fail script if performance regresses"
     )
+    parser.add_argument(
+        "--effectiveness", action="store_true",
+        help="Run the Context Graph Effectiveness suite (pytest-based metrics)"
+    )
     args = parser.parse_args()
+
+    # Run effectiveness suite first if requested
+    if args.effectiveness:
+        run_effectiveness_suite(strict=args.strict)
 
     print("Starting Semantica Benchmark Suite...")
 

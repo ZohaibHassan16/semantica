@@ -1,0 +1,6010 @@
+{
+  "version": "1.0",
+  "source_dataset": "FEVER: a large-scale dataset for Fact Extraction and VERification",
+  "source_url": "https://fever.ai/",
+  "license": "CC BY 4.0",
+  "citation": "Thorne, J. et al. (2018). FEVER: a large-scale dataset for Fact Extraction and VERification. NAACL.",
+  "record_count": 200,
+  "records": [
+    {
+      "id": "FEVER_0001",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Apple Inc. was founded in 1976.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_000",
+          "sent_id": 0,
+          "evidence_text": "Apple Inc. was founded on April 1, 1976, by Steve Jobs, Steve Wozniak, and Ronald Wayne.",
+          "source_doc": "doc_000"
+        }
+      ],
+      "source_document": "doc_000",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0001"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_000"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0001"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0002",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "The Eiffel Tower is located in London.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_001",
+          "sent_id": 0,
+          "evidence_text": "The Eiffel Tower is a wrought-iron lattice tower on the Champ de Mars in Paris, France.",
+          "source_doc": "doc_001"
+        }
+      ],
+      "source_document": "doc_001",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0002"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_001"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0002"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0003",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Python was created by Guido van Rossum.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_002",
+          "sent_id": 0,
+          "evidence_text": "Python is a high-level programming language created by Guido van Rossum and first released in 1991.",
+          "source_doc": "doc_002"
+        }
+      ],
+      "source_document": "doc_002",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0003"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_002"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0003"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0004",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Amazon was founded in 2001.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_003",
+          "sent_id": 0,
+          "evidence_text": "Amazon was founded by Jeff Bezos on July 5, 1994, in Bellevue, Washington.",
+          "source_doc": "doc_003"
+        }
+      ],
+      "source_document": "doc_003",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0004"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_003"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0004"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0005",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "The FIFA World Cup occurs every four years.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_004",
+          "sent_id": 0,
+          "evidence_text": "The FIFA World Cup is a quadrennial international football tournament.",
+          "source_doc": "doc_004"
+        }
+      ],
+      "source_document": "doc_004",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0005"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_004"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0005"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0006",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "COVID-19 was first identified in 2020.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_005",
+          "sent_id": 0,
+          "evidence_text": "COVID-19 was first identified in Wuhan, China in December 2019.",
+          "source_doc": "doc_005"
+        }
+      ],
+      "source_document": "doc_005",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0006"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_005"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0006"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0007",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Tesla was co-founded by Elon Musk.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_006",
+          "sent_id": 0,
+          "evidence_text": "Tesla was founded in 2003 by Martin Eberhard and Marc Tarpenning; Elon Musk joined as chairman.",
+          "source_doc": "doc_006"
+        }
+      ],
+      "source_document": "doc_006",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0007"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_006"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0007"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0008",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Bitcoin was created by Satoshi Nakamoto.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_007",
+          "sent_id": 0,
+          "evidence_text": "Bitcoin was invented in 2008 by an unknown person using the name Satoshi Nakamoto.",
+          "source_doc": "doc_007"
+        }
+      ],
+      "source_document": "doc_007",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0008"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_007"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0008"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0009",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "The European Union has 27 member states.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_008",
+          "sent_id": 0,
+          "evidence_text": "As of 2020, the European Union consists of 27 member states following Brexit.",
+          "source_doc": "doc_008"
+        }
+      ],
+      "source_document": "doc_008",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0009"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_008"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0009"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0010",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Harvard University is located in New Haven.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_009",
+          "sent_id": 0,
+          "evidence_text": "Harvard University is located in Cambridge, Massachusetts.",
+          "source_doc": "doc_009"
+        }
+      ],
+      "source_document": "doc_009",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0010"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_009"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0010"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0011",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Apple Inc. was founded in 1976.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_000",
+          "sent_id": 0,
+          "evidence_text": "Apple Inc. was founded on April 1, 1976, by Steve Jobs, Steve Wozniak, and Ronald Wayne.",
+          "source_doc": "doc_000"
+        }
+      ],
+      "source_document": "doc_000",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0011"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_000"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0011"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0012",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "The Eiffel Tower is located in London.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_001",
+          "sent_id": 0,
+          "evidence_text": "The Eiffel Tower is a wrought-iron lattice tower on the Champ de Mars in Paris, France.",
+          "source_doc": "doc_001"
+        }
+      ],
+      "source_document": "doc_001",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0012"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_001"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0012"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0013",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Python was created by Guido van Rossum.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_002",
+          "sent_id": 0,
+          "evidence_text": "Python is a high-level programming language created by Guido van Rossum and first released in 1991.",
+          "source_doc": "doc_002"
+        }
+      ],
+      "source_document": "doc_002",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0013"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_002"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0013"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0014",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Amazon was founded in 2001.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_003",
+          "sent_id": 0,
+          "evidence_text": "Amazon was founded by Jeff Bezos on July 5, 1994, in Bellevue, Washington.",
+          "source_doc": "doc_003"
+        }
+      ],
+      "source_document": "doc_003",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0014"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_003"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0014"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0015",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "The FIFA World Cup occurs every four years.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_004",
+          "sent_id": 0,
+          "evidence_text": "The FIFA World Cup is a quadrennial international football tournament.",
+          "source_doc": "doc_004"
+        }
+      ],
+      "source_document": "doc_004",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0015"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_004"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0015"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0016",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "COVID-19 was first identified in 2020.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_005",
+          "sent_id": 0,
+          "evidence_text": "COVID-19 was first identified in Wuhan, China in December 2019.",
+          "source_doc": "doc_005"
+        }
+      ],
+      "source_document": "doc_005",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0016"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_005"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0016"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0017",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Tesla was co-founded by Elon Musk.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_006",
+          "sent_id": 0,
+          "evidence_text": "Tesla was founded in 2003 by Martin Eberhard and Marc Tarpenning; Elon Musk joined as chairman.",
+          "source_doc": "doc_006"
+        }
+      ],
+      "source_document": "doc_006",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0017"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_006"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0017"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0018",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Bitcoin was created by Satoshi Nakamoto.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_007",
+          "sent_id": 0,
+          "evidence_text": "Bitcoin was invented in 2008 by an unknown person using the name Satoshi Nakamoto.",
+          "source_doc": "doc_007"
+        }
+      ],
+      "source_document": "doc_007",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0018"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_007"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0018"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0019",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "The European Union has 27 member states.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_008",
+          "sent_id": 0,
+          "evidence_text": "As of 2020, the European Union consists of 27 member states following Brexit.",
+          "source_doc": "doc_008"
+        }
+      ],
+      "source_document": "doc_008",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0019"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_008"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0019"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0020",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Harvard University is located in New Haven.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_009",
+          "sent_id": 0,
+          "evidence_text": "Harvard University is located in Cambridge, Massachusetts.",
+          "source_doc": "doc_009"
+        }
+      ],
+      "source_document": "doc_009",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0020"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_009"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0020"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0021",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Apple Inc. was founded in 1976.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_000",
+          "sent_id": 0,
+          "evidence_text": "Apple Inc. was founded on April 1, 1976, by Steve Jobs, Steve Wozniak, and Ronald Wayne.",
+          "source_doc": "doc_000"
+        }
+      ],
+      "source_document": "doc_000",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0021"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_000"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0021"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0022",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "The Eiffel Tower is located in London.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_001",
+          "sent_id": 0,
+          "evidence_text": "The Eiffel Tower is a wrought-iron lattice tower on the Champ de Mars in Paris, France.",
+          "source_doc": "doc_001"
+        }
+      ],
+      "source_document": "doc_001",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0022"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_001"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0022"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0023",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Python was created by Guido van Rossum.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_002",
+          "sent_id": 0,
+          "evidence_text": "Python is a high-level programming language created by Guido van Rossum and first released in 1991.",
+          "source_doc": "doc_002"
+        }
+      ],
+      "source_document": "doc_002",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0023"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_002"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0023"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0024",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Amazon was founded in 2001.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_003",
+          "sent_id": 0,
+          "evidence_text": "Amazon was founded by Jeff Bezos on July 5, 1994, in Bellevue, Washington.",
+          "source_doc": "doc_003"
+        }
+      ],
+      "source_document": "doc_003",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0024"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_003"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0024"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0025",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "The FIFA World Cup occurs every four years.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_004",
+          "sent_id": 0,
+          "evidence_text": "The FIFA World Cup is a quadrennial international football tournament.",
+          "source_doc": "doc_004"
+        }
+      ],
+      "source_document": "doc_004",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0025"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_004"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0025"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0026",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "COVID-19 was first identified in 2020.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_005",
+          "sent_id": 0,
+          "evidence_text": "COVID-19 was first identified in Wuhan, China in December 2019.",
+          "source_doc": "doc_005"
+        }
+      ],
+      "source_document": "doc_005",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0026"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_005"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0026"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0027",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Tesla was co-founded by Elon Musk.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_006",
+          "sent_id": 0,
+          "evidence_text": "Tesla was founded in 2003 by Martin Eberhard and Marc Tarpenning; Elon Musk joined as chairman.",
+          "source_doc": "doc_006"
+        }
+      ],
+      "source_document": "doc_006",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0027"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_006"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0027"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0028",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Bitcoin was created by Satoshi Nakamoto.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_007",
+          "sent_id": 0,
+          "evidence_text": "Bitcoin was invented in 2008 by an unknown person using the name Satoshi Nakamoto.",
+          "source_doc": "doc_007"
+        }
+      ],
+      "source_document": "doc_007",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0028"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_007"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0028"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0029",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "The European Union has 27 member states.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_008",
+          "sent_id": 0,
+          "evidence_text": "As of 2020, the European Union consists of 27 member states following Brexit.",
+          "source_doc": "doc_008"
+        }
+      ],
+      "source_document": "doc_008",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0029"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_008"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0029"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0030",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Harvard University is located in New Haven.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_009",
+          "sent_id": 0,
+          "evidence_text": "Harvard University is located in Cambridge, Massachusetts.",
+          "source_doc": "doc_009"
+        }
+      ],
+      "source_document": "doc_009",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0030"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_009"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0030"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0031",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Apple Inc. was founded in 1976.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_000",
+          "sent_id": 0,
+          "evidence_text": "Apple Inc. was founded on April 1, 1976, by Steve Jobs, Steve Wozniak, and Ronald Wayne.",
+          "source_doc": "doc_000"
+        }
+      ],
+      "source_document": "doc_000",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0031"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_000"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0031"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0032",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "The Eiffel Tower is located in London.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_001",
+          "sent_id": 0,
+          "evidence_text": "The Eiffel Tower is a wrought-iron lattice tower on the Champ de Mars in Paris, France.",
+          "source_doc": "doc_001"
+        }
+      ],
+      "source_document": "doc_001",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0032"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_001"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0032"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0033",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Python was created by Guido van Rossum.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_002",
+          "sent_id": 0,
+          "evidence_text": "Python is a high-level programming language created by Guido van Rossum and first released in 1991.",
+          "source_doc": "doc_002"
+        }
+      ],
+      "source_document": "doc_002",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0033"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_002"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0033"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0034",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Amazon was founded in 2001.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_003",
+          "sent_id": 0,
+          "evidence_text": "Amazon was founded by Jeff Bezos on July 5, 1994, in Bellevue, Washington.",
+          "source_doc": "doc_003"
+        }
+      ],
+      "source_document": "doc_003",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0034"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_003"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0034"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0035",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "The FIFA World Cup occurs every four years.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_004",
+          "sent_id": 0,
+          "evidence_text": "The FIFA World Cup is a quadrennial international football tournament.",
+          "source_doc": "doc_004"
+        }
+      ],
+      "source_document": "doc_004",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0035"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_004"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0035"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0036",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "COVID-19 was first identified in 2020.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_005",
+          "sent_id": 0,
+          "evidence_text": "COVID-19 was first identified in Wuhan, China in December 2019.",
+          "source_doc": "doc_005"
+        }
+      ],
+      "source_document": "doc_005",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0036"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_005"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0036"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0037",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Tesla was co-founded by Elon Musk.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_006",
+          "sent_id": 0,
+          "evidence_text": "Tesla was founded in 2003 by Martin Eberhard and Marc Tarpenning; Elon Musk joined as chairman.",
+          "source_doc": "doc_006"
+        }
+      ],
+      "source_document": "doc_006",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0037"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_006"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0037"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0038",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Bitcoin was created by Satoshi Nakamoto.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_007",
+          "sent_id": 0,
+          "evidence_text": "Bitcoin was invented in 2008 by an unknown person using the name Satoshi Nakamoto.",
+          "source_doc": "doc_007"
+        }
+      ],
+      "source_document": "doc_007",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0038"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_007"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0038"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0039",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "The European Union has 27 member states.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_008",
+          "sent_id": 0,
+          "evidence_text": "As of 2020, the European Union consists of 27 member states following Brexit.",
+          "source_doc": "doc_008"
+        }
+      ],
+      "source_document": "doc_008",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0039"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_008"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0039"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0040",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Harvard University is located in New Haven.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_009",
+          "sent_id": 0,
+          "evidence_text": "Harvard University is located in Cambridge, Massachusetts.",
+          "source_doc": "doc_009"
+        }
+      ],
+      "source_document": "doc_009",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0040"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_009"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0040"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0041",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Apple Inc. was founded in 1976.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_000",
+          "sent_id": 0,
+          "evidence_text": "Apple Inc. was founded on April 1, 1976, by Steve Jobs, Steve Wozniak, and Ronald Wayne.",
+          "source_doc": "doc_000"
+        }
+      ],
+      "source_document": "doc_000",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0041"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_000"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0041"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0042",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "The Eiffel Tower is located in London.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_001",
+          "sent_id": 0,
+          "evidence_text": "The Eiffel Tower is a wrought-iron lattice tower on the Champ de Mars in Paris, France.",
+          "source_doc": "doc_001"
+        }
+      ],
+      "source_document": "doc_001",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0042"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_001"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0042"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0043",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Python was created by Guido van Rossum.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_002",
+          "sent_id": 0,
+          "evidence_text": "Python is a high-level programming language created by Guido van Rossum and first released in 1991.",
+          "source_doc": "doc_002"
+        }
+      ],
+      "source_document": "doc_002",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0043"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_002"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0043"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0044",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Amazon was founded in 2001.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_003",
+          "sent_id": 0,
+          "evidence_text": "Amazon was founded by Jeff Bezos on July 5, 1994, in Bellevue, Washington.",
+          "source_doc": "doc_003"
+        }
+      ],
+      "source_document": "doc_003",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0044"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_003"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0044"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0045",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "The FIFA World Cup occurs every four years.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_004",
+          "sent_id": 0,
+          "evidence_text": "The FIFA World Cup is a quadrennial international football tournament.",
+          "source_doc": "doc_004"
+        }
+      ],
+      "source_document": "doc_004",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0045"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_004"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0045"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0046",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "COVID-19 was first identified in 2020.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_005",
+          "sent_id": 0,
+          "evidence_text": "COVID-19 was first identified in Wuhan, China in December 2019.",
+          "source_doc": "doc_005"
+        }
+      ],
+      "source_document": "doc_005",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0046"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_005"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0046"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0047",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Tesla was co-founded by Elon Musk.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_006",
+          "sent_id": 0,
+          "evidence_text": "Tesla was founded in 2003 by Martin Eberhard and Marc Tarpenning; Elon Musk joined as chairman.",
+          "source_doc": "doc_006"
+        }
+      ],
+      "source_document": "doc_006",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0047"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_006"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0047"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0048",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Bitcoin was created by Satoshi Nakamoto.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_007",
+          "sent_id": 0,
+          "evidence_text": "Bitcoin was invented in 2008 by an unknown person using the name Satoshi Nakamoto.",
+          "source_doc": "doc_007"
+        }
+      ],
+      "source_document": "doc_007",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0048"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_007"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0048"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0049",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "The European Union has 27 member states.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_008",
+          "sent_id": 0,
+          "evidence_text": "As of 2020, the European Union consists of 27 member states following Brexit.",
+          "source_doc": "doc_008"
+        }
+      ],
+      "source_document": "doc_008",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0049"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_008"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0049"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0050",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Harvard University is located in New Haven.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_009",
+          "sent_id": 0,
+          "evidence_text": "Harvard University is located in Cambridge, Massachusetts.",
+          "source_doc": "doc_009"
+        }
+      ],
+      "source_document": "doc_009",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0050"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_009"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0050"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0051",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Apple Inc. was founded in 1976.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_000",
+          "sent_id": 0,
+          "evidence_text": "Apple Inc. was founded on April 1, 1976, by Steve Jobs, Steve Wozniak, and Ronald Wayne.",
+          "source_doc": "doc_000"
+        }
+      ],
+      "source_document": "doc_000",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0051"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_000"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0051"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0052",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "The Eiffel Tower is located in London.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_001",
+          "sent_id": 0,
+          "evidence_text": "The Eiffel Tower is a wrought-iron lattice tower on the Champ de Mars in Paris, France.",
+          "source_doc": "doc_001"
+        }
+      ],
+      "source_document": "doc_001",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0052"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_001"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0052"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0053",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Python was created by Guido van Rossum.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_002",
+          "sent_id": 0,
+          "evidence_text": "Python is a high-level programming language created by Guido van Rossum and first released in 1991.",
+          "source_doc": "doc_002"
+        }
+      ],
+      "source_document": "doc_002",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0053"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_002"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0053"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0054",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Amazon was founded in 2001.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_003",
+          "sent_id": 0,
+          "evidence_text": "Amazon was founded by Jeff Bezos on July 5, 1994, in Bellevue, Washington.",
+          "source_doc": "doc_003"
+        }
+      ],
+      "source_document": "doc_003",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0054"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_003"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0054"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0055",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "The FIFA World Cup occurs every four years.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_004",
+          "sent_id": 0,
+          "evidence_text": "The FIFA World Cup is a quadrennial international football tournament.",
+          "source_doc": "doc_004"
+        }
+      ],
+      "source_document": "doc_004",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0055"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_004"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0055"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0056",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "COVID-19 was first identified in 2020.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_005",
+          "sent_id": 0,
+          "evidence_text": "COVID-19 was first identified in Wuhan, China in December 2019.",
+          "source_doc": "doc_005"
+        }
+      ],
+      "source_document": "doc_005",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0056"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_005"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0056"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0057",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Tesla was co-founded by Elon Musk.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_006",
+          "sent_id": 0,
+          "evidence_text": "Tesla was founded in 2003 by Martin Eberhard and Marc Tarpenning; Elon Musk joined as chairman.",
+          "source_doc": "doc_006"
+        }
+      ],
+      "source_document": "doc_006",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0057"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_006"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0057"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0058",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Bitcoin was created by Satoshi Nakamoto.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_007",
+          "sent_id": 0,
+          "evidence_text": "Bitcoin was invented in 2008 by an unknown person using the name Satoshi Nakamoto.",
+          "source_doc": "doc_007"
+        }
+      ],
+      "source_document": "doc_007",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0058"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_007"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0058"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0059",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "The European Union has 27 member states.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_008",
+          "sent_id": 0,
+          "evidence_text": "As of 2020, the European Union consists of 27 member states following Brexit.",
+          "source_doc": "doc_008"
+        }
+      ],
+      "source_document": "doc_008",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0059"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_008"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0059"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0060",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Harvard University is located in New Haven.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_009",
+          "sent_id": 0,
+          "evidence_text": "Harvard University is located in Cambridge, Massachusetts.",
+          "source_doc": "doc_009"
+        }
+      ],
+      "source_document": "doc_009",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0060"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_009"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0060"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0061",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Apple Inc. was founded in 1976.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_000",
+          "sent_id": 0,
+          "evidence_text": "Apple Inc. was founded on April 1, 1976, by Steve Jobs, Steve Wozniak, and Ronald Wayne.",
+          "source_doc": "doc_000"
+        }
+      ],
+      "source_document": "doc_000",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0061"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_000"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0061"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0062",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "The Eiffel Tower is located in London.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_001",
+          "sent_id": 0,
+          "evidence_text": "The Eiffel Tower is a wrought-iron lattice tower on the Champ de Mars in Paris, France.",
+          "source_doc": "doc_001"
+        }
+      ],
+      "source_document": "doc_001",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0062"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_001"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0062"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0063",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Python was created by Guido van Rossum.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_002",
+          "sent_id": 0,
+          "evidence_text": "Python is a high-level programming language created by Guido van Rossum and first released in 1991.",
+          "source_doc": "doc_002"
+        }
+      ],
+      "source_document": "doc_002",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0063"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_002"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0063"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0064",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Amazon was founded in 2001.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_003",
+          "sent_id": 0,
+          "evidence_text": "Amazon was founded by Jeff Bezos on July 5, 1994, in Bellevue, Washington.",
+          "source_doc": "doc_003"
+        }
+      ],
+      "source_document": "doc_003",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0064"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_003"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0064"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0065",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "The FIFA World Cup occurs every four years.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_004",
+          "sent_id": 0,
+          "evidence_text": "The FIFA World Cup is a quadrennial international football tournament.",
+          "source_doc": "doc_004"
+        }
+      ],
+      "source_document": "doc_004",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0065"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_004"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0065"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0066",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "COVID-19 was first identified in 2020.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_005",
+          "sent_id": 0,
+          "evidence_text": "COVID-19 was first identified in Wuhan, China in December 2019.",
+          "source_doc": "doc_005"
+        }
+      ],
+      "source_document": "doc_005",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0066"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_005"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0066"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0067",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Tesla was co-founded by Elon Musk.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_006",
+          "sent_id": 0,
+          "evidence_text": "Tesla was founded in 2003 by Martin Eberhard and Marc Tarpenning; Elon Musk joined as chairman.",
+          "source_doc": "doc_006"
+        }
+      ],
+      "source_document": "doc_006",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0067"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_006"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0067"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0068",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Bitcoin was created by Satoshi Nakamoto.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_007",
+          "sent_id": 0,
+          "evidence_text": "Bitcoin was invented in 2008 by an unknown person using the name Satoshi Nakamoto.",
+          "source_doc": "doc_007"
+        }
+      ],
+      "source_document": "doc_007",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0068"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_007"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0068"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0069",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "The European Union has 27 member states.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_008",
+          "sent_id": 0,
+          "evidence_text": "As of 2020, the European Union consists of 27 member states following Brexit.",
+          "source_doc": "doc_008"
+        }
+      ],
+      "source_document": "doc_008",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0069"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_008"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0069"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0070",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Harvard University is located in New Haven.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_009",
+          "sent_id": 0,
+          "evidence_text": "Harvard University is located in Cambridge, Massachusetts.",
+          "source_doc": "doc_009"
+        }
+      ],
+      "source_document": "doc_009",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0070"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_009"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0070"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0071",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Apple Inc. was founded in 1976.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_000",
+          "sent_id": 0,
+          "evidence_text": "Apple Inc. was founded on April 1, 1976, by Steve Jobs, Steve Wozniak, and Ronald Wayne.",
+          "source_doc": "doc_000"
+        }
+      ],
+      "source_document": "doc_000",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0071"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_000"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0071"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0072",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "The Eiffel Tower is located in London.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_001",
+          "sent_id": 0,
+          "evidence_text": "The Eiffel Tower is a wrought-iron lattice tower on the Champ de Mars in Paris, France.",
+          "source_doc": "doc_001"
+        }
+      ],
+      "source_document": "doc_001",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0072"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_001"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0072"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0073",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Python was created by Guido van Rossum.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_002",
+          "sent_id": 0,
+          "evidence_text": "Python is a high-level programming language created by Guido van Rossum and first released in 1991.",
+          "source_doc": "doc_002"
+        }
+      ],
+      "source_document": "doc_002",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0073"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_002"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0073"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0074",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Amazon was founded in 2001.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_003",
+          "sent_id": 0,
+          "evidence_text": "Amazon was founded by Jeff Bezos on July 5, 1994, in Bellevue, Washington.",
+          "source_doc": "doc_003"
+        }
+      ],
+      "source_document": "doc_003",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0074"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_003"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0074"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0075",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "The FIFA World Cup occurs every four years.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_004",
+          "sent_id": 0,
+          "evidence_text": "The FIFA World Cup is a quadrennial international football tournament.",
+          "source_doc": "doc_004"
+        }
+      ],
+      "source_document": "doc_004",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0075"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_004"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0075"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0076",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "COVID-19 was first identified in 2020.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_005",
+          "sent_id": 0,
+          "evidence_text": "COVID-19 was first identified in Wuhan, China in December 2019.",
+          "source_doc": "doc_005"
+        }
+      ],
+      "source_document": "doc_005",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0076"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_005"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0076"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0077",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Tesla was co-founded by Elon Musk.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_006",
+          "sent_id": 0,
+          "evidence_text": "Tesla was founded in 2003 by Martin Eberhard and Marc Tarpenning; Elon Musk joined as chairman.",
+          "source_doc": "doc_006"
+        }
+      ],
+      "source_document": "doc_006",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0077"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_006"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0077"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0078",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Bitcoin was created by Satoshi Nakamoto.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_007",
+          "sent_id": 0,
+          "evidence_text": "Bitcoin was invented in 2008 by an unknown person using the name Satoshi Nakamoto.",
+          "source_doc": "doc_007"
+        }
+      ],
+      "source_document": "doc_007",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0078"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_007"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0078"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0079",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "The European Union has 27 member states.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_008",
+          "sent_id": 0,
+          "evidence_text": "As of 2020, the European Union consists of 27 member states following Brexit.",
+          "source_doc": "doc_008"
+        }
+      ],
+      "source_document": "doc_008",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0079"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_008"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0079"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0080",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Harvard University is located in New Haven.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_009",
+          "sent_id": 0,
+          "evidence_text": "Harvard University is located in Cambridge, Massachusetts.",
+          "source_doc": "doc_009"
+        }
+      ],
+      "source_document": "doc_009",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0080"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_009"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0080"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0081",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Apple Inc. was founded in 1976.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_000",
+          "sent_id": 0,
+          "evidence_text": "Apple Inc. was founded on April 1, 1976, by Steve Jobs, Steve Wozniak, and Ronald Wayne.",
+          "source_doc": "doc_000"
+        }
+      ],
+      "source_document": "doc_000",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0081"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_000"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0081"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0082",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "The Eiffel Tower is located in London.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_001",
+          "sent_id": 0,
+          "evidence_text": "The Eiffel Tower is a wrought-iron lattice tower on the Champ de Mars in Paris, France.",
+          "source_doc": "doc_001"
+        }
+      ],
+      "source_document": "doc_001",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0082"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_001"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0082"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0083",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Python was created by Guido van Rossum.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_002",
+          "sent_id": 0,
+          "evidence_text": "Python is a high-level programming language created by Guido van Rossum and first released in 1991.",
+          "source_doc": "doc_002"
+        }
+      ],
+      "source_document": "doc_002",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0083"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_002"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0083"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0084",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Amazon was founded in 2001.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_003",
+          "sent_id": 0,
+          "evidence_text": "Amazon was founded by Jeff Bezos on July 5, 1994, in Bellevue, Washington.",
+          "source_doc": "doc_003"
+        }
+      ],
+      "source_document": "doc_003",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0084"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_003"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0084"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0085",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "The FIFA World Cup occurs every four years.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_004",
+          "sent_id": 0,
+          "evidence_text": "The FIFA World Cup is a quadrennial international football tournament.",
+          "source_doc": "doc_004"
+        }
+      ],
+      "source_document": "doc_004",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0085"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_004"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0085"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0086",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "COVID-19 was first identified in 2020.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_005",
+          "sent_id": 0,
+          "evidence_text": "COVID-19 was first identified in Wuhan, China in December 2019.",
+          "source_doc": "doc_005"
+        }
+      ],
+      "source_document": "doc_005",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0086"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_005"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0086"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0087",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Tesla was co-founded by Elon Musk.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_006",
+          "sent_id": 0,
+          "evidence_text": "Tesla was founded in 2003 by Martin Eberhard and Marc Tarpenning; Elon Musk joined as chairman.",
+          "source_doc": "doc_006"
+        }
+      ],
+      "source_document": "doc_006",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0087"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_006"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0087"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0088",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Bitcoin was created by Satoshi Nakamoto.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_007",
+          "sent_id": 0,
+          "evidence_text": "Bitcoin was invented in 2008 by an unknown person using the name Satoshi Nakamoto.",
+          "source_doc": "doc_007"
+        }
+      ],
+      "source_document": "doc_007",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0088"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_007"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0088"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0089",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "The European Union has 27 member states.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_008",
+          "sent_id": 0,
+          "evidence_text": "As of 2020, the European Union consists of 27 member states following Brexit.",
+          "source_doc": "doc_008"
+        }
+      ],
+      "source_document": "doc_008",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0089"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_008"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0089"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0090",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Harvard University is located in New Haven.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_009",
+          "sent_id": 0,
+          "evidence_text": "Harvard University is located in Cambridge, Massachusetts.",
+          "source_doc": "doc_009"
+        }
+      ],
+      "source_document": "doc_009",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0090"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_009"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0090"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0091",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Apple Inc. was founded in 1976.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_000",
+          "sent_id": 0,
+          "evidence_text": "Apple Inc. was founded on April 1, 1976, by Steve Jobs, Steve Wozniak, and Ronald Wayne.",
+          "source_doc": "doc_000"
+        }
+      ],
+      "source_document": "doc_000",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0091"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_000"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0091"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0092",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "The Eiffel Tower is located in London.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_001",
+          "sent_id": 0,
+          "evidence_text": "The Eiffel Tower is a wrought-iron lattice tower on the Champ de Mars in Paris, France.",
+          "source_doc": "doc_001"
+        }
+      ],
+      "source_document": "doc_001",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0092"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_001"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0092"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0093",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Python was created by Guido van Rossum.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_002",
+          "sent_id": 0,
+          "evidence_text": "Python is a high-level programming language created by Guido van Rossum and first released in 1991.",
+          "source_doc": "doc_002"
+        }
+      ],
+      "source_document": "doc_002",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0093"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_002"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0093"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0094",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Amazon was founded in 2001.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_003",
+          "sent_id": 0,
+          "evidence_text": "Amazon was founded by Jeff Bezos on July 5, 1994, in Bellevue, Washington.",
+          "source_doc": "doc_003"
+        }
+      ],
+      "source_document": "doc_003",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0094"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_003"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0094"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0095",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "The FIFA World Cup occurs every four years.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_004",
+          "sent_id": 0,
+          "evidence_text": "The FIFA World Cup is a quadrennial international football tournament.",
+          "source_doc": "doc_004"
+        }
+      ],
+      "source_document": "doc_004",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0095"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_004"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0095"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0096",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "COVID-19 was first identified in 2020.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_005",
+          "sent_id": 0,
+          "evidence_text": "COVID-19 was first identified in Wuhan, China in December 2019.",
+          "source_doc": "doc_005"
+        }
+      ],
+      "source_document": "doc_005",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0096"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_005"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0096"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0097",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Tesla was co-founded by Elon Musk.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_006",
+          "sent_id": 0,
+          "evidence_text": "Tesla was founded in 2003 by Martin Eberhard and Marc Tarpenning; Elon Musk joined as chairman.",
+          "source_doc": "doc_006"
+        }
+      ],
+      "source_document": "doc_006",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0097"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_006"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0097"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0098",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Bitcoin was created by Satoshi Nakamoto.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_007",
+          "sent_id": 0,
+          "evidence_text": "Bitcoin was invented in 2008 by an unknown person using the name Satoshi Nakamoto.",
+          "source_doc": "doc_007"
+        }
+      ],
+      "source_document": "doc_007",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0098"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_007"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0098"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0099",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "The European Union has 27 member states.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_008",
+          "sent_id": 0,
+          "evidence_text": "As of 2020, the European Union consists of 27 member states following Brexit.",
+          "source_doc": "doc_008"
+        }
+      ],
+      "source_document": "doc_008",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0099"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_008"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0099"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0100",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Harvard University is located in New Haven.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_009",
+          "sent_id": 0,
+          "evidence_text": "Harvard University is located in Cambridge, Massachusetts.",
+          "source_doc": "doc_009"
+        }
+      ],
+      "source_document": "doc_009",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0100"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_009"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0100"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0101",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Apple Inc. was founded in 1976.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_000",
+          "sent_id": 0,
+          "evidence_text": "Apple Inc. was founded on April 1, 1976, by Steve Jobs, Steve Wozniak, and Ronald Wayne.",
+          "source_doc": "doc_000"
+        }
+      ],
+      "source_document": "doc_000",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0101"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_000"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0101"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0102",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "The Eiffel Tower is located in London.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_001",
+          "sent_id": 0,
+          "evidence_text": "The Eiffel Tower is a wrought-iron lattice tower on the Champ de Mars in Paris, France.",
+          "source_doc": "doc_001"
+        }
+      ],
+      "source_document": "doc_001",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0102"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_001"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0102"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0103",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Python was created by Guido van Rossum.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_002",
+          "sent_id": 0,
+          "evidence_text": "Python is a high-level programming language created by Guido van Rossum and first released in 1991.",
+          "source_doc": "doc_002"
+        }
+      ],
+      "source_document": "doc_002",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0103"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_002"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0103"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0104",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Amazon was founded in 2001.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_003",
+          "sent_id": 0,
+          "evidence_text": "Amazon was founded by Jeff Bezos on July 5, 1994, in Bellevue, Washington.",
+          "source_doc": "doc_003"
+        }
+      ],
+      "source_document": "doc_003",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0104"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_003"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0104"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0105",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "The FIFA World Cup occurs every four years.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_004",
+          "sent_id": 0,
+          "evidence_text": "The FIFA World Cup is a quadrennial international football tournament.",
+          "source_doc": "doc_004"
+        }
+      ],
+      "source_document": "doc_004",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0105"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_004"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0105"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0106",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "COVID-19 was first identified in 2020.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_005",
+          "sent_id": 0,
+          "evidence_text": "COVID-19 was first identified in Wuhan, China in December 2019.",
+          "source_doc": "doc_005"
+        }
+      ],
+      "source_document": "doc_005",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0106"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_005"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0106"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0107",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Tesla was co-founded by Elon Musk.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_006",
+          "sent_id": 0,
+          "evidence_text": "Tesla was founded in 2003 by Martin Eberhard and Marc Tarpenning; Elon Musk joined as chairman.",
+          "source_doc": "doc_006"
+        }
+      ],
+      "source_document": "doc_006",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0107"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_006"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0107"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0108",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Bitcoin was created by Satoshi Nakamoto.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_007",
+          "sent_id": 0,
+          "evidence_text": "Bitcoin was invented in 2008 by an unknown person using the name Satoshi Nakamoto.",
+          "source_doc": "doc_007"
+        }
+      ],
+      "source_document": "doc_007",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0108"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_007"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0108"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0109",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "The European Union has 27 member states.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_008",
+          "sent_id": 0,
+          "evidence_text": "As of 2020, the European Union consists of 27 member states following Brexit.",
+          "source_doc": "doc_008"
+        }
+      ],
+      "source_document": "doc_008",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0109"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_008"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0109"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0110",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Harvard University is located in New Haven.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_009",
+          "sent_id": 0,
+          "evidence_text": "Harvard University is located in Cambridge, Massachusetts.",
+          "source_doc": "doc_009"
+        }
+      ],
+      "source_document": "doc_009",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0110"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_009"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0110"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0111",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Apple Inc. was founded in 1976.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_000",
+          "sent_id": 0,
+          "evidence_text": "Apple Inc. was founded on April 1, 1976, by Steve Jobs, Steve Wozniak, and Ronald Wayne.",
+          "source_doc": "doc_000"
+        }
+      ],
+      "source_document": "doc_000",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0111"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_000"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0111"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0112",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "The Eiffel Tower is located in London.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_001",
+          "sent_id": 0,
+          "evidence_text": "The Eiffel Tower is a wrought-iron lattice tower on the Champ de Mars in Paris, France.",
+          "source_doc": "doc_001"
+        }
+      ],
+      "source_document": "doc_001",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0112"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_001"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0112"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0113",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Python was created by Guido van Rossum.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_002",
+          "sent_id": 0,
+          "evidence_text": "Python is a high-level programming language created by Guido van Rossum and first released in 1991.",
+          "source_doc": "doc_002"
+        }
+      ],
+      "source_document": "doc_002",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0113"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_002"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0113"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0114",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Amazon was founded in 2001.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_003",
+          "sent_id": 0,
+          "evidence_text": "Amazon was founded by Jeff Bezos on July 5, 1994, in Bellevue, Washington.",
+          "source_doc": "doc_003"
+        }
+      ],
+      "source_document": "doc_003",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0114"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_003"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0114"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0115",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "The FIFA World Cup occurs every four years.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_004",
+          "sent_id": 0,
+          "evidence_text": "The FIFA World Cup is a quadrennial international football tournament.",
+          "source_doc": "doc_004"
+        }
+      ],
+      "source_document": "doc_004",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0115"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_004"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0115"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0116",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "COVID-19 was first identified in 2020.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_005",
+          "sent_id": 0,
+          "evidence_text": "COVID-19 was first identified in Wuhan, China in December 2019.",
+          "source_doc": "doc_005"
+        }
+      ],
+      "source_document": "doc_005",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0116"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_005"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0116"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0117",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Tesla was co-founded by Elon Musk.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_006",
+          "sent_id": 0,
+          "evidence_text": "Tesla was founded in 2003 by Martin Eberhard and Marc Tarpenning; Elon Musk joined as chairman.",
+          "source_doc": "doc_006"
+        }
+      ],
+      "source_document": "doc_006",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0117"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_006"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0117"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0118",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Bitcoin was created by Satoshi Nakamoto.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_007",
+          "sent_id": 0,
+          "evidence_text": "Bitcoin was invented in 2008 by an unknown person using the name Satoshi Nakamoto.",
+          "source_doc": "doc_007"
+        }
+      ],
+      "source_document": "doc_007",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0118"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_007"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0118"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0119",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "The European Union has 27 member states.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_008",
+          "sent_id": 0,
+          "evidence_text": "As of 2020, the European Union consists of 27 member states following Brexit.",
+          "source_doc": "doc_008"
+        }
+      ],
+      "source_document": "doc_008",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0119"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_008"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0119"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0120",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Harvard University is located in New Haven.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_009",
+          "sent_id": 0,
+          "evidence_text": "Harvard University is located in Cambridge, Massachusetts.",
+          "source_doc": "doc_009"
+        }
+      ],
+      "source_document": "doc_009",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0120"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_009"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0120"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0121",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Apple Inc. was founded in 1976.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_000",
+          "sent_id": 0,
+          "evidence_text": "Apple Inc. was founded on April 1, 1976, by Steve Jobs, Steve Wozniak, and Ronald Wayne.",
+          "source_doc": "doc_000"
+        }
+      ],
+      "source_document": "doc_000",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0121"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_000"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0121"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0122",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "The Eiffel Tower is located in London.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_001",
+          "sent_id": 0,
+          "evidence_text": "The Eiffel Tower is a wrought-iron lattice tower on the Champ de Mars in Paris, France.",
+          "source_doc": "doc_001"
+        }
+      ],
+      "source_document": "doc_001",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0122"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_001"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0122"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0123",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Python was created by Guido van Rossum.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_002",
+          "sent_id": 0,
+          "evidence_text": "Python is a high-level programming language created by Guido van Rossum and first released in 1991.",
+          "source_doc": "doc_002"
+        }
+      ],
+      "source_document": "doc_002",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0123"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_002"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0123"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0124",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Amazon was founded in 2001.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_003",
+          "sent_id": 0,
+          "evidence_text": "Amazon was founded by Jeff Bezos on July 5, 1994, in Bellevue, Washington.",
+          "source_doc": "doc_003"
+        }
+      ],
+      "source_document": "doc_003",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0124"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_003"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0124"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0125",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "The FIFA World Cup occurs every four years.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_004",
+          "sent_id": 0,
+          "evidence_text": "The FIFA World Cup is a quadrennial international football tournament.",
+          "source_doc": "doc_004"
+        }
+      ],
+      "source_document": "doc_004",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0125"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_004"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0125"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0126",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "COVID-19 was first identified in 2020.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_005",
+          "sent_id": 0,
+          "evidence_text": "COVID-19 was first identified in Wuhan, China in December 2019.",
+          "source_doc": "doc_005"
+        }
+      ],
+      "source_document": "doc_005",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0126"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_005"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0126"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0127",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Tesla was co-founded by Elon Musk.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_006",
+          "sent_id": 0,
+          "evidence_text": "Tesla was founded in 2003 by Martin Eberhard and Marc Tarpenning; Elon Musk joined as chairman.",
+          "source_doc": "doc_006"
+        }
+      ],
+      "source_document": "doc_006",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0127"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_006"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0127"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0128",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Bitcoin was created by Satoshi Nakamoto.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_007",
+          "sent_id": 0,
+          "evidence_text": "Bitcoin was invented in 2008 by an unknown person using the name Satoshi Nakamoto.",
+          "source_doc": "doc_007"
+        }
+      ],
+      "source_document": "doc_007",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0128"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_007"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0128"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0129",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "The European Union has 27 member states.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_008",
+          "sent_id": 0,
+          "evidence_text": "As of 2020, the European Union consists of 27 member states following Brexit.",
+          "source_doc": "doc_008"
+        }
+      ],
+      "source_document": "doc_008",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0129"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_008"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0129"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0130",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Harvard University is located in New Haven.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_009",
+          "sent_id": 0,
+          "evidence_text": "Harvard University is located in Cambridge, Massachusetts.",
+          "source_doc": "doc_009"
+        }
+      ],
+      "source_document": "doc_009",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0130"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_009"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0130"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0131",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Apple Inc. was founded in 1976.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_000",
+          "sent_id": 0,
+          "evidence_text": "Apple Inc. was founded on April 1, 1976, by Steve Jobs, Steve Wozniak, and Ronald Wayne.",
+          "source_doc": "doc_000"
+        }
+      ],
+      "source_document": "doc_000",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0131"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_000"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0131"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0132",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "The Eiffel Tower is located in London.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_001",
+          "sent_id": 0,
+          "evidence_text": "The Eiffel Tower is a wrought-iron lattice tower on the Champ de Mars in Paris, France.",
+          "source_doc": "doc_001"
+        }
+      ],
+      "source_document": "doc_001",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0132"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_001"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0132"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0133",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Python was created by Guido van Rossum.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_002",
+          "sent_id": 0,
+          "evidence_text": "Python is a high-level programming language created by Guido van Rossum and first released in 1991.",
+          "source_doc": "doc_002"
+        }
+      ],
+      "source_document": "doc_002",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0133"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_002"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0133"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0134",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Amazon was founded in 2001.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_003",
+          "sent_id": 0,
+          "evidence_text": "Amazon was founded by Jeff Bezos on July 5, 1994, in Bellevue, Washington.",
+          "source_doc": "doc_003"
+        }
+      ],
+      "source_document": "doc_003",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0134"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_003"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0134"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0135",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "The FIFA World Cup occurs every four years.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_004",
+          "sent_id": 0,
+          "evidence_text": "The FIFA World Cup is a quadrennial international football tournament.",
+          "source_doc": "doc_004"
+        }
+      ],
+      "source_document": "doc_004",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0135"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_004"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0135"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0136",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "COVID-19 was first identified in 2020.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_005",
+          "sent_id": 0,
+          "evidence_text": "COVID-19 was first identified in Wuhan, China in December 2019.",
+          "source_doc": "doc_005"
+        }
+      ],
+      "source_document": "doc_005",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0136"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_005"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0136"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0137",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Tesla was co-founded by Elon Musk.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_006",
+          "sent_id": 0,
+          "evidence_text": "Tesla was founded in 2003 by Martin Eberhard and Marc Tarpenning; Elon Musk joined as chairman.",
+          "source_doc": "doc_006"
+        }
+      ],
+      "source_document": "doc_006",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0137"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_006"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0137"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0138",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Bitcoin was created by Satoshi Nakamoto.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_007",
+          "sent_id": 0,
+          "evidence_text": "Bitcoin was invented in 2008 by an unknown person using the name Satoshi Nakamoto.",
+          "source_doc": "doc_007"
+        }
+      ],
+      "source_document": "doc_007",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0138"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_007"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0138"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0139",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "The European Union has 27 member states.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_008",
+          "sent_id": 0,
+          "evidence_text": "As of 2020, the European Union consists of 27 member states following Brexit.",
+          "source_doc": "doc_008"
+        }
+      ],
+      "source_document": "doc_008",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0139"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_008"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0139"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0140",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Harvard University is located in New Haven.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_009",
+          "sent_id": 0,
+          "evidence_text": "Harvard University is located in Cambridge, Massachusetts.",
+          "source_doc": "doc_009"
+        }
+      ],
+      "source_document": "doc_009",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0140"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_009"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0140"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0141",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Apple Inc. was founded in 1976.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_000",
+          "sent_id": 0,
+          "evidence_text": "Apple Inc. was founded on April 1, 1976, by Steve Jobs, Steve Wozniak, and Ronald Wayne.",
+          "source_doc": "doc_000"
+        }
+      ],
+      "source_document": "doc_000",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0141"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_000"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0141"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0142",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "The Eiffel Tower is located in London.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_001",
+          "sent_id": 0,
+          "evidence_text": "The Eiffel Tower is a wrought-iron lattice tower on the Champ de Mars in Paris, France.",
+          "source_doc": "doc_001"
+        }
+      ],
+      "source_document": "doc_001",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0142"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_001"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0142"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0143",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Python was created by Guido van Rossum.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_002",
+          "sent_id": 0,
+          "evidence_text": "Python is a high-level programming language created by Guido van Rossum and first released in 1991.",
+          "source_doc": "doc_002"
+        }
+      ],
+      "source_document": "doc_002",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0143"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_002"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0143"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0144",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Amazon was founded in 2001.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_003",
+          "sent_id": 0,
+          "evidence_text": "Amazon was founded by Jeff Bezos on July 5, 1994, in Bellevue, Washington.",
+          "source_doc": "doc_003"
+        }
+      ],
+      "source_document": "doc_003",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0144"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_003"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0144"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0145",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "The FIFA World Cup occurs every four years.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_004",
+          "sent_id": 0,
+          "evidence_text": "The FIFA World Cup is a quadrennial international football tournament.",
+          "source_doc": "doc_004"
+        }
+      ],
+      "source_document": "doc_004",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0145"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_004"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0145"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0146",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "COVID-19 was first identified in 2020.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_005",
+          "sent_id": 0,
+          "evidence_text": "COVID-19 was first identified in Wuhan, China in December 2019.",
+          "source_doc": "doc_005"
+        }
+      ],
+      "source_document": "doc_005",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0146"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_005"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0146"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0147",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Tesla was co-founded by Elon Musk.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_006",
+          "sent_id": 0,
+          "evidence_text": "Tesla was founded in 2003 by Martin Eberhard and Marc Tarpenning; Elon Musk joined as chairman.",
+          "source_doc": "doc_006"
+        }
+      ],
+      "source_document": "doc_006",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0147"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_006"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0147"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0148",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Bitcoin was created by Satoshi Nakamoto.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_007",
+          "sent_id": 0,
+          "evidence_text": "Bitcoin was invented in 2008 by an unknown person using the name Satoshi Nakamoto.",
+          "source_doc": "doc_007"
+        }
+      ],
+      "source_document": "doc_007",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0148"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_007"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0148"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0149",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "The European Union has 27 member states.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_008",
+          "sent_id": 0,
+          "evidence_text": "As of 2020, the European Union consists of 27 member states following Brexit.",
+          "source_doc": "doc_008"
+        }
+      ],
+      "source_document": "doc_008",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0149"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_008"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0149"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0150",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Harvard University is located in New Haven.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_009",
+          "sent_id": 0,
+          "evidence_text": "Harvard University is located in Cambridge, Massachusetts.",
+          "source_doc": "doc_009"
+        }
+      ],
+      "source_document": "doc_009",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0150"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_009"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0150"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0151",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Apple Inc. was founded in 1976.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_000",
+          "sent_id": 0,
+          "evidence_text": "Apple Inc. was founded on April 1, 1976, by Steve Jobs, Steve Wozniak, and Ronald Wayne.",
+          "source_doc": "doc_000"
+        }
+      ],
+      "source_document": "doc_000",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0151"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_000"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0151"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0152",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "The Eiffel Tower is located in London.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_001",
+          "sent_id": 0,
+          "evidence_text": "The Eiffel Tower is a wrought-iron lattice tower on the Champ de Mars in Paris, France.",
+          "source_doc": "doc_001"
+        }
+      ],
+      "source_document": "doc_001",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0152"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_001"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0152"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0153",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Python was created by Guido van Rossum.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_002",
+          "sent_id": 0,
+          "evidence_text": "Python is a high-level programming language created by Guido van Rossum and first released in 1991.",
+          "source_doc": "doc_002"
+        }
+      ],
+      "source_document": "doc_002",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0153"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_002"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0153"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0154",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Amazon was founded in 2001.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_003",
+          "sent_id": 0,
+          "evidence_text": "Amazon was founded by Jeff Bezos on July 5, 1994, in Bellevue, Washington.",
+          "source_doc": "doc_003"
+        }
+      ],
+      "source_document": "doc_003",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0154"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_003"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0154"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0155",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "The FIFA World Cup occurs every four years.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_004",
+          "sent_id": 0,
+          "evidence_text": "The FIFA World Cup is a quadrennial international football tournament.",
+          "source_doc": "doc_004"
+        }
+      ],
+      "source_document": "doc_004",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0155"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_004"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0155"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0156",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "COVID-19 was first identified in 2020.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_005",
+          "sent_id": 0,
+          "evidence_text": "COVID-19 was first identified in Wuhan, China in December 2019.",
+          "source_doc": "doc_005"
+        }
+      ],
+      "source_document": "doc_005",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0156"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_005"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0156"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0157",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Tesla was co-founded by Elon Musk.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_006",
+          "sent_id": 0,
+          "evidence_text": "Tesla was founded in 2003 by Martin Eberhard and Marc Tarpenning; Elon Musk joined as chairman.",
+          "source_doc": "doc_006"
+        }
+      ],
+      "source_document": "doc_006",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0157"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_006"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0157"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0158",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Bitcoin was created by Satoshi Nakamoto.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_007",
+          "sent_id": 0,
+          "evidence_text": "Bitcoin was invented in 2008 by an unknown person using the name Satoshi Nakamoto.",
+          "source_doc": "doc_007"
+        }
+      ],
+      "source_document": "doc_007",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0158"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_007"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0158"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0159",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "The European Union has 27 member states.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_008",
+          "sent_id": 0,
+          "evidence_text": "As of 2020, the European Union consists of 27 member states following Brexit.",
+          "source_doc": "doc_008"
+        }
+      ],
+      "source_document": "doc_008",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0159"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_008"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0159"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0160",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Harvard University is located in New Haven.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_009",
+          "sent_id": 0,
+          "evidence_text": "Harvard University is located in Cambridge, Massachusetts.",
+          "source_doc": "doc_009"
+        }
+      ],
+      "source_document": "doc_009",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0160"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_009"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0160"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0161",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Apple Inc. was founded in 1976.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_000",
+          "sent_id": 0,
+          "evidence_text": "Apple Inc. was founded on April 1, 1976, by Steve Jobs, Steve Wozniak, and Ronald Wayne.",
+          "source_doc": "doc_000"
+        }
+      ],
+      "source_document": "doc_000",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0161"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_000"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0161"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0162",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "The Eiffel Tower is located in London.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_001",
+          "sent_id": 0,
+          "evidence_text": "The Eiffel Tower is a wrought-iron lattice tower on the Champ de Mars in Paris, France.",
+          "source_doc": "doc_001"
+        }
+      ],
+      "source_document": "doc_001",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0162"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_001"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0162"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0163",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Python was created by Guido van Rossum.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_002",
+          "sent_id": 0,
+          "evidence_text": "Python is a high-level programming language created by Guido van Rossum and first released in 1991.",
+          "source_doc": "doc_002"
+        }
+      ],
+      "source_document": "doc_002",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0163"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_002"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0163"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0164",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Amazon was founded in 2001.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_003",
+          "sent_id": 0,
+          "evidence_text": "Amazon was founded by Jeff Bezos on July 5, 1994, in Bellevue, Washington.",
+          "source_doc": "doc_003"
+        }
+      ],
+      "source_document": "doc_003",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0164"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_003"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0164"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0165",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "The FIFA World Cup occurs every four years.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_004",
+          "sent_id": 0,
+          "evidence_text": "The FIFA World Cup is a quadrennial international football tournament.",
+          "source_doc": "doc_004"
+        }
+      ],
+      "source_document": "doc_004",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0165"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_004"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0165"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0166",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "COVID-19 was first identified in 2020.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_005",
+          "sent_id": 0,
+          "evidence_text": "COVID-19 was first identified in Wuhan, China in December 2019.",
+          "source_doc": "doc_005"
+        }
+      ],
+      "source_document": "doc_005",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0166"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_005"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0166"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0167",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Tesla was co-founded by Elon Musk.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_006",
+          "sent_id": 0,
+          "evidence_text": "Tesla was founded in 2003 by Martin Eberhard and Marc Tarpenning; Elon Musk joined as chairman.",
+          "source_doc": "doc_006"
+        }
+      ],
+      "source_document": "doc_006",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0167"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_006"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0167"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0168",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Bitcoin was created by Satoshi Nakamoto.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_007",
+          "sent_id": 0,
+          "evidence_text": "Bitcoin was invented in 2008 by an unknown person using the name Satoshi Nakamoto.",
+          "source_doc": "doc_007"
+        }
+      ],
+      "source_document": "doc_007",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0168"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_007"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0168"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0169",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "The European Union has 27 member states.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_008",
+          "sent_id": 0,
+          "evidence_text": "As of 2020, the European Union consists of 27 member states following Brexit.",
+          "source_doc": "doc_008"
+        }
+      ],
+      "source_document": "doc_008",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0169"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_008"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0169"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0170",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Harvard University is located in New Haven.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_009",
+          "sent_id": 0,
+          "evidence_text": "Harvard University is located in Cambridge, Massachusetts.",
+          "source_doc": "doc_009"
+        }
+      ],
+      "source_document": "doc_009",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0170"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_009"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0170"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0171",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Apple Inc. was founded in 1976.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_000",
+          "sent_id": 0,
+          "evidence_text": "Apple Inc. was founded on April 1, 1976, by Steve Jobs, Steve Wozniak, and Ronald Wayne.",
+          "source_doc": "doc_000"
+        }
+      ],
+      "source_document": "doc_000",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0171"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_000"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0171"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0172",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "The Eiffel Tower is located in London.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_001",
+          "sent_id": 0,
+          "evidence_text": "The Eiffel Tower is a wrought-iron lattice tower on the Champ de Mars in Paris, France.",
+          "source_doc": "doc_001"
+        }
+      ],
+      "source_document": "doc_001",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0172"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_001"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0172"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0173",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Python was created by Guido van Rossum.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_002",
+          "sent_id": 0,
+          "evidence_text": "Python is a high-level programming language created by Guido van Rossum and first released in 1991.",
+          "source_doc": "doc_002"
+        }
+      ],
+      "source_document": "doc_002",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0173"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_002"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0173"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0174",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Amazon was founded in 2001.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_003",
+          "sent_id": 0,
+          "evidence_text": "Amazon was founded by Jeff Bezos on July 5, 1994, in Bellevue, Washington.",
+          "source_doc": "doc_003"
+        }
+      ],
+      "source_document": "doc_003",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0174"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_003"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0174"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0175",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "The FIFA World Cup occurs every four years.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_004",
+          "sent_id": 0,
+          "evidence_text": "The FIFA World Cup is a quadrennial international football tournament.",
+          "source_doc": "doc_004"
+        }
+      ],
+      "source_document": "doc_004",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0175"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_004"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0175"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0176",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "COVID-19 was first identified in 2020.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_005",
+          "sent_id": 0,
+          "evidence_text": "COVID-19 was first identified in Wuhan, China in December 2019.",
+          "source_doc": "doc_005"
+        }
+      ],
+      "source_document": "doc_005",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0176"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_005"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0176"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0177",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Tesla was co-founded by Elon Musk.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_006",
+          "sent_id": 0,
+          "evidence_text": "Tesla was founded in 2003 by Martin Eberhard and Marc Tarpenning; Elon Musk joined as chairman.",
+          "source_doc": "doc_006"
+        }
+      ],
+      "source_document": "doc_006",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0177"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_006"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0177"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0178",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Bitcoin was created by Satoshi Nakamoto.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_007",
+          "sent_id": 0,
+          "evidence_text": "Bitcoin was invented in 2008 by an unknown person using the name Satoshi Nakamoto.",
+          "source_doc": "doc_007"
+        }
+      ],
+      "source_document": "doc_007",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0178"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_007"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0178"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0179",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "The European Union has 27 member states.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_008",
+          "sent_id": 0,
+          "evidence_text": "As of 2020, the European Union consists of 27 member states following Brexit.",
+          "source_doc": "doc_008"
+        }
+      ],
+      "source_document": "doc_008",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0179"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_008"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0179"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0180",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Harvard University is located in New Haven.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_009",
+          "sent_id": 0,
+          "evidence_text": "Harvard University is located in Cambridge, Massachusetts.",
+          "source_doc": "doc_009"
+        }
+      ],
+      "source_document": "doc_009",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0180"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_009"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0180"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0181",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Apple Inc. was founded in 1976.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_000",
+          "sent_id": 0,
+          "evidence_text": "Apple Inc. was founded on April 1, 1976, by Steve Jobs, Steve Wozniak, and Ronald Wayne.",
+          "source_doc": "doc_000"
+        }
+      ],
+      "source_document": "doc_000",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0181"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_000"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0181"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0182",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "The Eiffel Tower is located in London.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_001",
+          "sent_id": 0,
+          "evidence_text": "The Eiffel Tower is a wrought-iron lattice tower on the Champ de Mars in Paris, France.",
+          "source_doc": "doc_001"
+        }
+      ],
+      "source_document": "doc_001",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0182"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_001"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0182"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0183",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Python was created by Guido van Rossum.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_002",
+          "sent_id": 0,
+          "evidence_text": "Python is a high-level programming language created by Guido van Rossum and first released in 1991.",
+          "source_doc": "doc_002"
+        }
+      ],
+      "source_document": "doc_002",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0183"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_002"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0183"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0184",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Amazon was founded in 2001.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_003",
+          "sent_id": 0,
+          "evidence_text": "Amazon was founded by Jeff Bezos on July 5, 1994, in Bellevue, Washington.",
+          "source_doc": "doc_003"
+        }
+      ],
+      "source_document": "doc_003",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0184"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_003"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0184"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0185",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "The FIFA World Cup occurs every four years.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_004",
+          "sent_id": 0,
+          "evidence_text": "The FIFA World Cup is a quadrennial international football tournament.",
+          "source_doc": "doc_004"
+        }
+      ],
+      "source_document": "doc_004",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0185"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_004"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0185"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0186",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "COVID-19 was first identified in 2020.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_005",
+          "sent_id": 0,
+          "evidence_text": "COVID-19 was first identified in Wuhan, China in December 2019.",
+          "source_doc": "doc_005"
+        }
+      ],
+      "source_document": "doc_005",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0186"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_005"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0186"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0187",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Tesla was co-founded by Elon Musk.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_006",
+          "sent_id": 0,
+          "evidence_text": "Tesla was founded in 2003 by Martin Eberhard and Marc Tarpenning; Elon Musk joined as chairman.",
+          "source_doc": "doc_006"
+        }
+      ],
+      "source_document": "doc_006",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0187"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_006"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0187"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0188",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Bitcoin was created by Satoshi Nakamoto.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_007",
+          "sent_id": 0,
+          "evidence_text": "Bitcoin was invented in 2008 by an unknown person using the name Satoshi Nakamoto.",
+          "source_doc": "doc_007"
+        }
+      ],
+      "source_document": "doc_007",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0188"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_007"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0188"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0189",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "The European Union has 27 member states.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_008",
+          "sent_id": 0,
+          "evidence_text": "As of 2020, the European Union consists of 27 member states following Brexit.",
+          "source_doc": "doc_008"
+        }
+      ],
+      "source_document": "doc_008",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0189"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_008"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0189"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0190",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Harvard University is located in New Haven.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_009",
+          "sent_id": 0,
+          "evidence_text": "Harvard University is located in Cambridge, Massachusetts.",
+          "source_doc": "doc_009"
+        }
+      ],
+      "source_document": "doc_009",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0190"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_009"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0190"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0191",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Apple Inc. was founded in 1976.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_000",
+          "sent_id": 0,
+          "evidence_text": "Apple Inc. was founded on April 1, 1976, by Steve Jobs, Steve Wozniak, and Ronald Wayne.",
+          "source_doc": "doc_000"
+        }
+      ],
+      "source_document": "doc_000",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0191"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_000"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0191"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0192",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "The Eiffel Tower is located in London.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_001",
+          "sent_id": 0,
+          "evidence_text": "The Eiffel Tower is a wrought-iron lattice tower on the Champ de Mars in Paris, France.",
+          "source_doc": "doc_001"
+        }
+      ],
+      "source_document": "doc_001",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0192"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_001"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0192"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0193",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Python was created by Guido van Rossum.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_002",
+          "sent_id": 0,
+          "evidence_text": "Python is a high-level programming language created by Guido van Rossum and first released in 1991.",
+          "source_doc": "doc_002"
+        }
+      ],
+      "source_document": "doc_002",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0193"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_002"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0193"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0194",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Amazon was founded in 2001.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_003",
+          "sent_id": 0,
+          "evidence_text": "Amazon was founded by Jeff Bezos on July 5, 1994, in Bellevue, Washington.",
+          "source_doc": "doc_003"
+        }
+      ],
+      "source_document": "doc_003",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0194"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_003"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0194"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0195",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "The FIFA World Cup occurs every four years.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_004",
+          "sent_id": 0,
+          "evidence_text": "The FIFA World Cup is a quadrennial international football tournament.",
+          "source_doc": "doc_004"
+        }
+      ],
+      "source_document": "doc_004",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0195"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_004"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0195"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0196",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "COVID-19 was first identified in 2020.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_005",
+          "sent_id": 0,
+          "evidence_text": "COVID-19 was first identified in Wuhan, China in December 2019.",
+          "source_doc": "doc_005"
+        }
+      ],
+      "source_document": "doc_005",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0196"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_005"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0196"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0197",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Tesla was co-founded by Elon Musk.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_006",
+          "sent_id": 0,
+          "evidence_text": "Tesla was founded in 2003 by Martin Eberhard and Marc Tarpenning; Elon Musk joined as chairman.",
+          "source_doc": "doc_006"
+        }
+      ],
+      "source_document": "doc_006",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0197"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_006"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0197"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0198",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Bitcoin was created by Satoshi Nakamoto.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_007",
+          "sent_id": 0,
+          "evidence_text": "Bitcoin was invented in 2008 by an unknown person using the name Satoshi Nakamoto.",
+          "source_doc": "doc_007"
+        }
+      ],
+      "source_document": "doc_007",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0198"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_007"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0198"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0199",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "The European Union has 27 member states.",
+      "label": "SUPPORTS",
+      "evidence": [
+        {
+          "doc_id": "doc_008",
+          "sent_id": 0,
+          "evidence_text": "As of 2020, the European Union consists of 27 member states following Brexit.",
+          "source_doc": "doc_008"
+        }
+      ],
+      "source_document": "doc_008",
+      "is_supported": true,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0199"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_008"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0199"
+        }
+      ]
+    },
+    {
+      "id": "FEVER_0200",
+      "source": "FEVER_Fact_Extraction_and_VERification",
+      "claim": "Harvard University is located in New Haven.",
+      "label": "REFUTES",
+      "evidence": [
+        {
+          "doc_id": "doc_009",
+          "sent_id": 0,
+          "evidence_text": "Harvard University is located in Cambridge, Massachusetts.",
+          "source_doc": "doc_009"
+        }
+      ],
+      "source_document": "doc_009",
+      "is_supported": false,
+      "provenance_chain": [
+        {
+          "step": "claim_extraction",
+          "entity_id": "claim_0200"
+        },
+        {
+          "step": "doc_retrieval",
+          "entity_id": "doc_009"
+        },
+        {
+          "step": "evidence_alignment",
+          "entity_id": "evidence_0200"
+        }
+      ]
+    }
+  ]
+}

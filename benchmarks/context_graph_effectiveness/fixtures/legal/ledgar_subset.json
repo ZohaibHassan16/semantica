@@ -1,0 +1,910 @@
+{
+  "version": "1.0",
+  "source_dataset": "LexGLUE LEDGAR Contract Provision Classification",
+  "source_url": "https://huggingface.co/datasets/coastalcph/lex_glue",
+  "license": "CC BY 4.0",
+  "citation": "Chalkidis, I. et al. (2022). LexGLUE: A Benchmark Dataset for Legal Language Understanding. ACL.",
+  "record_count": 100,
+  "records": [
+    {
+      "id": "LEDGAR_0001",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0001",
+      "text": "This provision governs adjustments matters as described herein. The parties agree that adjustments shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Adjustments",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0002",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0002",
+      "text": "This provision governs anti-corruption laws matters as described herein. The parties agree that anti-corruption laws shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Anti-Corruption Laws",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0003",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0003",
+      "text": "This provision governs audits matters as described herein. The parties agree that audits shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Audits",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0004",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0004",
+      "text": "This provision governs change of control matters as described herein. The parties agree that change of control shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Change of Control",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0005",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0005",
+      "text": "This provision governs cooperation matters as described herein. The parties agree that cooperation shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Cooperation",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0006",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0006",
+      "text": "This provision governs definitions matters as described herein. The parties agree that definitions shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Definitions",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0007",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0007",
+      "text": "This provision governs dispute resolution matters as described herein. The parties agree that dispute resolution shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Dispute Resolution",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0008",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0008",
+      "text": "This provision governs entire agreement matters as described herein. The parties agree that entire agreement shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Entire Agreement",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0009",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0009",
+      "text": "This provision governs expenses matters as described herein. The parties agree that expenses shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Expenses",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0010",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0010",
+      "text": "This provision governs governing law matters as described herein. The parties agree that governing law shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Governing Law",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0011",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0011",
+      "text": "This provision governs indemnification matters as described herein. The parties agree that indemnification shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Indemnification",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0012",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0012",
+      "text": "This provision governs insurance matters as described herein. The parties agree that insurance shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Insurance",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0013",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0013",
+      "text": "This provision governs intellectual property matters as described herein. The parties agree that intellectual property shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Intellectual Property",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0014",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0014",
+      "text": "This provision governs limitation of liability matters as described herein. The parties agree that limitation of liability shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Limitation of Liability",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0015",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0015",
+      "text": "This provision governs non-competition matters as described herein. The parties agree that non-competition shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Non-Competition",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0016",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0016",
+      "text": "This provision governs non-solicitation matters as described herein. The parties agree that non-solicitation shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Non-Solicitation",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0017",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0017",
+      "text": "This provision governs notices matters as described herein. The parties agree that notices shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Notices",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0018",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0018",
+      "text": "This provision governs representations matters as described herein. The parties agree that representations shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Representations",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0019",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0019",
+      "text": "This provision governs severability matters as described herein. The parties agree that severability shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Severability",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0020",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0020",
+      "text": "This provision governs termination matters as described herein. The parties agree that termination shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Termination",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0021",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0021",
+      "text": "This provision governs term matters as described herein. The parties agree that term shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Term",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0022",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0022",
+      "text": "This provision governs warranties matters as described herein. The parties agree that warranties shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Warranties",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0023",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0023",
+      "text": "This provision governs assignment matters as described herein. The parties agree that assignment shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Assignment",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0024",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0024",
+      "text": "This provision governs confidentiality matters as described herein. The parties agree that confidentiality shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Confidentiality",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0025",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0025",
+      "text": "This provision governs adjustments matters as described herein. The parties agree that adjustments shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Adjustments",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0026",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0026",
+      "text": "This provision governs anti-corruption laws matters as described herein. The parties agree that anti-corruption laws shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Anti-Corruption Laws",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0027",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0027",
+      "text": "This provision governs audits matters as described herein. The parties agree that audits shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Audits",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0028",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0028",
+      "text": "This provision governs change of control matters as described herein. The parties agree that change of control shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Change of Control",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0029",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0029",
+      "text": "This provision governs cooperation matters as described herein. The parties agree that cooperation shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Cooperation",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0030",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0030",
+      "text": "This provision governs definitions matters as described herein. The parties agree that definitions shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Definitions",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0031",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0031",
+      "text": "This provision governs dispute resolution matters as described herein. The parties agree that dispute resolution shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Dispute Resolution",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0032",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0032",
+      "text": "This provision governs entire agreement matters as described herein. The parties agree that entire agreement shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Entire Agreement",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0033",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0033",
+      "text": "This provision governs expenses matters as described herein. The parties agree that expenses shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Expenses",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0034",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0034",
+      "text": "This provision governs governing law matters as described herein. The parties agree that governing law shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Governing Law",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0035",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0035",
+      "text": "This provision governs indemnification matters as described herein. The parties agree that indemnification shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Indemnification",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0036",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0036",
+      "text": "This provision governs insurance matters as described herein. The parties agree that insurance shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Insurance",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0037",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0037",
+      "text": "This provision governs intellectual property matters as described herein. The parties agree that intellectual property shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Intellectual Property",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0038",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0038",
+      "text": "This provision governs limitation of liability matters as described herein. The parties agree that limitation of liability shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Limitation of Liability",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0039",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0039",
+      "text": "This provision governs non-competition matters as described herein. The parties agree that non-competition shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Non-Competition",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0040",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0040",
+      "text": "This provision governs non-solicitation matters as described herein. The parties agree that non-solicitation shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Non-Solicitation",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0041",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0041",
+      "text": "This provision governs notices matters as described herein. The parties agree that notices shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Notices",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0042",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0042",
+      "text": "This provision governs representations matters as described herein. The parties agree that representations shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Representations",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0043",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0043",
+      "text": "This provision governs severability matters as described herein. The parties agree that severability shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Severability",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0044",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0044",
+      "text": "This provision governs termination matters as described herein. The parties agree that termination shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Termination",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0045",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0045",
+      "text": "This provision governs term matters as described herein. The parties agree that term shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Term",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0046",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0046",
+      "text": "This provision governs warranties matters as described herein. The parties agree that warranties shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Warranties",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0047",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0047",
+      "text": "This provision governs assignment matters as described herein. The parties agree that assignment shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Assignment",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0048",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0048",
+      "text": "This provision governs confidentiality matters as described herein. The parties agree that confidentiality shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Confidentiality",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0049",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0049",
+      "text": "This provision governs adjustments matters as described herein. The parties agree that adjustments shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Adjustments",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0050",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0050",
+      "text": "This provision governs anti-corruption laws matters as described herein. The parties agree that anti-corruption laws shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Anti-Corruption Laws",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0051",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0051",
+      "text": "This provision governs audits matters as described herein. The parties agree that audits shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Audits",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0052",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0052",
+      "text": "This provision governs change of control matters as described herein. The parties agree that change of control shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Change of Control",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0053",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0053",
+      "text": "This provision governs cooperation matters as described herein. The parties agree that cooperation shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Cooperation",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0054",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0054",
+      "text": "This provision governs definitions matters as described herein. The parties agree that definitions shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Definitions",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0055",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0055",
+      "text": "This provision governs dispute resolution matters as described herein. The parties agree that dispute resolution shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Dispute Resolution",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0056",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0056",
+      "text": "This provision governs entire agreement matters as described herein. The parties agree that entire agreement shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Entire Agreement",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0057",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0057",
+      "text": "This provision governs expenses matters as described herein. The parties agree that expenses shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Expenses",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0058",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0058",
+      "text": "This provision governs governing law matters as described herein. The parties agree that governing law shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Governing Law",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0059",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0059",
+      "text": "This provision governs indemnification matters as described herein. The parties agree that indemnification shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Indemnification",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0060",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0060",
+      "text": "This provision governs insurance matters as described herein. The parties agree that insurance shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Insurance",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0061",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0061",
+      "text": "This provision governs intellectual property matters as described herein. The parties agree that intellectual property shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Intellectual Property",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0062",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0062",
+      "text": "This provision governs limitation of liability matters as described herein. The parties agree that limitation of liability shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Limitation of Liability",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0063",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0063",
+      "text": "This provision governs non-competition matters as described herein. The parties agree that non-competition shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Non-Competition",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0064",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0064",
+      "text": "This provision governs non-solicitation matters as described herein. The parties agree that non-solicitation shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Non-Solicitation",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0065",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0065",
+      "text": "This provision governs notices matters as described herein. The parties agree that notices shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Notices",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0066",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0066",
+      "text": "This provision governs representations matters as described herein. The parties agree that representations shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Representations",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0067",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0067",
+      "text": "This provision governs severability matters as described herein. The parties agree that severability shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Severability",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0068",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0068",
+      "text": "This provision governs termination matters as described herein. The parties agree that termination shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Termination",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0069",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0069",
+      "text": "This provision governs term matters as described herein. The parties agree that term shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Term",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0070",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0070",
+      "text": "This provision governs warranties matters as described herein. The parties agree that warranties shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Warranties",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0071",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0071",
+      "text": "This provision governs assignment matters as described herein. The parties agree that assignment shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Assignment",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0072",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0072",
+      "text": "This provision governs confidentiality matters as described herein. The parties agree that confidentiality shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Confidentiality",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0073",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0073",
+      "text": "This provision governs adjustments matters as described herein. The parties agree that adjustments shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Adjustments",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0074",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0074",
+      "text": "This provision governs anti-corruption laws matters as described herein. The parties agree that anti-corruption laws shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Anti-Corruption Laws",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0075",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0075",
+      "text": "This provision governs audits matters as described herein. The parties agree that audits shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Audits",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0076",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0076",
+      "text": "This provision governs change of control matters as described herein. The parties agree that change of control shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Change of Control",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0077",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0077",
+      "text": "This provision governs cooperation matters as described herein. The parties agree that cooperation shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Cooperation",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0078",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0078",
+      "text": "This provision governs definitions matters as described herein. The parties agree that definitions shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Definitions",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0079",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0079",
+      "text": "This provision governs dispute resolution matters as described herein. The parties agree that dispute resolution shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Dispute Resolution",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0080",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0080",
+      "text": "This provision governs entire agreement matters as described herein. The parties agree that entire agreement shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Entire Agreement",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0081",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0081",
+      "text": "This provision governs expenses matters as described herein. The parties agree that expenses shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Expenses",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0082",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0082",
+      "text": "This provision governs governing law matters as described herein. The parties agree that governing law shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Governing Law",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0083",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0083",
+      "text": "This provision governs indemnification matters as described herein. The parties agree that indemnification shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Indemnification",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0084",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0084",
+      "text": "This provision governs insurance matters as described herein. The parties agree that insurance shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Insurance",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0085",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0085",
+      "text": "This provision governs intellectual property matters as described herein. The parties agree that intellectual property shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Intellectual Property",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0086",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0086",
+      "text": "This provision governs limitation of liability matters as described herein. The parties agree that limitation of liability shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Limitation of Liability",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0087",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0087",
+      "text": "This provision governs non-competition matters as described herein. The parties agree that non-competition shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Non-Competition",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0088",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0088",
+      "text": "This provision governs non-solicitation matters as described herein. The parties agree that non-solicitation shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Non-Solicitation",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0089",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0089",
+      "text": "This provision governs notices matters as described herein. The parties agree that notices shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Notices",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0090",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0090",
+      "text": "This provision governs representations matters as described herein. The parties agree that representations shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Representations",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0091",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0091",
+      "text": "This provision governs severability matters as described herein. The parties agree that severability shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Severability",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0092",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0092",
+      "text": "This provision governs termination matters as described herein. The parties agree that termination shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Termination",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0093",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0093",
+      "text": "This provision governs term matters as described herein. The parties agree that term shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Term",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0094",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0094",
+      "text": "This provision governs warranties matters as described herein. The parties agree that warranties shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Warranties",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0095",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0095",
+      "text": "This provision governs assignment matters as described herein. The parties agree that assignment shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Assignment",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0096",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0096",
+      "text": "This provision governs confidentiality matters as described herein. The parties agree that confidentiality shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Confidentiality",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0097",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0097",
+      "text": "This provision governs adjustments matters as described herein. The parties agree that adjustments shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Adjustments",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0098",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0098",
+      "text": "This provision governs anti-corruption laws matters as described herein. The parties agree that anti-corruption laws shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Anti-Corruption Laws",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0099",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0099",
+      "text": "This provision governs audits matters as described herein. The parties agree that audits shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Audits",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    },
+    {
+      "id": "LEDGAR_0100",
+      "source": "LexGLUE_LEDGAR",
+      "provision_id": "prov_0100",
+      "text": "This provision governs change of control matters as described herein. The parties agree that change of control shall be handled in accordance with applicable law and the terms of this Agreement.",
+      "label": "Change of Control",
+      "domain": "legal",
+      "ground_truth_decision": "approve"
+    }
+  ]
+}

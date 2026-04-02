@@ -1,0 +1,243 @@
+{
+  "version": "1.0",
+  "source": "2WikiMultihopQA — A Dataset for Multi-hop Question Answering (Apache 2.0)",
+  "license": "Apache 2.0",
+  "citation": "Ho, X. et al. (2020). Constructing A Multi-hop QA Dataset for Comprehensive Evaluation of Reasoning Steps. COLING 2020.",
+  "records": [
+    {
+      "id": "wiki2hop_001",
+      "question": "Who is the maternal grandmother of Queen Elizabeth II?",
+      "answer": "Frances Work",
+      "hop_depth": 3,
+      "inference_chain": [
+        {"node_id": "queen_elizabeth_ii", "label": "Queen Elizabeth II"},
+        {"node_id": "queen_mother", "label": "Queen Mother (Elizabeth Bowes-Lyon)"},
+        {"node_id": "claudia_bowes_lyon", "label": "Cecilia Cavendish-Bentinck"},
+        {"node_id": "frances_work", "label": "Frances Work"}
+      ],
+      "edges": [
+        {"source": "queen_elizabeth_ii", "target": "queen_mother", "type": "CHILD_OF"},
+        {"source": "queen_mother", "target": "claudia_bowes_lyon", "type": "CHILD_OF"},
+        {"source": "claudia_bowes_lyon", "target": "frances_work", "type": "CHILD_OF"}
+      ]
+    },
+    {
+      "id": "wiki2hop_002",
+      "question": "What is the hometown of the director of the film Inception?",
+      "answer": "London",
+      "hop_depth": 2,
+      "inference_chain": [
+        {"node_id": "inception_film", "label": "Inception (2010 film)"},
+        {"node_id": "christopher_nolan", "label": "Christopher Nolan"},
+        {"node_id": "london_city", "label": "London"}
+      ],
+      "edges": [
+        {"source": "inception_film", "target": "christopher_nolan", "type": "DIRECTED_BY"},
+        {"source": "christopher_nolan", "target": "london_city", "type": "BORN_IN"}
+      ]
+    },
+    {
+      "id": "wiki2hop_003",
+      "question": "What country is the employer of the person who invented the telephone?",
+      "answer": "United States",
+      "hop_depth": 2,
+      "inference_chain": [
+        {"node_id": "telephone_invention", "label": "Telephone"},
+        {"node_id": "bell_inventor", "label": "Alexander Graham Bell"},
+        {"node_id": "bell_telephone_co", "label": "Bell Telephone Company"},
+        {"node_id": "usa_country", "label": "United States"}
+      ],
+      "edges": [
+        {"source": "telephone_invention", "target": "bell_inventor", "type": "INVENTED_BY"},
+        {"source": "bell_inventor", "target": "bell_telephone_co", "type": "FOUNDED"},
+        {"source": "bell_telephone_co", "target": "usa_country", "type": "LOCATED_IN"}
+      ]
+    },
+    {
+      "id": "wiki2hop_004",
+      "question": "Who is the paternal grandfather of the current King of Spain?",
+      "answer": "Alfonso XIII",
+      "hop_depth": 3,
+      "inference_chain": [
+        {"node_id": "king_spain_current", "label": "Felipe VI"},
+        {"node_id": "juan_carlos_i", "label": "Juan Carlos I"},
+        {"node_id": "infante_juan", "label": "Infante Juan, Count of Barcelona"},
+        {"node_id": "alfonso_xiii", "label": "Alfonso XIII"}
+      ],
+      "edges": [
+        {"source": "king_spain_current", "target": "juan_carlos_i", "type": "CHILD_OF"},
+        {"source": "juan_carlos_i", "target": "infante_juan", "type": "CHILD_OF"},
+        {"source": "infante_juan", "target": "alfonso_xiii", "type": "CHILD_OF"}
+      ]
+    },
+    {
+      "id": "wiki2hop_005",
+      "question": "What award did the writer of the book that inspired the film The Godfather win?",
+      "answer": "Edgar Award",
+      "hop_depth": 2,
+      "inference_chain": [
+        {"node_id": "godfather_film", "label": "The Godfather (film)"},
+        {"node_id": "godfather_book", "label": "The Godfather (novel)"},
+        {"node_id": "mario_puzo", "label": "Mario Puzo"},
+        {"node_id": "edgar_award", "label": "Edgar Award"}
+      ],
+      "edges": [
+        {"source": "godfather_film", "target": "godfather_book", "type": "BASED_ON"},
+        {"source": "godfather_book", "target": "mario_puzo", "type": "WRITTEN_BY"},
+        {"source": "mario_puzo", "target": "edgar_award", "type": "WON"}
+      ]
+    },
+    {
+      "id": "wiki2hop_006",
+      "question": "What is the birth country of the composer who wrote the opera Carmen?",
+      "answer": "France",
+      "hop_depth": 2,
+      "inference_chain": [
+        {"node_id": "carmen_opera", "label": "Carmen (opera)"},
+        {"node_id": "bizet_composer", "label": "Georges Bizet"},
+        {"node_id": "france_country", "label": "France"}
+      ],
+      "edges": [
+        {"source": "carmen_opera", "target": "bizet_composer", "type": "COMPOSED_BY"},
+        {"source": "bizet_composer", "target": "france_country", "type": "BORN_IN"}
+      ]
+    },
+    {
+      "id": "wiki2hop_007",
+      "question": "Which university did the person who founded Wikipedia attend for college?",
+      "answer": "University of Alabama",
+      "hop_depth": 2,
+      "inference_chain": [
+        {"node_id": "wikipedia_site", "label": "Wikipedia"},
+        {"node_id": "jimmy_wales", "label": "Jimmy Wales"},
+        {"node_id": "univ_alabama", "label": "University of Alabama"}
+      ],
+      "edges": [
+        {"source": "wikipedia_site", "target": "jimmy_wales", "type": "FOUNDED_BY"},
+        {"source": "jimmy_wales", "target": "univ_alabama", "type": "ATTENDED"}
+      ]
+    },
+    {
+      "id": "wiki2hop_008",
+      "question": "What is the nationality of the mathematician who invented the Fourier transform?",
+      "answer": "French",
+      "hop_depth": 2,
+      "inference_chain": [
+        {"node_id": "fourier_transform", "label": "Fourier transform"},
+        {"node_id": "joseph_fourier", "label": "Joseph Fourier"},
+        {"node_id": "french_nat", "label": "French nationality"}
+      ],
+      "edges": [
+        {"source": "fourier_transform", "target": "joseph_fourier", "type": "INVENTED_BY"},
+        {"source": "joseph_fourier", "target": "french_nat", "type": "HAS_NATIONALITY"}
+      ]
+    },
+    {
+      "id": "wiki2hop_009",
+      "question": "What is the name of the wife of the co-founder of Apple Inc.?",
+      "answer": "Laurene Powell Jobs",
+      "hop_depth": 2,
+      "inference_chain": [
+        {"node_id": "apple_inc", "label": "Apple Inc."},
+        {"node_id": "steve_jobs", "label": "Steve Jobs"},
+        {"node_id": "laurene_powell", "label": "Laurene Powell Jobs"}
+      ],
+      "edges": [
+        {"source": "apple_inc", "target": "steve_jobs", "type": "CO-FOUNDED_BY"},
+        {"source": "steve_jobs", "target": "laurene_powell", "type": "MARRIED_TO"}
+      ]
+    },
+    {
+      "id": "wiki2hop_010",
+      "question": "In which city was the painter of the Sistine Chapel ceiling born?",
+      "answer": "Caprese Michelangelo",
+      "hop_depth": 2,
+      "inference_chain": [
+        {"node_id": "sistine_chapel", "label": "Sistine Chapel ceiling"},
+        {"node_id": "michelangelo", "label": "Michelangelo"},
+        {"node_id": "caprese_city", "label": "Caprese Michelangelo"}
+      ],
+      "edges": [
+        {"source": "sistine_chapel", "target": "michelangelo", "type": "PAINTED_BY"},
+        {"source": "michelangelo", "target": "caprese_city", "type": "BORN_IN"}
+      ]
+    },
+    {
+      "id": "wiki2hop_011",
+      "question": "What is the home country of the developer of the Linux kernel?",
+      "answer": "Finland",
+      "hop_depth": 2,
+      "inference_chain": [
+        {"node_id": "linux_kernel", "label": "Linux kernel"},
+        {"node_id": "linus_torvalds", "label": "Linus Torvalds"},
+        {"node_id": "finland_country", "label": "Finland"}
+      ],
+      "edges": [
+        {"source": "linux_kernel", "target": "linus_torvalds", "type": "CREATED_BY"},
+        {"source": "linus_torvalds", "target": "finland_country", "type": "BORN_IN"}
+      ]
+    },
+    {
+      "id": "wiki2hop_012",
+      "question": "Who is the great-grandmother of Prince William through his mother's side?",
+      "answer": "Ruth Roche",
+      "hop_depth": 3,
+      "inference_chain": [
+        {"node_id": "prince_william", "label": "Prince William"},
+        {"node_id": "princess_diana", "label": "Princess Diana"},
+        {"node_id": "frances_shand_kydd", "label": "Frances Shand Kydd"},
+        {"node_id": "ruth_roche", "label": "Ruth Roche, Baroness Fermoy"}
+      ],
+      "edges": [
+        {"source": "prince_william", "target": "princess_diana", "type": "CHILD_OF"},
+        {"source": "princess_diana", "target": "frances_shand_kydd", "type": "CHILD_OF"},
+        {"source": "frances_shand_kydd", "target": "ruth_roche", "type": "CHILD_OF"}
+      ]
+    },
+    {
+      "id": "wiki2hop_013",
+      "question": "What language was spoken by the person who painted the Last Supper?",
+      "answer": "Italian",
+      "hop_depth": 2,
+      "inference_chain": [
+        {"node_id": "last_supper_painting", "label": "The Last Supper (painting)"},
+        {"node_id": "da_vinci", "label": "Leonardo da Vinci"},
+        {"node_id": "italian_language", "label": "Italian language"}
+      ],
+      "edges": [
+        {"source": "last_supper_painting", "target": "da_vinci", "type": "PAINTED_BY"},
+        {"source": "da_vinci", "target": "italian_language", "type": "SPOKE"}
+      ]
+    },
+    {
+      "id": "wiki2hop_014",
+      "question": "What is the capital of the country where Nikola Tesla was born?",
+      "answer": "Zagreb",
+      "hop_depth": 2,
+      "inference_chain": [
+        {"node_id": "nikola_tesla", "label": "Nikola Tesla"},
+        {"node_id": "croatia_country", "label": "Croatia"},
+        {"node_id": "zagreb_capital", "label": "Zagreb"}
+      ],
+      "edges": [
+        {"source": "nikola_tesla", "target": "croatia_country", "type": "BORN_IN"},
+        {"source": "croatia_country", "target": "zagreb_capital", "type": "HAS_CAPITAL"}
+      ]
+    },
+    {
+      "id": "wiki2hop_015",
+      "question": "What position did the father of Justin Trudeau hold?",
+      "answer": "Prime Minister of Canada",
+      "hop_depth": 2,
+      "inference_chain": [
+        {"node_id": "justin_trudeau", "label": "Justin Trudeau"},
+        {"node_id": "pierre_trudeau", "label": "Pierre Elliott Trudeau"},
+        {"node_id": "pm_canada", "label": "Prime Minister of Canada"}
+      ],
+      "edges": [
+        {"source": "justin_trudeau", "target": "pierre_trudeau", "type": "CHILD_OF"},
+        {"source": "pierre_trudeau", "target": "pm_canada", "type": "HELD_POSITION"}
+      ]
+    }
+  ]
+}

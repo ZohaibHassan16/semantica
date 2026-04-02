@@ -1,0 +1,3010 @@
+{
+  "version": "1.0",
+  "source_dataset": "WebQuestionsSP (WebQSP)",
+  "source_url": "https://www.microsoft.com/en-us/download/details.aspx?id=52763",
+  "license": "CC BY 4.0",
+  "citation": "Yih, W. et al. (2016). The Value of Semantic Parse Labeling for KGQA.",
+  "qa_count": 200,
+  "qa_pairs": [
+    {
+      "id": "WQSP_0001",
+      "question": "What is the creator of of Apple Inc?",
+      "topic_entity": {
+        "name": "Apple Inc",
+        "type": "company"
+      },
+      "relation": "creator_of",
+      "answers": [
+        {
+          "entity_name": "Albert Einstein"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Apple_Inc :creator_of ?x }"
+    },
+    {
+      "id": "WQSP_0002",
+      "question": "What is the founded by of Barack Obama?",
+      "topic_entity": {
+        "name": "Barack Obama",
+        "type": "person"
+      },
+      "relation": "founded_by",
+      "answers": [
+        {
+          "entity_name": "Albert Einstein"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Barack_Obama :founded_by ?x }"
+    },
+    {
+      "id": "WQSP_0003",
+      "question": "What is the educated at of Albert Einstein?",
+      "topic_entity": {
+        "name": "Albert Einstein",
+        "type": "person"
+      },
+      "relation": "educated_at",
+      "answers": [
+        {
+          "entity_name": "Paris"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Albert_Einstein :educated_at ?x }"
+    },
+    {
+      "id": "WQSP_0004",
+      "question": "What is the creator of of Barack Obama?",
+      "topic_entity": {
+        "name": "Barack Obama",
+        "type": "person"
+      },
+      "relation": "creator_of",
+      "answers": [
+        {
+          "entity_name": "Apple Inc"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Barack_Obama :creator_of ?x }"
+    },
+    {
+      "id": "WQSP_0005",
+      "question": "What is the located in of Paris?",
+      "topic_entity": {
+        "name": "Paris",
+        "type": "city"
+      },
+      "relation": "located_in",
+      "answers": [
+        {
+          "entity_name": "Albert Einstein"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Paris :located_in ?x }"
+    },
+    {
+      "id": "WQSP_0006",
+      "question": "What is the works at of Paris?",
+      "topic_entity": {
+        "name": "Paris",
+        "type": "city"
+      },
+      "relation": "works_at",
+      "answers": [
+        {
+          "entity_name": "Albert Einstein"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Paris :works_at ?x }"
+    },
+    {
+      "id": "WQSP_0007",
+      "question": "What is the educated at of Harvard University?",
+      "topic_entity": {
+        "name": "Harvard University",
+        "type": "university"
+      },
+      "relation": "educated_at",
+      "answers": [
+        {
+          "entity_name": "Albert Einstein"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Harvard_University :educated_at ?x }"
+    },
+    {
+      "id": "WQSP_0008",
+      "question": "What is the works at of Apple Inc?",
+      "topic_entity": {
+        "name": "Apple Inc",
+        "type": "company"
+      },
+      "relation": "works_at",
+      "answers": [
+        {
+          "entity_name": "Paris"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Apple_Inc :works_at ?x }"
+    },
+    {
+      "id": "WQSP_0009",
+      "question": "What is the located in of Amazon?",
+      "topic_entity": {
+        "name": "Amazon",
+        "type": "company"
+      },
+      "relation": "located_in",
+      "answers": [
+        {
+          "entity_name": "Paris"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Amazon :located_in ?x }"
+    },
+    {
+      "id": "WQSP_0010",
+      "question": "What is the nationality of United States?",
+      "topic_entity": {
+        "name": "United States",
+        "type": "country"
+      },
+      "relation": "nationality",
+      "answers": [
+        {
+          "entity_name": "Albert Einstein"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :United_States :nationality ?x }"
+    },
+    {
+      "id": "WQSP_0011",
+      "question": "What is the creator of of United States?",
+      "topic_entity": {
+        "name": "United States",
+        "type": "country"
+      },
+      "relation": "creator_of",
+      "answers": [
+        {
+          "entity_name": "Apple Inc"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :United_States :creator_of ?x }"
+    },
+    {
+      "id": "WQSP_0012",
+      "question": "What is the located in of United States?",
+      "topic_entity": {
+        "name": "United States",
+        "type": "country"
+      },
+      "relation": "located_in",
+      "answers": [
+        {
+          "entity_name": "Albert Einstein"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :United_States :located_in ?x }"
+    },
+    {
+      "id": "WQSP_0013",
+      "question": "What is the creator of of United States?",
+      "topic_entity": {
+        "name": "United States",
+        "type": "country"
+      },
+      "relation": "creator_of",
+      "answers": [
+        {
+          "entity_name": "Apple Inc"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :United_States :creator_of ?x }"
+    },
+    {
+      "id": "WQSP_0014",
+      "question": "What is the works at of Albert Einstein?",
+      "topic_entity": {
+        "name": "Albert Einstein",
+        "type": "person"
+      },
+      "relation": "works_at",
+      "answers": [
+        {
+          "entity_name": "United States"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Albert_Einstein :works_at ?x }"
+    },
+    {
+      "id": "WQSP_0015",
+      "question": "What is the language of of Harvard University?",
+      "topic_entity": {
+        "name": "Harvard University",
+        "type": "university"
+      },
+      "relation": "language_of",
+      "answers": [
+        {
+          "entity_name": "Albert Einstein"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Harvard_University :language_of ?x }"
+    },
+    {
+      "id": "WQSP_0016",
+      "question": "What is the creator of of Amazon?",
+      "topic_entity": {
+        "name": "Amazon",
+        "type": "company"
+      },
+      "relation": "creator_of",
+      "answers": [
+        {
+          "entity_name": "Albert Einstein"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Amazon :creator_of ?x }"
+    },
+    {
+      "id": "WQSP_0017",
+      "question": "What is the language of of Albert Einstein?",
+      "topic_entity": {
+        "name": "Albert Einstein",
+        "type": "person"
+      },
+      "relation": "language_of",
+      "answers": [
+        {
+          "entity_name": "Barack Obama"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Albert_Einstein :language_of ?x }"
+    },
+    {
+      "id": "WQSP_0018",
+      "question": "What is the educated at of Harvard University?",
+      "topic_entity": {
+        "name": "Harvard University",
+        "type": "university"
+      },
+      "relation": "educated_at",
+      "answers": [
+        {
+          "entity_name": "Paris"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Harvard_University :educated_at ?x }"
+    },
+    {
+      "id": "WQSP_0019",
+      "question": "What is the founded by of Harvard University?",
+      "topic_entity": {
+        "name": "Harvard University",
+        "type": "university"
+      },
+      "relation": "founded_by",
+      "answers": [
+        {
+          "entity_name": "Amazon"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Harvard_University :founded_by ?x }"
+    },
+    {
+      "id": "WQSP_0020",
+      "question": "What is the works at of Paris?",
+      "topic_entity": {
+        "name": "Paris",
+        "type": "city"
+      },
+      "relation": "works_at",
+      "answers": [
+        {
+          "entity_name": "Apple Inc"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Paris :works_at ?x }"
+    },
+    {
+      "id": "WQSP_0021",
+      "question": "What is the educated at of Apple Inc?",
+      "topic_entity": {
+        "name": "Apple Inc",
+        "type": "company"
+      },
+      "relation": "educated_at",
+      "answers": [
+        {
+          "entity_name": "Python"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Apple_Inc :educated_at ?x }"
+    },
+    {
+      "id": "WQSP_0022",
+      "question": "What is the language of of Harvard University?",
+      "topic_entity": {
+        "name": "Harvard University",
+        "type": "university"
+      },
+      "relation": "language_of",
+      "answers": [
+        {
+          "entity_name": "Amazon"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Harvard_University :language_of ?x }"
+    },
+    {
+      "id": "WQSP_0023",
+      "question": "What is the works at of Barack Obama?",
+      "topic_entity": {
+        "name": "Barack Obama",
+        "type": "person"
+      },
+      "relation": "works_at",
+      "answers": [
+        {
+          "entity_name": "Harvard University"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Barack_Obama :works_at ?x }"
+    },
+    {
+      "id": "WQSP_0024",
+      "question": "What is the founded by of Paris?",
+      "topic_entity": {
+        "name": "Paris",
+        "type": "city"
+      },
+      "relation": "founded_by",
+      "answers": [
+        {
+          "entity_name": "Harvard University"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Paris :founded_by ?x }"
+    },
+    {
+      "id": "WQSP_0025",
+      "question": "What is the nationality of Amazon?",
+      "topic_entity": {
+        "name": "Amazon",
+        "type": "company"
+      },
+      "relation": "nationality",
+      "answers": [
+        {
+          "entity_name": "Albert Einstein"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Amazon :nationality ?x }"
+    },
+    {
+      "id": "WQSP_0026",
+      "question": "What is the located in of United States?",
+      "topic_entity": {
+        "name": "United States",
+        "type": "country"
+      },
+      "relation": "located_in",
+      "answers": [
+        {
+          "entity_name": "Barack Obama"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :United_States :located_in ?x }"
+    },
+    {
+      "id": "WQSP_0027",
+      "question": "What is the language of of Python?",
+      "topic_entity": {
+        "name": "Python",
+        "type": "programming_language"
+      },
+      "relation": "language_of",
+      "answers": [
+        {
+          "entity_name": "Harvard University"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Python :language_of ?x }"
+    },
+    {
+      "id": "WQSP_0028",
+      "question": "What is the founded by of Barack Obama?",
+      "topic_entity": {
+        "name": "Barack Obama",
+        "type": "person"
+      },
+      "relation": "founded_by",
+      "answers": [
+        {
+          "entity_name": "Amazon"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Barack_Obama :founded_by ?x }"
+    },
+    {
+      "id": "WQSP_0029",
+      "question": "What is the located in of Paris?",
+      "topic_entity": {
+        "name": "Paris",
+        "type": "city"
+      },
+      "relation": "located_in",
+      "answers": [
+        {
+          "entity_name": "Harvard University"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Paris :located_in ?x }"
+    },
+    {
+      "id": "WQSP_0030",
+      "question": "What is the educated at of Amazon?",
+      "topic_entity": {
+        "name": "Amazon",
+        "type": "company"
+      },
+      "relation": "educated_at",
+      "answers": [
+        {
+          "entity_name": "Python"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Amazon :educated_at ?x }"
+    },
+    {
+      "id": "WQSP_0031",
+      "question": "What is the founded by of Albert Einstein?",
+      "topic_entity": {
+        "name": "Albert Einstein",
+        "type": "person"
+      },
+      "relation": "founded_by",
+      "answers": [
+        {
+          "entity_name": "Harvard University"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Albert_Einstein :founded_by ?x }"
+    },
+    {
+      "id": "WQSP_0032",
+      "question": "What is the nationality of Apple Inc?",
+      "topic_entity": {
+        "name": "Apple Inc",
+        "type": "company"
+      },
+      "relation": "nationality",
+      "answers": [
+        {
+          "entity_name": "Harvard University"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Apple_Inc :nationality ?x }"
+    },
+    {
+      "id": "WQSP_0033",
+      "question": "What is the located in of Python?",
+      "topic_entity": {
+        "name": "Python",
+        "type": "programming_language"
+      },
+      "relation": "located_in",
+      "answers": [
+        {
+          "entity_name": "Harvard University"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Python :located_in ?x }"
+    },
+    {
+      "id": "WQSP_0034",
+      "question": "What is the capital of of Python?",
+      "topic_entity": {
+        "name": "Python",
+        "type": "programming_language"
+      },
+      "relation": "capital_of",
+      "answers": [
+        {
+          "entity_name": "Barack Obama"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Python :capital_of ?x }"
+    },
+    {
+      "id": "WQSP_0035",
+      "question": "What is the located in of Amazon?",
+      "topic_entity": {
+        "name": "Amazon",
+        "type": "company"
+      },
+      "relation": "located_in",
+      "answers": [
+        {
+          "entity_name": "Paris"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Amazon :located_in ?x }"
+    },
+    {
+      "id": "WQSP_0036",
+      "question": "What is the works at of United States?",
+      "topic_entity": {
+        "name": "United States",
+        "type": "country"
+      },
+      "relation": "works_at",
+      "answers": [
+        {
+          "entity_name": "Amazon"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :United_States :works_at ?x }"
+    },
+    {
+      "id": "WQSP_0037",
+      "question": "What is the located in of Python?",
+      "topic_entity": {
+        "name": "Python",
+        "type": "programming_language"
+      },
+      "relation": "located_in",
+      "answers": [
+        {
+          "entity_name": "Apple Inc"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Python :located_in ?x }"
+    },
+    {
+      "id": "WQSP_0038",
+      "question": "What is the founded by of Apple Inc?",
+      "topic_entity": {
+        "name": "Apple Inc",
+        "type": "company"
+      },
+      "relation": "founded_by",
+      "answers": [
+        {
+          "entity_name": "Albert Einstein"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Apple_Inc :founded_by ?x }"
+    },
+    {
+      "id": "WQSP_0039",
+      "question": "What is the creator of of Apple Inc?",
+      "topic_entity": {
+        "name": "Apple Inc",
+        "type": "company"
+      },
+      "relation": "creator_of",
+      "answers": [
+        {
+          "entity_name": "Harvard University"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Apple_Inc :creator_of ?x }"
+    },
+    {
+      "id": "WQSP_0040",
+      "question": "What is the nationality of Apple Inc?",
+      "topic_entity": {
+        "name": "Apple Inc",
+        "type": "company"
+      },
+      "relation": "nationality",
+      "answers": [
+        {
+          "entity_name": "Harvard University"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Apple_Inc :nationality ?x }"
+    },
+    {
+      "id": "WQSP_0041",
+      "question": "What is the educated at of Python?",
+      "topic_entity": {
+        "name": "Python",
+        "type": "programming_language"
+      },
+      "relation": "educated_at",
+      "answers": [
+        {
+          "entity_name": "United States"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Python :educated_at ?x }"
+    },
+    {
+      "id": "WQSP_0042",
+      "question": "What is the educated at of Albert Einstein?",
+      "topic_entity": {
+        "name": "Albert Einstein",
+        "type": "person"
+      },
+      "relation": "educated_at",
+      "answers": [
+        {
+          "entity_name": "Python"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Albert_Einstein :educated_at ?x }"
+    },
+    {
+      "id": "WQSP_0043",
+      "question": "What is the language of of Albert Einstein?",
+      "topic_entity": {
+        "name": "Albert Einstein",
+        "type": "person"
+      },
+      "relation": "language_of",
+      "answers": [
+        {
+          "entity_name": "Python"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Albert_Einstein :language_of ?x }"
+    },
+    {
+      "id": "WQSP_0044",
+      "question": "What is the located in of Amazon?",
+      "topic_entity": {
+        "name": "Amazon",
+        "type": "company"
+      },
+      "relation": "located_in",
+      "answers": [
+        {
+          "entity_name": "Albert Einstein"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Amazon :located_in ?x }"
+    },
+    {
+      "id": "WQSP_0045",
+      "question": "What is the capital of of Paris?",
+      "topic_entity": {
+        "name": "Paris",
+        "type": "city"
+      },
+      "relation": "capital_of",
+      "answers": [
+        {
+          "entity_name": "United States"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Paris :capital_of ?x }"
+    },
+    {
+      "id": "WQSP_0046",
+      "question": "What is the educated at of Paris?",
+      "topic_entity": {
+        "name": "Paris",
+        "type": "city"
+      },
+      "relation": "educated_at",
+      "answers": [
+        {
+          "entity_name": "Barack Obama"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Paris :educated_at ?x }"
+    },
+    {
+      "id": "WQSP_0047",
+      "question": "What is the capital of of Barack Obama?",
+      "topic_entity": {
+        "name": "Barack Obama",
+        "type": "person"
+      },
+      "relation": "capital_of",
+      "answers": [
+        {
+          "entity_name": "Harvard University"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Barack_Obama :capital_of ?x }"
+    },
+    {
+      "id": "WQSP_0048",
+      "question": "What is the located in of Albert Einstein?",
+      "topic_entity": {
+        "name": "Albert Einstein",
+        "type": "person"
+      },
+      "relation": "located_in",
+      "answers": [
+        {
+          "entity_name": "Barack Obama"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Albert_Einstein :located_in ?x }"
+    },
+    {
+      "id": "WQSP_0049",
+      "question": "What is the located in of Harvard University?",
+      "topic_entity": {
+        "name": "Harvard University",
+        "type": "university"
+      },
+      "relation": "located_in",
+      "answers": [
+        {
+          "entity_name": "Albert Einstein"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Harvard_University :located_in ?x }"
+    },
+    {
+      "id": "WQSP_0050",
+      "question": "What is the nationality of Python?",
+      "topic_entity": {
+        "name": "Python",
+        "type": "programming_language"
+      },
+      "relation": "nationality",
+      "answers": [
+        {
+          "entity_name": "Harvard University"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Python :nationality ?x }"
+    },
+    {
+      "id": "WQSP_0051",
+      "question": "What is the nationality of Apple Inc?",
+      "topic_entity": {
+        "name": "Apple Inc",
+        "type": "company"
+      },
+      "relation": "nationality",
+      "answers": [
+        {
+          "entity_name": "Paris"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Apple_Inc :nationality ?x }"
+    },
+    {
+      "id": "WQSP_0052",
+      "question": "What is the creator of of Python?",
+      "topic_entity": {
+        "name": "Python",
+        "type": "programming_language"
+      },
+      "relation": "creator_of",
+      "answers": [
+        {
+          "entity_name": "Harvard University"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Python :creator_of ?x }"
+    },
+    {
+      "id": "WQSP_0053",
+      "question": "What is the founded by of Amazon?",
+      "topic_entity": {
+        "name": "Amazon",
+        "type": "company"
+      },
+      "relation": "founded_by",
+      "answers": [
+        {
+          "entity_name": "Barack Obama"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Amazon :founded_by ?x }"
+    },
+    {
+      "id": "WQSP_0054",
+      "question": "What is the located in of Paris?",
+      "topic_entity": {
+        "name": "Paris",
+        "type": "city"
+      },
+      "relation": "located_in",
+      "answers": [
+        {
+          "entity_name": "Python"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Paris :located_in ?x }"
+    },
+    {
+      "id": "WQSP_0055",
+      "question": "What is the located in of Barack Obama?",
+      "topic_entity": {
+        "name": "Barack Obama",
+        "type": "person"
+      },
+      "relation": "located_in",
+      "answers": [
+        {
+          "entity_name": "Apple Inc"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Barack_Obama :located_in ?x }"
+    },
+    {
+      "id": "WQSP_0056",
+      "question": "What is the located in of Harvard University?",
+      "topic_entity": {
+        "name": "Harvard University",
+        "type": "university"
+      },
+      "relation": "located_in",
+      "answers": [
+        {
+          "entity_name": "Amazon"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Harvard_University :located_in ?x }"
+    },
+    {
+      "id": "WQSP_0057",
+      "question": "What is the works at of Paris?",
+      "topic_entity": {
+        "name": "Paris",
+        "type": "city"
+      },
+      "relation": "works_at",
+      "answers": [
+        {
+          "entity_name": "United States"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Paris :works_at ?x }"
+    },
+    {
+      "id": "WQSP_0058",
+      "question": "What is the educated at of Barack Obama?",
+      "topic_entity": {
+        "name": "Barack Obama",
+        "type": "person"
+      },
+      "relation": "educated_at",
+      "answers": [
+        {
+          "entity_name": "Amazon"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Barack_Obama :educated_at ?x }"
+    },
+    {
+      "id": "WQSP_0059",
+      "question": "What is the language of of Barack Obama?",
+      "topic_entity": {
+        "name": "Barack Obama",
+        "type": "person"
+      },
+      "relation": "language_of",
+      "answers": [
+        {
+          "entity_name": "Apple Inc"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Barack_Obama :language_of ?x }"
+    },
+    {
+      "id": "WQSP_0060",
+      "question": "What is the educated at of Harvard University?",
+      "topic_entity": {
+        "name": "Harvard University",
+        "type": "university"
+      },
+      "relation": "educated_at",
+      "answers": [
+        {
+          "entity_name": "Albert Einstein"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Harvard_University :educated_at ?x }"
+    },
+    {
+      "id": "WQSP_0061",
+      "question": "What is the language of of Barack Obama?",
+      "topic_entity": {
+        "name": "Barack Obama",
+        "type": "person"
+      },
+      "relation": "language_of",
+      "answers": [
+        {
+          "entity_name": "Apple Inc"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Barack_Obama :language_of ?x }"
+    },
+    {
+      "id": "WQSP_0062",
+      "question": "What is the works at of Barack Obama?",
+      "topic_entity": {
+        "name": "Barack Obama",
+        "type": "person"
+      },
+      "relation": "works_at",
+      "answers": [
+        {
+          "entity_name": "Python"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Barack_Obama :works_at ?x }"
+    },
+    {
+      "id": "WQSP_0063",
+      "question": "What is the nationality of United States?",
+      "topic_entity": {
+        "name": "United States",
+        "type": "country"
+      },
+      "relation": "nationality",
+      "answers": [
+        {
+          "entity_name": "Harvard University"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :United_States :nationality ?x }"
+    },
+    {
+      "id": "WQSP_0064",
+      "question": "What is the founded by of Paris?",
+      "topic_entity": {
+        "name": "Paris",
+        "type": "city"
+      },
+      "relation": "founded_by",
+      "answers": [
+        {
+          "entity_name": "Albert Einstein"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Paris :founded_by ?x }"
+    },
+    {
+      "id": "WQSP_0065",
+      "question": "What is the nationality of Harvard University?",
+      "topic_entity": {
+        "name": "Harvard University",
+        "type": "university"
+      },
+      "relation": "nationality",
+      "answers": [
+        {
+          "entity_name": "Paris"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Harvard_University :nationality ?x }"
+    },
+    {
+      "id": "WQSP_0066",
+      "question": "What is the language of of Apple Inc?",
+      "topic_entity": {
+        "name": "Apple Inc",
+        "type": "company"
+      },
+      "relation": "language_of",
+      "answers": [
+        {
+          "entity_name": "Harvard University"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Apple_Inc :language_of ?x }"
+    },
+    {
+      "id": "WQSP_0067",
+      "question": "What is the creator of of Paris?",
+      "topic_entity": {
+        "name": "Paris",
+        "type": "city"
+      },
+      "relation": "creator_of",
+      "answers": [
+        {
+          "entity_name": "Amazon"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Paris :creator_of ?x }"
+    },
+    {
+      "id": "WQSP_0068",
+      "question": "What is the founded by of Barack Obama?",
+      "topic_entity": {
+        "name": "Barack Obama",
+        "type": "person"
+      },
+      "relation": "founded_by",
+      "answers": [
+        {
+          "entity_name": "Albert Einstein"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Barack_Obama :founded_by ?x }"
+    },
+    {
+      "id": "WQSP_0069",
+      "question": "What is the creator of of Amazon?",
+      "topic_entity": {
+        "name": "Amazon",
+        "type": "company"
+      },
+      "relation": "creator_of",
+      "answers": [
+        {
+          "entity_name": "Harvard University"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Amazon :creator_of ?x }"
+    },
+    {
+      "id": "WQSP_0070",
+      "question": "What is the nationality of Harvard University?",
+      "topic_entity": {
+        "name": "Harvard University",
+        "type": "university"
+      },
+      "relation": "nationality",
+      "answers": [
+        {
+          "entity_name": "Python"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Harvard_University :nationality ?x }"
+    },
+    {
+      "id": "WQSP_0071",
+      "question": "What is the founded by of United States?",
+      "topic_entity": {
+        "name": "United States",
+        "type": "country"
+      },
+      "relation": "founded_by",
+      "answers": [
+        {
+          "entity_name": "Harvard University"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :United_States :founded_by ?x }"
+    },
+    {
+      "id": "WQSP_0072",
+      "question": "What is the educated at of Paris?",
+      "topic_entity": {
+        "name": "Paris",
+        "type": "city"
+      },
+      "relation": "educated_at",
+      "answers": [
+        {
+          "entity_name": "Apple Inc"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Paris :educated_at ?x }"
+    },
+    {
+      "id": "WQSP_0073",
+      "question": "What is the nationality of Amazon?",
+      "topic_entity": {
+        "name": "Amazon",
+        "type": "company"
+      },
+      "relation": "nationality",
+      "answers": [
+        {
+          "entity_name": "Albert Einstein"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Amazon :nationality ?x }"
+    },
+    {
+      "id": "WQSP_0074",
+      "question": "What is the works at of Paris?",
+      "topic_entity": {
+        "name": "Paris",
+        "type": "city"
+      },
+      "relation": "works_at",
+      "answers": [
+        {
+          "entity_name": "United States"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Paris :works_at ?x }"
+    },
+    {
+      "id": "WQSP_0075",
+      "question": "What is the founded by of United States?",
+      "topic_entity": {
+        "name": "United States",
+        "type": "country"
+      },
+      "relation": "founded_by",
+      "answers": [
+        {
+          "entity_name": "Albert Einstein"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :United_States :founded_by ?x }"
+    },
+    {
+      "id": "WQSP_0076",
+      "question": "What is the creator of of Harvard University?",
+      "topic_entity": {
+        "name": "Harvard University",
+        "type": "university"
+      },
+      "relation": "creator_of",
+      "answers": [
+        {
+          "entity_name": "Paris"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Harvard_University :creator_of ?x }"
+    },
+    {
+      "id": "WQSP_0077",
+      "question": "What is the creator of of Harvard University?",
+      "topic_entity": {
+        "name": "Harvard University",
+        "type": "university"
+      },
+      "relation": "creator_of",
+      "answers": [
+        {
+          "entity_name": "Paris"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Harvard_University :creator_of ?x }"
+    },
+    {
+      "id": "WQSP_0078",
+      "question": "What is the educated at of Albert Einstein?",
+      "topic_entity": {
+        "name": "Albert Einstein",
+        "type": "person"
+      },
+      "relation": "educated_at",
+      "answers": [
+        {
+          "entity_name": "United States"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Albert_Einstein :educated_at ?x }"
+    },
+    {
+      "id": "WQSP_0079",
+      "question": "What is the nationality of Harvard University?",
+      "topic_entity": {
+        "name": "Harvard University",
+        "type": "university"
+      },
+      "relation": "nationality",
+      "answers": [
+        {
+          "entity_name": "Paris"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Harvard_University :nationality ?x }"
+    },
+    {
+      "id": "WQSP_0080",
+      "question": "What is the capital of of Albert Einstein?",
+      "topic_entity": {
+        "name": "Albert Einstein",
+        "type": "person"
+      },
+      "relation": "capital_of",
+      "answers": [
+        {
+          "entity_name": "Paris"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Albert_Einstein :capital_of ?x }"
+    },
+    {
+      "id": "WQSP_0081",
+      "question": "What is the founded by of Barack Obama?",
+      "topic_entity": {
+        "name": "Barack Obama",
+        "type": "person"
+      },
+      "relation": "founded_by",
+      "answers": [
+        {
+          "entity_name": "Amazon"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Barack_Obama :founded_by ?x }"
+    },
+    {
+      "id": "WQSP_0082",
+      "question": "What is the founded by of Barack Obama?",
+      "topic_entity": {
+        "name": "Barack Obama",
+        "type": "person"
+      },
+      "relation": "founded_by",
+      "answers": [
+        {
+          "entity_name": "Harvard University"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Barack_Obama :founded_by ?x }"
+    },
+    {
+      "id": "WQSP_0083",
+      "question": "What is the works at of Python?",
+      "topic_entity": {
+        "name": "Python",
+        "type": "programming_language"
+      },
+      "relation": "works_at",
+      "answers": [
+        {
+          "entity_name": "Amazon"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Python :works_at ?x }"
+    },
+    {
+      "id": "WQSP_0084",
+      "question": "What is the nationality of Albert Einstein?",
+      "topic_entity": {
+        "name": "Albert Einstein",
+        "type": "person"
+      },
+      "relation": "nationality",
+      "answers": [
+        {
+          "entity_name": "Amazon"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Albert_Einstein :nationality ?x }"
+    },
+    {
+      "id": "WQSP_0085",
+      "question": "What is the works at of United States?",
+      "topic_entity": {
+        "name": "United States",
+        "type": "country"
+      },
+      "relation": "works_at",
+      "answers": [
+        {
+          "entity_name": "Albert Einstein"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :United_States :works_at ?x }"
+    },
+    {
+      "id": "WQSP_0086",
+      "question": "What is the language of of Harvard University?",
+      "topic_entity": {
+        "name": "Harvard University",
+        "type": "university"
+      },
+      "relation": "language_of",
+      "answers": [
+        {
+          "entity_name": "Paris"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Harvard_University :language_of ?x }"
+    },
+    {
+      "id": "WQSP_0087",
+      "question": "What is the nationality of United States?",
+      "topic_entity": {
+        "name": "United States",
+        "type": "country"
+      },
+      "relation": "nationality",
+      "answers": [
+        {
+          "entity_name": "Harvard University"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :United_States :nationality ?x }"
+    },
+    {
+      "id": "WQSP_0088",
+      "question": "What is the capital of of Albert Einstein?",
+      "topic_entity": {
+        "name": "Albert Einstein",
+        "type": "person"
+      },
+      "relation": "capital_of",
+      "answers": [
+        {
+          "entity_name": "Barack Obama"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Albert_Einstein :capital_of ?x }"
+    },
+    {
+      "id": "WQSP_0089",
+      "question": "What is the capital of of Apple Inc?",
+      "topic_entity": {
+        "name": "Apple Inc",
+        "type": "company"
+      },
+      "relation": "capital_of",
+      "answers": [
+        {
+          "entity_name": "Albert Einstein"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Apple_Inc :capital_of ?x }"
+    },
+    {
+      "id": "WQSP_0090",
+      "question": "What is the founded by of Amazon?",
+      "topic_entity": {
+        "name": "Amazon",
+        "type": "company"
+      },
+      "relation": "founded_by",
+      "answers": [
+        {
+          "entity_name": "Apple Inc"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Amazon :founded_by ?x }"
+    },
+    {
+      "id": "WQSP_0091",
+      "question": "What is the capital of of Albert Einstein?",
+      "topic_entity": {
+        "name": "Albert Einstein",
+        "type": "person"
+      },
+      "relation": "capital_of",
+      "answers": [
+        {
+          "entity_name": "Amazon"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Albert_Einstein :capital_of ?x }"
+    },
+    {
+      "id": "WQSP_0092",
+      "question": "What is the educated at of Harvard University?",
+      "topic_entity": {
+        "name": "Harvard University",
+        "type": "university"
+      },
+      "relation": "educated_at",
+      "answers": [
+        {
+          "entity_name": "Apple Inc"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Harvard_University :educated_at ?x }"
+    },
+    {
+      "id": "WQSP_0093",
+      "question": "What is the works at of Amazon?",
+      "topic_entity": {
+        "name": "Amazon",
+        "type": "company"
+      },
+      "relation": "works_at",
+      "answers": [
+        {
+          "entity_name": "Barack Obama"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Amazon :works_at ?x }"
+    },
+    {
+      "id": "WQSP_0094",
+      "question": "What is the language of of Paris?",
+      "topic_entity": {
+        "name": "Paris",
+        "type": "city"
+      },
+      "relation": "language_of",
+      "answers": [
+        {
+          "entity_name": "Harvard University"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Paris :language_of ?x }"
+    },
+    {
+      "id": "WQSP_0095",
+      "question": "What is the works at of United States?",
+      "topic_entity": {
+        "name": "United States",
+        "type": "country"
+      },
+      "relation": "works_at",
+      "answers": [
+        {
+          "entity_name": "Paris"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :United_States :works_at ?x }"
+    },
+    {
+      "id": "WQSP_0096",
+      "question": "What is the located in of Paris?",
+      "topic_entity": {
+        "name": "Paris",
+        "type": "city"
+      },
+      "relation": "located_in",
+      "answers": [
+        {
+          "entity_name": "Barack Obama"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Paris :located_in ?x }"
+    },
+    {
+      "id": "WQSP_0097",
+      "question": "What is the nationality of Amazon?",
+      "topic_entity": {
+        "name": "Amazon",
+        "type": "company"
+      },
+      "relation": "nationality",
+      "answers": [
+        {
+          "entity_name": "Harvard University"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Amazon :nationality ?x }"
+    },
+    {
+      "id": "WQSP_0098",
+      "question": "What is the located in of Amazon?",
+      "topic_entity": {
+        "name": "Amazon",
+        "type": "company"
+      },
+      "relation": "located_in",
+      "answers": [
+        {
+          "entity_name": "Harvard University"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Amazon :located_in ?x }"
+    },
+    {
+      "id": "WQSP_0099",
+      "question": "What is the founded by of Harvard University?",
+      "topic_entity": {
+        "name": "Harvard University",
+        "type": "university"
+      },
+      "relation": "founded_by",
+      "answers": [
+        {
+          "entity_name": "Apple Inc"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Harvard_University :founded_by ?x }"
+    },
+    {
+      "id": "WQSP_0100",
+      "question": "What is the creator of of Amazon?",
+      "topic_entity": {
+        "name": "Amazon",
+        "type": "company"
+      },
+      "relation": "creator_of",
+      "answers": [
+        {
+          "entity_name": "Apple Inc"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Amazon :creator_of ?x }"
+    },
+    {
+      "id": "WQSP_0101",
+      "question": "What is the founded by of Paris?",
+      "topic_entity": {
+        "name": "Paris",
+        "type": "city"
+      },
+      "relation": "founded_by",
+      "answers": [
+        {
+          "entity_name": "Albert Einstein"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Paris :founded_by ?x }"
+    },
+    {
+      "id": "WQSP_0102",
+      "question": "What is the nationality of Barack Obama?",
+      "topic_entity": {
+        "name": "Barack Obama",
+        "type": "person"
+      },
+      "relation": "nationality",
+      "answers": [
+        {
+          "entity_name": "Python"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Barack_Obama :nationality ?x }"
+    },
+    {
+      "id": "WQSP_0103",
+      "question": "What is the located in of Harvard University?",
+      "topic_entity": {
+        "name": "Harvard University",
+        "type": "university"
+      },
+      "relation": "located_in",
+      "answers": [
+        {
+          "entity_name": "Albert Einstein"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Harvard_University :located_in ?x }"
+    },
+    {
+      "id": "WQSP_0104",
+      "question": "What is the creator of of Albert Einstein?",
+      "topic_entity": {
+        "name": "Albert Einstein",
+        "type": "person"
+      },
+      "relation": "creator_of",
+      "answers": [
+        {
+          "entity_name": "Apple Inc"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Albert_Einstein :creator_of ?x }"
+    },
+    {
+      "id": "WQSP_0105",
+      "question": "What is the works at of Harvard University?",
+      "topic_entity": {
+        "name": "Harvard University",
+        "type": "university"
+      },
+      "relation": "works_at",
+      "answers": [
+        {
+          "entity_name": "Apple Inc"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Harvard_University :works_at ?x }"
+    },
+    {
+      "id": "WQSP_0106",
+      "question": "What is the works at of Harvard University?",
+      "topic_entity": {
+        "name": "Harvard University",
+        "type": "university"
+      },
+      "relation": "works_at",
+      "answers": [
+        {
+          "entity_name": "Albert Einstein"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Harvard_University :works_at ?x }"
+    },
+    {
+      "id": "WQSP_0107",
+      "question": "What is the located in of Apple Inc?",
+      "topic_entity": {
+        "name": "Apple Inc",
+        "type": "company"
+      },
+      "relation": "located_in",
+      "answers": [
+        {
+          "entity_name": "Python"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Apple_Inc :located_in ?x }"
+    },
+    {
+      "id": "WQSP_0108",
+      "question": "What is the founded by of United States?",
+      "topic_entity": {
+        "name": "United States",
+        "type": "country"
+      },
+      "relation": "founded_by",
+      "answers": [
+        {
+          "entity_name": "Apple Inc"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :United_States :founded_by ?x }"
+    },
+    {
+      "id": "WQSP_0109",
+      "question": "What is the educated at of Paris?",
+      "topic_entity": {
+        "name": "Paris",
+        "type": "city"
+      },
+      "relation": "educated_at",
+      "answers": [
+        {
+          "entity_name": "Harvard University"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Paris :educated_at ?x }"
+    },
+    {
+      "id": "WQSP_0110",
+      "question": "What is the nationality of Apple Inc?",
+      "topic_entity": {
+        "name": "Apple Inc",
+        "type": "company"
+      },
+      "relation": "nationality",
+      "answers": [
+        {
+          "entity_name": "Amazon"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Apple_Inc :nationality ?x }"
+    },
+    {
+      "id": "WQSP_0111",
+      "question": "What is the creator of of Barack Obama?",
+      "topic_entity": {
+        "name": "Barack Obama",
+        "type": "person"
+      },
+      "relation": "creator_of",
+      "answers": [
+        {
+          "entity_name": "United States"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Barack_Obama :creator_of ?x }"
+    },
+    {
+      "id": "WQSP_0112",
+      "question": "What is the nationality of Barack Obama?",
+      "topic_entity": {
+        "name": "Barack Obama",
+        "type": "person"
+      },
+      "relation": "nationality",
+      "answers": [
+        {
+          "entity_name": "Harvard University"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Barack_Obama :nationality ?x }"
+    },
+    {
+      "id": "WQSP_0113",
+      "question": "What is the located in of Paris?",
+      "topic_entity": {
+        "name": "Paris",
+        "type": "city"
+      },
+      "relation": "located_in",
+      "answers": [
+        {
+          "entity_name": "Albert Einstein"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Paris :located_in ?x }"
+    },
+    {
+      "id": "WQSP_0114",
+      "question": "What is the works at of Amazon?",
+      "topic_entity": {
+        "name": "Amazon",
+        "type": "company"
+      },
+      "relation": "works_at",
+      "answers": [
+        {
+          "entity_name": "Python"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Amazon :works_at ?x }"
+    },
+    {
+      "id": "WQSP_0115",
+      "question": "What is the nationality of Apple Inc?",
+      "topic_entity": {
+        "name": "Apple Inc",
+        "type": "company"
+      },
+      "relation": "nationality",
+      "answers": [
+        {
+          "entity_name": "United States"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Apple_Inc :nationality ?x }"
+    },
+    {
+      "id": "WQSP_0116",
+      "question": "What is the founded by of Paris?",
+      "topic_entity": {
+        "name": "Paris",
+        "type": "city"
+      },
+      "relation": "founded_by",
+      "answers": [
+        {
+          "entity_name": "Apple Inc"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Paris :founded_by ?x }"
+    },
+    {
+      "id": "WQSP_0117",
+      "question": "What is the language of of Python?",
+      "topic_entity": {
+        "name": "Python",
+        "type": "programming_language"
+      },
+      "relation": "language_of",
+      "answers": [
+        {
+          "entity_name": "Harvard University"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Python :language_of ?x }"
+    },
+    {
+      "id": "WQSP_0118",
+      "question": "What is the creator of of United States?",
+      "topic_entity": {
+        "name": "United States",
+        "type": "country"
+      },
+      "relation": "creator_of",
+      "answers": [
+        {
+          "entity_name": "Amazon"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :United_States :creator_of ?x }"
+    },
+    {
+      "id": "WQSP_0119",
+      "question": "What is the educated at of Apple Inc?",
+      "topic_entity": {
+        "name": "Apple Inc",
+        "type": "company"
+      },
+      "relation": "educated_at",
+      "answers": [
+        {
+          "entity_name": "United States"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Apple_Inc :educated_at ?x }"
+    },
+    {
+      "id": "WQSP_0120",
+      "question": "What is the creator of of Harvard University?",
+      "topic_entity": {
+        "name": "Harvard University",
+        "type": "university"
+      },
+      "relation": "creator_of",
+      "answers": [
+        {
+          "entity_name": "Albert Einstein"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Harvard_University :creator_of ?x }"
+    },
+    {
+      "id": "WQSP_0121",
+      "question": "What is the creator of of Python?",
+      "topic_entity": {
+        "name": "Python",
+        "type": "programming_language"
+      },
+      "relation": "creator_of",
+      "answers": [
+        {
+          "entity_name": "Barack Obama"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Python :creator_of ?x }"
+    },
+    {
+      "id": "WQSP_0122",
+      "question": "What is the creator of of Harvard University?",
+      "topic_entity": {
+        "name": "Harvard University",
+        "type": "university"
+      },
+      "relation": "creator_of",
+      "answers": [
+        {
+          "entity_name": "Barack Obama"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Harvard_University :creator_of ?x }"
+    },
+    {
+      "id": "WQSP_0123",
+      "question": "What is the educated at of United States?",
+      "topic_entity": {
+        "name": "United States",
+        "type": "country"
+      },
+      "relation": "educated_at",
+      "answers": [
+        {
+          "entity_name": "Apple Inc"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :United_States :educated_at ?x }"
+    },
+    {
+      "id": "WQSP_0124",
+      "question": "What is the language of of United States?",
+      "topic_entity": {
+        "name": "United States",
+        "type": "country"
+      },
+      "relation": "language_of",
+      "answers": [
+        {
+          "entity_name": "Harvard University"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :United_States :language_of ?x }"
+    },
+    {
+      "id": "WQSP_0125",
+      "question": "What is the nationality of Harvard University?",
+      "topic_entity": {
+        "name": "Harvard University",
+        "type": "university"
+      },
+      "relation": "nationality",
+      "answers": [
+        {
+          "entity_name": "Paris"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Harvard_University :nationality ?x }"
+    },
+    {
+      "id": "WQSP_0126",
+      "question": "What is the nationality of Python?",
+      "topic_entity": {
+        "name": "Python",
+        "type": "programming_language"
+      },
+      "relation": "nationality",
+      "answers": [
+        {
+          "entity_name": "Barack Obama"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Python :nationality ?x }"
+    },
+    {
+      "id": "WQSP_0127",
+      "question": "What is the nationality of Albert Einstein?",
+      "topic_entity": {
+        "name": "Albert Einstein",
+        "type": "person"
+      },
+      "relation": "nationality",
+      "answers": [
+        {
+          "entity_name": "Amazon"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Albert_Einstein :nationality ?x }"
+    },
+    {
+      "id": "WQSP_0128",
+      "question": "What is the works at of Paris?",
+      "topic_entity": {
+        "name": "Paris",
+        "type": "city"
+      },
+      "relation": "works_at",
+      "answers": [
+        {
+          "entity_name": "Harvard University"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Paris :works_at ?x }"
+    },
+    {
+      "id": "WQSP_0129",
+      "question": "What is the nationality of Paris?",
+      "topic_entity": {
+        "name": "Paris",
+        "type": "city"
+      },
+      "relation": "nationality",
+      "answers": [
+        {
+          "entity_name": "Apple Inc"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Paris :nationality ?x }"
+    },
+    {
+      "id": "WQSP_0130",
+      "question": "What is the creator of of Amazon?",
+      "topic_entity": {
+        "name": "Amazon",
+        "type": "company"
+      },
+      "relation": "creator_of",
+      "answers": [
+        {
+          "entity_name": "Apple Inc"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Amazon :creator_of ?x }"
+    },
+    {
+      "id": "WQSP_0131",
+      "question": "What is the founded by of Amazon?",
+      "topic_entity": {
+        "name": "Amazon",
+        "type": "company"
+      },
+      "relation": "founded_by",
+      "answers": [
+        {
+          "entity_name": "Albert Einstein"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Amazon :founded_by ?x }"
+    },
+    {
+      "id": "WQSP_0132",
+      "question": "What is the works at of Apple Inc?",
+      "topic_entity": {
+        "name": "Apple Inc",
+        "type": "company"
+      },
+      "relation": "works_at",
+      "answers": [
+        {
+          "entity_name": "Harvard University"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Apple_Inc :works_at ?x }"
+    },
+    {
+      "id": "WQSP_0133",
+      "question": "What is the located in of Python?",
+      "topic_entity": {
+        "name": "Python",
+        "type": "programming_language"
+      },
+      "relation": "located_in",
+      "answers": [
+        {
+          "entity_name": "United States"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Python :located_in ?x }"
+    },
+    {
+      "id": "WQSP_0134",
+      "question": "What is the works at of Harvard University?",
+      "topic_entity": {
+        "name": "Harvard University",
+        "type": "university"
+      },
+      "relation": "works_at",
+      "answers": [
+        {
+          "entity_name": "United States"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Harvard_University :works_at ?x }"
+    },
+    {
+      "id": "WQSP_0135",
+      "question": "What is the works at of Python?",
+      "topic_entity": {
+        "name": "Python",
+        "type": "programming_language"
+      },
+      "relation": "works_at",
+      "answers": [
+        {
+          "entity_name": "Albert Einstein"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Python :works_at ?x }"
+    },
+    {
+      "id": "WQSP_0136",
+      "question": "What is the language of of Python?",
+      "topic_entity": {
+        "name": "Python",
+        "type": "programming_language"
+      },
+      "relation": "language_of",
+      "answers": [
+        {
+          "entity_name": "Apple Inc"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Python :language_of ?x }"
+    },
+    {
+      "id": "WQSP_0137",
+      "question": "What is the language of of United States?",
+      "topic_entity": {
+        "name": "United States",
+        "type": "country"
+      },
+      "relation": "language_of",
+      "answers": [
+        {
+          "entity_name": "Amazon"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :United_States :language_of ?x }"
+    },
+    {
+      "id": "WQSP_0138",
+      "question": "What is the language of of Harvard University?",
+      "topic_entity": {
+        "name": "Harvard University",
+        "type": "university"
+      },
+      "relation": "language_of",
+      "answers": [
+        {
+          "entity_name": "Paris"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Harvard_University :language_of ?x }"
+    },
+    {
+      "id": "WQSP_0139",
+      "question": "What is the founded by of Albert Einstein?",
+      "topic_entity": {
+        "name": "Albert Einstein",
+        "type": "person"
+      },
+      "relation": "founded_by",
+      "answers": [
+        {
+          "entity_name": "Barack Obama"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Albert_Einstein :founded_by ?x }"
+    },
+    {
+      "id": "WQSP_0140",
+      "question": "What is the language of of United States?",
+      "topic_entity": {
+        "name": "United States",
+        "type": "country"
+      },
+      "relation": "language_of",
+      "answers": [
+        {
+          "entity_name": "Amazon"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :United_States :language_of ?x }"
+    },
+    {
+      "id": "WQSP_0141",
+      "question": "What is the works at of United States?",
+      "topic_entity": {
+        "name": "United States",
+        "type": "country"
+      },
+      "relation": "works_at",
+      "answers": [
+        {
+          "entity_name": "Paris"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :United_States :works_at ?x }"
+    },
+    {
+      "id": "WQSP_0142",
+      "question": "What is the founded by of Apple Inc?",
+      "topic_entity": {
+        "name": "Apple Inc",
+        "type": "company"
+      },
+      "relation": "founded_by",
+      "answers": [
+        {
+          "entity_name": "Albert Einstein"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Apple_Inc :founded_by ?x }"
+    },
+    {
+      "id": "WQSP_0143",
+      "question": "What is the founded by of Amazon?",
+      "topic_entity": {
+        "name": "Amazon",
+        "type": "company"
+      },
+      "relation": "founded_by",
+      "answers": [
+        {
+          "entity_name": "Albert Einstein"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Amazon :founded_by ?x }"
+    },
+    {
+      "id": "WQSP_0144",
+      "question": "What is the educated at of Paris?",
+      "topic_entity": {
+        "name": "Paris",
+        "type": "city"
+      },
+      "relation": "educated_at",
+      "answers": [
+        {
+          "entity_name": "Albert Einstein"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Paris :educated_at ?x }"
+    },
+    {
+      "id": "WQSP_0145",
+      "question": "What is the language of of United States?",
+      "topic_entity": {
+        "name": "United States",
+        "type": "country"
+      },
+      "relation": "language_of",
+      "answers": [
+        {
+          "entity_name": "Paris"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :United_States :language_of ?x }"
+    },
+    {
+      "id": "WQSP_0146",
+      "question": "What is the nationality of Apple Inc?",
+      "topic_entity": {
+        "name": "Apple Inc",
+        "type": "company"
+      },
+      "relation": "nationality",
+      "answers": [
+        {
+          "entity_name": "Barack Obama"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Apple_Inc :nationality ?x }"
+    },
+    {
+      "id": "WQSP_0147",
+      "question": "What is the educated at of Harvard University?",
+      "topic_entity": {
+        "name": "Harvard University",
+        "type": "university"
+      },
+      "relation": "educated_at",
+      "answers": [
+        {
+          "entity_name": "Paris"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Harvard_University :educated_at ?x }"
+    },
+    {
+      "id": "WQSP_0148",
+      "question": "What is the works at of Paris?",
+      "topic_entity": {
+        "name": "Paris",
+        "type": "city"
+      },
+      "relation": "works_at",
+      "answers": [
+        {
+          "entity_name": "Barack Obama"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Paris :works_at ?x }"
+    },
+    {
+      "id": "WQSP_0149",
+      "question": "What is the located in of Albert Einstein?",
+      "topic_entity": {
+        "name": "Albert Einstein",
+        "type": "person"
+      },
+      "relation": "located_in",
+      "answers": [
+        {
+          "entity_name": "Harvard University"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Albert_Einstein :located_in ?x }"
+    },
+    {
+      "id": "WQSP_0150",
+      "question": "What is the capital of of Amazon?",
+      "topic_entity": {
+        "name": "Amazon",
+        "type": "company"
+      },
+      "relation": "capital_of",
+      "answers": [
+        {
+          "entity_name": "Paris"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Amazon :capital_of ?x }"
+    },
+    {
+      "id": "WQSP_0151",
+      "question": "What is the works at of United States?",
+      "topic_entity": {
+        "name": "United States",
+        "type": "country"
+      },
+      "relation": "works_at",
+      "answers": [
+        {
+          "entity_name": "Amazon"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :United_States :works_at ?x }"
+    },
+    {
+      "id": "WQSP_0152",
+      "question": "What is the founded by of Barack Obama?",
+      "topic_entity": {
+        "name": "Barack Obama",
+        "type": "person"
+      },
+      "relation": "founded_by",
+      "answers": [
+        {
+          "entity_name": "Amazon"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Barack_Obama :founded_by ?x }"
+    },
+    {
+      "id": "WQSP_0153",
+      "question": "What is the nationality of Barack Obama?",
+      "topic_entity": {
+        "name": "Barack Obama",
+        "type": "person"
+      },
+      "relation": "nationality",
+      "answers": [
+        {
+          "entity_name": "Albert Einstein"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Barack_Obama :nationality ?x }"
+    },
+    {
+      "id": "WQSP_0154",
+      "question": "What is the creator of of Apple Inc?",
+      "topic_entity": {
+        "name": "Apple Inc",
+        "type": "company"
+      },
+      "relation": "creator_of",
+      "answers": [
+        {
+          "entity_name": "Barack Obama"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Apple_Inc :creator_of ?x }"
+    },
+    {
+      "id": "WQSP_0155",
+      "question": "What is the located in of Apple Inc?",
+      "topic_entity": {
+        "name": "Apple Inc",
+        "type": "company"
+      },
+      "relation": "located_in",
+      "answers": [
+        {
+          "entity_name": "United States"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Apple_Inc :located_in ?x }"
+    },
+    {
+      "id": "WQSP_0156",
+      "question": "What is the founded by of Harvard University?",
+      "topic_entity": {
+        "name": "Harvard University",
+        "type": "university"
+      },
+      "relation": "founded_by",
+      "answers": [
+        {
+          "entity_name": "Apple Inc"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Harvard_University :founded_by ?x }"
+    },
+    {
+      "id": "WQSP_0157",
+      "question": "What is the founded by of Barack Obama?",
+      "topic_entity": {
+        "name": "Barack Obama",
+        "type": "person"
+      },
+      "relation": "founded_by",
+      "answers": [
+        {
+          "entity_name": "Paris"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Barack_Obama :founded_by ?x }"
+    },
+    {
+      "id": "WQSP_0158",
+      "question": "What is the nationality of Albert Einstein?",
+      "topic_entity": {
+        "name": "Albert Einstein",
+        "type": "person"
+      },
+      "relation": "nationality",
+      "answers": [
+        {
+          "entity_name": "Python"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Albert_Einstein :nationality ?x }"
+    },
+    {
+      "id": "WQSP_0159",
+      "question": "What is the located in of Harvard University?",
+      "topic_entity": {
+        "name": "Harvard University",
+        "type": "university"
+      },
+      "relation": "located_in",
+      "answers": [
+        {
+          "entity_name": "Albert Einstein"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Harvard_University :located_in ?x }"
+    },
+    {
+      "id": "WQSP_0160",
+      "question": "What is the located in of Amazon?",
+      "topic_entity": {
+        "name": "Amazon",
+        "type": "company"
+      },
+      "relation": "located_in",
+      "answers": [
+        {
+          "entity_name": "United States"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Amazon :located_in ?x }"
+    },
+    {
+      "id": "WQSP_0161",
+      "question": "What is the works at of Paris?",
+      "topic_entity": {
+        "name": "Paris",
+        "type": "city"
+      },
+      "relation": "works_at",
+      "answers": [
+        {
+          "entity_name": "Barack Obama"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Paris :works_at ?x }"
+    },
+    {
+      "id": "WQSP_0162",
+      "question": "What is the educated at of Albert Einstein?",
+      "topic_entity": {
+        "name": "Albert Einstein",
+        "type": "person"
+      },
+      "relation": "educated_at",
+      "answers": [
+        {
+          "entity_name": "Python"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Albert_Einstein :educated_at ?x }"
+    },
+    {
+      "id": "WQSP_0163",
+      "question": "What is the located in of Barack Obama?",
+      "topic_entity": {
+        "name": "Barack Obama",
+        "type": "person"
+      },
+      "relation": "located_in",
+      "answers": [
+        {
+          "entity_name": "Python"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Barack_Obama :located_in ?x }"
+    },
+    {
+      "id": "WQSP_0164",
+      "question": "What is the creator of of Albert Einstein?",
+      "topic_entity": {
+        "name": "Albert Einstein",
+        "type": "person"
+      },
+      "relation": "creator_of",
+      "answers": [
+        {
+          "entity_name": "Barack Obama"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Albert_Einstein :creator_of ?x }"
+    },
+    {
+      "id": "WQSP_0165",
+      "question": "What is the founded by of Amazon?",
+      "topic_entity": {
+        "name": "Amazon",
+        "type": "company"
+      },
+      "relation": "founded_by",
+      "answers": [
+        {
+          "entity_name": "Apple Inc"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Amazon :founded_by ?x }"
+    },
+    {
+      "id": "WQSP_0166",
+      "question": "What is the founded by of Harvard University?",
+      "topic_entity": {
+        "name": "Harvard University",
+        "type": "university"
+      },
+      "relation": "founded_by",
+      "answers": [
+        {
+          "entity_name": "Paris"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Harvard_University :founded_by ?x }"
+    },
+    {
+      "id": "WQSP_0167",
+      "question": "What is the capital of of Paris?",
+      "topic_entity": {
+        "name": "Paris",
+        "type": "city"
+      },
+      "relation": "capital_of",
+      "answers": [
+        {
+          "entity_name": "Amazon"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Paris :capital_of ?x }"
+    },
+    {
+      "id": "WQSP_0168",
+      "question": "What is the capital of of United States?",
+      "topic_entity": {
+        "name": "United States",
+        "type": "country"
+      },
+      "relation": "capital_of",
+      "answers": [
+        {
+          "entity_name": "Albert Einstein"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :United_States :capital_of ?x }"
+    },
+    {
+      "id": "WQSP_0169",
+      "question": "What is the founded by of Amazon?",
+      "topic_entity": {
+        "name": "Amazon",
+        "type": "company"
+      },
+      "relation": "founded_by",
+      "answers": [
+        {
+          "entity_name": "Barack Obama"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Amazon :founded_by ?x }"
+    },
+    {
+      "id": "WQSP_0170",
+      "question": "What is the capital of of United States?",
+      "topic_entity": {
+        "name": "United States",
+        "type": "country"
+      },
+      "relation": "capital_of",
+      "answers": [
+        {
+          "entity_name": "Barack Obama"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :United_States :capital_of ?x }"
+    },
+    {
+      "id": "WQSP_0171",
+      "question": "What is the nationality of Amazon?",
+      "topic_entity": {
+        "name": "Amazon",
+        "type": "company"
+      },
+      "relation": "nationality",
+      "answers": [
+        {
+          "entity_name": "Apple Inc"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Amazon :nationality ?x }"
+    },
+    {
+      "id": "WQSP_0172",
+      "question": "What is the works at of United States?",
+      "topic_entity": {
+        "name": "United States",
+        "type": "country"
+      },
+      "relation": "works_at",
+      "answers": [
+        {
+          "entity_name": "Harvard University"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :United_States :works_at ?x }"
+    },
+    {
+      "id": "WQSP_0173",
+      "question": "What is the located in of Barack Obama?",
+      "topic_entity": {
+        "name": "Barack Obama",
+        "type": "person"
+      },
+      "relation": "located_in",
+      "answers": [
+        {
+          "entity_name": "Apple Inc"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Barack_Obama :located_in ?x }"
+    },
+    {
+      "id": "WQSP_0174",
+      "question": "What is the located in of Harvard University?",
+      "topic_entity": {
+        "name": "Harvard University",
+        "type": "university"
+      },
+      "relation": "located_in",
+      "answers": [
+        {
+          "entity_name": "Paris"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Harvard_University :located_in ?x }"
+    },
+    {
+      "id": "WQSP_0175",
+      "question": "What is the works at of Python?",
+      "topic_entity": {
+        "name": "Python",
+        "type": "programming_language"
+      },
+      "relation": "works_at",
+      "answers": [
+        {
+          "entity_name": "United States"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Python :works_at ?x }"
+    },
+    {
+      "id": "WQSP_0176",
+      "question": "What is the works at of Apple Inc?",
+      "topic_entity": {
+        "name": "Apple Inc",
+        "type": "company"
+      },
+      "relation": "works_at",
+      "answers": [
+        {
+          "entity_name": "Amazon"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Apple_Inc :works_at ?x }"
+    },
+    {
+      "id": "WQSP_0177",
+      "question": "What is the language of of Apple Inc?",
+      "topic_entity": {
+        "name": "Apple Inc",
+        "type": "company"
+      },
+      "relation": "language_of",
+      "answers": [
+        {
+          "entity_name": "Albert Einstein"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Apple_Inc :language_of ?x }"
+    },
+    {
+      "id": "WQSP_0178",
+      "question": "What is the located in of Apple Inc?",
+      "topic_entity": {
+        "name": "Apple Inc",
+        "type": "company"
+      },
+      "relation": "located_in",
+      "answers": [
+        {
+          "entity_name": "Harvard University"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Apple_Inc :located_in ?x }"
+    },
+    {
+      "id": "WQSP_0179",
+      "question": "What is the capital of of Harvard University?",
+      "topic_entity": {
+        "name": "Harvard University",
+        "type": "university"
+      },
+      "relation": "capital_of",
+      "answers": [
+        {
+          "entity_name": "Paris"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Harvard_University :capital_of ?x }"
+    },
+    {
+      "id": "WQSP_0180",
+      "question": "What is the founded by of United States?",
+      "topic_entity": {
+        "name": "United States",
+        "type": "country"
+      },
+      "relation": "founded_by",
+      "answers": [
+        {
+          "entity_name": "Harvard University"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :United_States :founded_by ?x }"
+    },
+    {
+      "id": "WQSP_0181",
+      "question": "What is the educated at of Paris?",
+      "topic_entity": {
+        "name": "Paris",
+        "type": "city"
+      },
+      "relation": "educated_at",
+      "answers": [
+        {
+          "entity_name": "United States"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Paris :educated_at ?x }"
+    },
+    {
+      "id": "WQSP_0182",
+      "question": "What is the located in of Amazon?",
+      "topic_entity": {
+        "name": "Amazon",
+        "type": "company"
+      },
+      "relation": "located_in",
+      "answers": [
+        {
+          "entity_name": "Paris"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Amazon :located_in ?x }"
+    },
+    {
+      "id": "WQSP_0183",
+      "question": "What is the founded by of Apple Inc?",
+      "topic_entity": {
+        "name": "Apple Inc",
+        "type": "company"
+      },
+      "relation": "founded_by",
+      "answers": [
+        {
+          "entity_name": "Paris"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Apple_Inc :founded_by ?x }"
+    },
+    {
+      "id": "WQSP_0184",
+      "question": "What is the located in of Python?",
+      "topic_entity": {
+        "name": "Python",
+        "type": "programming_language"
+      },
+      "relation": "located_in",
+      "answers": [
+        {
+          "entity_name": "Amazon"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Python :located_in ?x }"
+    },
+    {
+      "id": "WQSP_0185",
+      "question": "What is the language of of Amazon?",
+      "topic_entity": {
+        "name": "Amazon",
+        "type": "company"
+      },
+      "relation": "language_of",
+      "answers": [
+        {
+          "entity_name": "Albert Einstein"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Amazon :language_of ?x }"
+    },
+    {
+      "id": "WQSP_0186",
+      "question": "What is the language of of Albert Einstein?",
+      "topic_entity": {
+        "name": "Albert Einstein",
+        "type": "person"
+      },
+      "relation": "language_of",
+      "answers": [
+        {
+          "entity_name": "United States"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Albert_Einstein :language_of ?x }"
+    },
+    {
+      "id": "WQSP_0187",
+      "question": "What is the works at of Barack Obama?",
+      "topic_entity": {
+        "name": "Barack Obama",
+        "type": "person"
+      },
+      "relation": "works_at",
+      "answers": [
+        {
+          "entity_name": "Apple Inc"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Barack_Obama :works_at ?x }"
+    },
+    {
+      "id": "WQSP_0188",
+      "question": "What is the located in of Amazon?",
+      "topic_entity": {
+        "name": "Amazon",
+        "type": "company"
+      },
+      "relation": "located_in",
+      "answers": [
+        {
+          "entity_name": "Barack Obama"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Amazon :located_in ?x }"
+    },
+    {
+      "id": "WQSP_0189",
+      "question": "What is the creator of of Harvard University?",
+      "topic_entity": {
+        "name": "Harvard University",
+        "type": "university"
+      },
+      "relation": "creator_of",
+      "answers": [
+        {
+          "entity_name": "Albert Einstein"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Harvard_University :creator_of ?x }"
+    },
+    {
+      "id": "WQSP_0190",
+      "question": "What is the capital of of Albert Einstein?",
+      "topic_entity": {
+        "name": "Albert Einstein",
+        "type": "person"
+      },
+      "relation": "capital_of",
+      "answers": [
+        {
+          "entity_name": "Apple Inc"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Albert_Einstein :capital_of ?x }"
+    },
+    {
+      "id": "WQSP_0191",
+      "question": "What is the language of of United States?",
+      "topic_entity": {
+        "name": "United States",
+        "type": "country"
+      },
+      "relation": "language_of",
+      "answers": [
+        {
+          "entity_name": "Harvard University"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :United_States :language_of ?x }"
+    },
+    {
+      "id": "WQSP_0192",
+      "question": "What is the founded by of Barack Obama?",
+      "topic_entity": {
+        "name": "Barack Obama",
+        "type": "person"
+      },
+      "relation": "founded_by",
+      "answers": [
+        {
+          "entity_name": "Albert Einstein"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Barack_Obama :founded_by ?x }"
+    },
+    {
+      "id": "WQSP_0193",
+      "question": "What is the nationality of Amazon?",
+      "topic_entity": {
+        "name": "Amazon",
+        "type": "company"
+      },
+      "relation": "nationality",
+      "answers": [
+        {
+          "entity_name": "Harvard University"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Amazon :nationality ?x }"
+    },
+    {
+      "id": "WQSP_0194",
+      "question": "What is the educated at of Python?",
+      "topic_entity": {
+        "name": "Python",
+        "type": "programming_language"
+      },
+      "relation": "educated_at",
+      "answers": [
+        {
+          "entity_name": "Apple Inc"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Python :educated_at ?x }"
+    },
+    {
+      "id": "WQSP_0195",
+      "question": "What is the language of of Apple Inc?",
+      "topic_entity": {
+        "name": "Apple Inc",
+        "type": "company"
+      },
+      "relation": "language_of",
+      "answers": [
+        {
+          "entity_name": "Harvard University"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Apple_Inc :language_of ?x }"
+    },
+    {
+      "id": "WQSP_0196",
+      "question": "What is the educated at of Python?",
+      "topic_entity": {
+        "name": "Python",
+        "type": "programming_language"
+      },
+      "relation": "educated_at",
+      "answers": [
+        {
+          "entity_name": "Albert Einstein"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Python :educated_at ?x }"
+    },
+    {
+      "id": "WQSP_0197",
+      "question": "What is the nationality of Albert Einstein?",
+      "topic_entity": {
+        "name": "Albert Einstein",
+        "type": "person"
+      },
+      "relation": "nationality",
+      "answers": [
+        {
+          "entity_name": "Python"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Albert_Einstein :nationality ?x }"
+    },
+    {
+      "id": "WQSP_0198",
+      "question": "What is the founded by of Albert Einstein?",
+      "topic_entity": {
+        "name": "Albert Einstein",
+        "type": "person"
+      },
+      "relation": "founded_by",
+      "answers": [
+        {
+          "entity_name": "Python"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Albert_Einstein :founded_by ?x }"
+    },
+    {
+      "id": "WQSP_0199",
+      "question": "What is the language of of United States?",
+      "topic_entity": {
+        "name": "United States",
+        "type": "country"
+      },
+      "relation": "language_of",
+      "answers": [
+        {
+          "entity_name": "Barack Obama"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :United_States :language_of ?x }"
+    },
+    {
+      "id": "WQSP_0200",
+      "question": "What is the language of of Amazon?",
+      "topic_entity": {
+        "name": "Amazon",
+        "type": "company"
+      },
+      "relation": "language_of",
+      "answers": [
+        {
+          "entity_name": "Paris"
+        }
+      ],
+      "sparql": "SELECT ?x WHERE { :Amazon :language_of ?x }"
+    }
+  ]
+}

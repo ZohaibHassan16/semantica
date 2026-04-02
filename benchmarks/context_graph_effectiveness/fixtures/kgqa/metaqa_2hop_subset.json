@@ -1,0 +1,3932 @@
+{
+  "version": "1.0",
+  "source_dataset": "MetaQA 2-hop",
+  "source_url": "https://github.com/yuyuz/MetaQA",
+  "license": "Creative Commons Public License",
+  "movies_kb": [
+    {
+      "id": "movie_001",
+      "title": "Movie_001_Animation",
+      "directed_by": "Ridley Scott",
+      "starred_actors": [
+        "Tom Hanks",
+        "Matt Damon"
+      ],
+      "release_year": 2018,
+      "in_language": "Japanese",
+      "has_genre": "animation",
+      "has_imdb_rating": 6.2
+    },
+    {
+      "id": "movie_002",
+      "title": "Movie_002_Romance",
+      "directed_by": "Quentin Tarantino",
+      "starred_actors": [
+        "Matt Damon",
+        "Tom Hanks"
+      ],
+      "release_year": 1996,
+      "in_language": "English",
+      "has_genre": "romance",
+      "has_imdb_rating": 9.4
+    },
+    {
+      "id": "movie_003",
+      "title": "Movie_003_Documentary",
+      "directed_by": "Christopher Nolan",
+      "starred_actors": [
+        "Viola Davis",
+        "Leonardo DiCaprio"
+      ],
+      "release_year": 2020,
+      "in_language": "Korean",
+      "has_genre": "documentary",
+      "has_imdb_rating": 7.1
+    },
+    {
+      "id": "movie_004",
+      "title": "Movie_004_Animation",
+      "directed_by": "Alfonso Cuaron",
+      "starred_actors": [
+        "Tom Hanks",
+        "Sandra Bullock"
+      ],
+      "release_year": 1982,
+      "in_language": "Spanish",
+      "has_genre": "animation",
+      "has_imdb_rating": 9.0
+    },
+    {
+      "id": "movie_005",
+      "title": "Movie_005_Comedy",
+      "directed_by": "James Cameron",
+      "starred_actors": [
+        "Brad Pitt"
+      ],
+      "release_year": 1988,
+      "in_language": "German",
+      "has_genre": "comedy",
+      "has_imdb_rating": 8.8
+    },
+    {
+      "id": "movie_006",
+      "title": "Movie_006_Action",
+      "directed_by": "Steven Spielberg",
+      "starred_actors": [
+        "Meryl Streep",
+        "Morgan Freeman"
+      ],
+      "release_year": 1983,
+      "in_language": "English",
+      "has_genre": "action",
+      "has_imdb_rating": 6.2
+    },
+    {
+      "id": "movie_007",
+      "title": "Movie_007_Biography",
+      "directed_by": "Martin Scorsese",
+      "starred_actors": [
+        "Natalie Portman",
+        "Leonardo DiCaprio",
+        "Sandra Bullock"
+      ],
+      "release_year": 2001,
+      "in_language": "Spanish",
+      "has_genre": "biography",
+      "has_imdb_rating": 8.2
+    },
+    {
+      "id": "movie_008",
+      "title": "Movie_008_Animation",
+      "directed_by": "David Fincher",
+      "starred_actors": [
+        "Brad Pitt",
+        "Matt Damon"
+      ],
+      "release_year": 2022,
+      "in_language": "English",
+      "has_genre": "animation",
+      "has_imdb_rating": 8.0
+    },
+    {
+      "id": "movie_009",
+      "title": "Movie_009_Thriller",
+      "directed_by": "Steven Spielberg",
+      "starred_actors": [
+        "Halle Berry"
+      ],
+      "release_year": 2012,
+      "in_language": "German",
+      "has_genre": "thriller",
+      "has_imdb_rating": 6.2
+    },
+    {
+      "id": "movie_010",
+      "title": "Movie_010_Documentary",
+      "directed_by": "James Cameron",
+      "starred_actors": [
+        "Halle Berry"
+      ],
+      "release_year": 2018,
+      "in_language": "English",
+      "has_genre": "documentary",
+      "has_imdb_rating": 7.3
+    },
+    {
+      "id": "movie_011",
+      "title": "Movie_011_Action",
+      "directed_by": "James Cameron",
+      "starred_actors": [
+        "Meryl Streep",
+        "Natalie Portman"
+      ],
+      "release_year": 2015,
+      "in_language": "English",
+      "has_genre": "action",
+      "has_imdb_rating": 7.1
+    },
+    {
+      "id": "movie_012",
+      "title": "Movie_012_Drama",
+      "directed_by": "Guillermo del Toro",
+      "starred_actors": [
+        "Meryl Streep"
+      ],
+      "release_year": 2009,
+      "in_language": "English",
+      "has_genre": "drama",
+      "has_imdb_rating": 9.1
+    },
+    {
+      "id": "movie_013",
+      "title": "Movie_013_Drama",
+      "directed_by": "James Cameron",
+      "starred_actors": [
+        "Tom Hanks",
+        "Leonardo DiCaprio",
+        "Halle Berry"
+      ],
+      "release_year": 2017,
+      "in_language": "English",
+      "has_genre": "drama",
+      "has_imdb_rating": 6.0
+    },
+    {
+      "id": "movie_014",
+      "title": "Movie_014_Documentary",
+      "directed_by": "David Fincher",
+      "starred_actors": [
+        "Matt Damon",
+        "Halle Berry"
+      ],
+      "release_year": 1995,
+      "in_language": "English",
+      "has_genre": "documentary",
+      "has_imdb_rating": 9.2
+    },
+    {
+      "id": "movie_015",
+      "title": "Movie_015_Comedy",
+      "directed_by": "Martin Scorsese",
+      "starred_actors": [
+        "Denzel Washington",
+        "Leonardo DiCaprio",
+        "Halle Berry"
+      ],
+      "release_year": 2004,
+      "in_language": "English",
+      "has_genre": "comedy",
+      "has_imdb_rating": 5.6
+    },
+    {
+      "id": "movie_016",
+      "title": "Movie_016_Romance",
+      "directed_by": "David Fincher",
+      "starred_actors": [
+        "Cate Blanchett",
+        "Leonardo DiCaprio"
+      ],
+      "release_year": 1992,
+      "in_language": "English",
+      "has_genre": "romance",
+      "has_imdb_rating": 9.4
+    },
+    {
+      "id": "movie_017",
+      "title": "Movie_017_Documentary",
+      "directed_by": "Ridley Scott",
+      "starred_actors": [
+        "Sandra Bullock",
+        "Natalie Portman"
+      ],
+      "release_year": 2011,
+      "in_language": "English",
+      "has_genre": "documentary",
+      "has_imdb_rating": 6.6
+    },
+    {
+      "id": "movie_018",
+      "title": "Movie_018_Animation",
+      "directed_by": "Alfonso Cuaron",
+      "starred_actors": [
+        "Leonardo DiCaprio",
+        "Tom Hanks",
+        "Sandra Bullock"
+      ],
+      "release_year": 2020,
+      "in_language": "English",
+      "has_genre": "animation",
+      "has_imdb_rating": 6.7
+    },
+    {
+      "id": "movie_019",
+      "title": "Movie_019_Biography",
+      "directed_by": "Peter Jackson",
+      "starred_actors": [
+        "Matt Damon",
+        "Halle Berry"
+      ],
+      "release_year": 2007,
+      "in_language": "English",
+      "has_genre": "biography",
+      "has_imdb_rating": 8.6
+    },
+    {
+      "id": "movie_020",
+      "title": "Movie_020_Horror",
+      "directed_by": "Martin Scorsese",
+      "starred_actors": [
+        "Halle Berry",
+        "Denzel Washington",
+        "Meryl Streep"
+      ],
+      "release_year": 2012,
+      "in_language": "French",
+      "has_genre": "horror",
+      "has_imdb_rating": 7.3
+    },
+    {
+      "id": "movie_021",
+      "title": "Movie_021_Sci-Fi",
+      "directed_by": "Martin Scorsese",
+      "starred_actors": [
+        "Meryl Streep"
+      ],
+      "release_year": 1996,
+      "in_language": "English",
+      "has_genre": "sci-fi",
+      "has_imdb_rating": 7.3
+    },
+    {
+      "id": "movie_022",
+      "title": "Movie_022_Comedy",
+      "directed_by": "Alfonso Cuaron",
+      "starred_actors": [
+        "Natalie Portman",
+        "Halle Berry",
+        "Sandra Bullock"
+      ],
+      "release_year": 2009,
+      "in_language": "English",
+      "has_genre": "comedy",
+      "has_imdb_rating": 6.7
+    },
+    {
+      "id": "movie_023",
+      "title": "Movie_023_Action",
+      "directed_by": "Wes Anderson",
+      "starred_actors": [
+        "Natalie Portman",
+        "Tom Hanks",
+        "Leonardo DiCaprio"
+      ],
+      "release_year": 1986,
+      "in_language": "English",
+      "has_genre": "action",
+      "has_imdb_rating": 6.9
+    },
+    {
+      "id": "movie_024",
+      "title": "Movie_024_Horror",
+      "directed_by": "David Fincher",
+      "starred_actors": [
+        "Natalie Portman"
+      ],
+      "release_year": 1986,
+      "in_language": "French",
+      "has_genre": "horror",
+      "has_imdb_rating": 6.4
+    },
+    {
+      "id": "movie_025",
+      "title": "Movie_025_Animation",
+      "directed_by": "Quentin Tarantino",
+      "starred_actors": [
+        "Sandra Bullock",
+        "Viola Davis"
+      ],
+      "release_year": 1981,
+      "in_language": "English",
+      "has_genre": "animation",
+      "has_imdb_rating": 7.7
+    },
+    {
+      "id": "movie_026",
+      "title": "Movie_026_Romance",
+      "directed_by": "Guillermo del Toro",
+      "starred_actors": [
+        "Denzel Washington"
+      ],
+      "release_year": 2010,
+      "in_language": "Spanish",
+      "has_genre": "romance",
+      "has_imdb_rating": 8.3
+    },
+    {
+      "id": "movie_027",
+      "title": "Movie_027_Horror",
+      "directed_by": "Wes Anderson",
+      "starred_actors": [
+        "Tom Hanks",
+        "Cate Blanchett"
+      ],
+      "release_year": 2005,
+      "in_language": "English",
+      "has_genre": "horror",
+      "has_imdb_rating": 8.4
+    },
+    {
+      "id": "movie_028",
+      "title": "Movie_028_Drama",
+      "directed_by": "Peter Jackson",
+      "starred_actors": [
+        "Brad Pitt",
+        "Sandra Bullock",
+        "Tom Hanks"
+      ],
+      "release_year": 1997,
+      "in_language": "English",
+      "has_genre": "drama",
+      "has_imdb_rating": 5.7
+    },
+    {
+      "id": "movie_029",
+      "title": "Movie_029_Sci-Fi",
+      "directed_by": "James Cameron",
+      "starred_actors": [
+        "Sandra Bullock"
+      ],
+      "release_year": 2013,
+      "in_language": "Japanese",
+      "has_genre": "sci-fi",
+      "has_imdb_rating": 8.4
+    },
+    {
+      "id": "movie_030",
+      "title": "Movie_030_Horror",
+      "directed_by": "James Cameron",
+      "starred_actors": [
+        "Denzel Washington"
+      ],
+      "release_year": 1983,
+      "in_language": "Spanish",
+      "has_genre": "horror",
+      "has_imdb_rating": 8.6
+    },
+    {
+      "id": "movie_031",
+      "title": "Movie_031_Horror",
+      "directed_by": "James Cameron",
+      "starred_actors": [
+        "Tom Hanks",
+        "Matt Damon"
+      ],
+      "release_year": 1990,
+      "in_language": "English",
+      "has_genre": "horror",
+      "has_imdb_rating": 5.7
+    },
+    {
+      "id": "movie_032",
+      "title": "Movie_032_Sci-Fi",
+      "directed_by": "James Cameron",
+      "starred_actors": [
+        "Cate Blanchett"
+      ],
+      "release_year": 1991,
+      "in_language": "English",
+      "has_genre": "sci-fi",
+      "has_imdb_rating": 7.0
+    },
+    {
+      "id": "movie_033",
+      "title": "Movie_033_Thriller",
+      "directed_by": "Guillermo del Toro",
+      "starred_actors": [
+        "Tom Hanks",
+        "Viola Davis"
+      ],
+      "release_year": 2015,
+      "in_language": "English",
+      "has_genre": "thriller",
+      "has_imdb_rating": 5.7
+    },
+    {
+      "id": "movie_034",
+      "title": "Movie_034_Documentary",
+      "directed_by": "Steven Spielberg",
+      "starred_actors": [
+        "Cate Blanchett",
+        "Viola Davis",
+        "Brad Pitt"
+      ],
+      "release_year": 2005,
+      "in_language": "English",
+      "has_genre": "documentary",
+      "has_imdb_rating": 8.7
+    },
+    {
+      "id": "movie_035",
+      "title": "Movie_035_Thriller",
+      "directed_by": "Guillermo del Toro",
+      "starred_actors": [
+        "Leonardo DiCaprio",
+        "Natalie Portman"
+      ],
+      "release_year": 1986,
+      "in_language": "Spanish",
+      "has_genre": "thriller",
+      "has_imdb_rating": 8.4
+    },
+    {
+      "id": "movie_036",
+      "title": "Movie_036_Romance",
+      "directed_by": "James Cameron",
+      "starred_actors": [
+        "Halle Berry",
+        "Brad Pitt",
+        "Sandra Bullock"
+      ],
+      "release_year": 1998,
+      "in_language": "Spanish",
+      "has_genre": "romance",
+      "has_imdb_rating": 6.8
+    },
+    {
+      "id": "movie_037",
+      "title": "Movie_037_Horror",
+      "directed_by": "Steven Spielberg",
+      "starred_actors": [
+        "Cate Blanchett"
+      ],
+      "release_year": 2017,
+      "in_language": "English",
+      "has_genre": "horror",
+      "has_imdb_rating": 9.0
+    },
+    {
+      "id": "movie_038",
+      "title": "Movie_038_Thriller",
+      "directed_by": "James Cameron",
+      "starred_actors": [
+        "Tom Hanks",
+        "Sandra Bullock",
+        "Matt Damon"
+      ],
+      "release_year": 2001,
+      "in_language": "English",
+      "has_genre": "thriller",
+      "has_imdb_rating": 8.4
+    },
+    {
+      "id": "movie_039",
+      "title": "Movie_039_Thriller",
+      "directed_by": "Steven Spielberg",
+      "starred_actors": [
+        "Cate Blanchett"
+      ],
+      "release_year": 1992,
+      "in_language": "English",
+      "has_genre": "thriller",
+      "has_imdb_rating": 6.4
+    },
+    {
+      "id": "movie_040",
+      "title": "Movie_040_Horror",
+      "directed_by": "Steven Spielberg",
+      "starred_actors": [
+        "Leonardo DiCaprio",
+        "Denzel Washington"
+      ],
+      "release_year": 1991,
+      "in_language": "English",
+      "has_genre": "horror",
+      "has_imdb_rating": 6.4
+    },
+    {
+      "id": "movie_041",
+      "title": "Movie_041_Documentary",
+      "directed_by": "Alfonso Cuaron",
+      "starred_actors": [
+        "Leonardo DiCaprio"
+      ],
+      "release_year": 2006,
+      "in_language": "English",
+      "has_genre": "documentary",
+      "has_imdb_rating": 6.8
+    },
+    {
+      "id": "movie_042",
+      "title": "Movie_042_Drama",
+      "directed_by": "Peter Jackson",
+      "starred_actors": [
+        "Matt Damon",
+        "Meryl Streep"
+      ],
+      "release_year": 1985,
+      "in_language": "English",
+      "has_genre": "drama",
+      "has_imdb_rating": 8.0
+    },
+    {
+      "id": "movie_043",
+      "title": "Movie_043_Action",
+      "directed_by": "Denis Villeneuve",
+      "starred_actors": [
+        "Morgan Freeman",
+        "Brad Pitt",
+        "Viola Davis"
+      ],
+      "release_year": 1988,
+      "in_language": "English",
+      "has_genre": "action",
+      "has_imdb_rating": 5.1
+    },
+    {
+      "id": "movie_044",
+      "title": "Movie_044_Romance",
+      "directed_by": "Alfonso Cuaron",
+      "starred_actors": [
+        "Brad Pitt",
+        "Denzel Washington"
+      ],
+      "release_year": 1983,
+      "in_language": "English",
+      "has_genre": "romance",
+      "has_imdb_rating": 8.3
+    },
+    {
+      "id": "movie_045",
+      "title": "Movie_045_Biography",
+      "directed_by": "Steven Spielberg",
+      "starred_actors": [
+        "Natalie Portman",
+        "Viola Davis",
+        "Halle Berry"
+      ],
+      "release_year": 2008,
+      "in_language": "Spanish",
+      "has_genre": "biography",
+      "has_imdb_rating": 8.8
+    },
+    {
+      "id": "movie_046",
+      "title": "Movie_046_Drama",
+      "directed_by": "David Fincher",
+      "starred_actors": [
+        "Brad Pitt",
+        "Matt Damon",
+        "Meryl Streep"
+      ],
+      "release_year": 2007,
+      "in_language": "Spanish",
+      "has_genre": "drama",
+      "has_imdb_rating": 5.7
+    },
+    {
+      "id": "movie_047",
+      "title": "Movie_047_Biography",
+      "directed_by": "David Fincher",
+      "starred_actors": [
+        "Halle Berry",
+        "Viola Davis",
+        "Brad Pitt"
+      ],
+      "release_year": 2012,
+      "in_language": "English",
+      "has_genre": "biography",
+      "has_imdb_rating": 5.2
+    },
+    {
+      "id": "movie_048",
+      "title": "Movie_048_Action",
+      "directed_by": "Ridley Scott",
+      "starred_actors": [
+        "Natalie Portman",
+        "Tom Hanks"
+      ],
+      "release_year": 2011,
+      "in_language": "English",
+      "has_genre": "action",
+      "has_imdb_rating": 9.0
+    },
+    {
+      "id": "movie_049",
+      "title": "Movie_049_Horror",
+      "directed_by": "Alfonso Cuaron",
+      "starred_actors": [
+        "Denzel Washington",
+        "Tom Hanks",
+        "Morgan Freeman"
+      ],
+      "release_year": 2001,
+      "in_language": "English",
+      "has_genre": "horror",
+      "has_imdb_rating": 6.2
+    },
+    {
+      "id": "movie_050",
+      "title": "Movie_050_Horror",
+      "directed_by": "Ridley Scott",
+      "starred_actors": [
+        "Denzel Washington",
+        "Matt Damon"
+      ],
+      "release_year": 2008,
+      "in_language": "English",
+      "has_genre": "horror",
+      "has_imdb_rating": 5.2
+    },
+    {
+      "id": "movie_051",
+      "title": "Movie_051_Horror",
+      "directed_by": "Steven Spielberg",
+      "starred_actors": [
+        "Brad Pitt",
+        "Cate Blanchett",
+        "Leonardo DiCaprio"
+      ],
+      "release_year": 2014,
+      "in_language": "Spanish",
+      "has_genre": "horror",
+      "has_imdb_rating": 5.4
+    },
+    {
+      "id": "movie_052",
+      "title": "Movie_052_Comedy",
+      "directed_by": "Steven Spielberg",
+      "starred_actors": [
+        "Brad Pitt",
+        "Denzel Washington"
+      ],
+      "release_year": 2020,
+      "in_language": "Spanish",
+      "has_genre": "comedy",
+      "has_imdb_rating": 6.6
+    },
+    {
+      "id": "movie_053",
+      "title": "Movie_053_Biography",
+      "directed_by": "Quentin Tarantino",
+      "starred_actors": [
+        "Viola Davis",
+        "Tom Hanks",
+        "Meryl Streep"
+      ],
+      "release_year": 2013,
+      "in_language": "English",
+      "has_genre": "biography",
+      "has_imdb_rating": 6.5
+    },
+    {
+      "id": "movie_054",
+      "title": "Movie_054_Comedy",
+      "directed_by": "Christopher Nolan",
+      "starred_actors": [
+        "Brad Pitt"
+      ],
+      "release_year": 2020,
+      "in_language": "French",
+      "has_genre": "comedy",
+      "has_imdb_rating": 7.3
+    },
+    {
+      "id": "movie_055",
+      "title": "Movie_055_Drama",
+      "directed_by": "Guillermo del Toro",
+      "starred_actors": [
+        "Denzel Washington",
+        "Brad Pitt",
+        "Matt Damon"
+      ],
+      "release_year": 2020,
+      "in_language": "English",
+      "has_genre": "drama",
+      "has_imdb_rating": 5.1
+    },
+    {
+      "id": "movie_056",
+      "title": "Movie_056_Sci-Fi",
+      "directed_by": "Guillermo del Toro",
+      "starred_actors": [
+        "Meryl Streep",
+        "Cate Blanchett"
+      ],
+      "release_year": 1985,
+      "in_language": "Spanish",
+      "has_genre": "sci-fi",
+      "has_imdb_rating": 7.6
+    },
+    {
+      "id": "movie_057",
+      "title": "Movie_057_Biography",
+      "directed_by": "Ridley Scott",
+      "starred_actors": [
+        "Tom Hanks",
+        "Natalie Portman",
+        "Sandra Bullock"
+      ],
+      "release_year": 1995,
+      "in_language": "English",
+      "has_genre": "biography",
+      "has_imdb_rating": 7.1
+    },
+    {
+      "id": "movie_058",
+      "title": "Movie_058_Sci-Fi",
+      "directed_by": "Denis Villeneuve",
+      "starred_actors": [
+        "Morgan Freeman",
+        "Matt Damon"
+      ],
+      "release_year": 1991,
+      "in_language": "Spanish",
+      "has_genre": "sci-fi",
+      "has_imdb_rating": 5.2
+    },
+    {
+      "id": "movie_059",
+      "title": "Movie_059_Comedy",
+      "directed_by": "Denis Villeneuve",
+      "starred_actors": [
+        "Brad Pitt"
+      ],
+      "release_year": 1997,
+      "in_language": "French",
+      "has_genre": "comedy",
+      "has_imdb_rating": 5.9
+    },
+    {
+      "id": "movie_060",
+      "title": "Movie_060_Comedy",
+      "directed_by": "Denis Villeneuve",
+      "starred_actors": [
+        "Matt Damon",
+        "Natalie Portman",
+        "Meryl Streep"
+      ],
+      "release_year": 2009,
+      "in_language": "English",
+      "has_genre": "comedy",
+      "has_imdb_rating": 6.0
+    },
+    {
+      "id": "movie_061",
+      "title": "Movie_061_Horror",
+      "directed_by": "Christopher Nolan",
+      "starred_actors": [
+        "Halle Berry",
+        "Sandra Bullock"
+      ],
+      "release_year": 2019,
+      "in_language": "English",
+      "has_genre": "horror",
+      "has_imdb_rating": 8.7
+    },
+    {
+      "id": "movie_062",
+      "title": "Movie_062_Romance",
+      "directed_by": "Wes Anderson",
+      "starred_actors": [
+        "Brad Pitt",
+        "Viola Davis",
+        "Morgan Freeman"
+      ],
+      "release_year": 2001,
+      "in_language": "French",
+      "has_genre": "romance",
+      "has_imdb_rating": 5.1
+    },
+    {
+      "id": "movie_063",
+      "title": "Movie_063_Horror",
+      "directed_by": "David Fincher",
+      "starred_actors": [
+        "Viola Davis"
+      ],
+      "release_year": 2008,
+      "in_language": "English",
+      "has_genre": "horror",
+      "has_imdb_rating": 8.8
+    },
+    {
+      "id": "movie_064",
+      "title": "Movie_064_Thriller",
+      "directed_by": "Quentin Tarantino",
+      "starred_actors": [
+        "Brad Pitt",
+        "Denzel Washington",
+        "Halle Berry"
+      ],
+      "release_year": 1990,
+      "in_language": "English",
+      "has_genre": "thriller",
+      "has_imdb_rating": 5.1
+    },
+    {
+      "id": "movie_065",
+      "title": "Movie_065_Drama",
+      "directed_by": "Wes Anderson",
+      "starred_actors": [
+        "Meryl Streep",
+        "Cate Blanchett"
+      ],
+      "release_year": 2015,
+      "in_language": "French",
+      "has_genre": "drama",
+      "has_imdb_rating": 8.4
+    },
+    {
+      "id": "movie_066",
+      "title": "Movie_066_Horror",
+      "directed_by": "Peter Jackson",
+      "starred_actors": [
+        "Matt Damon",
+        "Viola Davis"
+      ],
+      "release_year": 2000,
+      "in_language": "English",
+      "has_genre": "horror",
+      "has_imdb_rating": 5.1
+    },
+    {
+      "id": "movie_067",
+      "title": "Movie_067_Biography",
+      "directed_by": "Wes Anderson",
+      "starred_actors": [
+        "Brad Pitt",
+        "Halle Berry",
+        "Tom Hanks"
+      ],
+      "release_year": 2002,
+      "in_language": "English",
+      "has_genre": "biography",
+      "has_imdb_rating": 8.4
+    },
+    {
+      "id": "movie_068",
+      "title": "Movie_068_Animation",
+      "directed_by": "Ridley Scott",
+      "starred_actors": [
+        "Morgan Freeman",
+        "Leonardo DiCaprio"
+      ],
+      "release_year": 1995,
+      "in_language": "Spanish",
+      "has_genre": "animation",
+      "has_imdb_rating": 6.7
+    },
+    {
+      "id": "movie_069",
+      "title": "Movie_069_Drama",
+      "directed_by": "Steven Spielberg",
+      "starred_actors": [
+        "Sandra Bullock"
+      ],
+      "release_year": 1993,
+      "in_language": "English",
+      "has_genre": "drama",
+      "has_imdb_rating": 6.3
+    },
+    {
+      "id": "movie_070",
+      "title": "Movie_070_Romance",
+      "directed_by": "James Cameron",
+      "starred_actors": [
+        "Brad Pitt"
+      ],
+      "release_year": 2002,
+      "in_language": "English",
+      "has_genre": "romance",
+      "has_imdb_rating": 9.1
+    },
+    {
+      "id": "movie_071",
+      "title": "Movie_071_Horror",
+      "directed_by": "Ridley Scott",
+      "starred_actors": [
+        "Matt Damon"
+      ],
+      "release_year": 2020,
+      "in_language": "Spanish",
+      "has_genre": "horror",
+      "has_imdb_rating": 9.0
+    },
+    {
+      "id": "movie_072",
+      "title": "Movie_072_Horror",
+      "directed_by": "Alfonso Cuaron",
+      "starred_actors": [
+        "Cate Blanchett",
+        "Brad Pitt"
+      ],
+      "release_year": 2014,
+      "in_language": "English",
+      "has_genre": "horror",
+      "has_imdb_rating": 7.2
+    },
+    {
+      "id": "movie_073",
+      "title": "Movie_073_Sci-Fi",
+      "directed_by": "Quentin Tarantino",
+      "starred_actors": [
+        "Leonardo DiCaprio"
+      ],
+      "release_year": 2008,
+      "in_language": "German",
+      "has_genre": "sci-fi",
+      "has_imdb_rating": 6.8
+    },
+    {
+      "id": "movie_074",
+      "title": "Movie_074_Animation",
+      "directed_by": "Christopher Nolan",
+      "starred_actors": [
+        "Leonardo DiCaprio",
+        "Matt Damon",
+        "Meryl Streep"
+      ],
+      "release_year": 2009,
+      "in_language": "German",
+      "has_genre": "animation",
+      "has_imdb_rating": 6.7
+    },
+    {
+      "id": "movie_075",
+      "title": "Movie_075_Romance",
+      "directed_by": "Alfonso Cuaron",
+      "starred_actors": [
+        "Matt Damon"
+      ],
+      "release_year": 2006,
+      "in_language": "Korean",
+      "has_genre": "romance",
+      "has_imdb_rating": 5.1
+    },
+    {
+      "id": "movie_076",
+      "title": "Movie_076_Comedy",
+      "directed_by": "Martin Scorsese",
+      "starred_actors": [
+        "Sandra Bullock"
+      ],
+      "release_year": 2012,
+      "in_language": "French",
+      "has_genre": "comedy",
+      "has_imdb_rating": 7.6
+    },
+    {
+      "id": "movie_077",
+      "title": "Movie_077_Action",
+      "directed_by": "Denis Villeneuve",
+      "starred_actors": [
+        "Sandra Bullock"
+      ],
+      "release_year": 1995,
+      "in_language": "English",
+      "has_genre": "action",
+      "has_imdb_rating": 7.8
+    },
+    {
+      "id": "movie_078",
+      "title": "Movie_078_Drama",
+      "directed_by": "Alfonso Cuaron",
+      "starred_actors": [
+        "Sandra Bullock",
+        "Matt Damon",
+        "Brad Pitt"
+      ],
+      "release_year": 1981,
+      "in_language": "Korean",
+      "has_genre": "drama",
+      "has_imdb_rating": 7.5
+    },
+    {
+      "id": "movie_079",
+      "title": "Movie_079_Comedy",
+      "directed_by": "Martin Scorsese",
+      "starred_actors": [
+        "Viola Davis"
+      ],
+      "release_year": 1995,
+      "in_language": "English",
+      "has_genre": "comedy",
+      "has_imdb_rating": 9.2
+    },
+    {
+      "id": "movie_080",
+      "title": "Movie_080_Horror",
+      "directed_by": "Martin Scorsese",
+      "starred_actors": [
+        "Cate Blanchett"
+      ],
+      "release_year": 1984,
+      "in_language": "English",
+      "has_genre": "horror",
+      "has_imdb_rating": 7.6
+    },
+    {
+      "id": "movie_081",
+      "title": "Movie_081_Thriller",
+      "directed_by": "Quentin Tarantino",
+      "starred_actors": [
+        "Leonardo DiCaprio"
+      ],
+      "release_year": 2008,
+      "in_language": "French",
+      "has_genre": "thriller",
+      "has_imdb_rating": 9.4
+    },
+    {
+      "id": "movie_082",
+      "title": "Movie_082_Drama",
+      "directed_by": "Peter Jackson",
+      "starred_actors": [
+        "Cate Blanchett"
+      ],
+      "release_year": 2001,
+      "in_language": "Spanish",
+      "has_genre": "drama",
+      "has_imdb_rating": 7.1
+    },
+    {
+      "id": "movie_083",
+      "title": "Movie_083_Action",
+      "directed_by": "Steven Spielberg",
+      "starred_actors": [
+        "Brad Pitt",
+        "Morgan Freeman",
+        "Viola Davis"
+      ],
+      "release_year": 2023,
+      "in_language": "Spanish",
+      "has_genre": "action",
+      "has_imdb_rating": 8.9
+    },
+    {
+      "id": "movie_084",
+      "title": "Movie_084_Romance",
+      "directed_by": "Steven Spielberg",
+      "starred_actors": [
+        "Halle Berry"
+      ],
+      "release_year": 2014,
+      "in_language": "Korean",
+      "has_genre": "romance",
+      "has_imdb_rating": 8.5
+    },
+    {
+      "id": "movie_085",
+      "title": "Movie_085_Animation",
+      "directed_by": "Alfonso Cuaron",
+      "starred_actors": [
+        "Halle Berry",
+        "Tom Hanks"
+      ],
+      "release_year": 2008,
+      "in_language": "Spanish",
+      "has_genre": "animation",
+      "has_imdb_rating": 6.3
+    },
+    {
+      "id": "movie_086",
+      "title": "Movie_086_Action",
+      "directed_by": "Denis Villeneuve",
+      "starred_actors": [
+        "Matt Damon",
+        "Viola Davis",
+        "Brad Pitt"
+      ],
+      "release_year": 2012,
+      "in_language": "English",
+      "has_genre": "action",
+      "has_imdb_rating": 8.5
+    },
+    {
+      "id": "movie_087",
+      "title": "Movie_087_Comedy",
+      "directed_by": "Steven Spielberg",
+      "starred_actors": [
+        "Halle Berry"
+      ],
+      "release_year": 2017,
+      "in_language": "German",
+      "has_genre": "comedy",
+      "has_imdb_rating": 5.8
+    },
+    {
+      "id": "movie_088",
+      "title": "Movie_088_Horror",
+      "directed_by": "Denis Villeneuve",
+      "starred_actors": [
+        "Cate Blanchett",
+        "Denzel Washington"
+      ],
+      "release_year": 1995,
+      "in_language": "English",
+      "has_genre": "horror",
+      "has_imdb_rating": 5.4
+    },
+    {
+      "id": "movie_089",
+      "title": "Movie_089_Drama",
+      "directed_by": "Alfonso Cuaron",
+      "starred_actors": [
+        "Denzel Washington"
+      ],
+      "release_year": 2011,
+      "in_language": "English",
+      "has_genre": "drama",
+      "has_imdb_rating": 6.5
+    },
+    {
+      "id": "movie_090",
+      "title": "Movie_090_Documentary",
+      "directed_by": "Guillermo del Toro",
+      "starred_actors": [
+        "Denzel Washington",
+        "Sandra Bullock",
+        "Halle Berry"
+      ],
+      "release_year": 2008,
+      "in_language": "English",
+      "has_genre": "documentary",
+      "has_imdb_rating": 7.7
+    },
+    {
+      "id": "movie_091",
+      "title": "Movie_091_Comedy",
+      "directed_by": "James Cameron",
+      "starred_actors": [
+        "Natalie Portman"
+      ],
+      "release_year": 1981,
+      "in_language": "English",
+      "has_genre": "comedy",
+      "has_imdb_rating": 7.5
+    },
+    {
+      "id": "movie_092",
+      "title": "Movie_092_Sci-Fi",
+      "directed_by": "Guillermo del Toro",
+      "starred_actors": [
+        "Matt Damon",
+        "Denzel Washington",
+        "Viola Davis"
+      ],
+      "release_year": 1990,
+      "in_language": "English",
+      "has_genre": "sci-fi",
+      "has_imdb_rating": 8.2
+    },
+    {
+      "id": "movie_093",
+      "title": "Movie_093_Sci-Fi",
+      "directed_by": "Alfonso Cuaron",
+      "starred_actors": [
+        "Sandra Bullock"
+      ],
+      "release_year": 1988,
+      "in_language": "English",
+      "has_genre": "sci-fi",
+      "has_imdb_rating": 6.3
+    },
+    {
+      "id": "movie_094",
+      "title": "Movie_094_Sci-Fi",
+      "directed_by": "Denis Villeneuve",
+      "starred_actors": [
+        "Sandra Bullock"
+      ],
+      "release_year": 1981,
+      "in_language": "French",
+      "has_genre": "sci-fi",
+      "has_imdb_rating": 6.4
+    },
+    {
+      "id": "movie_095",
+      "title": "Movie_095_Action",
+      "directed_by": "Wes Anderson",
+      "starred_actors": [
+        "Morgan Freeman",
+        "Brad Pitt",
+        "Viola Davis"
+      ],
+      "release_year": 2012,
+      "in_language": "English",
+      "has_genre": "action",
+      "has_imdb_rating": 7.8
+    },
+    {
+      "id": "movie_096",
+      "title": "Movie_096_Horror",
+      "directed_by": "James Cameron",
+      "starred_actors": [
+        "Natalie Portman",
+        "Morgan Freeman",
+        "Halle Berry"
+      ],
+      "release_year": 2017,
+      "in_language": "French",
+      "has_genre": "horror",
+      "has_imdb_rating": 6.7
+    },
+    {
+      "id": "movie_097",
+      "title": "Movie_097_Comedy",
+      "directed_by": "Quentin Tarantino",
+      "starred_actors": [
+        "Viola Davis"
+      ],
+      "release_year": 2010,
+      "in_language": "German",
+      "has_genre": "comedy",
+      "has_imdb_rating": 9.0
+    },
+    {
+      "id": "movie_098",
+      "title": "Movie_098_Drama",
+      "directed_by": "Christopher Nolan",
+      "starred_actors": [
+        "Cate Blanchett"
+      ],
+      "release_year": 1999,
+      "in_language": "English",
+      "has_genre": "drama",
+      "has_imdb_rating": 5.7
+    },
+    {
+      "id": "movie_099",
+      "title": "Movie_099_Drama",
+      "directed_by": "Wes Anderson",
+      "starred_actors": [
+        "Viola Davis",
+        "Sandra Bullock"
+      ],
+      "release_year": 2002,
+      "in_language": "French",
+      "has_genre": "drama",
+      "has_imdb_rating": 9.1
+    },
+    {
+      "id": "movie_100",
+      "title": "Movie_100_Animation",
+      "directed_by": "Christopher Nolan",
+      "starred_actors": [
+        "Matt Damon",
+        "Tom Hanks"
+      ],
+      "release_year": 1992,
+      "in_language": "Japanese",
+      "has_genre": "animation",
+      "has_imdb_rating": 6.8
+    }
+  ],
+  "qa_count": 150,
+  "qa_pairs": [
+    {
+      "id": "MQ2_0001",
+      "question": "What genre are the movies directed by James Cameron?",
+      "answer": [
+        "comedy",
+        "romance",
+        "action",
+        "horror",
+        "drama",
+        "documentary",
+        "sci-fi",
+        "thriller"
+      ],
+      "topic_entity": "director_James_Cameron",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0002",
+      "question": "What genre are the movies directed by Ridley Scott?",
+      "answer": [
+        "action",
+        "animation",
+        "horror",
+        "biography",
+        "documentary"
+      ],
+      "topic_entity": "director_Ridley_Scott",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0003",
+      "question": "What genre are the movies directed by Guillermo del Toro?",
+      "answer": [
+        "romance",
+        "drama",
+        "documentary",
+        "sci-fi",
+        "thriller"
+      ],
+      "topic_entity": "director_Guillermo_del_Toro",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0004",
+      "question": "What genre are the movies directed by Martin Scorsese?",
+      "answer": [
+        "comedy",
+        "biography",
+        "sci-fi",
+        "horror"
+      ],
+      "topic_entity": "director_Martin_Scorsese",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0005",
+      "question": "What genre are the movies directed by Guillermo del Toro?",
+      "answer": [
+        "romance",
+        "drama",
+        "documentary",
+        "sci-fi",
+        "thriller"
+      ],
+      "topic_entity": "director_Guillermo_del_Toro",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0006",
+      "question": "What genre are the movies directed by Ridley Scott?",
+      "answer": [
+        "action",
+        "animation",
+        "horror",
+        "biography",
+        "documentary"
+      ],
+      "topic_entity": "director_Ridley_Scott",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0007",
+      "question": "What genre are the movies directed by David Fincher?",
+      "answer": [
+        "romance",
+        "animation",
+        "horror",
+        "biography",
+        "drama",
+        "documentary"
+      ],
+      "topic_entity": "director_David_Fincher",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0008",
+      "question": "What genre are the movies directed by David Fincher?",
+      "answer": [
+        "romance",
+        "animation",
+        "horror",
+        "biography",
+        "drama",
+        "documentary"
+      ],
+      "topic_entity": "director_David_Fincher",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0009",
+      "question": "What genre are the movies directed by Denis Villeneuve?",
+      "answer": [
+        "comedy",
+        "horror",
+        "action",
+        "sci-fi"
+      ],
+      "topic_entity": "director_Denis_Villeneuve",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0010",
+      "question": "What genre are the movies directed by Peter Jackson?",
+      "answer": [
+        "horror",
+        "biography",
+        "drama"
+      ],
+      "topic_entity": "director_Peter_Jackson",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0011",
+      "question": "What genre are the movies directed by Guillermo del Toro?",
+      "answer": [
+        "romance",
+        "drama",
+        "documentary",
+        "sci-fi",
+        "thriller"
+      ],
+      "topic_entity": "director_Guillermo_del_Toro",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0012",
+      "question": "What genre are the movies directed by Martin Scorsese?",
+      "answer": [
+        "comedy",
+        "biography",
+        "sci-fi",
+        "horror"
+      ],
+      "topic_entity": "director_Martin_Scorsese",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0013",
+      "question": "What genre are the movies directed by Peter Jackson?",
+      "answer": [
+        "horror",
+        "biography",
+        "drama"
+      ],
+      "topic_entity": "director_Peter_Jackson",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0014",
+      "question": "What genre are the movies directed by Ridley Scott?",
+      "answer": [
+        "action",
+        "animation",
+        "horror",
+        "biography",
+        "documentary"
+      ],
+      "topic_entity": "director_Ridley_Scott",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0015",
+      "question": "What genre are the movies directed by Steven Spielberg?",
+      "answer": [
+        "comedy",
+        "romance",
+        "action",
+        "horror",
+        "biography",
+        "drama",
+        "documentary",
+        "thriller"
+      ],
+      "topic_entity": "director_Steven_Spielberg",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0016",
+      "question": "What genre are the movies directed by James Cameron?",
+      "answer": [
+        "comedy",
+        "romance",
+        "action",
+        "horror",
+        "drama",
+        "documentary",
+        "sci-fi",
+        "thriller"
+      ],
+      "topic_entity": "director_James_Cameron",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0017",
+      "question": "What genre are the movies directed by Guillermo del Toro?",
+      "answer": [
+        "romance",
+        "drama",
+        "documentary",
+        "sci-fi",
+        "thriller"
+      ],
+      "topic_entity": "director_Guillermo_del_Toro",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0018",
+      "question": "What genre are the movies directed by Guillermo del Toro?",
+      "answer": [
+        "romance",
+        "drama",
+        "documentary",
+        "sci-fi",
+        "thriller"
+      ],
+      "topic_entity": "director_Guillermo_del_Toro",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0019",
+      "question": "What genre are the movies directed by Christopher Nolan?",
+      "answer": [
+        "comedy",
+        "animation",
+        "horror",
+        "drama",
+        "documentary"
+      ],
+      "topic_entity": "director_Christopher_Nolan",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0020",
+      "question": "What genre are the movies directed by Denis Villeneuve?",
+      "answer": [
+        "comedy",
+        "horror",
+        "action",
+        "sci-fi"
+      ],
+      "topic_entity": "director_Denis_Villeneuve",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0021",
+      "question": "What genre are the movies directed by Martin Scorsese?",
+      "answer": [
+        "comedy",
+        "biography",
+        "sci-fi",
+        "horror"
+      ],
+      "topic_entity": "director_Martin_Scorsese",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0022",
+      "question": "What genre are the movies directed by Wes Anderson?",
+      "answer": [
+        "romance",
+        "action",
+        "horror",
+        "biography",
+        "drama"
+      ],
+      "topic_entity": "director_Wes_Anderson",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0023",
+      "question": "What genre are the movies directed by Denis Villeneuve?",
+      "answer": [
+        "comedy",
+        "horror",
+        "action",
+        "sci-fi"
+      ],
+      "topic_entity": "director_Denis_Villeneuve",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0024",
+      "question": "What genre are the movies directed by Steven Spielberg?",
+      "answer": [
+        "comedy",
+        "romance",
+        "action",
+        "horror",
+        "biography",
+        "drama",
+        "documentary",
+        "thriller"
+      ],
+      "topic_entity": "director_Steven_Spielberg",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0025",
+      "question": "What genre are the movies directed by Alfonso Cuaron?",
+      "answer": [
+        "comedy",
+        "romance",
+        "animation",
+        "horror",
+        "drama",
+        "documentary",
+        "sci-fi"
+      ],
+      "topic_entity": "director_Alfonso_Cuaron",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0026",
+      "question": "What genre are the movies directed by Ridley Scott?",
+      "answer": [
+        "action",
+        "animation",
+        "horror",
+        "biography",
+        "documentary"
+      ],
+      "topic_entity": "director_Ridley_Scott",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0027",
+      "question": "What genre are the movies directed by David Fincher?",
+      "answer": [
+        "romance",
+        "animation",
+        "horror",
+        "biography",
+        "drama",
+        "documentary"
+      ],
+      "topic_entity": "director_David_Fincher",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0028",
+      "question": "What genre are the movies directed by Ridley Scott?",
+      "answer": [
+        "action",
+        "animation",
+        "horror",
+        "biography",
+        "documentary"
+      ],
+      "topic_entity": "director_Ridley_Scott",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0029",
+      "question": "What genre are the movies directed by Quentin Tarantino?",
+      "answer": [
+        "romance",
+        "comedy",
+        "animation",
+        "biography",
+        "sci-fi",
+        "thriller"
+      ],
+      "topic_entity": "director_Quentin_Tarantino",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0030",
+      "question": "What genre are the movies directed by Guillermo del Toro?",
+      "answer": [
+        "romance",
+        "drama",
+        "documentary",
+        "sci-fi",
+        "thriller"
+      ],
+      "topic_entity": "director_Guillermo_del_Toro",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0031",
+      "question": "What genre are the movies directed by David Fincher?",
+      "answer": [
+        "romance",
+        "animation",
+        "horror",
+        "biography",
+        "drama",
+        "documentary"
+      ],
+      "topic_entity": "director_David_Fincher",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0032",
+      "question": "What genre are the movies directed by Guillermo del Toro?",
+      "answer": [
+        "romance",
+        "drama",
+        "documentary",
+        "sci-fi",
+        "thriller"
+      ],
+      "topic_entity": "director_Guillermo_del_Toro",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0033",
+      "question": "What genre are the movies directed by James Cameron?",
+      "answer": [
+        "comedy",
+        "romance",
+        "action",
+        "horror",
+        "drama",
+        "documentary",
+        "sci-fi",
+        "thriller"
+      ],
+      "topic_entity": "director_James_Cameron",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0034",
+      "question": "What genre are the movies directed by Wes Anderson?",
+      "answer": [
+        "romance",
+        "action",
+        "horror",
+        "biography",
+        "drama"
+      ],
+      "topic_entity": "director_Wes_Anderson",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0035",
+      "question": "What genre are the movies directed by Wes Anderson?",
+      "answer": [
+        "romance",
+        "action",
+        "horror",
+        "biography",
+        "drama"
+      ],
+      "topic_entity": "director_Wes_Anderson",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0036",
+      "question": "What genre are the movies directed by Peter Jackson?",
+      "answer": [
+        "horror",
+        "biography",
+        "drama"
+      ],
+      "topic_entity": "director_Peter_Jackson",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0037",
+      "question": "What genre are the movies directed by Quentin Tarantino?",
+      "answer": [
+        "romance",
+        "comedy",
+        "animation",
+        "biography",
+        "sci-fi",
+        "thriller"
+      ],
+      "topic_entity": "director_Quentin_Tarantino",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0038",
+      "question": "What genre are the movies directed by David Fincher?",
+      "answer": [
+        "romance",
+        "animation",
+        "horror",
+        "biography",
+        "drama",
+        "documentary"
+      ],
+      "topic_entity": "director_David_Fincher",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0039",
+      "question": "What genre are the movies directed by Peter Jackson?",
+      "answer": [
+        "horror",
+        "biography",
+        "drama"
+      ],
+      "topic_entity": "director_Peter_Jackson",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0040",
+      "question": "What genre are the movies directed by Peter Jackson?",
+      "answer": [
+        "horror",
+        "biography",
+        "drama"
+      ],
+      "topic_entity": "director_Peter_Jackson",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0041",
+      "question": "What genre are the movies directed by Ridley Scott?",
+      "answer": [
+        "action",
+        "animation",
+        "horror",
+        "biography",
+        "documentary"
+      ],
+      "topic_entity": "director_Ridley_Scott",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0042",
+      "question": "What genre are the movies directed by Christopher Nolan?",
+      "answer": [
+        "comedy",
+        "animation",
+        "horror",
+        "drama",
+        "documentary"
+      ],
+      "topic_entity": "director_Christopher_Nolan",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0043",
+      "question": "What genre are the movies directed by Steven Spielberg?",
+      "answer": [
+        "comedy",
+        "romance",
+        "action",
+        "horror",
+        "biography",
+        "drama",
+        "documentary",
+        "thriller"
+      ],
+      "topic_entity": "director_Steven_Spielberg",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0044",
+      "question": "What genre are the movies directed by Guillermo del Toro?",
+      "answer": [
+        "romance",
+        "drama",
+        "documentary",
+        "sci-fi",
+        "thriller"
+      ],
+      "topic_entity": "director_Guillermo_del_Toro",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0045",
+      "question": "What genre are the movies directed by David Fincher?",
+      "answer": [
+        "romance",
+        "animation",
+        "horror",
+        "biography",
+        "drama",
+        "documentary"
+      ],
+      "topic_entity": "director_David_Fincher",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0046",
+      "question": "What genre are the movies directed by Quentin Tarantino?",
+      "answer": [
+        "romance",
+        "comedy",
+        "animation",
+        "biography",
+        "sci-fi",
+        "thriller"
+      ],
+      "topic_entity": "director_Quentin_Tarantino",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0047",
+      "question": "What genre are the movies directed by Martin Scorsese?",
+      "answer": [
+        "comedy",
+        "biography",
+        "sci-fi",
+        "horror"
+      ],
+      "topic_entity": "director_Martin_Scorsese",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0048",
+      "question": "What genre are the movies directed by David Fincher?",
+      "answer": [
+        "romance",
+        "animation",
+        "horror",
+        "biography",
+        "drama",
+        "documentary"
+      ],
+      "topic_entity": "director_David_Fincher",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0049",
+      "question": "What genre are the movies directed by Martin Scorsese?",
+      "answer": [
+        "comedy",
+        "biography",
+        "sci-fi",
+        "horror"
+      ],
+      "topic_entity": "director_Martin_Scorsese",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0050",
+      "question": "What genre are the movies directed by David Fincher?",
+      "answer": [
+        "romance",
+        "animation",
+        "horror",
+        "biography",
+        "drama",
+        "documentary"
+      ],
+      "topic_entity": "director_David_Fincher",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0051",
+      "question": "What genre are the movies directed by Martin Scorsese?",
+      "answer": [
+        "comedy",
+        "biography",
+        "sci-fi",
+        "horror"
+      ],
+      "topic_entity": "director_Martin_Scorsese",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0052",
+      "question": "What genre are the movies directed by Guillermo del Toro?",
+      "answer": [
+        "romance",
+        "drama",
+        "documentary",
+        "sci-fi",
+        "thriller"
+      ],
+      "topic_entity": "director_Guillermo_del_Toro",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0053",
+      "question": "What genre are the movies directed by Ridley Scott?",
+      "answer": [
+        "action",
+        "animation",
+        "horror",
+        "biography",
+        "documentary"
+      ],
+      "topic_entity": "director_Ridley_Scott",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0054",
+      "question": "What genre are the movies directed by Guillermo del Toro?",
+      "answer": [
+        "romance",
+        "drama",
+        "documentary",
+        "sci-fi",
+        "thriller"
+      ],
+      "topic_entity": "director_Guillermo_del_Toro",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0055",
+      "question": "What genre are the movies directed by James Cameron?",
+      "answer": [
+        "comedy",
+        "romance",
+        "action",
+        "horror",
+        "drama",
+        "documentary",
+        "sci-fi",
+        "thriller"
+      ],
+      "topic_entity": "director_James_Cameron",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0056",
+      "question": "What genre are the movies directed by Alfonso Cuaron?",
+      "answer": [
+        "comedy",
+        "romance",
+        "animation",
+        "horror",
+        "drama",
+        "documentary",
+        "sci-fi"
+      ],
+      "topic_entity": "director_Alfonso_Cuaron",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0057",
+      "question": "What genre are the movies directed by Denis Villeneuve?",
+      "answer": [
+        "comedy",
+        "horror",
+        "action",
+        "sci-fi"
+      ],
+      "topic_entity": "director_Denis_Villeneuve",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0058",
+      "question": "What genre are the movies directed by Quentin Tarantino?",
+      "answer": [
+        "romance",
+        "comedy",
+        "animation",
+        "biography",
+        "sci-fi",
+        "thriller"
+      ],
+      "topic_entity": "director_Quentin_Tarantino",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0059",
+      "question": "What genre are the movies directed by Christopher Nolan?",
+      "answer": [
+        "comedy",
+        "animation",
+        "horror",
+        "drama",
+        "documentary"
+      ],
+      "topic_entity": "director_Christopher_Nolan",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0060",
+      "question": "What genre are the movies directed by Christopher Nolan?",
+      "answer": [
+        "comedy",
+        "animation",
+        "horror",
+        "drama",
+        "documentary"
+      ],
+      "topic_entity": "director_Christopher_Nolan",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0061",
+      "question": "What genre are the movies directed by David Fincher?",
+      "answer": [
+        "romance",
+        "animation",
+        "horror",
+        "biography",
+        "drama",
+        "documentary"
+      ],
+      "topic_entity": "director_David_Fincher",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0062",
+      "question": "What genre are the movies directed by Wes Anderson?",
+      "answer": [
+        "romance",
+        "action",
+        "horror",
+        "biography",
+        "drama"
+      ],
+      "topic_entity": "director_Wes_Anderson",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0063",
+      "question": "What genre are the movies directed by Christopher Nolan?",
+      "answer": [
+        "comedy",
+        "animation",
+        "horror",
+        "drama",
+        "documentary"
+      ],
+      "topic_entity": "director_Christopher_Nolan",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0064",
+      "question": "What genre are the movies directed by David Fincher?",
+      "answer": [
+        "romance",
+        "animation",
+        "horror",
+        "biography",
+        "drama",
+        "documentary"
+      ],
+      "topic_entity": "director_David_Fincher",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0065",
+      "question": "What genre are the movies directed by Peter Jackson?",
+      "answer": [
+        "horror",
+        "biography",
+        "drama"
+      ],
+      "topic_entity": "director_Peter_Jackson",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0066",
+      "question": "What genre are the movies directed by Ridley Scott?",
+      "answer": [
+        "action",
+        "animation",
+        "horror",
+        "biography",
+        "documentary"
+      ],
+      "topic_entity": "director_Ridley_Scott",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0067",
+      "question": "What genre are the movies directed by David Fincher?",
+      "answer": [
+        "romance",
+        "animation",
+        "horror",
+        "biography",
+        "drama",
+        "documentary"
+      ],
+      "topic_entity": "director_David_Fincher",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0068",
+      "question": "What genre are the movies directed by Steven Spielberg?",
+      "answer": [
+        "comedy",
+        "romance",
+        "action",
+        "horror",
+        "biography",
+        "drama",
+        "documentary",
+        "thriller"
+      ],
+      "topic_entity": "director_Steven_Spielberg",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0069",
+      "question": "What genre are the movies directed by Steven Spielberg?",
+      "answer": [
+        "comedy",
+        "romance",
+        "action",
+        "horror",
+        "biography",
+        "drama",
+        "documentary",
+        "thriller"
+      ],
+      "topic_entity": "director_Steven_Spielberg",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0070",
+      "question": "What genre are the movies directed by Steven Spielberg?",
+      "answer": [
+        "comedy",
+        "romance",
+        "action",
+        "horror",
+        "biography",
+        "drama",
+        "documentary",
+        "thriller"
+      ],
+      "topic_entity": "director_Steven_Spielberg",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0071",
+      "question": "What genre are the movies directed by Steven Spielberg?",
+      "answer": [
+        "comedy",
+        "romance",
+        "action",
+        "horror",
+        "biography",
+        "drama",
+        "documentary",
+        "thriller"
+      ],
+      "topic_entity": "director_Steven_Spielberg",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0072",
+      "question": "What genre are the movies directed by James Cameron?",
+      "answer": [
+        "comedy",
+        "romance",
+        "action",
+        "horror",
+        "drama",
+        "documentary",
+        "sci-fi",
+        "thriller"
+      ],
+      "topic_entity": "director_James_Cameron",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0073",
+      "question": "What genre are the movies directed by Peter Jackson?",
+      "answer": [
+        "horror",
+        "biography",
+        "drama"
+      ],
+      "topic_entity": "director_Peter_Jackson",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0074",
+      "question": "What genre are the movies directed by Wes Anderson?",
+      "answer": [
+        "romance",
+        "action",
+        "horror",
+        "biography",
+        "drama"
+      ],
+      "topic_entity": "director_Wes_Anderson",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0075",
+      "question": "What genre are the movies directed by Wes Anderson?",
+      "answer": [
+        "romance",
+        "action",
+        "horror",
+        "biography",
+        "drama"
+      ],
+      "topic_entity": "director_Wes_Anderson",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0076",
+      "question": "What genre are the movies directed by Martin Scorsese?",
+      "answer": [
+        "comedy",
+        "biography",
+        "sci-fi",
+        "horror"
+      ],
+      "topic_entity": "director_Martin_Scorsese",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0077",
+      "question": "What genre are the movies directed by Steven Spielberg?",
+      "answer": [
+        "comedy",
+        "romance",
+        "action",
+        "horror",
+        "biography",
+        "drama",
+        "documentary",
+        "thriller"
+      ],
+      "topic_entity": "director_Steven_Spielberg",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0078",
+      "question": "What genre are the movies directed by Alfonso Cuaron?",
+      "answer": [
+        "comedy",
+        "romance",
+        "animation",
+        "horror",
+        "drama",
+        "documentary",
+        "sci-fi"
+      ],
+      "topic_entity": "director_Alfonso_Cuaron",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0079",
+      "question": "What genre are the movies directed by Ridley Scott?",
+      "answer": [
+        "action",
+        "animation",
+        "horror",
+        "biography",
+        "documentary"
+      ],
+      "topic_entity": "director_Ridley_Scott",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0080",
+      "question": "What genre are the movies directed by Quentin Tarantino?",
+      "answer": [
+        "romance",
+        "comedy",
+        "animation",
+        "biography",
+        "sci-fi",
+        "thriller"
+      ],
+      "topic_entity": "director_Quentin_Tarantino",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0081",
+      "question": "What genre are the movies directed by James Cameron?",
+      "answer": [
+        "comedy",
+        "romance",
+        "action",
+        "horror",
+        "drama",
+        "documentary",
+        "sci-fi",
+        "thriller"
+      ],
+      "topic_entity": "director_James_Cameron",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0082",
+      "question": "What genre are the movies directed by David Fincher?",
+      "answer": [
+        "romance",
+        "animation",
+        "horror",
+        "biography",
+        "drama",
+        "documentary"
+      ],
+      "topic_entity": "director_David_Fincher",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0083",
+      "question": "What genre are the movies directed by James Cameron?",
+      "answer": [
+        "comedy",
+        "romance",
+        "action",
+        "horror",
+        "drama",
+        "documentary",
+        "sci-fi",
+        "thriller"
+      ],
+      "topic_entity": "director_James_Cameron",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0084",
+      "question": "What genre are the movies directed by Wes Anderson?",
+      "answer": [
+        "romance",
+        "action",
+        "horror",
+        "biography",
+        "drama"
+      ],
+      "topic_entity": "director_Wes_Anderson",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0085",
+      "question": "What genre are the movies directed by Quentin Tarantino?",
+      "answer": [
+        "romance",
+        "comedy",
+        "animation",
+        "biography",
+        "sci-fi",
+        "thriller"
+      ],
+      "topic_entity": "director_Quentin_Tarantino",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0086",
+      "question": "What genre are the movies directed by Guillermo del Toro?",
+      "answer": [
+        "romance",
+        "drama",
+        "documentary",
+        "sci-fi",
+        "thriller"
+      ],
+      "topic_entity": "director_Guillermo_del_Toro",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0087",
+      "question": "What genre are the movies directed by Christopher Nolan?",
+      "answer": [
+        "comedy",
+        "animation",
+        "horror",
+        "drama",
+        "documentary"
+      ],
+      "topic_entity": "director_Christopher_Nolan",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0088",
+      "question": "What genre are the movies directed by Wes Anderson?",
+      "answer": [
+        "romance",
+        "action",
+        "horror",
+        "biography",
+        "drama"
+      ],
+      "topic_entity": "director_Wes_Anderson",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0089",
+      "question": "What genre are the movies directed by Christopher Nolan?",
+      "answer": [
+        "comedy",
+        "animation",
+        "horror",
+        "drama",
+        "documentary"
+      ],
+      "topic_entity": "director_Christopher_Nolan",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0090",
+      "question": "What genre are the movies directed by Denis Villeneuve?",
+      "answer": [
+        "comedy",
+        "horror",
+        "action",
+        "sci-fi"
+      ],
+      "topic_entity": "director_Denis_Villeneuve",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0091",
+      "question": "What genre are the movies directed by Christopher Nolan?",
+      "answer": [
+        "comedy",
+        "animation",
+        "horror",
+        "drama",
+        "documentary"
+      ],
+      "topic_entity": "director_Christopher_Nolan",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0092",
+      "question": "What genre are the movies directed by David Fincher?",
+      "answer": [
+        "romance",
+        "animation",
+        "horror",
+        "biography",
+        "drama",
+        "documentary"
+      ],
+      "topic_entity": "director_David_Fincher",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0093",
+      "question": "What genre are the movies directed by James Cameron?",
+      "answer": [
+        "comedy",
+        "romance",
+        "action",
+        "horror",
+        "drama",
+        "documentary",
+        "sci-fi",
+        "thriller"
+      ],
+      "topic_entity": "director_James_Cameron",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0094",
+      "question": "What genre are the movies directed by Martin Scorsese?",
+      "answer": [
+        "comedy",
+        "biography",
+        "sci-fi",
+        "horror"
+      ],
+      "topic_entity": "director_Martin_Scorsese",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0095",
+      "question": "What genre are the movies directed by Alfonso Cuaron?",
+      "answer": [
+        "comedy",
+        "romance",
+        "animation",
+        "horror",
+        "drama",
+        "documentary",
+        "sci-fi"
+      ],
+      "topic_entity": "director_Alfonso_Cuaron",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0096",
+      "question": "What genre are the movies directed by Peter Jackson?",
+      "answer": [
+        "horror",
+        "biography",
+        "drama"
+      ],
+      "topic_entity": "director_Peter_Jackson",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0097",
+      "question": "What genre are the movies directed by Alfonso Cuaron?",
+      "answer": [
+        "comedy",
+        "romance",
+        "animation",
+        "horror",
+        "drama",
+        "documentary",
+        "sci-fi"
+      ],
+      "topic_entity": "director_Alfonso_Cuaron",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0098",
+      "question": "What genre are the movies directed by Martin Scorsese?",
+      "answer": [
+        "comedy",
+        "biography",
+        "sci-fi",
+        "horror"
+      ],
+      "topic_entity": "director_Martin_Scorsese",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0099",
+      "question": "What genre are the movies directed by Wes Anderson?",
+      "answer": [
+        "romance",
+        "action",
+        "horror",
+        "biography",
+        "drama"
+      ],
+      "topic_entity": "director_Wes_Anderson",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0100",
+      "question": "What genre are the movies directed by Guillermo del Toro?",
+      "answer": [
+        "romance",
+        "drama",
+        "documentary",
+        "sci-fi",
+        "thriller"
+      ],
+      "topic_entity": "director_Guillermo_del_Toro",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0101",
+      "question": "What genre are the movies directed by Martin Scorsese?",
+      "answer": [
+        "comedy",
+        "biography",
+        "sci-fi",
+        "horror"
+      ],
+      "topic_entity": "director_Martin_Scorsese",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0102",
+      "question": "What genre are the movies directed by James Cameron?",
+      "answer": [
+        "comedy",
+        "romance",
+        "action",
+        "horror",
+        "drama",
+        "documentary",
+        "sci-fi",
+        "thriller"
+      ],
+      "topic_entity": "director_James_Cameron",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0103",
+      "question": "What genre are the movies directed by Ridley Scott?",
+      "answer": [
+        "action",
+        "animation",
+        "horror",
+        "biography",
+        "documentary"
+      ],
+      "topic_entity": "director_Ridley_Scott",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0104",
+      "question": "What genre are the movies directed by Steven Spielberg?",
+      "answer": [
+        "comedy",
+        "romance",
+        "action",
+        "horror",
+        "biography",
+        "drama",
+        "documentary",
+        "thriller"
+      ],
+      "topic_entity": "director_Steven_Spielberg",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0105",
+      "question": "What genre are the movies directed by Peter Jackson?",
+      "answer": [
+        "horror",
+        "biography",
+        "drama"
+      ],
+      "topic_entity": "director_Peter_Jackson",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0106",
+      "question": "What genre are the movies directed by Christopher Nolan?",
+      "answer": [
+        "comedy",
+        "animation",
+        "horror",
+        "drama",
+        "documentary"
+      ],
+      "topic_entity": "director_Christopher_Nolan",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0107",
+      "question": "What genre are the movies directed by Peter Jackson?",
+      "answer": [
+        "horror",
+        "biography",
+        "drama"
+      ],
+      "topic_entity": "director_Peter_Jackson",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0108",
+      "question": "What genre are the movies directed by Steven Spielberg?",
+      "answer": [
+        "comedy",
+        "romance",
+        "action",
+        "horror",
+        "biography",
+        "drama",
+        "documentary",
+        "thriller"
+      ],
+      "topic_entity": "director_Steven_Spielberg",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0109",
+      "question": "What genre are the movies directed by David Fincher?",
+      "answer": [
+        "romance",
+        "animation",
+        "horror",
+        "biography",
+        "drama",
+        "documentary"
+      ],
+      "topic_entity": "director_David_Fincher",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0110",
+      "question": "What genre are the movies directed by Alfonso Cuaron?",
+      "answer": [
+        "comedy",
+        "romance",
+        "animation",
+        "horror",
+        "drama",
+        "documentary",
+        "sci-fi"
+      ],
+      "topic_entity": "director_Alfonso_Cuaron",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0111",
+      "question": "What genre are the movies directed by Martin Scorsese?",
+      "answer": [
+        "comedy",
+        "biography",
+        "sci-fi",
+        "horror"
+      ],
+      "topic_entity": "director_Martin_Scorsese",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0112",
+      "question": "What genre are the movies directed by James Cameron?",
+      "answer": [
+        "comedy",
+        "romance",
+        "action",
+        "horror",
+        "drama",
+        "documentary",
+        "sci-fi",
+        "thriller"
+      ],
+      "topic_entity": "director_James_Cameron",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0113",
+      "question": "What genre are the movies directed by Ridley Scott?",
+      "answer": [
+        "action",
+        "animation",
+        "horror",
+        "biography",
+        "documentary"
+      ],
+      "topic_entity": "director_Ridley_Scott",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0114",
+      "question": "What genre are the movies directed by Martin Scorsese?",
+      "answer": [
+        "comedy",
+        "biography",
+        "sci-fi",
+        "horror"
+      ],
+      "topic_entity": "director_Martin_Scorsese",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0115",
+      "question": "What genre are the movies directed by David Fincher?",
+      "answer": [
+        "romance",
+        "animation",
+        "horror",
+        "biography",
+        "drama",
+        "documentary"
+      ],
+      "topic_entity": "director_David_Fincher",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0116",
+      "question": "What genre are the movies directed by James Cameron?",
+      "answer": [
+        "comedy",
+        "romance",
+        "action",
+        "horror",
+        "drama",
+        "documentary",
+        "sci-fi",
+        "thriller"
+      ],
+      "topic_entity": "director_James_Cameron",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0117",
+      "question": "What genre are the movies directed by Steven Spielberg?",
+      "answer": [
+        "comedy",
+        "romance",
+        "action",
+        "horror",
+        "biography",
+        "drama",
+        "documentary",
+        "thriller"
+      ],
+      "topic_entity": "director_Steven_Spielberg",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0118",
+      "question": "What genre are the movies directed by Christopher Nolan?",
+      "answer": [
+        "comedy",
+        "animation",
+        "horror",
+        "drama",
+        "documentary"
+      ],
+      "topic_entity": "director_Christopher_Nolan",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0119",
+      "question": "What genre are the movies directed by Guillermo del Toro?",
+      "answer": [
+        "romance",
+        "drama",
+        "documentary",
+        "sci-fi",
+        "thriller"
+      ],
+      "topic_entity": "director_Guillermo_del_Toro",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0120",
+      "question": "What genre are the movies directed by Denis Villeneuve?",
+      "answer": [
+        "comedy",
+        "horror",
+        "action",
+        "sci-fi"
+      ],
+      "topic_entity": "director_Denis_Villeneuve",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0121",
+      "question": "What genre are the movies directed by Quentin Tarantino?",
+      "answer": [
+        "romance",
+        "comedy",
+        "animation",
+        "biography",
+        "sci-fi",
+        "thriller"
+      ],
+      "topic_entity": "director_Quentin_Tarantino",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0122",
+      "question": "What genre are the movies directed by Denis Villeneuve?",
+      "answer": [
+        "comedy",
+        "horror",
+        "action",
+        "sci-fi"
+      ],
+      "topic_entity": "director_Denis_Villeneuve",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0123",
+      "question": "What genre are the movies directed by Martin Scorsese?",
+      "answer": [
+        "comedy",
+        "biography",
+        "sci-fi",
+        "horror"
+      ],
+      "topic_entity": "director_Martin_Scorsese",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0124",
+      "question": "What genre are the movies directed by Denis Villeneuve?",
+      "answer": [
+        "comedy",
+        "horror",
+        "action",
+        "sci-fi"
+      ],
+      "topic_entity": "director_Denis_Villeneuve",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0125",
+      "question": "What genre are the movies directed by Steven Spielberg?",
+      "answer": [
+        "comedy",
+        "romance",
+        "action",
+        "horror",
+        "biography",
+        "drama",
+        "documentary",
+        "thriller"
+      ],
+      "topic_entity": "director_Steven_Spielberg",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0126",
+      "question": "What genre are the movies directed by Peter Jackson?",
+      "answer": [
+        "horror",
+        "biography",
+        "drama"
+      ],
+      "topic_entity": "director_Peter_Jackson",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0127",
+      "question": "What genre are the movies directed by Guillermo del Toro?",
+      "answer": [
+        "romance",
+        "drama",
+        "documentary",
+        "sci-fi",
+        "thriller"
+      ],
+      "topic_entity": "director_Guillermo_del_Toro",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0128",
+      "question": "What genre are the movies directed by James Cameron?",
+      "answer": [
+        "comedy",
+        "romance",
+        "action",
+        "horror",
+        "drama",
+        "documentary",
+        "sci-fi",
+        "thriller"
+      ],
+      "topic_entity": "director_James_Cameron",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0129",
+      "question": "What genre are the movies directed by Martin Scorsese?",
+      "answer": [
+        "comedy",
+        "biography",
+        "sci-fi",
+        "horror"
+      ],
+      "topic_entity": "director_Martin_Scorsese",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0130",
+      "question": "What genre are the movies directed by Quentin Tarantino?",
+      "answer": [
+        "romance",
+        "comedy",
+        "animation",
+        "biography",
+        "sci-fi",
+        "thriller"
+      ],
+      "topic_entity": "director_Quentin_Tarantino",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0131",
+      "question": "What genre are the movies directed by Wes Anderson?",
+      "answer": [
+        "romance",
+        "action",
+        "horror",
+        "biography",
+        "drama"
+      ],
+      "topic_entity": "director_Wes_Anderson",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0132",
+      "question": "What genre are the movies directed by Guillermo del Toro?",
+      "answer": [
+        "romance",
+        "drama",
+        "documentary",
+        "sci-fi",
+        "thriller"
+      ],
+      "topic_entity": "director_Guillermo_del_Toro",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0133",
+      "question": "What genre are the movies directed by Denis Villeneuve?",
+      "answer": [
+        "comedy",
+        "horror",
+        "action",
+        "sci-fi"
+      ],
+      "topic_entity": "director_Denis_Villeneuve",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0134",
+      "question": "What genre are the movies directed by Martin Scorsese?",
+      "answer": [
+        "comedy",
+        "biography",
+        "sci-fi",
+        "horror"
+      ],
+      "topic_entity": "director_Martin_Scorsese",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0135",
+      "question": "What genre are the movies directed by Peter Jackson?",
+      "answer": [
+        "horror",
+        "biography",
+        "drama"
+      ],
+      "topic_entity": "director_Peter_Jackson",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0136",
+      "question": "What genre are the movies directed by Quentin Tarantino?",
+      "answer": [
+        "romance",
+        "comedy",
+        "animation",
+        "biography",
+        "sci-fi",
+        "thriller"
+      ],
+      "topic_entity": "director_Quentin_Tarantino",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0137",
+      "question": "What genre are the movies directed by Peter Jackson?",
+      "answer": [
+        "horror",
+        "biography",
+        "drama"
+      ],
+      "topic_entity": "director_Peter_Jackson",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0138",
+      "question": "What genre are the movies directed by Quentin Tarantino?",
+      "answer": [
+        "romance",
+        "comedy",
+        "animation",
+        "biography",
+        "sci-fi",
+        "thriller"
+      ],
+      "topic_entity": "director_Quentin_Tarantino",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0139",
+      "question": "What genre are the movies directed by Christopher Nolan?",
+      "answer": [
+        "comedy",
+        "animation",
+        "horror",
+        "drama",
+        "documentary"
+      ],
+      "topic_entity": "director_Christopher_Nolan",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0140",
+      "question": "What genre are the movies directed by Denis Villeneuve?",
+      "answer": [
+        "comedy",
+        "horror",
+        "action",
+        "sci-fi"
+      ],
+      "topic_entity": "director_Denis_Villeneuve",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0141",
+      "question": "What genre are the movies directed by Steven Spielberg?",
+      "answer": [
+        "comedy",
+        "romance",
+        "action",
+        "horror",
+        "biography",
+        "drama",
+        "documentary",
+        "thriller"
+      ],
+      "topic_entity": "director_Steven_Spielberg",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0142",
+      "question": "What genre are the movies directed by David Fincher?",
+      "answer": [
+        "romance",
+        "animation",
+        "horror",
+        "biography",
+        "drama",
+        "documentary"
+      ],
+      "topic_entity": "director_David_Fincher",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0143",
+      "question": "What genre are the movies directed by Steven Spielberg?",
+      "answer": [
+        "comedy",
+        "romance",
+        "action",
+        "horror",
+        "biography",
+        "drama",
+        "documentary",
+        "thriller"
+      ],
+      "topic_entity": "director_Steven_Spielberg",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0144",
+      "question": "What genre are the movies directed by Alfonso Cuaron?",
+      "answer": [
+        "comedy",
+        "romance",
+        "animation",
+        "horror",
+        "drama",
+        "documentary",
+        "sci-fi"
+      ],
+      "topic_entity": "director_Alfonso_Cuaron",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0145",
+      "question": "What genre are the movies directed by Martin Scorsese?",
+      "answer": [
+        "comedy",
+        "biography",
+        "sci-fi",
+        "horror"
+      ],
+      "topic_entity": "director_Martin_Scorsese",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0146",
+      "question": "What genre are the movies directed by Steven Spielberg?",
+      "answer": [
+        "comedy",
+        "romance",
+        "action",
+        "horror",
+        "biography",
+        "drama",
+        "documentary",
+        "thriller"
+      ],
+      "topic_entity": "director_Steven_Spielberg",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0147",
+      "question": "What genre are the movies directed by Alfonso Cuaron?",
+      "answer": [
+        "comedy",
+        "romance",
+        "animation",
+        "horror",
+        "drama",
+        "documentary",
+        "sci-fi"
+      ],
+      "topic_entity": "director_Alfonso_Cuaron",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0148",
+      "question": "What genre are the movies directed by Quentin Tarantino?",
+      "answer": [
+        "romance",
+        "comedy",
+        "animation",
+        "biography",
+        "sci-fi",
+        "thriller"
+      ],
+      "topic_entity": "director_Quentin_Tarantino",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0149",
+      "question": "What genre are the movies directed by Ridley Scott?",
+      "answer": [
+        "action",
+        "animation",
+        "horror",
+        "biography",
+        "documentary"
+      ],
+      "topic_entity": "director_Ridley_Scott",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    },
+    {
+      "id": "MQ2_0150",
+      "question": "What genre are the movies directed by Alfonso Cuaron?",
+      "answer": [
+        "comedy",
+        "romance",
+        "animation",
+        "horror",
+        "drama",
+        "documentary",
+        "sci-fi"
+      ],
+      "topic_entity": "director_Alfonso_Cuaron",
+      "hop_count": 2,
+      "relation_path": [
+        "directed_by_inv",
+        "has_genre"
+      ]
+    }
+  ]
+}

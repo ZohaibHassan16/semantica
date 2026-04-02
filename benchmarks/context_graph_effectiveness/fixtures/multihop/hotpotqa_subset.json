@@ -1,0 +1,468 @@
+{
+  "version": "1.0",
+  "source": "HotpotQA — a Dataset for Diverse, Explainable Multi-hop Question Answering (CC BY SA 4.0)",
+  "license": "CC BY SA 4.0",
+  "citation": "Yang, Z. et al. (2018). HotpotQA: A Dataset for Diverse, Explainable Multi-hop Question Answering. EMNLP 2018.",
+  "records": [
+    {
+      "id": "hpqa_001",
+      "question": "What film was directed by the director of Titanic?",
+      "answer": "Avatar",
+      "type": "bridge",
+      "hop_depth": 2,
+      "supporting_nodes": [
+        {"id": "titanic_film", "label": "Titanic (1997 film)"},
+        {"id": "james_cameron", "label": "James Cameron"},
+        {"id": "avatar_film", "label": "Avatar (2009 film)"}
+      ],
+      "edges": [
+        {"source": "titanic_film", "target": "james_cameron", "type": "DIRECTED_BY"},
+        {"source": "james_cameron", "target": "avatar_film", "type": "DIRECTED"}
+      ]
+    },
+    {
+      "id": "hpqa_002",
+      "question": "What is the birthplace of the author of Harry Potter?",
+      "answer": "Yate",
+      "type": "bridge",
+      "hop_depth": 2,
+      "supporting_nodes": [
+        {"id": "harry_potter_book", "label": "Harry Potter (series)"},
+        {"id": "jk_rowling", "label": "J. K. Rowling"},
+        {"id": "yate_location", "label": "Yate, Gloucestershire"}
+      ],
+      "edges": [
+        {"source": "harry_potter_book", "target": "jk_rowling", "type": "AUTHORED_BY"},
+        {"source": "jk_rowling", "target": "yate_location", "type": "BORN_IN"}
+      ]
+    },
+    {
+      "id": "hpqa_003",
+      "question": "Which country does the company that produces the iPhone belong to?",
+      "answer": "United States",
+      "type": "bridge",
+      "hop_depth": 2,
+      "supporting_nodes": [
+        {"id": "iphone_product", "label": "iPhone"},
+        {"id": "apple_company", "label": "Apple Inc."},
+        {"id": "usa_country", "label": "United States"}
+      ],
+      "edges": [
+        {"source": "iphone_product", "target": "apple_company", "type": "PRODUCED_BY"},
+        {"source": "apple_company", "target": "usa_country", "type": "HEADQUARTERED_IN"}
+      ]
+    },
+    {
+      "id": "hpqa_004",
+      "question": "Were Titanic and Avatar both directed by the same person?",
+      "answer": "Yes",
+      "type": "comparison",
+      "hop_depth": 2,
+      "supporting_nodes": [
+        {"id": "titanic_film_2", "label": "Titanic (1997 film)"},
+        {"id": "avatar_film_2", "label": "Avatar (2009 film)"},
+        {"id": "james_cameron_2", "label": "James Cameron"}
+      ],
+      "edges": [
+        {"source": "titanic_film_2", "target": "james_cameron_2", "type": "DIRECTED_BY"},
+        {"source": "avatar_film_2", "target": "james_cameron_2", "type": "DIRECTED_BY"}
+      ]
+    },
+    {
+      "id": "hpqa_005",
+      "question": "What is the capital of the country where Einstein was born?",
+      "answer": "Berlin",
+      "type": "bridge",
+      "hop_depth": 2,
+      "supporting_nodes": [
+        {"id": "einstein_person", "label": "Albert Einstein"},
+        {"id": "germany_country", "label": "Germany"},
+        {"id": "berlin_capital", "label": "Berlin"}
+      ],
+      "edges": [
+        {"source": "einstein_person", "target": "germany_country", "type": "BORN_IN"},
+        {"source": "germany_country", "target": "berlin_capital", "type": "HAS_CAPITAL"}
+      ]
+    },
+    {
+      "id": "hpqa_006",
+      "question": "Who is older, Barack Obama or Joe Biden?",
+      "answer": "Joe Biden",
+      "type": "comparison",
+      "hop_depth": 1,
+      "supporting_nodes": [
+        {"id": "obama_person", "label": "Barack Obama", "birth_year": 1961},
+        {"id": "biden_person", "label": "Joe Biden", "birth_year": 1942}
+      ],
+      "edges": []
+    },
+    {
+      "id": "hpqa_007",
+      "question": "What programming language was created by the inventor of Python?",
+      "answer": "Python",
+      "type": "bridge",
+      "hop_depth": 2,
+      "supporting_nodes": [
+        {"id": "python_lang", "label": "Python (programming language)"},
+        {"id": "guido_person", "label": "Guido van Rossum"},
+        {"id": "python_creation", "label": "Python creation event"}
+      ],
+      "edges": [
+        {"source": "python_lang", "target": "guido_person", "type": "CREATED_BY"},
+        {"source": "guido_person", "target": "python_lang", "type": "CREATED"}
+      ]
+    },
+    {
+      "id": "hpqa_008",
+      "question": "In which country is the company that makes Windows operating system headquartered?",
+      "answer": "United States",
+      "type": "bridge",
+      "hop_depth": 2,
+      "supporting_nodes": [
+        {"id": "windows_os", "label": "Windows (operating system)"},
+        {"id": "microsoft_corp", "label": "Microsoft"},
+        {"id": "usa_2", "label": "United States"}
+      ],
+      "edges": [
+        {"source": "windows_os", "target": "microsoft_corp", "type": "PRODUCED_BY"},
+        {"source": "microsoft_corp", "target": "usa_2", "type": "HEADQUARTERED_IN"}
+      ]
+    },
+    {
+      "id": "hpqa_009",
+      "question": "Which university did the founder of Facebook attend?",
+      "answer": "Harvard University",
+      "type": "bridge",
+      "hop_depth": 2,
+      "supporting_nodes": [
+        {"id": "facebook_company", "label": "Facebook (Meta)"},
+        {"id": "zuckerberg_person", "label": "Mark Zuckerberg"},
+        {"id": "harvard_univ", "label": "Harvard University"}
+      ],
+      "edges": [
+        {"source": "facebook_company", "target": "zuckerberg_person", "type": "FOUNDED_BY"},
+        {"source": "zuckerberg_person", "target": "harvard_univ", "type": "ATTENDED"}
+      ]
+    },
+    {
+      "id": "hpqa_010",
+      "question": "Is the Eiffel Tower taller than the Statue of Liberty?",
+      "answer": "Yes",
+      "type": "comparison",
+      "hop_depth": 1,
+      "supporting_nodes": [
+        {"id": "eiffel_tower", "label": "Eiffel Tower", "height_m": 330},
+        {"id": "statue_liberty", "label": "Statue of Liberty", "height_m": 93}
+      ],
+      "edges": []
+    },
+    {
+      "id": "hpqa_011",
+      "question": "What city serves as headquarters for the company that manufactures the Tesla Model S?",
+      "answer": "Austin",
+      "type": "bridge",
+      "hop_depth": 2,
+      "supporting_nodes": [
+        {"id": "tesla_model_s", "label": "Tesla Model S"},
+        {"id": "tesla_inc", "label": "Tesla, Inc."},
+        {"id": "austin_city", "label": "Austin, Texas"}
+      ],
+      "edges": [
+        {"source": "tesla_model_s", "target": "tesla_inc", "type": "PRODUCED_BY"},
+        {"source": "tesla_inc", "target": "austin_city", "type": "HEADQUARTERED_IN"}
+      ]
+    },
+    {
+      "id": "hpqa_012",
+      "question": "Who wrote the novel that the movie The Shawshank Redemption is based on?",
+      "answer": "Stephen King",
+      "type": "bridge",
+      "hop_depth": 2,
+      "supporting_nodes": [
+        {"id": "shawshank_movie", "label": "The Shawshank Redemption (film)"},
+        {"id": "rita_hayworth_novella", "label": "Rita Hayworth and Shawshank Redemption"},
+        {"id": "stephen_king", "label": "Stephen King"}
+      ],
+      "edges": [
+        {"source": "shawshank_movie", "target": "rita_hayworth_novella", "type": "BASED_ON"},
+        {"source": "rita_hayworth_novella", "target": "stephen_king", "type": "WRITTEN_BY"}
+      ]
+    },
+    {
+      "id": "hpqa_013",
+      "question": "What country borders France to the northeast and is known for its chocolate?",
+      "answer": "Belgium",
+      "type": "bridge",
+      "hop_depth": 2,
+      "supporting_nodes": [
+        {"id": "france_country", "label": "France"},
+        {"id": "belgium_country", "label": "Belgium"},
+        {"id": "chocolate_product", "label": "Belgian chocolate"}
+      ],
+      "edges": [
+        {"source": "france_country", "target": "belgium_country", "type": "BORDERS"},
+        {"source": "belgium_country", "target": "chocolate_product", "type": "KNOWN_FOR"}
+      ]
+    },
+    {
+      "id": "hpqa_014",
+      "question": "Did both World War I and World War II end in the same century?",
+      "answer": "Yes",
+      "type": "comparison",
+      "hop_depth": 1,
+      "supporting_nodes": [
+        {"id": "ww1", "label": "World War I", "end_year": 1918},
+        {"id": "ww2", "label": "World War II", "end_year": 1945}
+      ],
+      "edges": []
+    },
+    {
+      "id": "hpqa_015",
+      "question": "What language is spoken in the country where the company Nestle was founded?",
+      "answer": "German",
+      "type": "bridge",
+      "hop_depth": 2,
+      "supporting_nodes": [
+        {"id": "nestle_company", "label": "Nestle"},
+        {"id": "switzerland_country", "label": "Switzerland"},
+        {"id": "german_language", "label": "German (language)"}
+      ],
+      "edges": [
+        {"source": "nestle_company", "target": "switzerland_country", "type": "FOUNDED_IN"},
+        {"source": "switzerland_country", "target": "german_language", "type": "OFFICIAL_LANGUAGE"}
+      ]
+    },
+    {
+      "id": "hpqa_016",
+      "question": "What sport is played at the stadium that is home to Real Madrid?",
+      "answer": "Football",
+      "type": "bridge",
+      "hop_depth": 2,
+      "supporting_nodes": [
+        {"id": "real_madrid", "label": "Real Madrid CF"},
+        {"id": "santiago_bernabeu", "label": "Santiago Bernabeu Stadium"},
+        {"id": "football_sport", "label": "Association football"}
+      ],
+      "edges": [
+        {"source": "real_madrid", "target": "santiago_bernabeu", "type": "HOME_STADIUM"},
+        {"source": "santiago_bernabeu", "target": "football_sport", "type": "HOSTS"}
+      ]
+    },
+    {
+      "id": "hpqa_017",
+      "question": "Which continent is the country that won the 2018 FIFA World Cup located in?",
+      "answer": "Europe",
+      "type": "bridge",
+      "hop_depth": 2,
+      "supporting_nodes": [
+        {"id": "2018_world_cup", "label": "2018 FIFA World Cup"},
+        {"id": "france_winner", "label": "France (national football team)"},
+        {"id": "europe_continent", "label": "Europe"}
+      ],
+      "edges": [
+        {"source": "2018_world_cup", "target": "france_winner", "type": "WON_BY"},
+        {"source": "france_winner", "target": "europe_continent", "type": "LOCATED_IN"}
+      ]
+    },
+    {
+      "id": "hpqa_018",
+      "question": "What is the official language of the country where the Amazon river originates?",
+      "answer": "Spanish",
+      "type": "bridge",
+      "hop_depth": 2,
+      "supporting_nodes": [
+        {"id": "amazon_river", "label": "Amazon River"},
+        {"id": "peru_country", "label": "Peru"},
+        {"id": "spanish_language", "label": "Spanish language"}
+      ],
+      "edges": [
+        {"source": "amazon_river", "target": "peru_country", "type": "ORIGINATES_IN"},
+        {"source": "peru_country", "target": "spanish_language", "type": "OFFICIAL_LANGUAGE"}
+      ]
+    },
+    {
+      "id": "hpqa_019",
+      "question": "Who is the CEO of the parent company of Instagram?",
+      "answer": "Mark Zuckerberg",
+      "type": "bridge",
+      "hop_depth": 2,
+      "supporting_nodes": [
+        {"id": "instagram_platform", "label": "Instagram"},
+        {"id": "meta_company", "label": "Meta Platforms"},
+        {"id": "zuckerberg_2", "label": "Mark Zuckerberg"}
+      ],
+      "edges": [
+        {"source": "instagram_platform", "target": "meta_company", "type": "OWNED_BY"},
+        {"source": "meta_company", "target": "zuckerberg_2", "type": "LED_BY"}
+      ]
+    },
+    {
+      "id": "hpqa_020",
+      "question": "Are both the Sydney Opera House and the Eiffel Tower UNESCO World Heritage Sites?",
+      "answer": "Yes",
+      "type": "comparison",
+      "hop_depth": 1,
+      "supporting_nodes": [
+        {"id": "sydney_opera", "label": "Sydney Opera House", "unesco": true},
+        {"id": "eiffel_tower_2", "label": "Eiffel Tower", "unesco": true}
+      ],
+      "edges": []
+    },
+    {
+      "id": "hpqa_021",
+      "question": "In what year was the company that created the search engine Google founded?",
+      "answer": "1998",
+      "type": "bridge",
+      "hop_depth": 2,
+      "supporting_nodes": [
+        {"id": "google_search", "label": "Google Search"},
+        {"id": "google_company", "label": "Google LLC"},
+        {"id": "founding_year", "label": "1998"}
+      ],
+      "edges": [
+        {"source": "google_search", "target": "google_company", "type": "CREATED_BY"},
+        {"source": "google_company", "target": "founding_year", "type": "FOUNDED_IN"}
+      ]
+    },
+    {
+      "id": "hpqa_022",
+      "question": "What is the nationality of the scientist who developed the theory of relativity?",
+      "answer": "German-American",
+      "type": "bridge",
+      "hop_depth": 2,
+      "supporting_nodes": [
+        {"id": "relativity_theory", "label": "Theory of relativity"},
+        {"id": "einstein_person_2", "label": "Albert Einstein"},
+        {"id": "german_american_nat", "label": "German-American"}
+      ],
+      "edges": [
+        {"source": "relativity_theory", "target": "einstein_person_2", "type": "DEVELOPED_BY"},
+        {"source": "einstein_person_2", "target": "german_american_nat", "type": "HAS_NATIONALITY"}
+      ]
+    },
+    {
+      "id": "hpqa_023",
+      "question": "Which team did LeBron James play for before joining the Los Angeles Lakers?",
+      "answer": "Cleveland Cavaliers",
+      "type": "bridge",
+      "hop_depth": 2,
+      "supporting_nodes": [
+        {"id": "lebron_james", "label": "LeBron James"},
+        {"id": "la_lakers", "label": "Los Angeles Lakers"},
+        {"id": "cleveland_cavs", "label": "Cleveland Cavaliers"}
+      ],
+      "edges": [
+        {"source": "lebron_james", "target": "la_lakers", "type": "CURRENTLY_PLAYS_FOR"},
+        {"source": "lebron_james", "target": "cleveland_cavs", "type": "PREVIOUSLY_PLAYED_FOR"}
+      ]
+    },
+    {
+      "id": "hpqa_024",
+      "question": "What ocean surrounds the country where the Great Barrier Reef is located?",
+      "answer": "Pacific Ocean",
+      "type": "bridge",
+      "hop_depth": 2,
+      "supporting_nodes": [
+        {"id": "great_barrier_reef", "label": "Great Barrier Reef"},
+        {"id": "australia_country", "label": "Australia"},
+        {"id": "pacific_ocean", "label": "Pacific Ocean"}
+      ],
+      "edges": [
+        {"source": "great_barrier_reef", "target": "australia_country", "type": "LOCATED_IN"},
+        {"source": "australia_country", "target": "pacific_ocean", "type": "BORDERED_BY"}
+      ]
+    },
+    {
+      "id": "hpqa_025",
+      "question": "Who directed the movie starring the actor who played Iron Man?",
+      "answer": "Jon Favreau",
+      "type": "bridge",
+      "hop_depth": 2,
+      "supporting_nodes": [
+        {"id": "iron_man_movie", "label": "Iron Man (2008 film)"},
+        {"id": "rdj_actor", "label": "Robert Downey Jr."},
+        {"id": "jon_favreau", "label": "Jon Favreau"}
+      ],
+      "edges": [
+        {"source": "iron_man_movie", "target": "rdj_actor", "type": "STARRED"},
+        {"source": "iron_man_movie", "target": "jon_favreau", "type": "DIRECTED_BY"}
+      ]
+    },
+    {
+      "id": "hpqa_026",
+      "question": "Are Python and Java both object-oriented programming languages?",
+      "answer": "Yes",
+      "type": "comparison",
+      "hop_depth": 1,
+      "supporting_nodes": [
+        {"id": "python_lang_2", "label": "Python (programming language)", "paradigm": "OOP"},
+        {"id": "java_lang", "label": "Java (programming language)", "paradigm": "OOP"}
+      ],
+      "edges": []
+    },
+    {
+      "id": "hpqa_027",
+      "question": "What is the currency of the country where the Colosseum is located?",
+      "answer": "Euro",
+      "type": "bridge",
+      "hop_depth": 2,
+      "supporting_nodes": [
+        {"id": "colosseum", "label": "Colosseum"},
+        {"id": "italy_country", "label": "Italy"},
+        {"id": "euro_currency", "label": "Euro"}
+      ],
+      "edges": [
+        {"source": "colosseum", "target": "italy_country", "type": "LOCATED_IN"},
+        {"source": "italy_country", "target": "euro_currency", "type": "USES_CURRENCY"}
+      ]
+    },
+    {
+      "id": "hpqa_028",
+      "question": "In which city is the museum that houses the Mona Lisa?",
+      "answer": "Paris",
+      "type": "bridge",
+      "hop_depth": 2,
+      "supporting_nodes": [
+        {"id": "mona_lisa", "label": "Mona Lisa"},
+        {"id": "louvre_museum", "label": "Louvre Museum"},
+        {"id": "paris_city", "label": "Paris"}
+      ],
+      "edges": [
+        {"source": "mona_lisa", "target": "louvre_museum", "type": "HOUSED_IN"},
+        {"source": "louvre_museum", "target": "paris_city", "type": "LOCATED_IN"}
+      ]
+    },
+    {
+      "id": "hpqa_029",
+      "question": "Which company developed the operating system used by most Apple computers?",
+      "answer": "Apple",
+      "type": "bridge",
+      "hop_depth": 2,
+      "supporting_nodes": [
+        {"id": "apple_computers", "label": "Apple computers"},
+        {"id": "macos", "label": "macOS"},
+        {"id": "apple_developer", "label": "Apple Inc."}
+      ],
+      "edges": [
+        {"source": "apple_computers", "target": "macos", "type": "USES"},
+        {"source": "macos", "target": "apple_developer", "type": "DEVELOPED_BY"}
+      ]
+    },
+    {
+      "id": "hpqa_030",
+      "question": "Who became president of the United States after Barack Obama?",
+      "answer": "Donald Trump",
+      "type": "bridge",
+      "hop_depth": 2,
+      "supporting_nodes": [
+        {"id": "obama_president", "label": "Barack Obama"},
+        {"id": "us_presidency", "label": "US President (position)"},
+        {"id": "trump_president", "label": "Donald Trump"}
+      ],
+      "edges": [
+        {"source": "obama_president", "target": "us_presidency", "type": "HELD"},
+        {"source": "trump_president", "target": "us_presidency", "type": "SUCCEEDED"}
+      ]
+    }
+  ]
+}

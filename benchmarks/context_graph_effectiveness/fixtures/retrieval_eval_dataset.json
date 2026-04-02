@@ -1,0 +1,1402 @@
+{
+  "version": "1.0",
+  "description": "70-record labelled retrieval queries for precision/recall evaluation.",
+  "sources": [
+    "MetaQA CC-Public",
+    "WebQSP CC-BY-4.0",
+    "TimeQA research",
+    "ATOMIC CC-BY-4.0",
+    "synthetic"
+  ],
+  "record_count": 70,
+  "query_type_counts": {
+    "direct_lookup": 15,
+    "multi_hop": 20,
+    "temporal": 15,
+    "causal": 10,
+    "no_match": 10
+  },
+  "records": [
+    {
+      "id": "R_LU_01",
+      "query": "Who directed Inception?",
+      "query_type": "direct_lookup",
+      "source_dataset": "metaqa_1hop",
+      "graph_fixture": "metaqa_1hop",
+      "relevant_node_ids": [
+        "movie_001"
+      ],
+      "irrelevant_node_ids": [
+        "movie_005",
+        "movie_010"
+      ],
+      "at_time": null,
+      "expected_hop_depth": 1,
+      "tags": [
+        "direct_lookup"
+      ]
+    },
+    {
+      "id": "R_LU_02",
+      "query": "What is Apple Inc's founding year?",
+      "query_type": "direct_lookup",
+      "source_dataset": "synthetic",
+      "graph_fixture": "webqsp",
+      "relevant_node_ids": [
+        "entity_apple"
+      ],
+      "irrelevant_node_ids": [
+        "entity_amazon"
+      ],
+      "at_time": null,
+      "expected_hop_depth": 1,
+      "tags": [
+        "direct_lookup"
+      ]
+    },
+    {
+      "id": "R_LU_03",
+      "query": "What policy governs DTI limits?",
+      "query_type": "direct_lookup",
+      "source_dataset": "synthetic",
+      "graph_fixture": "linear_5",
+      "relevant_node_ids": [
+        "n000"
+      ],
+      "irrelevant_node_ids": [
+        "n003",
+        "n004"
+      ],
+      "at_time": null,
+      "expected_hop_depth": 1,
+      "tags": [
+        "direct_lookup"
+      ]
+    },
+    {
+      "id": "R_LU_04",
+      "query": "What is the credit score minimum for approval?",
+      "query_type": "direct_lookup",
+      "source_dataset": "synthetic",
+      "graph_fixture": "linear_5",
+      "relevant_node_ids": [
+        "n001"
+      ],
+      "irrelevant_node_ids": [
+        "n003"
+      ],
+      "at_time": null,
+      "expected_hop_depth": 1,
+      "tags": [
+        "direct_lookup"
+      ]
+    },
+    {
+      "id": "R_LU_05",
+      "query": "Who starred in Movie_001?",
+      "query_type": "direct_lookup",
+      "source_dataset": "metaqa_1hop",
+      "graph_fixture": "metaqa_1hop",
+      "relevant_node_ids": [
+        "movie_001"
+      ],
+      "irrelevant_node_ids": [
+        "movie_050"
+      ],
+      "at_time": null,
+      "expected_hop_depth": 1,
+      "tags": [
+        "direct_lookup"
+      ]
+    },
+    {
+      "id": "R_LU_06",
+      "query": "What genre is Movie_015?",
+      "query_type": "direct_lookup",
+      "source_dataset": "metaqa_1hop",
+      "graph_fixture": "metaqa_1hop",
+      "relevant_node_ids": [
+        "movie_015"
+      ],
+      "irrelevant_node_ids": [
+        "movie_020"
+      ],
+      "at_time": null,
+      "expected_hop_depth": 1,
+      "tags": [
+        "direct_lookup"
+      ]
+    },
+    {
+      "id": "R_LU_07",
+      "query": "What is the DTI policy version?",
+      "query_type": "direct_lookup",
+      "source_dataset": "synthetic",
+      "graph_fixture": "linear_5",
+      "relevant_node_ids": [
+        "n000"
+      ],
+      "irrelevant_node_ids": [
+        "n002",
+        "n003"
+      ],
+      "at_time": null,
+      "expected_hop_depth": 1,
+      "tags": [
+        "direct_lookup"
+      ]
+    },
+    {
+      "id": "R_LU_08",
+      "query": "What are the termination policy rules?",
+      "query_type": "direct_lookup",
+      "source_dataset": "synthetic",
+      "graph_fixture": "linear_5",
+      "relevant_node_ids": [
+        "n000",
+        "n001"
+      ],
+      "irrelevant_node_ids": [
+        "n004"
+      ],
+      "at_time": null,
+      "expected_hop_depth": 1,
+      "tags": [
+        "direct_lookup"
+      ]
+    },
+    {
+      "id": "R_LU_09",
+      "query": "What year was Python created?",
+      "query_type": "direct_lookup",
+      "source_dataset": "webqsp",
+      "graph_fixture": "webqsp",
+      "relevant_node_ids": [
+        "entity_python"
+      ],
+      "irrelevant_node_ids": [
+        "entity_java"
+      ],
+      "at_time": null,
+      "expected_hop_depth": 1,
+      "tags": [
+        "direct_lookup"
+      ]
+    },
+    {
+      "id": "R_LU_10",
+      "query": "Who founded Amazon?",
+      "query_type": "direct_lookup",
+      "source_dataset": "webqsp",
+      "graph_fixture": "webqsp",
+      "relevant_node_ids": [
+        "entity_amazon"
+      ],
+      "irrelevant_node_ids": [
+        "entity_apple"
+      ],
+      "at_time": null,
+      "expected_hop_depth": 1,
+      "tags": [
+        "direct_lookup"
+      ]
+    },
+    {
+      "id": "R_LU_11",
+      "query": "Where is Harvard University located?",
+      "query_type": "direct_lookup",
+      "source_dataset": "webqsp",
+      "graph_fixture": "webqsp",
+      "relevant_node_ids": [
+        "entity_harvard"
+      ],
+      "irrelevant_node_ids": [
+        "entity_yale"
+      ],
+      "at_time": null,
+      "expected_hop_depth": 1,
+      "tags": [
+        "direct_lookup"
+      ]
+    },
+    {
+      "id": "R_LU_12",
+      "query": "What is the notice period requirement?",
+      "query_type": "direct_lookup",
+      "source_dataset": "synthetic",
+      "graph_fixture": "linear_5",
+      "relevant_node_ids": [
+        "n001"
+      ],
+      "irrelevant_node_ids": [
+        "n003",
+        "n004"
+      ],
+      "at_time": null,
+      "expected_hop_depth": 1,
+      "tags": [
+        "direct_lookup"
+      ]
+    },
+    {
+      "id": "R_LU_13",
+      "query": "What is the non-compete duration limit?",
+      "query_type": "direct_lookup",
+      "source_dataset": "synthetic",
+      "graph_fixture": "linear_5",
+      "relevant_node_ids": [
+        "n000"
+      ],
+      "irrelevant_node_ids": [
+        "n002"
+      ],
+      "at_time": null,
+      "expected_hop_depth": 1,
+      "tags": [
+        "direct_lookup"
+      ]
+    },
+    {
+      "id": "R_LU_14",
+      "query": "Who directed Movie_050?",
+      "query_type": "direct_lookup",
+      "source_dataset": "metaqa_1hop",
+      "graph_fixture": "metaqa_1hop",
+      "relevant_node_ids": [
+        "movie_050"
+      ],
+      "irrelevant_node_ids": [
+        "movie_001"
+      ],
+      "at_time": null,
+      "expected_hop_depth": 1,
+      "tags": [
+        "direct_lookup"
+      ]
+    },
+    {
+      "id": "R_LU_15",
+      "query": "What are the refund policy rules?",
+      "query_type": "direct_lookup",
+      "source_dataset": "synthetic",
+      "graph_fixture": "linear_5",
+      "relevant_node_ids": [
+        "n001",
+        "n002"
+      ],
+      "irrelevant_node_ids": [
+        "n004"
+      ],
+      "at_time": null,
+      "expected_hop_depth": 1,
+      "tags": [
+        "direct_lookup"
+      ]
+    },
+    {
+      "id": "R_MH_01",
+      "query": "What languages are spoken in movies starring actors from Christopher Nolan films?",
+      "query_type": "multi_hop",
+      "source_dataset": "metaqa_3hop",
+      "graph_fixture": "metaqa_3hop",
+      "relevant_node_ids": [
+        "lang_english",
+        "lang_french"
+      ],
+      "irrelevant_node_ids": [
+        "movie_099"
+      ],
+      "at_time": null,
+      "expected_hop_depth": 3,
+      "tags": [
+        "multi_hop",
+        "multi_hop"
+      ]
+    },
+    {
+      "id": "R_MH_02",
+      "query": "What genre movies were made by directors who worked with Tom Hanks?",
+      "query_type": "multi_hop",
+      "source_dataset": "metaqa_2hop",
+      "graph_fixture": "metaqa_2hop",
+      "relevant_node_ids": [
+        "genre_drama",
+        "genre_action"
+      ],
+      "irrelevant_node_ids": [
+        "movie_001"
+      ],
+      "at_time": null,
+      "expected_hop_depth": 2,
+      "tags": [
+        "multi_hop",
+        "multi_hop"
+      ]
+    },
+    {
+      "id": "R_MH_03",
+      "query": "What decisions were influenced by the DTI policy violation?",
+      "query_type": "multi_hop",
+      "source_dataset": "synthetic",
+      "graph_fixture": "diamond",
+      "relevant_node_ids": [
+        "B",
+        "D"
+      ],
+      "irrelevant_node_ids": [
+        "A"
+      ],
+      "at_time": null,
+      "expected_hop_depth": 2,
+      "tags": [
+        "multi_hop",
+        "multi_hop"
+      ]
+    },
+    {
+      "id": "R_MH_04",
+      "query": "What caused the policy compliance failure that led to the rejection?",
+      "query_type": "multi_hop",
+      "source_dataset": "synthetic",
+      "graph_fixture": "diamond",
+      "relevant_node_ids": [
+        "A",
+        "B"
+      ],
+      "irrelevant_node_ids": [
+        "D"
+      ],
+      "at_time": null,
+      "expected_hop_depth": 2,
+      "tags": [
+        "multi_hop",
+        "multi_hop"
+      ]
+    },
+    {
+      "id": "R_MH_05",
+      "query": "Which actors starred in movies produced in the same year as Movie_010?",
+      "query_type": "multi_hop",
+      "source_dataset": "metaqa_2hop",
+      "graph_fixture": "metaqa_2hop",
+      "relevant_node_ids": [
+        "actor_001",
+        "actor_002"
+      ],
+      "irrelevant_node_ids": [
+        "actor_010"
+      ],
+      "at_time": null,
+      "expected_hop_depth": 2,
+      "tags": [
+        "multi_hop",
+        "multi_hop"
+      ]
+    },
+    {
+      "id": "R_MH_06",
+      "query": "What are the downstream effects of the credit policy change?",
+      "query_type": "multi_hop",
+      "source_dataset": "synthetic",
+      "graph_fixture": "branching",
+      "relevant_node_ids": [
+        "branch_0",
+        "leaf_0_0",
+        "leaf_0_1"
+      ],
+      "irrelevant_node_ids": [
+        "branch_1"
+      ],
+      "at_time": null,
+      "expected_hop_depth": 2,
+      "tags": [
+        "multi_hop",
+        "multi_hop"
+      ]
+    },
+    {
+      "id": "R_MH_07",
+      "query": "What policies were applied in cases similar to the overturned precedent?",
+      "query_type": "multi_hop",
+      "source_dataset": "synthetic",
+      "graph_fixture": "diamond",
+      "relevant_node_ids": [
+        "A",
+        "C"
+      ],
+      "irrelevant_node_ids": [
+        "D"
+      ],
+      "at_time": null,
+      "expected_hop_depth": 2,
+      "tags": [
+        "multi_hop",
+        "multi_hop"
+      ]
+    },
+    {
+      "id": "R_MH_08",
+      "query": "Which movies in the same genre as Inception were directed in the 2010s?",
+      "query_type": "multi_hop",
+      "source_dataset": "metaqa_2hop",
+      "graph_fixture": "metaqa_2hop",
+      "relevant_node_ids": [
+        "movie_010",
+        "movie_020"
+      ],
+      "irrelevant_node_ids": [
+        "movie_001"
+      ],
+      "at_time": null,
+      "expected_hop_depth": 2,
+      "tags": [
+        "multi_hop",
+        "multi_hop"
+      ]
+    },
+    {
+      "id": "R_MH_09",
+      "query": "What is the root cause of the compliance violation chain?",
+      "query_type": "multi_hop",
+      "source_dataset": "synthetic",
+      "graph_fixture": "linear_5",
+      "relevant_node_ids": [
+        "n000",
+        "n001"
+      ],
+      "irrelevant_node_ids": [
+        "n003",
+        "n004"
+      ],
+      "at_time": null,
+      "expected_hop_depth": 2,
+      "tags": [
+        "multi_hop",
+        "multi_hop"
+      ]
+    },
+    {
+      "id": "R_MH_10",
+      "query": "Which employees were promoted under the same policy as Employee A?",
+      "query_type": "multi_hop",
+      "source_dataset": "synthetic",
+      "graph_fixture": "branching",
+      "relevant_node_ids": [
+        "branch_0",
+        "leaf_0_0"
+      ],
+      "irrelevant_node_ids": [
+        "branch_1"
+      ],
+      "at_time": null,
+      "expected_hop_depth": 2,
+      "tags": [
+        "multi_hop",
+        "multi_hop"
+      ]
+    },
+    {
+      "id": "R_MH_11",
+      "query": "What are all effects of the fraudulent order detection policy?",
+      "query_type": "multi_hop",
+      "source_dataset": "synthetic",
+      "graph_fixture": "branching",
+      "relevant_node_ids": [
+        "branch_0",
+        "branch_1"
+      ],
+      "irrelevant_node_ids": [
+        "leaf_0_0"
+      ],
+      "at_time": null,
+      "expected_hop_depth": 2,
+      "tags": [
+        "multi_hop",
+        "multi_hop"
+      ]
+    },
+    {
+      "id": "R_MH_12",
+      "query": "Which clinical trials affected by the same exclusion criterion as Trial_001?",
+      "query_type": "multi_hop",
+      "source_dataset": "synthetic",
+      "graph_fixture": "diamond",
+      "relevant_node_ids": [
+        "B",
+        "C"
+      ],
+      "irrelevant_node_ids": [
+        "A"
+      ],
+      "at_time": null,
+      "expected_hop_depth": 2,
+      "tags": [
+        "multi_hop",
+        "multi_hop"
+      ]
+    },
+    {
+      "id": "R_MH_13",
+      "query": "What decisions led to the final contract rejection?",
+      "query_type": "multi_hop",
+      "source_dataset": "synthetic",
+      "graph_fixture": "linear_5",
+      "relevant_node_ids": [
+        "n000",
+        "n001",
+        "n002"
+      ],
+      "irrelevant_node_ids": [
+        "n004"
+      ],
+      "at_time": null,
+      "expected_hop_depth": 3,
+      "tags": [
+        "multi_hop",
+        "multi_hop"
+      ]
+    },
+    {
+      "id": "R_MH_14",
+      "query": "What actors worked with directors who made sci-fi films released after 2015?",
+      "query_type": "multi_hop",
+      "source_dataset": "metaqa_3hop",
+      "graph_fixture": "metaqa_3hop",
+      "relevant_node_ids": [
+        "actor_003",
+        "actor_005"
+      ],
+      "irrelevant_node_ids": [
+        "actor_009"
+      ],
+      "at_time": null,
+      "expected_hop_depth": 3,
+      "tags": [
+        "multi_hop",
+        "multi_hop"
+      ]
+    },
+    {
+      "id": "R_MH_15",
+      "query": "What are all ancestors of the compliance failure node?",
+      "query_type": "multi_hop",
+      "source_dataset": "synthetic",
+      "graph_fixture": "linear_5",
+      "relevant_node_ids": [
+        "n000",
+        "n001",
+        "n002",
+        "n003"
+      ],
+      "irrelevant_node_ids": [],
+      "at_time": null,
+      "expected_hop_depth": 4,
+      "tags": [
+        "multi_hop",
+        "multi_hop"
+      ]
+    },
+    {
+      "id": "R_MH_16",
+      "query": "Which vendor policies were overridden by the exception approval?",
+      "query_type": "multi_hop",
+      "source_dataset": "synthetic",
+      "graph_fixture": "diamond",
+      "relevant_node_ids": [
+        "A",
+        "B",
+        "C"
+      ],
+      "irrelevant_node_ids": [
+        "D"
+      ],
+      "at_time": null,
+      "expected_hop_depth": 3,
+      "tags": [
+        "multi_hop",
+        "multi_hop"
+      ]
+    },
+    {
+      "id": "R_MH_17",
+      "query": "What are the consequences of the employment policy breach?",
+      "query_type": "multi_hop",
+      "source_dataset": "synthetic",
+      "graph_fixture": "branching",
+      "relevant_node_ids": [
+        "branch_0",
+        "leaf_0_0",
+        "leaf_0_1"
+      ],
+      "irrelevant_node_ids": [
+        "branch_1"
+      ],
+      "at_time": null,
+      "expected_hop_depth": 2,
+      "tags": [
+        "multi_hop",
+        "multi_hop"
+      ]
+    },
+    {
+      "id": "R_MH_18",
+      "query": "Which contract clauses are linked to the IP ownership dispute?",
+      "query_type": "multi_hop",
+      "source_dataset": "synthetic",
+      "graph_fixture": "diamond",
+      "relevant_node_ids": [
+        "A",
+        "C",
+        "D"
+      ],
+      "irrelevant_node_ids": [
+        "B"
+      ],
+      "at_time": null,
+      "expected_hop_depth": 2,
+      "tags": [
+        "multi_hop",
+        "multi_hop"
+      ]
+    },
+    {
+      "id": "R_MH_19",
+      "query": "What decisions were made under the pre-2023 fraud detection rules?",
+      "query_type": "multi_hop",
+      "source_dataset": "synthetic",
+      "graph_fixture": "temporal_6",
+      "relevant_node_ids": [
+        "t000",
+        "t001",
+        "t002"
+      ],
+      "irrelevant_node_ids": [
+        "t004",
+        "t005"
+      ],
+      "at_time": null,
+      "expected_hop_depth": 2,
+      "tags": [
+        "multi_hop",
+        "multi_hop"
+      ]
+    },
+    {
+      "id": "R_MH_20",
+      "query": "What genre movies feature actors who appeared in movies directed by Denis Villeneuve?",
+      "query_type": "multi_hop",
+      "source_dataset": "metaqa_3hop",
+      "graph_fixture": "metaqa_3hop",
+      "relevant_node_ids": [
+        "genre_sci-fi",
+        "genre_drama"
+      ],
+      "irrelevant_node_ids": [
+        "genre_comedy"
+      ],
+      "at_time": null,
+      "expected_hop_depth": 3,
+      "tags": [
+        "multi_hop",
+        "multi_hop"
+      ]
+    },
+    {
+      "id": "R_TM_01",
+      "query": "What loans were approved as of June 2022?",
+      "query_type": "temporal",
+      "source_dataset": "timeqa + synthetic",
+      "graph_fixture": "temporal_6",
+      "relevant_node_ids": [
+        "t002"
+      ],
+      "irrelevant_node_ids": [
+        "t000",
+        "t001",
+        "t003",
+        "t004",
+        "t005"
+      ],
+      "at_time": "2022-06-15T00:00:00Z",
+      "expected_hop_depth": 1,
+      "tags": [
+        "temporal",
+        "temporal"
+      ]
+    },
+    {
+      "id": "R_TM_02",
+      "query": "What policies were active before 2021?",
+      "query_type": "temporal",
+      "source_dataset": "timeqa + synthetic",
+      "graph_fixture": "temporal_6",
+      "relevant_node_ids": [
+        "t000",
+        "t001"
+      ],
+      "irrelevant_node_ids": [
+        "t003",
+        "t004",
+        "t005"
+      ],
+      "at_time": "2020-12-31T23:59:59Z",
+      "expected_hop_depth": 1,
+      "tags": [
+        "temporal",
+        "temporal"
+      ]
+    },
+    {
+      "id": "R_TM_03",
+      "query": "What decisions were recorded after January 2023?",
+      "query_type": "temporal",
+      "source_dataset": "timeqa + synthetic",
+      "graph_fixture": "temporal_6",
+      "relevant_node_ids": [
+        "t003",
+        "t004",
+        "t005"
+      ],
+      "irrelevant_node_ids": [
+        "t000",
+        "t001"
+      ],
+      "at_time": "2023-01-01T00:00:00Z",
+      "expected_hop_depth": 1,
+      "tags": [
+        "temporal",
+        "temporal"
+      ]
+    },
+    {
+      "id": "R_TM_04",
+      "query": "Which contracts were valid during 2021?",
+      "query_type": "temporal",
+      "source_dataset": "timeqa + synthetic",
+      "graph_fixture": "temporal_6",
+      "relevant_node_ids": [
+        "t001"
+      ],
+      "irrelevant_node_ids": [
+        "t000",
+        "t002",
+        "t003"
+      ],
+      "at_time": "2021-06-01T00:00:00Z",
+      "expected_hop_depth": 1,
+      "tags": [
+        "temporal",
+        "temporal"
+      ]
+    },
+    {
+      "id": "R_TM_05",
+      "query": "What was the credit policy as of Q3 2022?",
+      "query_type": "temporal",
+      "source_dataset": "timeqa + synthetic",
+      "graph_fixture": "temporal_6",
+      "relevant_node_ids": [
+        "t002"
+      ],
+      "irrelevant_node_ids": [
+        "t004",
+        "t005"
+      ],
+      "at_time": "2022-09-01T00:00:00Z",
+      "expected_hop_depth": 1,
+      "tags": [
+        "temporal",
+        "temporal"
+      ]
+    },
+    {
+      "id": "R_TM_06",
+      "query": "Which employee promotions occurred between 2020 and 2022?",
+      "query_type": "temporal",
+      "source_dataset": "timeqa + synthetic",
+      "graph_fixture": "temporal_6",
+      "relevant_node_ids": [
+        "t000",
+        "t001",
+        "t002"
+      ],
+      "irrelevant_node_ids": [
+        "t004",
+        "t005"
+      ],
+      "at_time": null,
+      "expected_hop_depth": 1,
+      "tags": [
+        "temporal",
+        "temporal"
+      ]
+    },
+    {
+      "id": "R_TM_07",
+      "query": "What fraud detections were recorded since the 2023 policy update?",
+      "query_type": "temporal",
+      "source_dataset": "timeqa + synthetic",
+      "graph_fixture": "temporal_6",
+      "relevant_node_ids": [
+        "t003",
+        "t004"
+      ],
+      "irrelevant_node_ids": [
+        "t000",
+        "t001"
+      ],
+      "at_time": "2023-01-01T00:00:00Z",
+      "expected_hop_depth": 1,
+      "tags": [
+        "temporal",
+        "temporal"
+      ]
+    },
+    {
+      "id": "R_TM_08",
+      "query": "What clinical trial enrollments were valid prior to 2022?",
+      "query_type": "temporal",
+      "source_dataset": "timeqa + synthetic",
+      "graph_fixture": "temporal_6",
+      "relevant_node_ids": [
+        "t000",
+        "t001"
+      ],
+      "irrelevant_node_ids": [
+        "t003",
+        "t004"
+      ],
+      "at_time": "2021-12-31T23:59:59Z",
+      "expected_hop_depth": 1,
+      "tags": [
+        "temporal",
+        "temporal"
+      ]
+    },
+    {
+      "id": "R_TM_09",
+      "query": "What decisions were overturned after the 2024 policy change?",
+      "query_type": "temporal",
+      "source_dataset": "timeqa + synthetic",
+      "graph_fixture": "temporal_6",
+      "relevant_node_ids": [
+        "t004",
+        "t005"
+      ],
+      "irrelevant_node_ids": [
+        "t000",
+        "t001",
+        "t002"
+      ],
+      "at_time": "2024-01-01T00:00:00Z",
+      "expected_hop_depth": 1,
+      "tags": [
+        "temporal",
+        "temporal"
+      ]
+    },
+    {
+      "id": "R_TM_10",
+      "query": "What loan decisions were active throughout 2021?",
+      "query_type": "temporal",
+      "source_dataset": "timeqa + synthetic",
+      "graph_fixture": "temporal_6",
+      "relevant_node_ids": [
+        "t001"
+      ],
+      "irrelevant_node_ids": [
+        "t000",
+        "t003"
+      ],
+      "at_time": "2021-06-01T00:00:00Z",
+      "expected_hop_depth": 1,
+      "tags": [
+        "temporal",
+        "temporal"
+      ]
+    },
+    {
+      "id": "R_TM_11",
+      "query": "Which contracts expired before 2022?",
+      "query_type": "temporal",
+      "source_dataset": "timeqa + synthetic",
+      "graph_fixture": "temporal_6",
+      "relevant_node_ids": [
+        "t000",
+        "t001"
+      ],
+      "irrelevant_node_ids": [
+        "t003",
+        "t004",
+        "t005"
+      ],
+      "at_time": "2022-01-01T00:00:00Z",
+      "expected_hop_depth": 1,
+      "tags": [
+        "temporal",
+        "temporal"
+      ]
+    },
+    {
+      "id": "R_TM_12",
+      "query": "What vendor approvals were in force as of March 2023?",
+      "query_type": "temporal",
+      "source_dataset": "timeqa + synthetic",
+      "graph_fixture": "temporal_6",
+      "relevant_node_ids": [
+        "t003"
+      ],
+      "irrelevant_node_ids": [
+        "t000",
+        "t001",
+        "t005"
+      ],
+      "at_time": "2023-03-01T00:00:00Z",
+      "expected_hop_depth": 1,
+      "tags": [
+        "temporal",
+        "temporal"
+      ]
+    },
+    {
+      "id": "R_TM_13",
+      "query": "Which HR policies changed between 2022 and 2023?",
+      "query_type": "temporal",
+      "source_dataset": "timeqa + synthetic",
+      "graph_fixture": "temporal_6",
+      "relevant_node_ids": [
+        "t002",
+        "t003"
+      ],
+      "irrelevant_node_ids": [
+        "t000",
+        "t005"
+      ],
+      "at_time": null,
+      "expected_hop_depth": 1,
+      "tags": [
+        "temporal",
+        "temporal"
+      ]
+    },
+    {
+      "id": "R_TM_14",
+      "query": "What were the active fraud rules before 2020?",
+      "query_type": "temporal",
+      "source_dataset": "timeqa + synthetic",
+      "graph_fixture": "temporal_6",
+      "relevant_node_ids": [],
+      "irrelevant_node_ids": [
+        "t001",
+        "t002",
+        "t003"
+      ],
+      "at_time": "2019-12-31T23:59:59Z",
+      "expected_hop_depth": 1,
+      "tags": [
+        "temporal",
+        "temporal"
+      ]
+    },
+    {
+      "id": "R_TM_15",
+      "query": "What refund policies applied in January 2022?",
+      "query_type": "temporal",
+      "source_dataset": "timeqa + synthetic",
+      "graph_fixture": "temporal_6",
+      "relevant_node_ids": [
+        "t002"
+      ],
+      "irrelevant_node_ids": [
+        "t004",
+        "t005"
+      ],
+      "at_time": "2022-01-15T00:00:00Z",
+      "expected_hop_depth": 1,
+      "tags": [
+        "temporal",
+        "temporal"
+      ]
+    },
+    {
+      "id": "R_CA_01",
+      "query": "What caused the DTI policy violation?",
+      "query_type": "causal",
+      "source_dataset": "atomic_causal + synthetic",
+      "graph_fixture": "diamond",
+      "relevant_node_ids": [
+        "A",
+        "B"
+      ],
+      "irrelevant_node_ids": [
+        "D"
+      ],
+      "at_time": null,
+      "expected_hop_depth": 2,
+      "tags": [
+        "causal",
+        "causal"
+      ]
+    },
+    {
+      "id": "R_CA_02",
+      "query": "What are the downstream effects of the credit score failure?",
+      "query_type": "causal",
+      "source_dataset": "atomic_causal + synthetic",
+      "graph_fixture": "linear_5",
+      "relevant_node_ids": [
+        "n001",
+        "n002",
+        "n003"
+      ],
+      "irrelevant_node_ids": [
+        "n000"
+      ],
+      "at_time": null,
+      "expected_hop_depth": 2,
+      "tags": [
+        "causal",
+        "causal"
+      ]
+    },
+    {
+      "id": "R_CA_03",
+      "query": "What is the root cause of the compliance rejection?",
+      "query_type": "causal",
+      "source_dataset": "atomic_causal + synthetic",
+      "graph_fixture": "linear_5",
+      "relevant_node_ids": [
+        "n000"
+      ],
+      "irrelevant_node_ids": [
+        "n003",
+        "n004"
+      ],
+      "at_time": null,
+      "expected_hop_depth": 4,
+      "tags": [
+        "causal",
+        "causal"
+      ]
+    },
+    {
+      "id": "R_CA_04",
+      "query": "What led to the contract termination?",
+      "query_type": "causal",
+      "source_dataset": "atomic_causal + synthetic",
+      "graph_fixture": "branching",
+      "relevant_node_ids": [
+        "root",
+        "branch_0"
+      ],
+      "irrelevant_node_ids": [
+        "branch_1"
+      ],
+      "at_time": null,
+      "expected_hop_depth": 2,
+      "tags": [
+        "causal",
+        "causal"
+      ]
+    },
+    {
+      "id": "R_CA_05",
+      "query": "What triggered the fraud escalation decision?",
+      "query_type": "causal",
+      "source_dataset": "atomic_causal + synthetic",
+      "graph_fixture": "diamond",
+      "relevant_node_ids": [
+        "A",
+        "C"
+      ],
+      "irrelevant_node_ids": [
+        "D"
+      ],
+      "at_time": null,
+      "expected_hop_depth": 2,
+      "tags": [
+        "causal",
+        "causal"
+      ]
+    },
+    {
+      "id": "R_CA_06",
+      "query": "What are the causes of the loan rejection chain?",
+      "query_type": "causal",
+      "source_dataset": "atomic_causal + synthetic",
+      "graph_fixture": "linear_5",
+      "relevant_node_ids": [
+        "n000",
+        "n001"
+      ],
+      "irrelevant_node_ids": [
+        "n004"
+      ],
+      "at_time": null,
+      "expected_hop_depth": 3,
+      "tags": [
+        "causal",
+        "causal"
+      ]
+    },
+    {
+      "id": "R_CA_07",
+      "query": "What caused the policy conflict in the healthcare trial?",
+      "query_type": "causal",
+      "source_dataset": "atomic_causal + synthetic",
+      "graph_fixture": "diamond",
+      "relevant_node_ids": [
+        "A",
+        "B",
+        "C"
+      ],
+      "irrelevant_node_ids": [
+        "D"
+      ],
+      "at_time": null,
+      "expected_hop_depth": 2,
+      "tags": [
+        "causal",
+        "causal"
+      ]
+    },
+    {
+      "id": "R_CA_08",
+      "query": "What are the upstream causes of the HR promotion denial?",
+      "query_type": "causal",
+      "source_dataset": "atomic_causal + synthetic",
+      "graph_fixture": "branching",
+      "relevant_node_ids": [
+        "root"
+      ],
+      "irrelevant_node_ids": [
+        "leaf_0_0"
+      ],
+      "at_time": null,
+      "expected_hop_depth": 2,
+      "tags": [
+        "causal",
+        "causal"
+      ]
+    },
+    {
+      "id": "R_CA_09",
+      "query": "What caused the vendor compliance failure?",
+      "query_type": "causal",
+      "source_dataset": "atomic_causal + synthetic",
+      "graph_fixture": "linear_5",
+      "relevant_node_ids": [
+        "n000",
+        "n001",
+        "n002"
+      ],
+      "irrelevant_node_ids": [
+        "n004"
+      ],
+      "at_time": null,
+      "expected_hop_depth": 3,
+      "tags": [
+        "causal",
+        "causal"
+      ]
+    },
+    {
+      "id": "R_CA_10",
+      "query": "What is the full causal chain behind the contract rejection?",
+      "query_type": "causal",
+      "source_dataset": "atomic_causal + synthetic",
+      "graph_fixture": "linear_5",
+      "relevant_node_ids": [
+        "n000",
+        "n001",
+        "n002",
+        "n003"
+      ],
+      "irrelevant_node_ids": [],
+      "at_time": null,
+      "expected_hop_depth": 4,
+      "tags": [
+        "causal",
+        "causal"
+      ]
+    },
+    {
+      "id": "R_NM_01",
+      "query": "quantum entanglement in mortgage approval",
+      "query_type": "no_match",
+      "source_dataset": "synthetic",
+      "graph_fixture": "linear_5",
+      "relevant_node_ids": [],
+      "irrelevant_node_ids": [
+        "n000",
+        "n001"
+      ],
+      "at_time": null,
+      "expected_hop_depth": 0,
+      "tags": [
+        "no_match",
+        "uncertainty"
+      ]
+    },
+    {
+      "id": "R_NM_02",
+      "query": "blockchain consensus in employee promotion",
+      "query_type": "no_match",
+      "source_dataset": "synthetic",
+      "graph_fixture": "linear_5",
+      "relevant_node_ids": [],
+      "irrelevant_node_ids": [
+        "n001",
+        "n002"
+      ],
+      "at_time": null,
+      "expected_hop_depth": 0,
+      "tags": [
+        "no_match",
+        "uncertainty"
+      ]
+    },
+    {
+      "id": "R_NM_03",
+      "query": "dark matter in clinical trial eligibility",
+      "query_type": "no_match",
+      "source_dataset": "synthetic",
+      "graph_fixture": "temporal_6",
+      "relevant_node_ids": [],
+      "irrelevant_node_ids": [
+        "t000",
+        "t001"
+      ],
+      "at_time": null,
+      "expected_hop_depth": 0,
+      "tags": [
+        "no_match",
+        "uncertainty"
+      ]
+    },
+    {
+      "id": "R_NM_04",
+      "query": "cryptocurrency volatility in contract review",
+      "query_type": "no_match",
+      "source_dataset": "synthetic",
+      "graph_fixture": "diamond",
+      "relevant_node_ids": [],
+      "irrelevant_node_ids": [
+        "A",
+        "B"
+      ],
+      "at_time": null,
+      "expected_hop_depth": 0,
+      "tags": [
+        "no_match",
+        "uncertainty"
+      ]
+    },
+    {
+      "id": "R_NM_05",
+      "query": "nuclear fusion in fraud detection",
+      "query_type": "no_match",
+      "source_dataset": "synthetic",
+      "graph_fixture": "branching",
+      "relevant_node_ids": [],
+      "irrelevant_node_ids": [
+        "root",
+        "branch_0"
+      ],
+      "at_time": null,
+      "expected_hop_depth": 0,
+      "tags": [
+        "no_match",
+        "uncertainty"
+      ]
+    },
+    {
+      "id": "R_NM_06",
+      "query": "alien contact in vendor approval",
+      "query_type": "no_match",
+      "source_dataset": "synthetic",
+      "graph_fixture": "linear_5",
+      "relevant_node_ids": [],
+      "irrelevant_node_ids": [
+        "n003",
+        "n004"
+      ],
+      "at_time": null,
+      "expected_hop_depth": 0,
+      "tags": [
+        "no_match",
+        "uncertainty"
+      ]
+    },
+    {
+      "id": "R_NM_07",
+      "query": "time travel in HR policy",
+      "query_type": "no_match",
+      "source_dataset": "synthetic",
+      "graph_fixture": "temporal_6",
+      "relevant_node_ids": [],
+      "irrelevant_node_ids": [
+        "t002",
+        "t003"
+      ],
+      "at_time": null,
+      "expected_hop_depth": 0,
+      "tags": [
+        "no_match",
+        "uncertainty"
+      ]
+    },
+    {
+      "id": "R_NM_08",
+      "query": "perpetual motion in loan underwriting",
+      "query_type": "no_match",
+      "source_dataset": "synthetic",
+      "graph_fixture": "linear_5",
+      "relevant_node_ids": [],
+      "irrelevant_node_ids": [
+        "n000"
+      ],
+      "at_time": null,
+      "expected_hop_depth": 0,
+      "tags": [
+        "no_match",
+        "uncertainty"
+      ]
+    },
+    {
+      "id": "R_NM_09",
+      "query": "telepathy in customer identification",
+      "query_type": "no_match",
+      "source_dataset": "synthetic",
+      "graph_fixture": "diamond",
+      "relevant_node_ids": [],
+      "irrelevant_node_ids": [
+        "C",
+        "D"
+      ],
+      "at_time": null,
+      "expected_hop_depth": 0,
+      "tags": [
+        "no_match",
+        "uncertainty"
+      ]
+    },
+    {
+      "id": "R_NM_10",
+      "query": "faster-than-light travel in compliance checking",
+      "query_type": "no_match",
+      "source_dataset": "synthetic",
+      "graph_fixture": "branching",
+      "relevant_node_ids": [],
+      "irrelevant_node_ids": [
+        "leaf_0_0"
+      ],
+      "at_time": null,
+      "expected_hop_depth": 0,
+      "tags": [
+        "no_match",
+        "uncertainty"
+      ]
+    }
+  ]
+}

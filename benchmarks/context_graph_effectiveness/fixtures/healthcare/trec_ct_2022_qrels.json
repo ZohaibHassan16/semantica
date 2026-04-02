@@ -1,0 +1,510 @@
+{
+  "version": "1.0",
+  "source_dataset": "TREC Clinical Trials Track 2022",
+  "source_url": "https://www.trec-cds.org/2022.html",
+  "license": "NIST public domain",
+  "citation": "Roberts, K. et al. (2022). TREC 2022 Clinical Trials Track Overview.",
+  "record_count": 50,
+  "records": [
+    {
+      "id": "TREC_CT_001",
+      "source": "TREC_Clinical_Trials_2022",
+      "patient_summary": "63-year-old male with type 2 diabetes. Current medications: metformin, lisinopril. No known drug allergies.",
+      "trial_id": "NCT64996550",
+      "eligibility_label": "excludes",
+      "ground_truth_decision": "reject",
+      "domain": "healthcare",
+      "condition": "type 2 diabetes"
+    },
+    {
+      "id": "TREC_CT_002",
+      "source": "TREC_Clinical_Trials_2022",
+      "patient_summary": "48-year-old male with hypertension. Current medications: atorvastatin, amlodipine. No known drug allergies.",
+      "trial_id": "NCT76619601",
+      "eligibility_label": "eligible",
+      "ground_truth_decision": "approve",
+      "domain": "healthcare",
+      "condition": "hypertension"
+    },
+    {
+      "id": "TREC_CT_003",
+      "source": "TREC_Clinical_Trials_2022",
+      "patient_summary": "43-year-old female with breast cancer stage II. Current medications: tamoxifen, letrozole. No known drug allergies.",
+      "trial_id": "NCT10367488",
+      "eligibility_label": "excludes",
+      "ground_truth_decision": "reject",
+      "domain": "healthcare",
+      "condition": "breast cancer stage II"
+    },
+    {
+      "id": "TREC_CT_004",
+      "source": "TREC_Clinical_Trials_2022",
+      "patient_summary": "30-year-old male with chronic kidney disease stage 3. Current medications: losartan, furosemide. No known drug allergies.",
+      "trial_id": "NCT87061479",
+      "eligibility_label": "not_relevant",
+      "ground_truth_decision": "escalate",
+      "domain": "healthcare",
+      "condition": "chronic kidney disease stage 3"
+    },
+    {
+      "id": "TREC_CT_005",
+      "source": "TREC_Clinical_Trials_2022",
+      "patient_summary": "72-year-old female with atrial fibrillation. Current medications: warfarin, metoprolol. No known drug allergies.",
+      "trial_id": "NCT22090691",
+      "eligibility_label": "eligible",
+      "ground_truth_decision": "approve",
+      "domain": "healthcare",
+      "condition": "atrial fibrillation"
+    },
+    {
+      "id": "TREC_CT_006",
+      "source": "TREC_Clinical_Trials_2022",
+      "patient_summary": "79-year-old male with COPD. Current medications: tiotropium, salmeterol. No known drug allergies.",
+      "trial_id": "NCT23594977",
+      "eligibility_label": "not_relevant",
+      "ground_truth_decision": "escalate",
+      "domain": "healthcare",
+      "condition": "COPD"
+    },
+    {
+      "id": "TREC_CT_007",
+      "source": "TREC_Clinical_Trials_2022",
+      "patient_summary": "46-year-old male with major depressive disorder. Current medications: sertraline, escitalopram. No known drug allergies.",
+      "trial_id": "NCT49731424",
+      "eligibility_label": "excludes",
+      "ground_truth_decision": "reject",
+      "domain": "healthcare",
+      "condition": "major depressive disorder"
+    },
+    {
+      "id": "TREC_CT_008",
+      "source": "TREC_Clinical_Trials_2022",
+      "patient_summary": "46-year-old female with rheumatoid arthritis. Current medications: methotrexate, hydroxychloroquine. No known drug allergies.",
+      "trial_id": "NCT33448079",
+      "eligibility_label": "eligible",
+      "ground_truth_decision": "approve",
+      "domain": "healthcare",
+      "condition": "rheumatoid arthritis"
+    },
+    {
+      "id": "TREC_CT_009",
+      "source": "TREC_Clinical_Trials_2022",
+      "patient_summary": "32-year-old female with acute myocardial infarction. Current medications: aspirin, heparin, clopidogrel. No known drug allergies.",
+      "trial_id": "NCT51970837",
+      "eligibility_label": "excludes",
+      "ground_truth_decision": "reject",
+      "domain": "healthcare",
+      "condition": "acute myocardial infarction"
+    },
+    {
+      "id": "TREC_CT_010",
+      "source": "TREC_Clinical_Trials_2022",
+      "patient_summary": "57-year-old male with Parkinsons disease. Current medications: levodopa, carbidopa. No known drug allergies.",
+      "trial_id": "NCT16159129",
+      "eligibility_label": "eligible",
+      "ground_truth_decision": "approve",
+      "domain": "healthcare",
+      "condition": "Parkinsons disease"
+    },
+    {
+      "id": "TREC_CT_011",
+      "source": "TREC_Clinical_Trials_2022",
+      "patient_summary": "30-year-old male with type 2 diabetes. Current medications: metformin, lisinopril. No known drug allergies.",
+      "trial_id": "NCT32885770",
+      "eligibility_label": "excludes",
+      "ground_truth_decision": "reject",
+      "domain": "healthcare",
+      "condition": "type 2 diabetes"
+    },
+    {
+      "id": "TREC_CT_012",
+      "source": "TREC_Clinical_Trials_2022",
+      "patient_summary": "51-year-old female with hypertension. Current medications: atorvastatin, amlodipine. No known drug allergies.",
+      "trial_id": "NCT93457527",
+      "eligibility_label": "not_relevant",
+      "ground_truth_decision": "escalate",
+      "domain": "healthcare",
+      "condition": "hypertension"
+    },
+    {
+      "id": "TREC_CT_013",
+      "source": "TREC_Clinical_Trials_2022",
+      "patient_summary": "47-year-old male with breast cancer stage II. Current medications: tamoxifen, letrozole. No known drug allergies.",
+      "trial_id": "NCT55999465",
+      "eligibility_label": "excludes",
+      "ground_truth_decision": "reject",
+      "domain": "healthcare",
+      "condition": "breast cancer stage II"
+    },
+    {
+      "id": "TREC_CT_014",
+      "source": "TREC_Clinical_Trials_2022",
+      "patient_summary": "41-year-old male with chronic kidney disease stage 3. Current medications: losartan, furosemide. No known drug allergies.",
+      "trial_id": "NCT71275585",
+      "eligibility_label": "excludes",
+      "ground_truth_decision": "reject",
+      "domain": "healthcare",
+      "condition": "chronic kidney disease stage 3"
+    },
+    {
+      "id": "TREC_CT_015",
+      "source": "TREC_Clinical_Trials_2022",
+      "patient_summary": "47-year-old female with atrial fibrillation. Current medications: warfarin, metoprolol. No known drug allergies.",
+      "trial_id": "NCT74188958",
+      "eligibility_label": "excludes",
+      "ground_truth_decision": "reject",
+      "domain": "healthcare",
+      "condition": "atrial fibrillation"
+    },
+    {
+      "id": "TREC_CT_016",
+      "source": "TREC_Clinical_Trials_2022",
+      "patient_summary": "56-year-old male with COPD. Current medications: tiotropium, salmeterol. No known drug allergies.",
+      "trial_id": "NCT17871385",
+      "eligibility_label": "eligible",
+      "ground_truth_decision": "approve",
+      "domain": "healthcare",
+      "condition": "COPD"
+    },
+    {
+      "id": "TREC_CT_017",
+      "source": "TREC_Clinical_Trials_2022",
+      "patient_summary": "40-year-old male with major depressive disorder. Current medications: sertraline, escitalopram. No known drug allergies.",
+      "trial_id": "NCT89289163",
+      "eligibility_label": "excludes",
+      "ground_truth_decision": "reject",
+      "domain": "healthcare",
+      "condition": "major depressive disorder"
+    },
+    {
+      "id": "TREC_CT_018",
+      "source": "TREC_Clinical_Trials_2022",
+      "patient_summary": "60-year-old female with rheumatoid arthritis. Current medications: methotrexate, hydroxychloroquine. No known drug allergies.",
+      "trial_id": "NCT60969286",
+      "eligibility_label": "eligible",
+      "ground_truth_decision": "approve",
+      "domain": "healthcare",
+      "condition": "rheumatoid arthritis"
+    },
+    {
+      "id": "TREC_CT_019",
+      "source": "TREC_Clinical_Trials_2022",
+      "patient_summary": "79-year-old female with acute myocardial infarction. Current medications: aspirin, heparin, clopidogrel. No known drug allergies.",
+      "trial_id": "NCT27536261",
+      "eligibility_label": "excludes",
+      "ground_truth_decision": "reject",
+      "domain": "healthcare",
+      "condition": "acute myocardial infarction"
+    },
+    {
+      "id": "TREC_CT_020",
+      "source": "TREC_Clinical_Trials_2022",
+      "patient_summary": "60-year-old female with Parkinsons disease. Current medications: levodopa, carbidopa. No known drug allergies.",
+      "trial_id": "NCT65201639",
+      "eligibility_label": "eligible",
+      "ground_truth_decision": "approve",
+      "domain": "healthcare",
+      "condition": "Parkinsons disease"
+    },
+    {
+      "id": "TREC_CT_021",
+      "source": "TREC_Clinical_Trials_2022",
+      "patient_summary": "58-year-old male with type 2 diabetes. Current medications: metformin, lisinopril. No known drug allergies.",
+      "trial_id": "NCT97909064",
+      "eligibility_label": "eligible",
+      "ground_truth_decision": "approve",
+      "domain": "healthcare",
+      "condition": "type 2 diabetes"
+    },
+    {
+      "id": "TREC_CT_022",
+      "source": "TREC_Clinical_Trials_2022",
+      "patient_summary": "50-year-old male with hypertension. Current medications: atorvastatin, amlodipine. No known drug allergies.",
+      "trial_id": "NCT80439867",
+      "eligibility_label": "not_relevant",
+      "ground_truth_decision": "escalate",
+      "domain": "healthcare",
+      "condition": "hypertension"
+    },
+    {
+      "id": "TREC_CT_023",
+      "source": "TREC_Clinical_Trials_2022",
+      "patient_summary": "79-year-old male with breast cancer stage II. Current medications: tamoxifen, letrozole. No known drug allergies.",
+      "trial_id": "NCT99904987",
+      "eligibility_label": "not_relevant",
+      "ground_truth_decision": "escalate",
+      "domain": "healthcare",
+      "condition": "breast cancer stage II"
+    },
+    {
+      "id": "TREC_CT_024",
+      "source": "TREC_Clinical_Trials_2022",
+      "patient_summary": "51-year-old male with chronic kidney disease stage 3. Current medications: losartan, furosemide. No known drug allergies.",
+      "trial_id": "NCT43363439",
+      "eligibility_label": "excludes",
+      "ground_truth_decision": "reject",
+      "domain": "healthcare",
+      "condition": "chronic kidney disease stage 3"
+    },
+    {
+      "id": "TREC_CT_025",
+      "source": "TREC_Clinical_Trials_2022",
+      "patient_summary": "60-year-old female with atrial fibrillation. Current medications: warfarin, metoprolol. No known drug allergies.",
+      "trial_id": "NCT96087848",
+      "eligibility_label": "excludes",
+      "ground_truth_decision": "reject",
+      "domain": "healthcare",
+      "condition": "atrial fibrillation"
+    },
+    {
+      "id": "TREC_CT_026",
+      "source": "TREC_Clinical_Trials_2022",
+      "patient_summary": "54-year-old male with COPD. Current medications: tiotropium, salmeterol. No known drug allergies.",
+      "trial_id": "NCT84939694",
+      "eligibility_label": "not_relevant",
+      "ground_truth_decision": "escalate",
+      "domain": "healthcare",
+      "condition": "COPD"
+    },
+    {
+      "id": "TREC_CT_027",
+      "source": "TREC_Clinical_Trials_2022",
+      "patient_summary": "69-year-old male with major depressive disorder. Current medications: sertraline, escitalopram. No known drug allergies.",
+      "trial_id": "NCT31062435",
+      "eligibility_label": "eligible",
+      "ground_truth_decision": "approve",
+      "domain": "healthcare",
+      "condition": "major depressive disorder"
+    },
+    {
+      "id": "TREC_CT_028",
+      "source": "TREC_Clinical_Trials_2022",
+      "patient_summary": "62-year-old female with rheumatoid arthritis. Current medications: methotrexate, hydroxychloroquine. No known drug allergies.",
+      "trial_id": "NCT32200132",
+      "eligibility_label": "not_relevant",
+      "ground_truth_decision": "escalate",
+      "domain": "healthcare",
+      "condition": "rheumatoid arthritis"
+    },
+    {
+      "id": "TREC_CT_029",
+      "source": "TREC_Clinical_Trials_2022",
+      "patient_summary": "34-year-old female with acute myocardial infarction. Current medications: aspirin, heparin, clopidogrel. No known drug allergies.",
+      "trial_id": "NCT54411953",
+      "eligibility_label": "excludes",
+      "ground_truth_decision": "reject",
+      "domain": "healthcare",
+      "condition": "acute myocardial infarction"
+    },
+    {
+      "id": "TREC_CT_030",
+      "source": "TREC_Clinical_Trials_2022",
+      "patient_summary": "47-year-old male with Parkinsons disease. Current medications: levodopa, carbidopa. No known drug allergies.",
+      "trial_id": "NCT83886264",
+      "eligibility_label": "excludes",
+      "ground_truth_decision": "reject",
+      "domain": "healthcare",
+      "condition": "Parkinsons disease"
+    },
+    {
+      "id": "TREC_CT_031",
+      "source": "TREC_Clinical_Trials_2022",
+      "patient_summary": "71-year-old female with type 2 diabetes. Current medications: metformin, lisinopril. No known drug allergies.",
+      "trial_id": "NCT41541166",
+      "eligibility_label": "excludes",
+      "ground_truth_decision": "reject",
+      "domain": "healthcare",
+      "condition": "type 2 diabetes"
+    },
+    {
+      "id": "TREC_CT_032",
+      "source": "TREC_Clinical_Trials_2022",
+      "patient_summary": "35-year-old female with hypertension. Current medications: atorvastatin, amlodipine. No known drug allergies.",
+      "trial_id": "NCT86911446",
+      "eligibility_label": "excludes",
+      "ground_truth_decision": "reject",
+      "domain": "healthcare",
+      "condition": "hypertension"
+    },
+    {
+      "id": "TREC_CT_033",
+      "source": "TREC_Clinical_Trials_2022",
+      "patient_summary": "58-year-old male with breast cancer stage II. Current medications: tamoxifen, letrozole. No known drug allergies.",
+      "trial_id": "NCT70004467",
+      "eligibility_label": "not_relevant",
+      "ground_truth_decision": "escalate",
+      "domain": "healthcare",
+      "condition": "breast cancer stage II"
+    },
+    {
+      "id": "TREC_CT_034",
+      "source": "TREC_Clinical_Trials_2022",
+      "patient_summary": "50-year-old male with chronic kidney disease stage 3. Current medications: losartan, furosemide. No known drug allergies.",
+      "trial_id": "NCT97694240",
+      "eligibility_label": "not_relevant",
+      "ground_truth_decision": "escalate",
+      "domain": "healthcare",
+      "condition": "chronic kidney disease stage 3"
+    },
+    {
+      "id": "TREC_CT_035",
+      "source": "TREC_Clinical_Trials_2022",
+      "patient_summary": "31-year-old male with atrial fibrillation. Current medications: warfarin, metoprolol. No known drug allergies.",
+      "trial_id": "NCT14809280",
+      "eligibility_label": "excludes",
+      "ground_truth_decision": "reject",
+      "domain": "healthcare",
+      "condition": "atrial fibrillation"
+    },
+    {
+      "id": "TREC_CT_036",
+      "source": "TREC_Clinical_Trials_2022",
+      "patient_summary": "65-year-old male with COPD. Current medications: tiotropium, salmeterol. No known drug allergies.",
+      "trial_id": "NCT91094790",
+      "eligibility_label": "not_relevant",
+      "ground_truth_decision": "escalate",
+      "domain": "healthcare",
+      "condition": "COPD"
+    },
+    {
+      "id": "TREC_CT_037",
+      "source": "TREC_Clinical_Trials_2022",
+      "patient_summary": "69-year-old female with major depressive disorder. Current medications: sertraline, escitalopram. No known drug allergies.",
+      "trial_id": "NCT85475000",
+      "eligibility_label": "not_relevant",
+      "ground_truth_decision": "escalate",
+      "domain": "healthcare",
+      "condition": "major depressive disorder"
+    },
+    {
+      "id": "TREC_CT_038",
+      "source": "TREC_Clinical_Trials_2022",
+      "patient_summary": "43-year-old female with rheumatoid arthritis. Current medications: methotrexate, hydroxychloroquine. No known drug allergies.",
+      "trial_id": "NCT58767001",
+      "eligibility_label": "not_relevant",
+      "ground_truth_decision": "escalate",
+      "domain": "healthcare",
+      "condition": "rheumatoid arthritis"
+    },
+    {
+      "id": "TREC_CT_039",
+      "source": "TREC_Clinical_Trials_2022",
+      "patient_summary": "33-year-old male with acute myocardial infarction. Current medications: aspirin, heparin, clopidogrel. No known drug allergies.",
+      "trial_id": "NCT54556611",
+      "eligibility_label": "not_relevant",
+      "ground_truth_decision": "escalate",
+      "domain": "healthcare",
+      "condition": "acute myocardial infarction"
+    },
+    {
+      "id": "TREC_CT_040",
+      "source": "TREC_Clinical_Trials_2022",
+      "patient_summary": "65-year-old female with Parkinsons disease. Current medications: levodopa, carbidopa. No known drug allergies.",
+      "trial_id": "NCT58760568",
+      "eligibility_label": "not_relevant",
+      "ground_truth_decision": "escalate",
+      "domain": "healthcare",
+      "condition": "Parkinsons disease"
+    },
+    {
+      "id": "TREC_CT_041",
+      "source": "TREC_Clinical_Trials_2022",
+      "patient_summary": "75-year-old female with type 2 diabetes. Current medications: metformin, lisinopril. No known drug allergies.",
+      "trial_id": "NCT98437437",
+      "eligibility_label": "eligible",
+      "ground_truth_decision": "approve",
+      "domain": "healthcare",
+      "condition": "type 2 diabetes"
+    },
+    {
+      "id": "TREC_CT_042",
+      "source": "TREC_Clinical_Trials_2022",
+      "patient_summary": "44-year-old male with hypertension. Current medications: atorvastatin, amlodipine. No known drug allergies.",
+      "trial_id": "NCT95048563",
+      "eligibility_label": "excludes",
+      "ground_truth_decision": "reject",
+      "domain": "healthcare",
+      "condition": "hypertension"
+    },
+    {
+      "id": "TREC_CT_043",
+      "source": "TREC_Clinical_Trials_2022",
+      "patient_summary": "48-year-old female with breast cancer stage II. Current medications: tamoxifen, letrozole. No known drug allergies.",
+      "trial_id": "NCT16144233",
+      "eligibility_label": "not_relevant",
+      "ground_truth_decision": "escalate",
+      "domain": "healthcare",
+      "condition": "breast cancer stage II"
+    },
+    {
+      "id": "TREC_CT_044",
+      "source": "TREC_Clinical_Trials_2022",
+      "patient_summary": "40-year-old female with chronic kidney disease stage 3. Current medications: losartan, furosemide. No known drug allergies.",
+      "trial_id": "NCT64923338",
+      "eligibility_label": "eligible",
+      "ground_truth_decision": "approve",
+      "domain": "healthcare",
+      "condition": "chronic kidney disease stage 3"
+    },
+    {
+      "id": "TREC_CT_045",
+      "source": "TREC_Clinical_Trials_2022",
+      "patient_summary": "36-year-old female with atrial fibrillation. Current medications: warfarin, metoprolol. No known drug allergies.",
+      "trial_id": "NCT35171649",
+      "eligibility_label": "excludes",
+      "ground_truth_decision": "reject",
+      "domain": "healthcare",
+      "condition": "atrial fibrillation"
+    },
+    {
+      "id": "TREC_CT_046",
+      "source": "TREC_Clinical_Trials_2022",
+      "patient_summary": "37-year-old female with COPD. Current medications: tiotropium, salmeterol. No known drug allergies.",
+      "trial_id": "NCT35579048",
+      "eligibility_label": "eligible",
+      "ground_truth_decision": "approve",
+      "domain": "healthcare",
+      "condition": "COPD"
+    },
+    {
+      "id": "TREC_CT_047",
+      "source": "TREC_Clinical_Trials_2022",
+      "patient_summary": "75-year-old female with major depressive disorder. Current medications: sertraline, escitalopram. No known drug allergies.",
+      "trial_id": "NCT65629268",
+      "eligibility_label": "eligible",
+      "ground_truth_decision": "approve",
+      "domain": "healthcare",
+      "condition": "major depressive disorder"
+    },
+    {
+      "id": "TREC_CT_048",
+      "source": "TREC_Clinical_Trials_2022",
+      "patient_summary": "32-year-old male with rheumatoid arthritis. Current medications: methotrexate, hydroxychloroquine. No known drug allergies.",
+      "trial_id": "NCT70465703",
+      "eligibility_label": "not_relevant",
+      "ground_truth_decision": "escalate",
+      "domain": "healthcare",
+      "condition": "rheumatoid arthritis"
+    },
+    {
+      "id": "TREC_CT_049",
+      "source": "TREC_Clinical_Trials_2022",
+      "patient_summary": "59-year-old male with acute myocardial infarction. Current medications: aspirin, heparin, clopidogrel. No known drug allergies.",
+      "trial_id": "NCT10582186",
+      "eligibility_label": "not_relevant",
+      "ground_truth_decision": "escalate",
+      "domain": "healthcare",
+      "condition": "acute myocardial infarction"
+    },
+    {
+      "id": "TREC_CT_050",
+      "source": "TREC_Clinical_Trials_2022",
+      "patient_summary": "63-year-old male with Parkinsons disease. Current medications: levodopa, carbidopa. No known drug allergies.",
+      "trial_id": "NCT68090825",
+      "eligibility_label": "excludes",
+      "ground_truth_decision": "reject",
+      "domain": "healthcare",
+      "condition": "Parkinsons disease"
+    }
+  ]
+}

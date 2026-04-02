@@ -239,4 +239,5 @@ profile = "black"
 testpaths = ["tests"]
 markers = [
     "integration: marks tests that require external services or API keys (deselect with '-m not integration')",
+    "real_llm: marks tests that require SEMANTICA_REAL_LLM=1 and ANTHROPIC_API_KEY (weekly CI only, skip with '-m not real_llm')",
 ]

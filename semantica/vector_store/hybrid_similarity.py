@@ -33,8 +33,32 @@ Example Usage:
 
 from typing import Any, Dict, List, Optional, Tuple, Union
 import numpy as np
-from scipy.spatial.distance import cosine
-from scipy.stats import pearsonr
+
+try:
+    from scipy.spatial.distance import cosine as _scipy_cosine
+    from scipy.stats import pearsonr as _scipy_pearsonr
+    _SCIPY_AVAILABLE = True
+except Exception:
+    _SCIPY_AVAILABLE = False
+
+
+def cosine(u, v):
+    if _SCIPY_AVAILABLE:
+        return _scipy_cosine(u, v)
+    # Pure-numpy fallback
+    u, v = np.asarray(u, dtype=float), np.asarray(v, dtype=float)
+    n = np.linalg.norm(u) * np.linalg.norm(v)
+    return 1.0 - (np.dot(u, v) / n if n > 0 else 0.0)
+
+
+def pearsonr(x, y):
+    if _SCIPY_AVAILABLE:
+        return _scipy_pearsonr(x, y)
+    x, y = np.asarray(x, dtype=float), np.asarray(y, dtype=float)
+    xm, ym = x - x.mean(), y - y.mean()
+    denom = np.linalg.norm(xm) * np.linalg.norm(ym)
+    r = float(np.dot(xm, ym) / denom) if denom > 0 else 0.0
+    return r, None
 
 from ..utils.logging import get_logger
 from ..utils.progress_tracker import get_progress_tracker

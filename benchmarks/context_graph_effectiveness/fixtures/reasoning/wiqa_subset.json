@@ -1,0 +1,188 @@
+{
+  "version": "1.0",
+  "source": "WIQA: What If? Question Answering about Processes (research open)",
+  "license": "Research open",
+  "citation": "Tandon, N. et al. (2019). WIQA: A dataset for What If... reasoning over procedural text. EMNLP 2019.",
+  "records": [
+    {
+      "id": "wiqa_001",
+      "context": ["Plants absorb sunlight through their leaves.", "The sunlight is converted to energy via photosynthesis.", "The plant uses this energy to grow.", "The plant produces oxygen as a byproduct."],
+      "question": "what if plants received more sunlight than normal",
+      "what_if": "more sunlight than normal",
+      "effect_direction": "more",
+      "process_step_affected": "photosynthesis",
+      "correct_effect": "more energy would be produced"
+    },
+    {
+      "id": "wiqa_002",
+      "context": ["Water evaporates from the surface of the ocean.", "Water vapor rises into the atmosphere.", "The vapor cools and condenses into clouds.", "Rain falls from the clouds back to earth."],
+      "question": "what if the temperature of the ocean decreased significantly",
+      "what_if": "ocean temperature decreased",
+      "effect_direction": "less",
+      "process_step_affected": "evaporation",
+      "correct_effect": "less water would evaporate"
+    },
+    {
+      "id": "wiqa_003",
+      "context": ["Animals eat food to get energy.", "The food is broken down in the digestive system.", "Nutrients are absorbed into the bloodstream.", "The body uses nutrients for growth and repair."],
+      "question": "what if an animal ate less food than needed",
+      "what_if": "less food consumption",
+      "effect_direction": "less",
+      "process_step_affected": "nutrient absorption",
+      "correct_effect": "less energy would be available"
+    },
+    {
+      "id": "wiqa_004",
+      "context": ["Volcanoes form at boundaries of tectonic plates.", "Magma from the mantle rises through the crust.", "The magma erupts as lava at the surface.", "The lava cools and forms new rock."],
+      "question": "what if tectonic plate movement increased",
+      "what_if": "increased plate movement",
+      "effect_direction": "more",
+      "process_step_affected": "volcanic activity",
+      "correct_effect": "more volcanic eruptions would occur"
+    },
+    {
+      "id": "wiqa_005",
+      "context": ["Glaciers form when snow accumulates over centuries.", "The weight of snow compresses lower layers into ice.", "The glacier slowly moves downhill due to gravity.", "The glacier melts at lower elevations."],
+      "question": "what if global temperatures rose significantly",
+      "what_if": "higher global temperatures",
+      "effect_direction": "less",
+      "process_step_affected": "glacier formation",
+      "correct_effect": "glaciers would melt faster and retreat"
+    },
+    {
+      "id": "wiqa_006",
+      "context": ["Seeds germinate when conditions are right.", "Roots grow downward into the soil.", "The stem pushes upward toward sunlight.", "Leaves unfurl and begin photosynthesis."],
+      "question": "what if there was no sunlight available during germination",
+      "what_if": "no sunlight",
+      "effect_direction": "less",
+      "process_step_affected": "photosynthesis",
+      "correct_effect": "plants would not be able to grow normally"
+    },
+    {
+      "id": "wiqa_007",
+      "context": ["Blood is pumped from the heart to the lungs.", "Oxygen enters the blood from the lungs.", "Oxygenated blood is pumped to the body.", "Cells use the oxygen for metabolism."],
+      "question": "what if a person exercised more intensely",
+      "what_if": "more intense exercise",
+      "effect_direction": "more",
+      "process_step_affected": "oxygen demand",
+      "correct_effect": "more oxygen would be needed by cells"
+    },
+    {
+      "id": "wiqa_008",
+      "context": ["Rivers carry water from mountains to the sea.", "Sediment is picked up along the way.", "The sediment is deposited at the river delta.", "The delta grows over thousands of years."],
+      "question": "what if the river flow rate decreased",
+      "what_if": "lower river flow rate",
+      "effect_direction": "less",
+      "process_step_affected": "sediment transport",
+      "correct_effect": "less sediment would be transported"
+    },
+    {
+      "id": "wiqa_009",
+      "context": ["Bees collect nectar from flowers.", "The nectar is converted to honey in the hive.", "The honey is stored in honeycomb cells.", "Bees consume the honey during winter."],
+      "question": "what if fewer flowers were available",
+      "what_if": "fewer flowers",
+      "effect_direction": "less",
+      "process_step_affected": "nectar collection",
+      "correct_effect": "less honey would be produced"
+    },
+    {
+      "id": "wiqa_010",
+      "context": ["Stars form from collapsing clouds of gas and dust.", "The core heats up due to compression.", "Nuclear fusion begins in the core.", "The star emits light and heat for billions of years."],
+      "question": "what if a gas cloud had more mass",
+      "what_if": "larger mass gas cloud",
+      "effect_direction": "more",
+      "process_step_affected": "core temperature",
+      "correct_effect": "the star would burn brighter and hotter"
+    },
+    {
+      "id": "wiqa_011",
+      "context": ["Soil is broken down by weathering.", "Organic matter is added by decaying plants.", "Microbes decompose organic matter into nutrients.", "Plants absorb the nutrients from the soil."],
+      "question": "what if there were fewer microbes in the soil",
+      "what_if": "fewer soil microbes",
+      "effect_direction": "less",
+      "process_step_affected": "decomposition",
+      "correct_effect": "fewer nutrients would be available for plants"
+    },
+    {
+      "id": "wiqa_012",
+      "context": ["Fish reproduce by releasing eggs in water.", "The eggs are fertilized externally.", "The fertilized eggs hatch into larvae.", "The larvae grow into juvenile fish."],
+      "question": "what if water temperature increased for tropical fish",
+      "what_if": "higher water temperature",
+      "effect_direction": "more",
+      "process_step_affected": "egg hatching",
+      "correct_effect": "eggs would hatch faster"
+    },
+    {
+      "id": "wiqa_013",
+      "context": ["Hurricanes form over warm ocean water.", "Heat energy evaporates water into vapor.", "The vapor rises and cools forming clouds.", "The storm intensifies as it draws more energy."],
+      "question": "what if ocean water temperatures were cooler",
+      "what_if": "cooler ocean temperatures",
+      "effect_direction": "less",
+      "process_step_affected": "evaporation energy",
+      "correct_effect": "hurricanes would be less intense"
+    },
+    {
+      "id": "wiqa_014",
+      "context": ["Caterpillars consume large amounts of leaves.", "The caterpillar forms a chrysalis.", "Inside the chrysalis metamorphosis occurs.", "A butterfly emerges from the chrysalis."],
+      "question": "what if a caterpillar consumed less food",
+      "what_if": "less food for caterpillar",
+      "effect_direction": "less",
+      "process_step_affected": "energy for metamorphosis",
+      "correct_effect": "the butterfly might be smaller or weaker"
+    },
+    {
+      "id": "wiqa_015",
+      "context": ["Predators hunt prey to obtain food.", "The prey population decreases when predation is high.", "With fewer prey, predators may starve.", "The predator population then decreases."],
+      "question": "what if the predator population suddenly doubled",
+      "what_if": "doubled predator population",
+      "effect_direction": "more",
+      "process_step_affected": "prey predation rate",
+      "correct_effect": "prey population would decrease faster"
+    },
+    {
+      "id": "wiqa_016",
+      "context": ["Wind energy is captured by turbine blades.", "The rotating blades turn a generator.", "The generator produces electricity.", "The electricity is sent to the power grid."],
+      "question": "what if wind speed increased",
+      "what_if": "higher wind speed",
+      "effect_direction": "more",
+      "process_step_affected": "blade rotation speed",
+      "correct_effect": "more electricity would be generated"
+    },
+    {
+      "id": "wiqa_017",
+      "context": ["Coral reefs provide habitat for marine life.", "Algae live within coral providing food and color.", "Ocean warming causes coral to expel the algae.", "Without algae the coral bleaches and may die."],
+      "question": "what if ocean acidity increased",
+      "what_if": "increased ocean acidity",
+      "effect_direction": "less",
+      "process_step_affected": "coral skeleton formation",
+      "correct_effect": "coral would have more difficulty building skeletons"
+    },
+    {
+      "id": "wiqa_018",
+      "context": ["Trees absorb carbon dioxide from the atmosphere.", "Carbon is stored in the wood and roots.", "When trees die and decay, carbon is released.", "This cycle regulates atmospheric carbon levels."],
+      "question": "what if large areas of forest were cut down",
+      "what_if": "deforestation",
+      "effect_direction": "more",
+      "process_step_affected": "carbon absorption",
+      "correct_effect": "more carbon dioxide would remain in the atmosphere"
+    },
+    {
+      "id": "wiqa_019",
+      "context": ["Rain erodes exposed soil on hillsides.", "The soil particles flow downhill in runoff.", "Sediment accumulates in rivers and streams.", "Over time rivers become shallower and can flood."],
+      "question": "what if more vegetation covered the hillsides",
+      "what_if": "more vegetation coverage",
+      "effect_direction": "less",
+      "process_step_affected": "soil erosion",
+      "correct_effect": "less soil would be eroded"
+    },
+    {
+      "id": "wiqa_020",
+      "context": ["Solar panels absorb sunlight.", "The light energy is converted to electrical energy.", "The electricity powers homes and businesses.", "Excess electricity is stored in batteries."],
+      "question": "what if there were more cloudy days",
+      "what_if": "more cloud cover",
+      "effect_direction": "less",
+      "process_step_affected": "sunlight absorption",
+      "correct_effect": "less electricity would be generated"
+    }
+  ]
+}
