@@ -31,6 +31,7 @@ License: MIT
 """
 
 import time
+import re
 from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Any, Dict, List, Optional
@@ -120,11 +121,22 @@ class QueryEngine:
         try:
             start_time = time.time()
 
+            supports_named_graphs = options.get("supports_named_graphs")
+            if supports_named_graphs is None:
+                supports_named_graphs = getattr(store_backend, "supports_named_graphs", True)
+
+            prepared_query = self.prepare_query(
+                query,
+                graph=options.get("graph"),
+                graphs=options.get("graphs"),
+                supports_named_graphs=supports_named_graphs,
+            )
+
             # Validate query
             self.progress_tracker.update_tracking(
                 tracking_id, message="Validating query..."
             )
-            if not self._validate_query(query):
+            if not self._validate_query(prepared_query):
                 self.progress_tracker.stop_tracking(
                     tracking_id, status="failed", message="Invalid SPARQL query"
                 )
@@ -135,7 +147,7 @@ class QueryEngine:
                 self.progress_tracker.update_tracking(
                     tracking_id, message="Checking cache..."
                 )
-                cache_key = self._get_cache_key(query)
+                cache_key = self._get_cache_key(prepared_query)
                 if cache_key in self.query_cache:
                     self.logger.debug("Returning cached query result")
                     cached_result = self.query_cache[cache_key]
@@ -152,9 +164,9 @@ class QueryEngine:
                 self.progress_tracker.update_tracking(
                     tracking_id, message="Optimizing query..."
                 )
-                optimized_query = self.optimize_query(query, **options)
+                optimized_query = self.optimize_query(prepared_query, **options)
             else:
-                optimized_query = query
+                optimized_query = prepared_query
 
             # Execute query
             self.progress_tracker.update_tracking(
@@ -173,8 +185,10 @@ class QueryEngine:
                 execution_time=execution_time,
                 metadata={
                     **result_data.get("metadata", {}),
-                    "optimized": optimized_query != query,
+                    "optimized": optimized_query != prepared_query,
                     "cached": False,
+                    "graph": options.get("graph"),
+                    "graphs": options.get("graphs") or [],
                 },
             )
 
@@ -183,12 +197,12 @@ class QueryEngine:
                 self.progress_tracker.update_tracking(
                     tracking_id, message="Caching result..."
                 )
-                self._cache_result(query, result)
+                self._cache_result(prepared_query, result)
 
             # Record history
             self.query_history.append(
                 {
-                    "query": query,
+                    "query": prepared_query,
                     "execution_time": execution_time,
                     "result_count": len(result.bindings),
                     "timestamp": datetime.now().isoformat(),
@@ -211,6 +225,88 @@ class QueryEngine:
                 tracking_id, status="failed", message=str(e)
             )
             raise ProcessingError(f"Query execution failed: {e}")
+
+    def prepare_query(
+        self,
+        query: str,
+        graph: Optional[str] = None,
+        graphs: Optional[List[str]] = None,
+        supports_named_graphs: bool = True,
+    ) -> str:
+        """Prepare query with optional graph dataset clauses."""
+        if not query:
+            return ""
+
+        resolved_graph = graph or self.config.get("default_graph")
+        resolved_graphs = graphs
+        if resolved_graphs is None:
+            resolved_graphs = self.config.get("default_graphs")
+
+        if isinstance(resolved_graphs, str):
+            resolved_graphs = [resolved_graphs]
+        resolved_graphs = [g for g in (resolved_graphs or []) if g]
+
+        if resolved_graph and resolved_graph not in resolved_graphs:
+            # Preserve graph as default dataset while avoiding duplicate URIs in FROM NAMED.
+            resolved_graphs = [g for g in resolved_graphs if g != resolved_graph]
+
+        if not supports_named_graphs and (resolved_graph or resolved_graphs):
+            self.logger.warning(
+                "Named graph options were provided but backend does not support named graphs; "
+                "falling back to backend default dataset"
+            )
+            return query.strip()
+
+        return self._inject_graph_clauses(
+            query,
+            graph=resolved_graph,
+            graphs=resolved_graphs,
+        )
+
+    def _inject_graph_clauses(
+        self,
+        query: str,
+        graph: Optional[str] = None,
+        graphs: Optional[List[str]] = None,
+    ) -> str:
+        """Inject FROM/FROM NAMED clauses immediately before WHERE."""
+        normalized_query = query.strip()
+        graph_list = [g for g in (graphs or []) if g]
+
+        if not graph and not graph_list:
+            return normalized_query
+
+        if re.search(r"\bFROM\b", normalized_query, flags=re.IGNORECASE):
+            return normalized_query
+
+        if not re.search(
+            r"\b(SELECT|ASK|CONSTRUCT|DESCRIBE)\b",
+            normalized_query,
+            flags=re.IGNORECASE,
+        ):
+            return normalized_query
+
+        where_match = re.search(r"\bWHERE\b", normalized_query, flags=re.IGNORECASE)
+        if not where_match:
+            return normalized_query
+
+        dataset_clauses: List[str] = []
+        if graph:
+            safe_graph = self._sanitize_uri(graph)
+            dataset_clauses.append(f"FROM <{safe_graph}>")
+
+        for graph_uri in graph_list:
+            safe_graph = self._sanitize_uri(graph_uri)
+            dataset_clauses.append(f"FROM NAMED <{safe_graph}>")
+
+        if not dataset_clauses:
+            return normalized_query
+
+        before_where = normalized_query[: where_match.start()].rstrip()
+        where_and_after = normalized_query[where_match.start() :].lstrip()
+        dataset_block = "\n".join(dataset_clauses)
+
+        return f"{before_where}\n{dataset_block}\n{where_and_after}"
 
     def optimize_query(self, query: str, **options) -> str:
         """
