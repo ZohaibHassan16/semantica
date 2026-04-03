@@ -176,3 +176,9 @@ def check_thresholds(metrics: Dict[str, float]) -> bool:
         return False
 
     return True
+
+
+def get_threshold(key: str) -> float:
+    if key not in THRESHOLDS:
+        raise KeyError(f"Unknown benchmark threshold: {key}")
+    return THRESHOLDS[key][1]

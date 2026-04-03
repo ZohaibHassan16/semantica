@@ -1,88 +1,62 @@
-import pytest
-from benchmarks.context_graph_effectiveness.thresholds import THRESHOLDS
+from __future__ import annotations
+
+import os
+import tempfile
+import time
+
+from semantica.provenance.integrity import compute_checksum, verify_checksum
 from semantica.provenance.manager import ProvenanceManager
-from semantica.provenance.schemas import SourceReference, ProvenanceEntry
+from semantica.provenance.schemas import ProvenanceEntry, SourceReference
+from semantica.provenance.storage import SQLiteStorage
+
 
 def test_lineage_completeness():
-    """
-    Given a response entity, get_lineage() should trace back to 
-    the source document without gaps.
-    """
     manager = ProvenanceManager()
-    
-    # Simulate data ingestion
-    source = SourceReference(document="doc1", metadata={"content": "Company A acquired B"})
-    try:
-        p_id = manager.record_extraction(source=source, extracted_entities=[{"name": "Company A"}], method="llm")
-        lineage = manager.get_lineage(p_id)
-    except AttributeError:
-        lineage = [source]
-    
-    # Trace lineage back from the extraction record
-    assert len(lineage) > 0
-    assert any(getattr(item, "document", getattr(item, "source_id", None)) in ("doc1", None) for item in lineage)
-    
-    completeness = 1.0
-    assert completeness == THRESHOLDS["provenance_lineage_completeness"]
+    root = manager.track_entity("doc1", source="doc1", metadata={"content": "Company A acquired B"})
+    child = manager.track_entity("entity_a", source="doc1", parent_entity_id="doc1", metadata={"label": "ORG"})
+    lineage = manager.get_lineage("entity_a")
+    sources = set(lineage.get("source_documents", []))
+    completeness = 1.0 if "doc1" in sources and lineage.get("entity_count", 0) >= 1 else 0.0
+    assert completeness == 1.0
+
 
 def test_source_citation_accuracy():
-    """
-    SourceReference (DOI + page + quote) correctly round-trips 
-    through storage and retrieval.
-    """
     manager = ProvenanceManager()
-   
     source = SourceReference(document="doi:10.1000/182", metadata={"page": 5, "quote": "Findings"})
-    try:
-        p_id = manager.record_extraction(source=source, extracted_entities=[], method="regex")
-        record = manager.get_provenance(p_id)
-        saved_source = record.source
-    except AttributeError:
-        saved_source = source
-    
-    assert saved_source.metadata.get("page") == 5
+    manager.track_entity("citation_entity", source=source.document, metadata=source.metadata)
+    record = manager.get_provenance("citation_entity")
+    assert record is not None
+    assert record["metadata"].get("page") == 5
+    assert record["source_document"] == "doi:10.1000/182"
+
 
 def test_checksum_integrity():
-    """
-    compute_checksum() / verify_checksum() detect single-byte mutations.
-    """
-    from semantica.provenance.integrity import compute_checksum, verify_checksum
     entry = ProvenanceEntry(entity_id="1", entity_type="test", activity_id="test", source_document="test")
     checksum = compute_checksum(entry)
-    
     assert verify_checksum(entry, checksum)
-    # Mutate data
     entry.confidence += 1.0
     assert not verify_checksum(entry, checksum)
 
+
 def test_sqlite_persistence_round_trip():
-    """
-    Provenance written to SQLiteStorage survives process restart 
-    and is read back identically. (Simulated via class init/read)
-    """
-    from semantica.provenance.storage import SQLiteStorage
-    import tempfile
-    import os
-    
     fd, path = tempfile.mkstemp(suffix=".db")
     os.close(fd)
     try:
         storage = SQLiteStorage(path)
-        # Store dummy dict
         entry = ProvenanceEntry(entity_id="test_id", entity_type="test", activity_id="test", source_document="test")
         storage.store(entry)
-        
-        # New instance
-        storage2 = SQLiteStorage(path)
-        data = storage2.retrieve("test_id")
+        data = SQLiteStorage(path).retrieve("test_id")
+        assert data is not None
         assert data.entity_id == "test_id"
     finally:
         os.remove(path)
 
+
 def test_provenance_overhead():
-    """
-    GraphBuilderWithProvenance and AlgorithmTrackerWithProvenance 
-    should add less than 15% overhead vs. non-provenance equivalents.
-    """
-    overhead_percentage = 0.10
-    assert overhead_percentage < 0.15
+    manager = ProvenanceManager()
+    start = time.perf_counter()
+    for index in range(100):
+        manager.track_entity(f"entity_{index}", source="doc1", metadata={"index": index})
+    elapsed = time.perf_counter() - start
+    average_ms = elapsed / 100 * 1000
+    assert average_ms < 15

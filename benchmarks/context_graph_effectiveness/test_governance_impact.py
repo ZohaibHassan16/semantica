@@ -1,32 +1,21 @@
 """
-Track 24 — Governance Impact & Change Propagation
-
-Tests that metric definition changes (expression restatements, filter additions,
-window changes, threshold raises) correctly propagate to downstream decisions via
-ContextGraph + VersionManager.
-
-Metrics:
-    metric_change_impact_score  >= 0.95  (impacted decisions flagged after metric change)
-    decision_drift_rate         <= 0.02  (unaffected decisions do not change)
-    version_snapshot_fidelity   == 1.0   (VersionManager captures metric nodes correctly)
-    change_type_coverage        >= 0.80  (all change types are detectable)
-    impact_precision            >= 0.85  (flagged decisions are actually impacted)
-
-Evidence basis:
-    MetricChangeImpactScore >= 0.95 is a hard auditability SLA (GDPR, SOX compliance).
-    DecisionDriftRate <= 0.02 is production SLA — wrong decisions due to silent metric
-    changes must be near-zero.
+Track 24 - Governance Impact and Change Propagation
 """
 
-import json
-import pytest
-from pathlib import Path
-from typing import Any, Dict, List, Set
+from __future__ import annotations
 
+import json
+from pathlib import Path
+from typing import Any
+
+import pytest
+
+from benchmarks.context_graph_effectiveness.metrics import absolute_lift, safe_mean, slice_records
 from semantica.context import ContextGraph
 
 try:
     from semantica.kg.version_manager import VersionManager
+
     _HAS_VERSION_MANAGER = True
 except ImportError:
     _HAS_VERSION_MANAGER = False
@@ -45,157 +34,118 @@ def change_pairs():
     return data["records"], data["policy_decision_registry"]
 
 
-def _build_decision_graph(registry: Dict, metric_name: str) -> ContextGraph:
-    """Build a graph with metric node and all decisions that reference it."""
-    g = ContextGraph()
-    g.add_node(metric_name, "Metric", metric_name)
+def _build_decision_graph(registry: dict, metric_name: str) -> ContextGraph:
+    graph = ContextGraph()
+    graph.add_node(metric_name, "Metric", metric_name)
     for decision_id, policy in registry.items():
         if policy["metric"] == metric_name:
-            g.add_node(decision_id, "Decision", decision_id,
-                       condition=policy["condition"],
-                       value=str(policy["value"]))
-            g.add_edge(metric_name, decision_id, "GOVERNS", 1.0)
-    return g
+            graph.add_node(
+                decision_id,
+                "Decision",
+                decision_id,
+                condition=policy["condition"],
+                value=str(policy["value"]),
+            )
+            graph.add_edge(metric_name, decision_id, "GOVERNS", 1.0)
+    return graph
 
 
-def _decisions_for_metric(registry: Dict, metric_name: str) -> Set[str]:
-    return {d for d, p in registry.items() if p["metric"] == metric_name}
+def _baseline_neighbors(registry: dict, metric_name: str) -> set[str]:
+    return {decision_id for decision_id, policy in registry.items() if policy["metric"] == metric_name}
+
+
+@pytest.fixture(scope="module")
+def governance_impact_report(change_pairs):
+    records, registry = change_pairs
+    per_record = []
+
+    for record in records:
+        metric_name = record["metric_name"]
+        graph = _build_decision_graph(registry, metric_name)
+        graph_neighbors = set(graph.get_neighbor_ids(metric_name) or [])
+        baseline = _baseline_neighbors(registry, metric_name)
+        affected_gold = set(record["affected_decisions"])
+        unaffected_gold = set(record["unaffected_decisions"])
+
+        impact_score = len(graph_neighbors & affected_gold) / len(affected_gold) if affected_gold else 0.0
+        impact_precision = len(graph_neighbors & affected_gold) / len(graph_neighbors) if graph_neighbors else 0.0
+        decision_drift_rate = len(graph_neighbors & unaffected_gold) / len(unaffected_gold) if unaffected_gold else 0.0
+        baseline_impact = len(baseline & affected_gold) / len(affected_gold) if affected_gold else 0.0
+
+        per_record.append(
+            {
+                "id": record["id"],
+                "change_type": record["change_type"],
+                "impact_score": impact_score,
+                "impact_precision": impact_precision,
+                "decision_drift_rate": decision_drift_rate,
+                "baseline_impact": baseline_impact,
+            }
+        )
+
+    change_type_breakdown = {
+        change_type: {
+            "sample_size": len(rows),
+            "impact_score": safe_mean(row["impact_score"] for row in rows),
+            "impact_precision": safe_mean(row["impact_precision"] for row in rows),
+        }
+        for change_type, rows in slice_records(per_record, lambda row: row["change_type"]).items()
+    }
+
+    return {
+        "sample_size": len(per_record),
+        "metric_change_impact_score": safe_mean(row["impact_score"] for row in per_record),
+        "decision_drift_rate": safe_mean(row["decision_drift_rate"] for row in per_record),
+        "impact_precision": safe_mean(row["impact_precision"] for row in per_record),
+        "change_type_coverage": len(change_type_breakdown) / 8.0,
+        "baseline_impact_score": safe_mean(row["baseline_impact"] for row in per_record),
+        "change_type_breakdown": change_type_breakdown,
+        "lift": {
+            "impact_score_vs_baseline": absolute_lift(
+                safe_mean(row["impact_score"] for row in per_record),
+                safe_mean(row["baseline_impact"] for row in per_record),
+            )
+        },
+    }
 
 
 class TestGovernanceImpact:
-    """Track 24 — Governance Impact & Change Propagation."""
+    def test_metric_change_impact_score(self, governance_impact_report):
+        assert governance_impact_report["metric_change_impact_score"] >= 0.95
 
-    def test_metric_change_impact_score(self, change_pairs):
-        """Impacted decisions (per gold labels) are linked to the changed metric."""
-        records, registry = change_pairs
-        total_impact = 0.0
-        count = 0
+    def test_decision_drift_rate(self, governance_impact_report):
+        assert governance_impact_report["decision_drift_rate"] <= 0.02
 
-        for rec in records:
-            metric_name = rec["metric_name"]
-            affected_gold = set(rec["affected_decisions"])
-            if not affected_gold:
-                continue
+    def test_change_type_coverage(self, governance_impact_report):
+        assert governance_impact_report["change_type_coverage"] >= 0.80
 
-            # All affected decisions must be reachable via GOVERNS edge
-            g = _build_decision_graph(registry, metric_name)
-            try:
-                neighbors = set(g.get_neighbor_ids(metric_name) or [])
-            except Exception:
-                neighbors = set()
+    def test_impact_precision(self, governance_impact_report):
+        assert governance_impact_report["impact_precision"] >= 0.85
 
-            flagged = neighbors & affected_gold
-            score = len(flagged) / len(affected_gold)
-            total_impact += score
-            count += 1
+    def test_change_breakdown_is_reported(self, governance_impact_report):
+        assert governance_impact_report["sample_size"] == 8
+        assert "expression_and_filter" in governance_impact_report["change_type_breakdown"]
 
-        mean_score = total_impact / max(count, 1)
-        assert mean_score >= 0.95, (
-            f"metric_change_impact_score = {mean_score:.3f} < 0.95 across {count} records"
-        )
-
-    def test_decision_drift_rate(self, change_pairs):
-        """Decisions not linked to the changed metric are not incorrectly flagged."""
-        records, registry = change_pairs
-        total_drift = 0.0
-        count = 0
-
-        for rec in records:
-            metric_name = rec["metric_name"]
-            unaffected_gold = set(rec["unaffected_decisions"])
-            if not unaffected_gold:
-                continue
-
-            # Decisions for OTHER metrics should not be neighbors of this metric node
-            g = _build_decision_graph(registry, metric_name)
-            try:
-                neighbors = set(g.get_neighbor_ids(metric_name) or [])
-            except Exception:
-                neighbors = set()
-
-            false_flags = neighbors & unaffected_gold
-            drift = len(false_flags) / max(len(unaffected_gold), 1)
-            total_drift += drift
-            count += 1
-
-        mean_drift = total_drift / max(count, 1)
-        assert mean_drift <= 0.02, (
-            f"decision_drift_rate = {mean_drift:.3f} > 0.02 — unaffected decisions "
-            f"being incorrectly flagged"
-        )
-
-    def test_change_type_coverage(self, change_pairs):
-        """All expected change types are present in the fixture."""
-        records, _ = change_pairs
-        expected_types = {
-            "expression_and_filter",
-            "time_window_added",
-            "window_tightened",
-            "filter_added",
-            "threshold_raised",
-            "filter_exclusion_added",
-            "expression_restatement",
-            "filter_broadened",
-        }
-        found_types = {r["change_type"] for r in records}
-        coverage = len(found_types & expected_types) / len(expected_types)
-        assert coverage >= 0.80, (
-            f"change_type_coverage = {coverage:.3f} < 0.80 "
-            f"(missing: {expected_types - found_types})"
-        )
-
-    def test_impact_precision(self, change_pairs):
-        """Flagged (neighbor) decisions are actually in the gold affected set."""
-        records, registry = change_pairs
-        total_precision = 0.0
-        count = 0
-
-        for rec in records:
-            metric_name = rec["metric_name"]
-            affected_gold = set(rec["affected_decisions"])
-            if not affected_gold:
-                continue
-
-            g = _build_decision_graph(registry, metric_name)
-            try:
-                neighbors = set(g.get_neighbor_ids(metric_name) or [])
-            except Exception:
-                neighbors = set()
-
-            if not neighbors:
-                continue
-            precision = len(neighbors & affected_gold) / len(neighbors)
-            total_precision += precision
-            count += 1
-
-        mean_precision = total_precision / max(count, 1)
-        assert mean_precision >= 0.85, (
-            f"impact_precision = {mean_precision:.3f} < 0.85 across {count} records"
-        )
+    def test_graph_impact_matches_or_beats_baseline(self, governance_impact_report):
+        assert governance_impact_report["metric_change_impact_score"] >= governance_impact_report["baseline_impact_score"]
 
     @pytest.mark.skipif(not _HAS_VERSION_MANAGER, reason="VersionManager not available")
     def test_version_snapshot_fidelity(self, change_pairs):
-        """VersionManager correctly snapshots a metric node before and after change."""
         records, registry = change_pairs
-        rec = records[0]
-        metric_name = rec["metric_name"]
+        record = records[0]
+        metric_name = record["metric_name"]
 
-        vm = VersionManager()
-        g = _build_decision_graph(registry, metric_name)
+        version_manager = VersionManager()
+        graph = _build_decision_graph(registry, metric_name)
+        before = version_manager.create_snapshot(graph, label="before_change", author="test")
+        assert before is not None
 
-        # Snapshot before change
-        snap_before = vm.create_snapshot(g, label="before_change", author="test")
-        assert snap_before is not None, "snapshot before change must not be None"
-
-        # Apply change: add new expression metadata to metric node
-        g.add_node(
-            metric_name, "Metric", f"{metric_name} (updated)",
-            expression=rec["version_after"].get("expression", ""),
+        graph.add_node(
+            metric_name,
+            "Metric",
+            f"{metric_name} (updated)",
+            expression=record["version_after"].get("expression", ""),
         )
-        snap_after = vm.create_snapshot(g, label="after_change", author="test")
-        assert snap_after is not None, "snapshot after change must not be None"
-
-        # Snapshots must differ
-        assert snap_before != snap_after or snap_before.get("checksum") != snap_after.get(
-            "checksum"
-        ), "before and after snapshots must differ after metric change"
+        after = version_manager.create_snapshot(graph, label="after_change", author="test")
+        assert after is not None
+        assert before != after or before.get("checksum") != after.get("checksum")

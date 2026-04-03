@@ -1,28 +1,16 @@
 """
-Track 23 — Metric-Graph Hybrid Reasoning
-
-Tests that ContextGraph correctly encodes metric observations alongside causal chains
-and temporal windows — the core "why did this metric change?" pattern in decision
-intelligence. All tests use direct graph operations (no ContextRetriever).
-
-Metrics:
-    hybrid_recall               >= 0.75  (metric + causal + policy nodes all reachable)
-    policy_metric_compliance    >= 0.85  (decisions respect both policy and metric rules)
-    causal_root_accuracy        >= 0.70  (BFS from metric node reaches gold root cause)
-    metric_policy_linkage_rate  >= 0.90  (every metric node linked to ≥1 policy node)
-    hybrid_graph_coverage       >= 0.80  (all hybrid records buildable into valid graphs)
-
-Evidence basis:
-    Real enterprise KG-RAG use cases mix metric context with causal/temporal reasoning.
-    Threshold 0.75 for HybridRecall is calibrated for pattern-based traversal on
-    structured fixtures.
+Track 23 - Metric-Graph Hybrid Reasoning
 """
 
-import json
-import pytest
-from pathlib import Path
-from typing import Any, Dict, List, Set
+from __future__ import annotations
 
+import json
+from pathlib import Path
+from typing import Any
+
+import pytest
+
+from benchmarks.context_graph_effectiveness.metrics import absolute_lift, safe_mean, slice_records
 from semantica.context import ContextGraph
 
 FIXTURES = Path(__file__).parent / "fixtures" / "semantic_layer"
@@ -38,205 +26,155 @@ def hybrid_dataset():
     return _load("hybrid_metric_graph.json")["records"]
 
 
-def _build_hybrid_graph(record: Dict) -> ContextGraph:
-    """Build a ContextGraph from a hybrid metric+causal+policy record."""
-    g = ContextGraph()
-
-    # Metric observation node
-    m = record["metric"]
-    g.add_node(
-        m["name"], "Metric", m["name"],
-        observed_value=str(m.get("observed_value", "")),
-        policy_threshold=str(m.get("policy_threshold", "")),
-        compliant=str(m.get("compliant", "")),
+def _build_hybrid_graph(record: dict) -> ContextGraph:
+    graph = ContextGraph()
+    metric = record["metric"]
+    graph.add_node(
+        metric["name"],
+        "Metric",
+        metric["name"],
+        observed_value=str(metric.get("observed_value", "")),
+        policy_threshold=str(metric.get("policy_threshold", "")),
+        compliant=str(metric.get("compliant", "")),
     )
 
-    # Causal chain nodes + edges
     for node_id in record.get("causal_nodes", []):
-        g.add_node(node_id, "Decision", node_id)
-        # Connect metric node to each causal factor (metric is affected by these causes)
-        g.add_edge(m["name"], node_id, "AFFECTED_BY", 1.0)
+        graph.add_node(node_id, "Decision", node_id)
+        graph.add_edge(metric["name"], node_id, "AFFECTED_BY", 1.0)
     for edge in record.get("causal_edges", []):
-        g.add_edge(edge["from"], edge["to"], "CAUSED", 1.0)
-
-    # Policy nodes linked to metric
+        graph.add_edge(edge["from"], edge["to"], "CAUSED", 1.0)
     for policy_id in record.get("policy_nodes", []):
-        g.add_node(policy_id, "Policy", policy_id)
-        g.add_edge(m["name"], policy_id, "GOVERNED_BY", 1.0)
+        graph.add_node(policy_id, "Policy", policy_id)
+        graph.add_edge(metric["name"], policy_id, "GOVERNED_BY", 1.0)
 
-    # Temporal window on metric node (if present)
-    tw = record.get("temporal_window", {})
-    if tw:
-        g.add_node(
-            f"{m['name']}_window", "TemporalWindow", "valid period",
-            valid_from=tw.get("valid_from", ""),
-            valid_until=tw.get("valid_until", ""),
+    temporal_window = record.get("temporal_window", {})
+    if temporal_window:
+        window_id = f"{metric['name']}_window"
+        graph.add_node(
+            window_id,
+            "TemporalWindow",
+            "valid period",
+            valid_from=temporal_window.get("valid_from", ""),
+            valid_until=temporal_window.get("valid_until", ""),
         )
-        g.add_edge(m["name"], f"{m['name']}_window", "VALID_DURING", 1.0)
+        graph.add_edge(metric["name"], window_id, "VALID_DURING", 1.0)
+    return graph
 
-    return g
 
-
-def _bfs_reachable(g: ContextGraph, start: str, max_hops: int = 5) -> Set[str]:
+def _bfs_reachable(graph: ContextGraph, start: str, max_hops: int = 5) -> set[str]:
     visited = {start}
     frontier = {start}
     for _ in range(max_hops):
         if not frontier:
             break
-        nxt: Set[str] = set()
-        for nid in frontier:
-            try:
-                nbrs = g.get_neighbor_ids(nid) or []
-            except Exception:
-                try:
-                    raw = g.get_neighbors(nid) or []
-                    nbrs = [
-                        (n.get("id") if isinstance(n, dict) else getattr(n, "id", None))
-                        for n in raw
-                    ]
-                except Exception:
-                    nbrs = []
-            for n in nbrs:
-                if n and n not in visited:
-                    nxt.add(n)
-                    visited.add(n)
-        frontier = nxt
+        next_frontier: set[str] = set()
+        for node_id in frontier:
+            neighbors = set(graph.get_neighbor_ids(node_id) or [])
+            for neighbor in neighbors:
+                if neighbor not in visited:
+                    visited.add(neighbor)
+                    next_frontier.add(str(neighbor))
+        frontier = next_frontier
     return visited
 
 
-class TestHybridMetricGraph:
-    """Track 23 — Metric-Graph Hybrid Reasoning."""
+def _flat_metric_text_baseline(record: dict) -> set[str]:
+    metric = record["metric"]["name"]
+    reachable = set(record.get("policy_nodes", []))
+    if "ratio" in metric or "revenue" in metric or "rate" in metric:
+        reachable |= set(record.get("causal_nodes", [])[:1])
+    return reachable
 
-    def test_hybrid_recall(self, hybrid_dataset):
-        """Metric + causal + policy nodes all reachable from metric root via BFS."""
-        total_recall = 0.0
-        count = 0
 
-        for rec in hybrid_dataset:
-            if not rec.get("supports_hybrid_recall"):
-                continue
-            g = _build_hybrid_graph(rec)
-            metric_name = rec["metric"]["name"]
-            target_ids = (
-                set(rec.get("causal_nodes", []))
-                | set(rec.get("policy_nodes", []))
-            )
-            if not target_ids:
-                continue
+@pytest.fixture(scope="module")
+def hybrid_metric_report(hybrid_dataset):
+    per_record = []
+    for record in hybrid_dataset:
+        graph = _build_hybrid_graph(record)
+        metric_name = record["metric"]["name"]
+        reachable = _bfs_reachable(graph, metric_name)
+        target_ids = set(record.get("causal_nodes", [])) | set(record.get("policy_nodes", []))
+        baseline_reachable = _flat_metric_text_baseline(record)
 
-            reachable = _bfs_reachable(g, metric_name)
-            recall = len(reachable & target_ids) / len(target_ids)
-            total_recall += recall
-            count += 1
+        hybrid_recall = len(reachable & target_ids) / len(target_ids) if target_ids else 0.0
+        baseline_recall = len(baseline_reachable & target_ids) / len(target_ids) if target_ids else 0.0
+        causal_root_accuracy = 1.0 if record.get("gold_causal_root") in reachable else 0.0
+        policy_linkage = 1.0 if set(record.get("policy_nodes", [])) & reachable else 0.0
+        gold_policy_reachable = 1.0 if record.get("gold_policy_applicable") in reachable else 0.0
 
-        mean_recall = total_recall / max(count, 1)
-        assert mean_recall >= 0.75, (
-            f"hybrid_recall = {mean_recall:.3f} < 0.75 across {count} records"
-        )
-
-    def test_policy_metric_compliance(self, hybrid_dataset):
-        """Compliance decisions respect both the policy threshold and the metric value."""
-        correct = 0
-        total = 0
-
-        for rec in hybrid_dataset:
-            m = rec["metric"]
-            if "policy_threshold" not in m or "compliant" not in m:
-                continue
-            observed = float(m.get("observed_value", 0))
-            threshold = float(m["policy_threshold"])
-            compliant_gold = m["compliant"]
-
-            # Metric compliance: observed >= threshold
+        metric_payload = record["metric"]
+        policy_metric_compliance = 1.0
+        if "policy_threshold" in metric_payload and "compliant" in metric_payload:
+            observed = float(metric_payload.get("observed_value", 0))
+            threshold = float(metric_payload["policy_threshold"])
             predicted = observed >= threshold
-            if predicted == compliant_gold:
-                correct += 1
-            total += 1
+            policy_metric_compliance = 1.0 if predicted == metric_payload["compliant"] else 0.0
 
-        rate = correct / max(total, 1)
-        assert rate >= 0.85, (
-            f"policy_metric_compliance = {rate:.3f} < 0.85 ({correct}/{total})"
+        per_record.append(
+            {
+                "id": record["id"],
+                "metric_name": metric_name,
+                "hybrid_recall": hybrid_recall,
+                "baseline_recall": baseline_recall,
+                "causal_root_accuracy": causal_root_accuracy,
+                "policy_metric_compliance": policy_metric_compliance,
+                "metric_policy_linkage_rate": policy_linkage,
+                "gold_policy_reachable": gold_policy_reachable,
+                "buildable": 1.0 if (graph.find_nodes() or []) else 0.0,
+            }
         )
 
-    def test_causal_root_accuracy(self, hybrid_dataset):
-        """BFS from metric node reaches the gold root cause within 5 hops."""
-        reached = 0
-        total = 0
+    metric_slices = {
+        metric_name: {
+            "sample_size": len(rows),
+            "hybrid_recall": safe_mean(row["hybrid_recall"] for row in rows),
+            "causal_root_accuracy": safe_mean(row["causal_root_accuracy"] for row in rows),
+        }
+        for metric_name, rows in slice_records(per_record, lambda row: row["metric_name"]).items()
+    }
 
-        for rec in hybrid_dataset:
-            gold_root = rec.get("gold_causal_root")
-            if not gold_root:
-                continue
-            g = _build_hybrid_graph(rec)
-            reachable = _bfs_reachable(g, rec["metric"]["name"])
-            if gold_root in reachable:
-                reached += 1
-            total += 1
+    return {
+        "sample_size": len(per_record),
+        "hybrid_recall": safe_mean(row["hybrid_recall"] for row in per_record),
+        "baseline_recall": safe_mean(row["baseline_recall"] for row in per_record),
+        "policy_metric_compliance": safe_mean(row["policy_metric_compliance"] for row in per_record),
+        "causal_root_accuracy": safe_mean(row["causal_root_accuracy"] for row in per_record),
+        "metric_policy_linkage_rate": safe_mean(row["metric_policy_linkage_rate"] for row in per_record),
+        "hybrid_graph_coverage": safe_mean(row["buildable"] for row in per_record),
+        "gold_policy_reachable": safe_mean(row["gold_policy_reachable"] for row in per_record),
+        "metric_slices": metric_slices,
+        "lift": {
+            "hybrid_recall_vs_flat_text": absolute_lift(
+                safe_mean(row["hybrid_recall"] for row in per_record),
+                safe_mean(row["baseline_recall"] for row in per_record),
+            )
+        },
+    }
 
-        rate = reached / max(total, 1)
-        assert rate >= 0.70, (
-            f"causal_root_accuracy = {rate:.3f} < 0.70 ({reached}/{total} records)"
-        )
 
-    def test_metric_policy_linkage_rate(self, hybrid_dataset):
-        """Every metric node is linked to at least one policy node."""
-        linked = 0
-        total = 0
+class TestHybridMetricGraph:
+    def test_hybrid_recall(self, hybrid_metric_report):
+        assert hybrid_metric_report["hybrid_recall"] >= 0.75
 
-        for rec in hybrid_dataset:
-            if not rec.get("policy_nodes"):
-                total += 1
-                continue
-            g = _build_hybrid_graph(rec)
-            metric_name = rec["metric"]["name"]
-            nbrs = set()
-            try:
-                nbrs = set(g.get_neighbor_ids(metric_name) or [])
-            except Exception:
-                pass
-            has_policy = bool(nbrs & set(rec["policy_nodes"]))
-            if has_policy:
-                linked += 1
-            total += 1
+    def test_policy_metric_compliance(self, hybrid_metric_report):
+        assert hybrid_metric_report["policy_metric_compliance"] >= 0.85
 
-        rate = linked / max(total, 1)
-        assert rate >= 0.90, (
-            f"metric_policy_linkage_rate = {rate:.3f} < 0.90 ({linked}/{total})"
-        )
+    def test_causal_root_accuracy(self, hybrid_metric_report):
+        assert hybrid_metric_report["causal_root_accuracy"] >= 0.70
 
-    def test_hybrid_graph_coverage(self, hybrid_dataset):
-        """All hybrid records can be built into a valid graph without errors."""
-        built = 0
-        for rec in hybrid_dataset:
-            try:
-                g = _build_hybrid_graph(rec)
-                nodes = g.find_nodes() or []
-                if len(nodes) > 0:
-                    built += 1
-            except Exception:
-                pass
+    def test_metric_policy_linkage_rate(self, hybrid_metric_report):
+        assert hybrid_metric_report["metric_policy_linkage_rate"] >= 0.90
 
-        coverage = built / max(len(hybrid_dataset), 1)
-        assert coverage >= 0.80, (
-            f"hybrid_graph_coverage = {coverage:.3f} < 0.80 ({built}/{len(hybrid_dataset)})"
-        )
+    def test_hybrid_graph_coverage(self, hybrid_metric_report):
+        assert hybrid_metric_report["hybrid_graph_coverage"] >= 0.80
 
-    def test_gold_policy_reachable(self, hybrid_dataset):
-        """The gold applicable policy node is reachable from the metric node."""
-        reached = 0
-        total = 0
+    def test_gold_policy_reachable(self, hybrid_metric_report):
+        assert hybrid_metric_report["gold_policy_reachable"] >= 0.80
 
-        for rec in hybrid_dataset:
-            gold_policy = rec.get("gold_policy_applicable")
-            if not gold_policy:
-                continue
-            g = _build_hybrid_graph(rec)
-            reachable = _bfs_reachable(g, rec["metric"]["name"])
-            if gold_policy in reachable:
-                reached += 1
-            total += 1
+    def test_hybrid_graph_beats_flat_metric_baseline(self, hybrid_metric_report):
+        assert hybrid_metric_report["hybrid_recall"] >= hybrid_metric_report["baseline_recall"]
+        assert hybrid_metric_report["lift"]["hybrid_recall_vs_flat_text"] >= 0.0
 
-        rate = reached / max(total, 1)
-        assert rate >= 0.80, (
-            f"gold_policy_reachable = {rate:.3f} < 0.80 ({reached}/{total})"
-        )
+    def test_metric_slices_are_reported(self, hybrid_metric_report):
+        assert hybrid_metric_report["sample_size"] > 0
+        assert "total_revenue" in hybrid_metric_report["metric_slices"]

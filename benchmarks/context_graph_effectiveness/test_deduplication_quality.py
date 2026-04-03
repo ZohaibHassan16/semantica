@@ -1,78 +1,114 @@
-import pytest
+from __future__ import annotations
+
+from benchmarks.context_graph_effectiveness.metrics import precision_recall_f1
 from benchmarks.context_graph_effectiveness.thresholds import THRESHOLDS
+from semantica.deduplication.cluster_builder import ClusterBuilder
+from semantica.deduplication.entity_merger import EntityMerger
+from semantica.deduplication.similarity_calculator import SimilarityCalculator
 
-def test_duplicate_detection_recall():
-    """
-    Fraction of injected duplicate pairs detected at threshold=0.8.
-    """
-    try:
-        from semantica.deduplication.duplicate_detector import DuplicateDetector
-        detector = DuplicateDetector()
-    except Exception:
-        pass
-    recall = 0.90
-    assert recall >= 0.85
 
-def test_duplicate_detection_precision():
-    """
-    Fraction of flagged pairs that are true duplicates.
-    """
-    precision = 0.95
-    assert precision > 0.85
+def _entity_text(entity: dict) -> str:
+    return str(entity.get("title") or entity.get("name") or entity.get("authors") or entity.get("manufacturer") or entity.get("id"))
 
-def test_f1_by_similarity_method():
-    """
-    Compare Levenshtein vs. Jaro-Winkler vs. cosine vs. multi-factor; 
-    multi-factor should dominate.
-    """
-    try:
-        from semantica.deduplication.similarity_calculator import SimilarityCalculator
-        calc = SimilarityCalculator()
-    except Exception:
-        pass
-    multi_factor_f1 = 0.92
-    assert multi_factor_f1 >= THRESHOLDS["duplicate_detection_f1"]
 
-def test_cluster_quality():
-    """
-    NMI of union-find clusters vs. ground-truth entity groups.
-    """
-    try:
-        from semantica.deduplication.cluster_builder import ClusterBuilder
-        builder = ClusterBuilder()
-    except Exception:
-        pass
-    nmi = 0.90
-    assert nmi > 0.85
+def _augment(entity: dict) -> dict:
+    augmented = dict(entity)
+    augmented.setdefault("name", _entity_text(entity))
+    augmented.setdefault("type", "Entity")
+    return augmented
+
+
+def _evaluate_pairs(dataset: dict, limit: int = 200) -> tuple[float, float, float]:
+    calculator = SimilarityCalculator(similarity_threshold=0.75)
+    pairs = dataset["pairs"][:limit]
+    expected = []
+    predicted = []
+    for pair in pairs:
+        result = calculator.calculate_similarity(_augment(pair["entity1"]), _augment(pair["entity2"]), track=False)
+        expected.append(bool(pair["is_duplicate"]))
+        predicted.append(result.score >= 0.75)
+    return precision_recall_f1(expected, predicted)
+
+
+def test_duplicate_detection_recall(dedup_dblp_acm_dataset):
+    _, recall, _ = _evaluate_pairs(dedup_dblp_acm_dataset)
+    assert recall >= THRESHOLDS["duplicate_detection_recall"][1]
+
+
+def test_duplicate_detection_precision(dedup_dblp_acm_dataset):
+    precision, _, _ = _evaluate_pairs(dedup_dblp_acm_dataset)
+    assert precision >= THRESHOLDS["duplicate_detection_precision"][1]
+
+
+def test_f1_by_similarity_method(dedup_amazon_google_dataset):
+    _, _, f1 = _evaluate_pairs(dedup_amazon_google_dataset)
+    assert f1 >= THRESHOLDS["duplicate_detection_f1"][1]
+
+
+def test_cluster_quality(dedup_abt_buy_dataset):
+    entities = [
+        {"id": "a1", "name": "Apple Inc.", "type": "Company"},
+        {"id": "a2", "name": "Apple", "type": "Company"},
+        {"id": "g1", "name": "Google LLC", "type": "Company"},
+        {"id": "g2", "name": "Google", "type": "Company"},
+        {"id": "m1", "name": "Microsoft Corporation", "type": "Company"},
+        {"id": "m2", "name": "Microsoft", "type": "Company"},
+        {"id": "banana", "name": "Banana Republic", "type": "Brand"},
+    ]
+    gold_pairs = {
+        tuple(sorted(("a1", "a2"))),
+        tuple(sorted(("g1", "g2"))),
+        tuple(sorted(("m1", "m2"))),
+    }
+
+    builder = ClusterBuilder(similarity_threshold=0.75)
+    result = builder.build_clusters(entities)
+    clustered_pairs = set()
+    for cluster in result.clusters:
+        ids = [entity["id"] for entity in cluster.entities]
+        for index, left in enumerate(ids):
+            for right in ids[index + 1 :]:
+                clustered_pairs.add(tuple(sorted((left, right))))
+
+    assert clustered_pairs, "Cluster builder returned no clusters on obvious duplicate sample"
+    purity = len(clustered_pairs & gold_pairs) / len(clustered_pairs)
+    coverage = len(clustered_pairs & gold_pairs) / len(gold_pairs)
+    assert purity >= 0.50
+    assert coverage >= 0.67
+
 
 def test_merge_strategy_keep_most_complete():
-    """
-    merged entity should have the union of all non-null properties.
-    """
-    try:
-        from semantica.deduplication.merge_strategy import MergeStrategy
-        strategy = MergeStrategy()
-    except Exception:
-        pass
-    union_successful = True
-    assert union_successful
+    merger = EntityMerger(preserve_provenance=True)
+    entities = [
+        {"id": "1", "name": "Apple Inc.", "type": "Company", "industry": "Technology"},
+        {"id": "2", "name": "Apple", "type": "Company", "website": "apple.com", "hq": "Cupertino"},
+    ]
+    operations = merger.merge_duplicates(entities, strategy="keep_most_complete", threshold=0.75)
+    assert operations, "Expected at least one merge operation"
+    merged = operations[0].merged_entity
+    assert set(merged.get("merged_from", [])) >= {"1", "2"}
+    assert merged.get("name") in {"Apple Inc.", "Apple"}
+
 
 def test_provenance_preservation():
-    """
-    merged entity's metadata should reference all source entities.
-    """
-    try:
-        from semantica.deduplication.entity_merger import EntityMerger
-        merger = EntityMerger()
-    except Exception:
-        pass
-    preservation_successful = True
-    assert preservation_successful
+    merger = EntityMerger(preserve_provenance=True)
+    entities = [
+        {"id": "1", "name": "Apple Inc.", "type": "Company"},
+        {"id": "2", "name": "Apple", "type": "Company"},
+    ]
+    operations = merger.merge_duplicates(entities, strategy="merge_all", threshold=0.75)
+    assert operations, "Expected merge operation to preserve provenance"
+    merged_sources = operations[0].merged_entity.get("merged_from", [])
+    assert set(merged_sources) >= {"1", "2"}
+
 
 def test_incremental_detection_efficiency():
-    """
-    O(n×m) new-vs-existing comparison should be faster than O(n²) 
-    all-pairs for large N.
-    """
-    faster = True
-    assert faster
+    calculator = SimilarityCalculator()
+    new_entity = {"id": "new", "name": "Apple Inc.", "type": "Company"}
+    existing = [
+        {"id": "1", "name": "Apple", "type": "Company"},
+        {"id": "2", "name": "Microsoft", "type": "Company"},
+        {"id": "3", "name": "Google", "type": "Company"},
+    ]
+    scores = [calculator.calculate_similarity(new_entity, entity, track=False).score for entity in existing]
+    assert max(scores) == scores[0]

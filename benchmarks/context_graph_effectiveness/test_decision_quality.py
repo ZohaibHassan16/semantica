@@ -1,97 +1,135 @@
+from __future__ import annotations
+
 import pytest
+
+from benchmarks.context_graph_effectiveness.metrics import normalize_decision_label
 from benchmarks.context_graph_effectiveness.thresholds import THRESHOLDS
-from semantica.context import ContextRetriever
+from semantica.context import ContextGraph
 
-def lightweight_ner(text: str) -> list[str]:
-    """
-    Mock NER for hallucination rate calculation.
-    """
-    return ["D"]
+pytestmark = pytest.mark.real_llm
 
-def hallucination_rate(agent_output: str, graph_nodes: list[dict]) -> float:
-    """
-    Approximation of hallucination rate for mock runs.
-    """
-    entities = lightweight_ner(agent_output)
-    known = {n.get("id") for n in graph_nodes}
-    hallucinated = [e for e in entities if e not in known]
-    return len(hallucinated) / max(len(entities), 1)
 
-def test_decision_accuracy_delta(mock_llm, qa_dataset, synthetic_graph_factory):
-    """
-    Test if context graph injection improves agent decision accuracy 
-    compared to no context.
-    """
-    graph = synthetic_graph_factory.create_diamond_chain()
-    retriever = ContextRetriever(knowledge_graph=graph)
+def _build_context_graph(record: dict) -> ContextGraph:
+    graph = ContextGraph(advanced_analytics=True)
+    graph.add_node(record["id"], "Scenario", content=record["scenario"], domain=record["domain"])
 
-    # Run baseline (no context)
-    baseline_prompt = "What caused D?"
-    baseline_resp = mock_llm.predict(baseline_prompt)
-    baseline_accuracy = 0.50
-    
-    # Run with context graph
-    context_items = retriever.retrieve("D", max_results=5)
-    context_str = "\n".join(item.content for item in context_items)
-    context_prompt = f"Context: {context_str}\n\nQuestion: What caused D?"
-    context_resp = mock_llm.predict(context_prompt)
-    
+    for node in record.get("context_graph", {}).get("nodes", []):
+        node_id = node["id"]
+        label = node.get("label") or node_id
+        metadata = {k: v for k, v in node.items() if k not in {"id", "type", "label"}}
+        graph.add_node(node_id, node["type"], content=label, **metadata)
+        graph.add_edge(record["id"], node_id, "CONTEXT_FOR", weight=1.0)
 
-    context_accuracy = 0.85 if len(context_items) > 0 else 0.50
-    
-    decision_accuracy_delta = context_accuracy - baseline_accuracy
-    assert decision_accuracy_delta > THRESHOLDS["decision_accuracy_delta"]
+    for edge in record.get("context_graph", {}).get("edges", []):
+        graph.add_edge(edge["source"], edge["target"], edge["type"], weight=edge.get("weight", 1.0))
 
-def test_hallucination_rate_delta(mock_llm, qa_dataset, synthetic_graph_factory):
-    """
-    Test if context graph injection reduces hallucination rate.
-    """
-    graph = synthetic_graph_factory.create_diamond_chain()
-    retriever = ContextRetriever(knowledge_graph=graph)
-    context_items = retriever.retrieve("D", max_results=5)
+    return graph
 
-    baseline_hallucinations = 0.40
-   
-    retrieved_graph_nodes = [{"id": r.metadata.get("node_id")} for r in context_items if "node_id" in r.metadata]
-    
-   
-    context_hallucinations = hallucination_rate("A", retrieved_graph_nodes) if not retrieved_graph_nodes else 0.05
-    
-    hallucination_rate_delta = baseline_hallucinations - context_hallucinations
-    assert hallucination_rate_delta > THRESHOLDS["hallucination_rate_delta"]
 
-def test_citation_groundedness(mock_llm, qa_dataset, synthetic_graph_factory):
-    """
-    Test fraction of agent claims traceable to a context node.
-    """
-    graph = synthetic_graph_factory.create_diamond_chain()
-    retriever = ContextRetriever(knowledge_graph=graph)
-    context_items = retriever.retrieve("D", max_results=5)
-    
-    prompt = "Based on the context, what caused D?"
-    agent_output = mock_llm.predict(prompt)
-    
-   
-    entities = lightweight_ner(agent_output)
-    known_entities = {r.metadata.get("node_id", r.content) for r in context_items}
-    
-    grounded_claims = [e for e in entities if e in known_entities]
-    
-    citation_groundedness = len(grounded_claims) / max(len(entities), 1) if context_items else 0.95
-    assert citation_groundedness >= THRESHOLDS.get("citation_groundedness", 0.90)
+def _render_context(record: dict) -> str:
+    lines = [f"Scenario: {record['scenario']}"]
+    for node in record.get("context_graph", {}).get("nodes", []):
+        details = []
+        if "rules" in node:
+            details.append(f"rules={node['rules']}")
+        if "outcome" in node:
+            details.append(f"outcome={node['outcome']}")
+        lines.append(f"- {node['type']} {node['id']}: {node.get('label', node['id'])} {' '.join(details)}".strip())
+    lines.append(f"Applicable policies: {', '.join(record.get('applicable_policy_ids', [])) or 'none'}")
+    return "\n".join(lines)
 
-def test_policy_compliance_rate(mock_llm, qa_dataset, synthetic_graph_factory):
-    """
-    Test fraction of decisions that satisfy applicable policies 
-    when context is injected.
-    """
-    graph = synthetic_graph_factory.create_diamond_chain()
-    
-   
-    prompt = "Make a decision regarding node B."
-    decision_output = mock_llm.predict(prompt)
-   
-    is_compliant = "Mock deterministic" in decision_output 
-    compliance_rate = 1.0 if is_compliant else 0.0
-    
-    assert compliance_rate >= THRESHOLDS.get("policy_compliance_hit_rate", 0.90)
+
+def _baseline_prompt(record: dict) -> str:
+    return (
+        "Decide APPROVE, REJECT, or ESCALATE. Respond with one label and a short reason.\n"
+        f"Scenario: {record['scenario']}"
+    )
+
+
+def _context_prompt(record: dict) -> str:
+    return (
+        "Decide APPROVE, REJECT, or ESCALATE. Use the context graph evidence. "
+        "Respond with one label and a short reason.\n"
+        f"{_render_context(record)}"
+    )
+
+
+def _hallucination_rate(response: str, allowed_terms: set[str]) -> float:
+    tokens = {token.strip(".,:;()[]{}\"'").lower() for token in response.split() if len(token) > 3}
+    if not tokens:
+        return 0.0
+    unsupported = [token for token in tokens if token not in allowed_terms]
+    return len(unsupported) / len(tokens)
+
+
+def _allowed_terms(record: dict) -> set[str]:
+    allowed = set(record["scenario"].lower().replace("%", " ").replace("$", " ").replace(",", " ").split())
+    allowed.update(record.get("ground_truth_reasoning", "").lower().split())
+    for policy_id in record.get("applicable_policy_ids", []):
+        allowed.update(policy_id.lower().split("_"))
+    for node in record.get("context_graph", {}).get("nodes", []):
+        allowed.update(str(node.get("label", "")).lower().split())
+        allowed.update(str(node.get("outcome", "")).lower().split())
+    allowed.update({"approve", "reject", "escalate", "policy", "context", "review", "manual"})
+    return {token for token in allowed if token}
+
+
+def _evaluate_record(real_llm, record: dict) -> dict[str, object]:
+    _build_context_graph(record)
+    baseline_response = real_llm.generate(_baseline_prompt(record))
+    context_response = real_llm.generate(_context_prompt(record))
+
+    gold = normalize_decision_label(record["ground_truth_decision"])
+    baseline_label = normalize_decision_label(baseline_response)
+    context_label = normalize_decision_label(context_response)
+
+    allowed_terms = _allowed_terms(record)
+    return {
+        "gold": gold,
+        "baseline_correct": baseline_label == gold,
+        "context_correct": context_label == gold,
+        "baseline_hallucination": _hallucination_rate(baseline_response, allowed_terms),
+        "context_hallucination": _hallucination_rate(context_response, allowed_terms),
+        "context_response": context_response,
+        "baseline_response": baseline_response,
+    }
+
+
+def test_decision_accuracy_delta(real_llm, decision_dataset):
+    sample = decision_dataset["records"][:12]
+    outcomes = [_evaluate_record(real_llm, record) for record in sample]
+    baseline_accuracy = sum(1 for item in outcomes if item["baseline_correct"]) / len(outcomes)
+    context_accuracy = sum(1 for item in outcomes if item["context_correct"]) / len(outcomes)
+    assert context_accuracy - baseline_accuracy > THRESHOLDS["decision_accuracy_delta"][1]
+
+
+def test_hallucination_rate_delta(real_llm, decision_dataset):
+    sample = decision_dataset["records"][:12]
+    outcomes = [_evaluate_record(real_llm, record) for record in sample]
+    baseline_rate = sum(item["baseline_hallucination"] for item in outcomes) / len(outcomes)
+    context_rate = sum(item["context_hallucination"] for item in outcomes) / len(outcomes)
+    assert baseline_rate - context_rate > THRESHOLDS["hallucination_rate_delta"][1]
+
+
+def test_citation_groundedness(real_llm, decision_dataset):
+    sample = decision_dataset["records"][:8]
+    grounded = []
+    for record in sample:
+        outcome = _evaluate_record(real_llm, record)
+        response = outcome["context_response"].lower()
+        context_terms = _allowed_terms(record)
+        tokens = [token.strip(".,:;()[]{}\"'") for token in response.split() if len(token) > 3]
+        if not tokens:
+            grounded.append(0.0)
+            continue
+        supported = sum(1 for token in tokens if token in context_terms)
+        grounded.append(supported / len(tokens))
+    citation_groundedness = sum(grounded) / len(grounded)
+    assert citation_groundedness >= THRESHOLDS["citation_groundedness"][1]
+
+
+def test_policy_compliance_rate(real_llm, decision_dataset):
+    sample = decision_dataset["records"][:12]
+    outcomes = [_evaluate_record(real_llm, record) for record in sample]
+    compliance_rate = sum(1 for item in outcomes if item["context_correct"]) / len(outcomes)
+    assert compliance_rate >= THRESHOLDS["policy_compliance_rate"][1]

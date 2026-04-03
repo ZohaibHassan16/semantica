@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- **Benchmark documentation correction**:
+  - The Context Graph Effectiveness suite is a manual benchmark suite and is not part of CI merge gating.
+  - Benchmark reporting has been tightened so only tracks rerun with measurement-based assertions should be presented as `measured`.
+  - Real-LLM tracks such as decision quality and skill injection are auxiliary manual benchmarks and should not be summarized as deterministic offline results.
+  - Remaining semantic-layer and aggregate benchmark tracks are under audit until all placeholder-style assertions are removed.
+
 - **Context Graph Effectiveness Benchmark Suite — 20 Tracks** (PR #418 by @ZohaibHassan16, extended by @KaifAhmad1):
   - **Infrastructure**: `benchmarks/context_graph_effectiveness/` with `conftest.py` (session-scoped dataset fixtures for 28 real-world corpora), `thresholds.py` (54 evidence-based pass/fail thresholds with `check_thresholds()` CI helper), `benchmarks_runner.py` extended with `--effectiveness` flag running the full suite as plain pytest.
   - **28 real-world fixture datasets** committed under `benchmarks/context_graph_effectiveness/fixtures/` — zero network access at test time:
@@ -1167,7 +1173,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+\#\#\ \[Unreleased]\r\n\r\n-\ \*\*Benchmark\ documentation\ correction\*\*:\r\n\ \ -\ The\ Context\ Graph\ Effectiveness\ suite\ is\ a\ manual\ benchmark\ suite\ and\ is\ not\ part\ of\ CI\ merge\ gating\.\r\n\ \ -\ Benchmark\ reporting\ has\ been\ tightened\ so\ only\ tracks\ rerun\ with\ measurement-based\ assertions\ should\ be\ presented\ as\ measured\.\r\n\ \ -\ Real-LLM\ tracks\ such\ as\ decision\ quality\ and\ skill\ injection\ are\ auxiliary\ manual\ benchmarks\ and\ should\ not\ be\ summarized\ as\ deterministic\ offline\ results\.\r\n\ \ -\ Remaining\ semantic-layer\ and\ aggregate\ benchmark\ tracks\ are\ under\ audit\ until\ all\ placeholder-style\ assertions\ are\ removed\.\r\n
 
 - Fixed: PolicyEngine latest version selection on ContextGraph; AgentContext fallback robustness and secure logging (PR #TBD by @KaifAhmad1)
 - Tests: Added ContextGraph fallback and AgentContext smoke tests; full suite passing
@@ -1714,7 +1720,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+\#\#\ \[Unreleased]\r\n\r\n-\ \*\*Benchmark\ documentation\ correction\*\*:\r\n\ \ -\ The\ Context\ Graph\ Effectiveness\ suite\ is\ a\ manual\ benchmark\ suite\ and\ is\ not\ part\ of\ CI\ merge\ gating\.\r\n\ \ -\ Benchmark\ reporting\ has\ been\ tightened\ so\ only\ tracks\ rerun\ with\ measurement-based\ assertions\ should\ be\ presented\ as\ measured\.\r\n\ \ -\ Real-LLM\ tracks\ such\ as\ decision\ quality\ and\ skill\ injection\ are\ auxiliary\ manual\ benchmarks\ and\ should\ not\ be\ summarized\ as\ deterministic\ offline\ results\.\r\n\ \ -\ Remaining\ semantic-layer\ and\ aggregate\ benchmark\ tracks\ are\ under\ audit\ until\ all\ placeholder-style\ assertions\ are\ removed\.\r\n
 
 - Fixed: PolicyEngine latest version selection on ContextGraph; AgentContext fallback robustness and secure logging (PR #TBD by @KaifAhmad1)
 - Tests: Added ContextGraph fallback and AgentContext smoke tests; full suite passing
@@ -2253,4 +2259,6 @@ When breaking changes are introduced, migration guides will be provided in the r
 ---
 
 For detailed release notes, see [GitHub Releases](https://github.com/Hawksight-AI/semantica/releases).
+
+
 
