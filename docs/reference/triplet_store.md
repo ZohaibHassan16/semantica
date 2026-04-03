@@ -206,6 +206,45 @@ LIMIT 10
 """
 results = store.execute_query(query)
 ```
+
+### Named Graph Partitions
+
+Use named graphs to partition RDF data inside one store while keeping backward compatibility.
+
+```python
+from semantica.semantic_extract.triplet_extractor import Triplet
+
+# Write into a specific graph partition
+store.add_triplet(
+    Triplet("http://entity/1", "http://relation/type", "http://TypeA"),
+    graph="http://example.org/graphs/partition-a",
+)
+
+# Query only one graph as default dataset
+result_a = store.execute_query(
+    "SELECT ?s ?p ?o WHERE { ?s ?p ?o }",
+    graph="http://example.org/graphs/partition-a",
+)
+
+# Query multiple named graphs (use GRAPH pattern in WHERE)
+result_multi = store.execute_query(
+    """
+    SELECT ?g ?s ?p ?o WHERE {
+      GRAPH ?g { ?s ?p ?o }
+    }
+    """,
+    graphs=[
+        "http://example.org/graphs/partition-a",
+        "http://example.org/graphs/partition-b",
+    ],
+)
+```
+
+Notes:
+- `graph` injects `FROM <...>` before `WHERE`.
+- `graphs` injects `FROM NAMED <...>` before `WHERE`.
+- If not provided, existing behavior is unchanged.
+
 ### Alignment-Aware Queries
 
 In complex enterprise environments with multiple data sources, you may want queries to seamlessly retrieve instances across aligned classes. For example, retrieving all http://schema.org/Person instances when querying for your internal http://internal.org/ontology/Employee class.

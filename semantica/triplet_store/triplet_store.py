@@ -46,6 +46,7 @@ class TripletStore:
     """
 
     SUPPORTED_BACKENDS = {"blazegraph", "jena", "rdf4j"}
+    NAMED_GRAPH_CAPABLE_BACKENDS = {"blazegraph", "rdf4j"}
 
     def __init__(
         self,
@@ -76,7 +77,7 @@ class TripletStore:
 
         self.backend_type = backend.lower()
         self.endpoint = endpoint
-        self.config = config
+        self.config = {**triplet_store_config.get_all(), **config}
 
         # Initialize store backend
         self._store_backend = None
@@ -393,7 +394,12 @@ class TripletStore:
         return self.add_triplet(new_triplet, **options)
 
     def execute_query(
-        self, query: str, parameters: Optional[Dict[str, Any]] = None, **options
+        self,
+        query: str,
+        parameters: Optional[Dict[str, Any]] = None,
+        graph: Optional[str] = None,
+        graphs: Optional[List[str]] = None,
+        **options,
     ) -> Any:
         """
         Execute a SPARQL query.
@@ -401,11 +407,25 @@ class TripletStore:
         Args:
             query: SPARQL query string
             parameters: Query parameters
+            graph: Optional default graph URI for dataset scoping
+            graphs: Optional list of named graph URIs for dataset scoping
             **options: Additional options
 
         Returns:
             Query results (format depends on query type)
         """
+        if graph is not None:
+            options["graph"] = graph
+        if graphs is not None:
+            options["graphs"] = graphs
+
+        enable_named_graphs = self.config.get("enable_named_graphs", True)
+        options.setdefault(
+            "supports_named_graphs",
+            enable_named_graphs
+            and self.backend_type in self.NAMED_GRAPH_CAPABLE_BACKENDS,
+        )
+
         return self.query_engine.execute_query(query, self._store_backend, **options)
 
     def _validate_triplet(self, triplet: Triplet) -> bool:

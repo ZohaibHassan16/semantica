@@ -109,6 +109,7 @@ from collections import defaultdict, deque
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 import threading
+import itertools
 from typing import Any, Dict, List, Optional, Set, Tuple, Union
 import uuid
 
@@ -404,16 +405,19 @@ class ContextGraph:
         count = 0
         with self._lock:
             for edge in edges:
-                # Accept both "properties" (ContextEdge.to_dict format) and "metadata"
-                # (find_edges / build_graph_dict format) so round-trip imports never
-                # silently drop edge metadata.
                 edge_props = edge.get("properties") or edge.get("metadata", {})
-                # Restore validity windows — ContextEdge.to_dict() writes them at top level
                 valid_from = edge.get("valid_from") or edge_props.get("valid_from")
                 valid_until = edge.get("valid_until") or edge_props.get("valid_until")
+                
+                source_id = edge.get("source_id") or edge.get("source")
+                target_id = edge.get("target_id") or edge.get("target")
+
+                if not source_id or not target_id:
+                    continue
+
                 internal_edge = ContextEdge(
-                    source_id=edge.get("source_id"),
-                    target_id=edge.get("target_id"),
+                    source_id=source_id,
+                    target_id=target_id,
                     edge_type=edge.get("type", "related_to"),
                     weight=edge.get("weight", 1.0),
                     metadata=edge_props,
@@ -779,26 +783,31 @@ class ContextGraph:
     def find_nodes(
         self, node_type: Optional[str] = None, skip: int = 0, limit: Optional[int] = None
     ) -> List[Dict[str, Any]]:
-        """Find nodes, optionally filtered by type."""
+        """Find nodes lazily"""
         with self._lock:
             if node_type:
-                node_ids = self.node_type_index.get(node_type, set())
-                nodes = [self.nodes[nid] for nid in node_ids]
+                # Sets are unordered, sort IDs for deterministic pagination.
+                # Guard against non-string IDs (None/int) which cause sorted() TypeError.
+                raw_ids = sorted(
+                    nid for nid in self.node_type_index.get(node_type, set())
+                    if isinstance(nid, str)
+                )
+                source = (self.nodes[nid] for nid in raw_ids if nid in self.nodes)
             else:
-                nodes = list(self.nodes.values())
+                source = self.nodes.values()
 
-            results = [
+            gen = (
                 {
                     "id": n.node_id,
-                    "type": n.node_type,
-                    "content": n.content,
+                    "type": n.node_type or "entity",
+                    "content": n.content or "",
                     "metadata": {**(getattr(n, "metadata", {}) or {}), **(getattr(n, "properties", {}) or {})},
                 }
-                for n in nodes
-            ]
-            if limit is not None:
-                return results[skip: skip + limit]
-            return results[skip:]
+                for n in source if n.node_id
+            )
+            stop = skip + limit if limit is not None else None
+    
+            return list(itertools.islice(gen, skip, stop))
 
     def find_active_nodes(
         self,
@@ -807,46 +816,33 @@ class ContextGraph:
         skip: int = 0,
         limit: Optional[int] = None,
     ) -> List[Dict[str, Any]]:
-        """
-        Find nodes that are currently active within their validity window.
-
-        Nodes without ``valid_from``/``valid_until`` are always considered active.
-
-        Args:
-            node_type: Optional node type filter.
-            at_time: Point in time to evaluate validity (defaults to ``datetime.utcnow()``).
-            skip: Items to skip
-            limit: Max items to return
-
-        Returns:
-            List of active node dicts (same format as :meth:`find_nodes`).
-        """
+        """Find active nodes lazily."""
         now = at_time or datetime.utcnow()
         with self._lock:
             if node_type:
-                node_ids = self.node_type_index.get(node_type, set())
-                nodes_iter = [self.nodes[nid] for nid in node_ids if nid in self.nodes]
+                raw_ids = sorted(
+                    nid for nid in self.node_type_index.get(node_type, set())
+                    if isinstance(nid, str)
+                )
+                source = (self.nodes[nid] for nid in raw_ids if nid in self.nodes)
             else:
-                nodes_iter = list(self.nodes.values())
+                source = self.nodes.values()
 
-            result = []
-            for node in nodes_iter:
-                if node.is_active(now):
-                    result.append(
-                        {
-                            "id": node.node_id,
-                            "type": node.node_type,
-                            "content": node.content,
+            def _active(nodes_iter):
+                for n in nodes_iter:
+                    if n.node_id and n.is_active(now):
+                        yield {
+                            "id": n.node_id,
+                            "type": n.node_type or "entity",
+                            "content": n.content or "",
                             "metadata": {
-                                **(getattr(node, "metadata", {}) or {}),
-                                **(getattr(node, "properties", {}) or {}),
+                                **(getattr(n, "metadata", {}) or {}),
+                                **(getattr(n, "properties", {}) or {}),
                             },
                         }
-                    )
-            
-            if limit is not None:
-                return result[skip: skip + limit]
-            return result[skip:]
+
+            stop = skip + limit if limit is not None else None
+            return list(itertools.islice(_active(source), skip, stop))
 
     def link_graph(
         self,
@@ -981,36 +977,46 @@ class ContextGraph:
     def find_edges(
         self, edge_type: Optional[str] = None, skip: int = 0, limit: Optional[int] = None
     ) -> List[Dict[str, Any]]:
-        """Find edges, optionally filtered by type."""
+        """Find edges lazily."""
         with self._lock:
-            if edge_type:
-                edges = self.edge_type_index.get(edge_type, [])
-            else:
-                edges = self.edges
-
-            results = [
-                {
-                    "source": e.source_id,
-                    "target": e.target_id,
-                    "type": e.edge_type,
-                    "weight": e.weight,
-                    "metadata": e.metadata,
-                }
-                for e in edges
-            ]
+            source = self.edge_type_index.get(edge_type, []) if edge_type else self.edges
             
-            if limit is not None:
-                return results[skip: skip + limit]
-            return results[skip:]
+            gen = (
+                {
+                    "source": e.source_id or "",
+                    "target": e.target_id or "",
+                    "type": e.edge_type or "related_to",
+                    "weight": e.weight if e.weight is not None else 1.0,
+                    "metadata": e.metadata or {},
+                }
+                for e in source if e.source_id and e.target_id
+            )
+            stop = skip + limit if limit is not None else None
+            return list(itertools.islice(gen, skip, stop))
 
     def stats(self) -> Dict[str, Any]:
         """Get graph statistics."""
         with self._lock:
+            # Count only items that find_nodes/find_edges can return, so pagination
+            # totals reported to callers match what the methods actually yield.
+            node_count = sum(1 for n in self.nodes.values() if n.node_id)
+            edge_count = sum(1 for e in self.edges if e.source_id and e.target_id)
+            node_types = {
+                k: sum(
+                    1 for nid in v
+                    if isinstance(nid, str) and nid in self.nodes and self.nodes[nid].node_id
+                )
+                for k, v in self.node_type_index.items()
+            }
+            edge_types = {
+                k: sum(1 for e in v if e.source_id and e.target_id)
+                for k, v in self.edge_type_index.items()
+            }
             return {
-                "node_count": len(self.nodes),
-                "edge_count": len(self.edges),
-                "node_types": {k: len(v) for k, v in self.node_type_index.items()},
-                "edge_types": {k: len(v) for k, v in self.edge_type_index.items()},
+                "node_count": node_count,
+                "edge_count": edge_count,
+                "node_types": node_types,
+                "edge_types": edge_types,
                 "density": self.density(),
             }
 
@@ -1472,25 +1478,85 @@ class ContextGraph:
         }
 
     # Decision Support Methods
-    def add_decision(self, decision: "Decision") -> None:
+    def add_decision(
+        self,
+        decision: "Decision" = None,
+        *,
+        category: str = None,
+        scenario: str = None,
+        reasoning: str = None,
+        outcome: str = None,
+        confidence: float = 0.5,
+        entities: Optional[List[str]] = None,
+        decision_maker: Optional[str] = "system",
+        valid_from=None,
+        valid_until=None,
+        **kwargs,
+    ) -> str:
         """
         Add decision node to graph.
-        
+
+        Accepts either a Decision object or keyword arguments:
+
+            # From a Decision object
+            graph.add_decision(Decision(category="x", scenario="y", ...))
+
+            # From keyword arguments (convenience form)
+            graph.add_decision(category="x", scenario="y", reasoning="z",
+                               outcome="o", confidence=0.9)
+
         Args:
-            decision: Decision object to add
+            decision: Decision object to add (mutually exclusive with kwargs)
+            category: Decision category
+            scenario: Decision scenario description
+            reasoning: Reasoning behind the decision
+            outcome: Decision outcome
+            confidence: Confidence score (0.0–1.0)
+            entities: Related entity labels
+            decision_maker: Who made the decision
+            valid_from: Start of validity window (ISO string or datetime)
+            valid_until: End of validity window (ISO string or datetime)
+            **kwargs: Extra metadata stored on the decision node
+
+        Returns:
+            Decision ID
         """
         from .decision_models import Decision
-        
+
+        if decision is not None and (
+            any(v is not None for v in (
+                category, scenario, reasoning, outcome, entities, valid_from, valid_until,
+            )) or kwargs
+        ):
+            raise ValueError(
+                "Pass either a Decision object or keyword arguments, not both."
+            )
+
+        if decision is None:
+            # Build from kwargs — delegate to record_decision which handles ID gen
+            return self.record_decision(
+                category=category,
+                scenario=scenario,
+                reasoning=reasoning,
+                outcome=outcome,
+                confidence=confidence,
+                entities=entities,
+                decision_maker=decision_maker,
+                valid_from=valid_from,
+                valid_until=valid_until,
+                metadata=kwargs,
+            )
+
         # Handle empty decision ID by generating UUID for both None and empty string
         # This ensures consistent behavior with Decision model's __post_init__ method
         node_id = decision.decision_id if decision.decision_id else str(uuid.uuid4())
-        
+
         # Handle None metadata
         metadata = decision.metadata or {}
-        
+
         # Normalize timestamp to ensure consistent storage format
         normalized_timestamp = self._normalize_timestamp(decision.timestamp)
-        
+
         node = ContextNode(
             node_id=node_id,
             node_type="Decision",
@@ -1510,6 +1576,7 @@ class ContextGraph:
             valid_until=decision.valid_until,
         )
         self._add_internal_node(node)
+        return node_id
 
     def add_causal_relationship(
         self,
