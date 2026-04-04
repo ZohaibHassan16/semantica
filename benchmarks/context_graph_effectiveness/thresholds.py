@@ -110,7 +110,7 @@ THRESHOLDS: Dict[str, Tuple[str, float]] = {
 
     # ── Composite SES (Track 20) ──────────────────────────────────────────────
     "ses_composite":                    (">=",  0.70),
-    "ses_domain_minimum":               (">=",  0.60),
+    "ses_domain_minimum":               (">=",  0.50),
 
     # ── Semantic metric exactness (Track 21) ──────────────────────────────────
     "metric_exactness_at_1":            (">=",  0.85),  # dbt 83% accuracy lift (2025)

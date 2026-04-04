@@ -9,6 +9,7 @@ The suite is intentionally hybrid:
 - **Manual real-LLM auxiliary layer** for prompt-time lift, policy-grounding, and semantic-layer behavior
 
 Benchmarks are manual and offline by design. They are not part of CI and should not block merges.
+The effectiveness runner now supports explicit run modes and can emit a machine-readable JSON summary for each run.
 
 ## Current Validation Status
 
@@ -16,6 +17,13 @@ Latest offline deterministic validation run:
 
 ```bash
 pytest benchmarks/context_graph_effectiveness/ -m "not real_llm" -q
+```
+
+Equivalent runner command with summary artifact:
+
+```bash
+python benchmarks/benchmarks_runner.py --effectiveness --effectiveness-mode offline \
+  --effectiveness-report-json benchmarks/results/effectiveness_offline.json
 ```
 
 Observed result on April 3, 2026:
@@ -38,6 +46,7 @@ This result is the current reference point for the offline benchmark core. Real-
 - Major tracks should report baselines, slice breakdowns, and sample sizes.
 - Mock LLMs are acceptable for shape tests, not for headline effectiveness claims.
 - Any benchmark that cannot yet be measured honestly should be marked `partial` or `skipped`.
+- Published benchmark summaries should be derived from measured artifacts, not hand-edited pass/fail claims.
 
 ## Benchmark Families
 

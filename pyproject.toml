@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "semantica"
 version = "0.3.0"
-description = "🧠 Semantica - An Open Source Framework for building Semantic Layers and Knowledge Engineering"
+description = "🧠 Semantica - A Framework for building Context Graphs and Decision Intelligence Layers for AI"
 readme = "README.md"
 license = { text = "MIT" }
 
@@ -240,4 +240,6 @@ testpaths = ["tests"]
 markers = [
     "integration: marks tests that require external services or API keys (deselect with '-m not integration')",
     "real_llm: marks tests that require SEMANTICA_REAL_LLM=1 and ANTHROPIC_API_KEY (weekly CI only, skip with '-m not real_llm')",
+    "effectiveness_offline: deterministic effectiveness benchmark path intended for reproducible local or CI runs",
+    "effectiveness_optional: effectiveness benchmark path that depends on optional modules or environment-specific capabilities",
 ]

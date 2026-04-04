@@ -1,11 +1,38 @@
 import argparse
+import json
 import os
+import re
 import subprocess
 import sys
 from datetime import datetime
 
 
-def run_effectiveness_suite(strict: bool = False) -> int:
+def _effectiveness_marker_expr(mode: str) -> str:
+    if mode == "offline":
+        return "not real_llm and not effectiveness_optional"
+    if mode == "optional":
+        return "effectiveness_optional and not real_llm"
+    if mode == "real_llm":
+        return "real_llm"
+    if mode == "all":
+        return ""
+    raise ValueError(f"Unsupported effectiveness mode: {mode}")
+
+
+def _parse_pytest_summary(output: str) -> dict[str, int]:
+    summary = {"passed": 0, "failed": 0, "skipped": 0, "deselected": 0, "errors": 0}
+    for key in summary:
+        match = re.search(rf"(\d+)\s+{key}", output)
+        if match:
+            summary[key] = int(match.group(1))
+    return summary
+
+
+def run_effectiveness_suite(
+    strict: bool = False,
+    mode: str = "offline",
+    report_json: str | None = None,
+) -> int:
     """
     Run the Context Graph Effectiveness benchmark suite (pytest-based, no
     pytest-benchmark fixture).  Uses pytest directly — does NOT use
@@ -13,6 +40,8 @@ def run_effectiveness_suite(strict: bool = False) -> int:
 
     Args:
         strict: If True, exit(1) on any threshold failure.
+        mode: Which marker subset to run.
+        report_json: Optional output path for machine-readable summary.
 
     Returns:
         pytest exit code (0 = all passed/skipped, non-zero = failures).
@@ -26,12 +55,33 @@ def run_effectiveness_suite(strict: bool = False) -> int:
         "benchmarks/context_graph_effectiveness/",
         "-p", "no:typeguard",
         "-p", "no:langsmith",
-        "-m", "not real_llm",       # skip real-LLM tests in normal CI
         "-v", "--tb=short",
         "--no-header",
     ]
+    marker_expr = _effectiveness_marker_expr(mode)
+    if marker_expr:
+        cmd.extend(["-m", marker_expr])
 
-    result = subprocess.run(cmd)
+    result = subprocess.run(cmd, capture_output=True, text=True)
+    if result.stdout:
+        print(result.stdout, end="" if result.stdout.endswith("\n") else "\n")
+    if result.stderr:
+        print(result.stderr, file=sys.stderr, end="" if result.stderr.endswith("\n") else "\n")
+
+    if report_json:
+        os.makedirs(os.path.dirname(report_json), exist_ok=True)
+        with open(report_json, "w", encoding="utf-8") as handle:
+            json.dump(
+                {
+                    "timestamp": datetime.now().isoformat(),
+                    "mode": mode,
+                    "command": cmd,
+                    "exit_code": result.returncode,
+                    "summary": _parse_pytest_summary(f"{result.stdout}\n{result.stderr}"),
+                },
+                handle,
+                indent=2,
+            )
     if result.returncode != 0:
         print("\n[EFFECTIVENESS] One or more effectiveness tests FAILED.")
         if strict:
@@ -53,11 +103,27 @@ def run_benchmarks():
         "--effectiveness", action="store_true",
         help="Run the Context Graph Effectiveness suite (pytest-based metrics)"
     )
+    parser.add_argument(
+        "--effectiveness-mode",
+        choices=["offline", "optional", "real_llm", "all"],
+        default="offline",
+        help="Select which effectiveness subset to run",
+    )
+    parser.add_argument(
+        "--effectiveness-report-json",
+        default=None,
+        help="Optional path for machine-readable effectiveness summary JSON",
+    )
     args = parser.parse_args()
 
     # Run effectiveness suite first if requested
     if args.effectiveness:
-        run_effectiveness_suite(strict=args.strict)
+        run_effectiveness_suite(
+            strict=args.strict,
+            mode=args.effectiveness_mode,
+            report_json=args.effectiveness_report_json,
+        )
+        return
 
     print("Starting Semantica Benchmark Suite...")
 

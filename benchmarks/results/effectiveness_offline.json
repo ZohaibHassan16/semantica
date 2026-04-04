@@ -1,0 +1,27 @@
+{
+  "timestamp": "2026-04-04T13:37:18.641331",
+  "mode": "offline",
+  "command": [
+    "C:\\Users\\Mohd Kaif\\AppData\\Local\\Programs\\Python\\Python311\\python.exe",
+    "-m",
+    "pytest",
+    "benchmarks/context_graph_effectiveness/",
+    "-p",
+    "no:typeguard",
+    "-p",
+    "no:langsmith",
+    "-v",
+    "--tb=short",
+    "--no-header",
+    "-m",
+    "not real_llm and not effectiveness_optional"
+  ],
+  "exit_code": 0,
+  "summary": {
+    "passed": 142,
+    "failed": 0,
+    "skipped": 12,
+    "deselected": 12,
+    "errors": 0
+  }
+}

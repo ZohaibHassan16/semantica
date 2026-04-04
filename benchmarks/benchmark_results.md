@@ -7,6 +7,7 @@
 - The current validated offline deterministic suite result is: `139 passed, 12 skipped, 12 deselected`.
 - Real-LLM benchmark tracks are auxiliary and run only when `SEMANTICA_REAL_LLM=1` is enabled.
 - Results should be reported by run mode and track status, not as one undifferentiated aggregate claim.
+- New effectiveness runs should also persist a machine-readable summary via `--effectiveness-report-json` under `benchmarks/results/`.
 
 ## Current Validation Snapshot
 
@@ -56,6 +57,7 @@ We only report benchmark results here when assertions are derived from:
 - actual Semantica API outputs
 - labeled fixtures committed under `benchmarks/context_graph_effectiveness/fixtures/`
 - explicit metric helpers such as precision, recall, F1, Hit@k, MRR, MAP, nDCG, ECE, and Brier score where relevant
+- run artifacts captured from the effectiveness runner rather than manual suite totals copied by hand
 
 We do not treat the following as valid benchmark evidence:
 - hardcoded metric values
