@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- **Benchmark suite follow-up — reporting, offline results, and description update** (PR #418 follow-up by @KaifAhmad1 and @ZohaibHassan16):
+  - Added `benchmarks/context_graph_effectiveness/reporting.py` — structured benchmark output helpers that write per-track results and aggregate SES_v2 score to `benchmarks/results/effectiveness_offline.json`.
+  - Added `benchmarks/context_graph_effectiveness/test_reporting_helpers.py` — coverage for reporting module (fixture loading, JSON serialisation, threshold formatting).
+  - Committed `benchmarks/results/effectiveness_offline.json` — offline run record (`142 passed, 12 skipped, 0 failed`, exit code 0, no API key required).
+  - Deepened `test_decision_intelligence.py`, `test_ses_score.py`, and `test_skill_injection.py` with additional measurement-based assertions and slice breakdowns.
+  - Refined `thresholds.py` values based on measured offline results.
+  - Updated `benchmarks_runner.py`, `benchmarks.md`, and `benchmark_results.md` to reflect current suite state.
+  - Updated `pyproject.toml` description to reflect the project's focus on Context Graphs and Decision Intelligence Layers for AI.
+
 - **Benchmark documentation correction**:
   - The Context Graph Effectiveness suite is a manual benchmark suite and is not part of CI merge gating.
   - Benchmark reporting has been tightened so only tracks rerun with measurement-based assertions should be presented as `measured`.
