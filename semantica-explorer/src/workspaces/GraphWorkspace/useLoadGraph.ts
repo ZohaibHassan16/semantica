@@ -195,7 +195,6 @@ interface UseLoadGraphOptions {
 
 export function useLoadGraph(options: UseLoadGraphOptions = {}) {
   const { enabled = true, onGraphReady } = options;
-  const queryClient = useQueryClient();
 
   return useQuery<GraphLoadSummary>({
     queryKey: ["graph", "full-load"],
