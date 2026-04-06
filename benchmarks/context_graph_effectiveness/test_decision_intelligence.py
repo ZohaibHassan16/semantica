@@ -210,14 +210,25 @@ def _structured_predict_decision(record: dict) -> tuple[str, float, dict]:
     top_similarity = float(precedents[0].get("similarity_score", 0.0)) if precedents else 0.0
     distinct_precedent_outcomes = {outcome for outcome in precedent_outcomes if outcome != "unknown"}
 
-    if record.get("has_conflicting_policies") or record.get("boundary_case") or record.get("has_overturned_precedent"):
-        return "escalate", 0.83, {"compliance": compliance, "retrieved_ids": retrieved_ids}
+    # ── Graph-derived conflict signals (no oracle flags read) ─────────────────
+    # Conflict: multiple distinct precedent outcomes with low top-similarity
+    # means the graph itself signals ambiguity — escalate for human review.
+    conflict_signal = len(distinct_precedent_outcomes) > 1 and top_similarity < 0.70
 
-    if "insufficient" in record["ground_truth_reasoning"].lower() or "no applicable" in record["ground_truth_reasoning"].lower():
-        return "escalate", 0.85, {"compliance": compliance, "retrieved_ids": retrieved_ids}
+    # Ambiguous compliance: some policies pass, some fail, and precedents disagree
+    ambiguous_compliance = (
+        bool(compliance)
+        and not all(compliance.values())
+        and any(compliance.values())
+        and len(distinct_precedent_outcomes) > 1
+    )
 
+    if conflict_signal or ambiguous_compliance:
+        return "escalate", 0.74, {"compliance": compliance, "retrieved_ids": retrieved_ids}
+
+    # No applicable policies loaded into the engine graph — cannot decide
     if not runtime.applicable_policy_ids:
-        return "escalate", 0.7, {"compliance": compliance, "retrieved_ids": retrieved_ids}
+        return "escalate", 0.70, {"compliance": compliance, "retrieved_ids": retrieved_ids}
 
     if compliance and not all(compliance.values()):
         if len(distinct_precedent_outcomes) > 1:
@@ -273,10 +284,10 @@ def decision_benchmark_report(decision_dataset):
                 "boundary_case": bool(record.get("boundary_case")),
                 "has_conflicting_policies": bool(record.get("has_conflicting_policies")),
                 "has_overturned_precedent": bool(record.get("has_overturned_precedent")),
-                "no_applicable_policy": expected == "escalate" and (
-                    not record.get("applicable_policy_ids")
-                    or "insufficient" in record["ground_truth_reasoning"].lower()
-                    or "no applicable" in record["ground_truth_reasoning"].lower()
+                # Derived from graph structure only — no ground_truth_reasoning read
+                "no_applicable_policy": (
+                    expected == "escalate"
+                    and not record.get("applicable_policy_ids")
                 ),
                 "retrieved_ids": evidence["retrieved_ids"],
                 "policy_violated": bool(evidence["compliance"]) and not all(evidence["compliance"].values()),

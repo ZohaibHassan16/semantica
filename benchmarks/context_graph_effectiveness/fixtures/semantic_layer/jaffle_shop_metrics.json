@@ -1,5 +1,5 @@
 {
-  "description": "Jaffle Shop governed metric definitions (dbt Semantic Layer / MetricFlow format). Used for Track 21 — Semantic Metric Exactness.",
+  "description": "Jaffle Shop governed metric definitions (dbt Semantic Layer / MetricFlow format). Used for Track 21 - Semantic Metric Exactness.",
   "source": "dbt-labs/jaffle_shop + dbt-labs/jaffle-sl-template (open examples)",
   "metrics": [
     {
@@ -9,7 +9,7 @@
       "description": "Sum of all completed order amounts including tax",
       "expression": "sum(amount)",
       "grain": "order_id",
-      "dimensions": ["customer_segment", "region", "order_date"],
+      "dimensions": ["customer_segment", "region", "order_date", "payment_method"],
       "filters": [{"field": "status", "operator": "=", "value": "completed"}],
       "aliases": ["revenue", "total sales", "gross revenue"]
     },
@@ -33,7 +33,7 @@
       "grain": "customer_id",
       "dimensions": ["customer_segment", "region", "acquisition_channel"],
       "filters": [{"field": "status", "operator": "=", "value": "completed"}],
-      "aliases": ["LTV", "CLV", "lifetime value", "customer value"]
+      "aliases": ["ltv", "clv", "lifetime value", "customer value"]
     },
     {
       "name": "average_order_value",
@@ -42,9 +42,9 @@
       "description": "Mean value of completed orders (total_revenue / order_count)",
       "expression": "sum(amount) / count(distinct order_id)",
       "grain": "order_id",
-      "dimensions": ["customer_segment", "region", "order_date"],
+      "dimensions": ["customer_segment", "region", "order_date", "product_category"],
       "filters": [{"field": "status", "operator": "=", "value": "completed"}],
-      "aliases": ["AOV", "avg order value", "mean order value"]
+      "aliases": ["aov", "avg order value", "mean order value"]
     },
     {
       "name": "churn_rate",
@@ -66,7 +66,7 @@
       "grain": "customer_id",
       "dimensions": ["acquisition_channel", "customer_segment"],
       "filters": [],
-      "aliases": ["LTV to CAC", "ltv cac", "value acquisition ratio"]
+      "aliases": ["ltv to cac", "ltv cac", "value acquisition ratio"]
     },
     {
       "name": "new_customer_count",
@@ -89,202 +89,145 @@
       "dimensions": ["region", "product_category", "order_date"],
       "filters": [],
       "aliases": ["return rate", "refunds", "reversal rate"]
+    },
+    {
+      "name": "gross_margin",
+      "label": "Gross Margin",
+      "type": "derived",
+      "description": "Gross profit divided by revenue after product cost",
+      "expression": "(sum(amount) - sum(cost_amount)) / sum(amount)",
+      "grain": "order_id",
+      "dimensions": ["region", "product_category", "order_date"],
+      "filters": [{"field": "status", "operator": "=", "value": "completed"}],
+      "aliases": ["margin", "gross profit margin", "gm percent"]
+    },
+    {
+      "name": "repeat_purchase_rate",
+      "label": "Repeat Purchase Rate",
+      "type": "derived",
+      "description": "Share of customers who have placed two or more completed orders",
+      "expression": "count(distinct customer_id) filter (where completed_order_count >= 2) / count(distinct customer_id)",
+      "grain": "customer_id",
+      "dimensions": ["customer_segment", "region", "acquisition_channel"],
+      "filters": [{"field": "status", "operator": "=", "value": "completed"}],
+      "aliases": ["repeat rate", "repeat buyers", "repeat purchase"]
+    },
+    {
+      "name": "net_promoter_score",
+      "label": "Net Promoter Score",
+      "type": "simple",
+      "description": "Average NPS survey score captured after purchase or support interactions",
+      "expression": "avg(nps_score)",
+      "grain": "survey_id",
+      "dimensions": ["region", "customer_segment", "survey_date", "channel"],
+      "filters": [],
+      "aliases": ["nps", "promoter score", "customer advocacy score"]
+    },
+    {
+      "name": "support_ticket_volume",
+      "label": "Support Ticket Volume",
+      "type": "simple",
+      "description": "Count of submitted customer support tickets",
+      "expression": "count(ticket_id)",
+      "grain": "ticket_id",
+      "dimensions": ["region", "priority", "issue_type", "created_date"],
+      "filters": [],
+      "aliases": ["ticket volume", "support tickets", "case volume"]
+    },
+    {
+      "name": "avg_resolution_time",
+      "label": "Average Resolution Time",
+      "type": "derived",
+      "description": "Average hours required to resolve a support ticket",
+      "expression": "avg(resolution_hours)",
+      "grain": "ticket_id",
+      "dimensions": ["region", "priority", "issue_type", "created_date"],
+      "filters": [{"field": "status", "operator": "=", "value": "resolved"}],
+      "aliases": ["resolution time", "avg solve time", "ticket turnaround"]
+    },
+    {
+      "name": "inventory_turnover",
+      "label": "Inventory Turnover",
+      "type": "derived",
+      "description": "Cost of goods sold divided by average inventory for a SKU",
+      "expression": "sum(cost_of_goods_sold) / avg(average_inventory)",
+      "grain": "sku_id",
+      "dimensions": ["warehouse", "product_category", "sku_status", "order_date"],
+      "filters": [],
+      "aliases": ["stock turnover", "inventory turns", "turnover ratio"]
+    },
+    {
+      "name": "customer_acquisition_cost",
+      "label": "Customer Acquisition Cost",
+      "type": "derived",
+      "description": "Marketing spend divided by new customers attributed to a campaign",
+      "expression": "sum(marketing_spend) / count(distinct customer_id) filter (where is_first_order = true)",
+      "grain": "campaign_id",
+      "dimensions": ["acquisition_channel", "campaign_name", "region", "order_date"],
+      "filters": [],
+      "aliases": ["cac", "acquisition cost", "cost per new customer"]
+    },
+    {
+      "name": "active_customers",
+      "label": "Active Customers",
+      "type": "simple",
+      "description": "Distinct customers with at least one completed order in the trailing 90 days",
+      "expression": "count(distinct customer_id) filter (where last_completed_order_at >= current_date - interval '90 days')",
+      "grain": "customer_id",
+      "dimensions": ["customer_segment", "region", "order_date", "acquisition_channel"],
+      "filters": [{"field": "status", "operator": "=", "value": "completed"}],
+      "aliases": ["active users", "active buyers", "active customer count"]
     }
   ],
   "nl_queries": [
-    {
-      "id": "q001",
-      "query": "What is total revenue by region this quarter?",
-      "governed_metric": "total_revenue",
-      "expected_dimensions": ["region"],
-      "expected_time_grain": "quarter",
-      "valid_dimension_values": ["region"],
-      "invalid_approximation": "gross sales"
-    },
-    {
-      "id": "q002",
-      "query": "Show me LTV by customer segment",
-      "governed_metric": "customer_lifetime_value",
-      "expected_dimensions": ["customer_segment"],
-      "expected_time_grain": null,
-      "valid_dimension_values": ["customer_segment"],
-      "invalid_approximation": "average revenue per user"
-    },
-    {
-      "id": "q003",
-      "query": "How many orders were placed last month?",
-      "governed_metric": "order_count",
-      "expected_dimensions": [],
-      "expected_time_grain": "month",
-      "valid_dimension_values": [],
-      "invalid_approximation": "transaction count"
-    },
-    {
-      "id": "q004",
-      "query": "What is the AOV for the enterprise segment in Q3?",
-      "governed_metric": "average_order_value",
-      "expected_dimensions": ["customer_segment"],
-      "expected_time_grain": "quarter",
-      "valid_dimension_values": ["customer_segment"],
-      "invalid_approximation": "mean purchase value"
-    },
-    {
-      "id": "q005",
-      "query": "What is our churn rate for enterprise customers this year?",
-      "governed_metric": "churn_rate",
-      "expected_dimensions": ["customer_segment"],
-      "expected_time_grain": "year",
-      "valid_dimension_values": ["customer_segment"],
-      "invalid_approximation": "customer loss rate"
-    },
-    {
-      "id": "q006",
-      "query": "Is the LTV to CAC ratio above 3 for the paid channel?",
-      "governed_metric": "ltv_cac_ratio",
-      "expected_dimensions": ["acquisition_channel"],
-      "expected_time_grain": null,
-      "valid_dimension_values": ["acquisition_channel"],
-      "invalid_approximation": "customer value over acquisition cost"
-    },
-    {
-      "id": "q007",
-      "query": "How many new customers did we acquire via organic in January?",
-      "governed_metric": "new_customer_count",
-      "expected_dimensions": ["acquisition_channel"],
-      "expected_time_grain": "month",
-      "valid_dimension_values": ["acquisition_channel"],
-      "invalid_approximation": "first-time buyer count"
-    },
-    {
-      "id": "q008",
-      "query": "What is the refund rate for the APAC region last quarter?",
-      "governed_metric": "refund_rate",
-      "expected_dimensions": ["region"],
-      "expected_time_grain": "quarter",
-      "valid_dimension_values": ["region"],
-      "invalid_approximation": "return percentage"
-    },
-    {
-      "id": "q009",
-      "query": "Revenue breakdown by payment method for completed orders",
-      "governed_metric": "total_revenue",
-      "expected_dimensions": ["payment_method"],
-      "expected_time_grain": null,
-      "valid_dimension_values": ["payment_method"],
-      "invalid_approximation": "sales by payment type"
-    },
-    {
-      "id": "q010",
-      "query": "Customer lifetime value for the EMEA region",
-      "governed_metric": "customer_lifetime_value",
-      "expected_dimensions": ["region"],
-      "expected_time_grain": null,
-      "valid_dimension_values": ["region"],
-      "invalid_approximation": "EMEA customer spend"
-    },
-    {
-      "id": "q011",
-      "query": "Weekly order count trend for North America",
-      "governed_metric": "order_count",
-      "expected_dimensions": ["region"],
-      "expected_time_grain": "week",
-      "valid_dimension_values": ["region"],
-      "invalid_approximation": "weekly purchases"
-    },
-    {
-      "id": "q012",
-      "query": "What percentage of customers churned from the SMB segment?",
-      "governed_metric": "churn_rate",
-      "expected_dimensions": ["customer_segment"],
-      "expected_time_grain": null,
-      "valid_dimension_values": ["customer_segment"],
-      "invalid_approximation": "SMB customer loss"
-    },
-    {
-      "id": "q013",
-      "query": "Average order value by product category this month",
-      "governed_metric": "average_order_value",
-      "expected_dimensions": ["product_category"],
-      "expected_time_grain": "month",
-      "valid_dimension_values": ["product_category"],
-      "invalid_approximation": "mean basket size"
-    },
-    {
-      "id": "q014",
-      "query": "New customers from the referral channel in H1",
-      "governed_metric": "new_customer_count",
-      "expected_dimensions": ["acquisition_channel"],
-      "expected_time_grain": "half_year",
-      "valid_dimension_values": ["acquisition_channel"],
-      "invalid_approximation": "referred new buyers"
-    },
-    {
-      "id": "q015",
-      "query": "Is our LTV:CAC above the viability threshold of 3?",
-      "governed_metric": "ltv_cac_ratio",
-      "expected_dimensions": [],
-      "expected_time_grain": null,
-      "policy_threshold": 3.0,
-      "valid_dimension_values": [],
-      "invalid_approximation": "customer value ratio"
-    }
+    {"id": "q001", "query": "What is total revenue by region this quarter?", "governed_metric": "total_revenue", "expected_dimensions": ["region"], "expected_time_grain": "quarter", "valid_dimension_values": ["region"], "invalid_approximation": "gross sales"},
+    {"id": "q002", "query": "Show me customer lifetime value by customer segment", "governed_metric": "customer_lifetime_value", "expected_dimensions": ["customer_segment"], "expected_time_grain": null, "valid_dimension_values": ["customer_segment"], "invalid_approximation": "average revenue per user"},
+    {"id": "q003", "query": "How many orders were placed last month?", "governed_metric": "order_count", "expected_dimensions": [], "expected_time_grain": "month", "valid_dimension_values": [], "invalid_approximation": "transaction count"},
+    {"id": "q004", "query": "What is the average order value for the enterprise segment in Q3?", "governed_metric": "average_order_value", "expected_dimensions": ["customer_segment"], "expected_time_grain": "quarter", "valid_dimension_values": ["customer_segment"], "invalid_approximation": "mean purchase value"},
+    {"id": "q005", "query": "What is our churn rate for enterprise customers this year?", "governed_metric": "churn_rate", "expected_dimensions": ["customer_segment"], "expected_time_grain": "year", "valid_dimension_values": ["customer_segment"], "invalid_approximation": "customer loss rate"},
+    {"id": "q006", "query": "Is the ltv cac ratio above 3 for the paid channel?", "governed_metric": "ltv_cac_ratio", "expected_dimensions": ["acquisition_channel"], "expected_time_grain": null, "valid_dimension_values": ["acquisition_channel"], "invalid_approximation": "customer value over acquisition cost"},
+    {"id": "q007", "query": "How many new customers did we acquire via organic in January?", "governed_metric": "new_customer_count", "expected_dimensions": ["acquisition_channel"], "expected_time_grain": "month", "valid_dimension_values": ["acquisition_channel"], "invalid_approximation": "first-time buyer count"},
+    {"id": "q008", "query": "What is the refund rate for the APAC region last quarter?", "governed_metric": "refund_rate", "expected_dimensions": ["region"], "expected_time_grain": "quarter", "valid_dimension_values": ["region"], "invalid_approximation": "return percentage"},
+    {"id": "q009", "query": "Revenue breakdown by payment method for completed orders", "governed_metric": "total_revenue", "expected_dimensions": ["payment_method"], "expected_time_grain": null, "valid_dimension_values": ["payment_method"], "invalid_approximation": "sales by payment type"},
+    {"id": "q010", "query": "Customer lifetime value for the EMEA region", "governed_metric": "customer_lifetime_value", "expected_dimensions": ["region"], "expected_time_grain": null, "valid_dimension_values": ["region"], "invalid_approximation": "EMEA customer spend"},
+    {"id": "q011", "query": "Weekly order count trend for North America", "governed_metric": "order_count", "expected_dimensions": ["region"], "expected_time_grain": "week", "valid_dimension_values": ["region"], "invalid_approximation": "weekly purchases"},
+    {"id": "q012", "query": "What percentage of customers churned from the SMB segment?", "governed_metric": "churn_rate", "expected_dimensions": ["customer_segment"], "expected_time_grain": null, "valid_dimension_values": ["customer_segment"], "invalid_approximation": "SMB customer loss"},
+    {"id": "q013", "query": "Average order value by product category this month", "governed_metric": "average_order_value", "expected_dimensions": ["product_category"], "expected_time_grain": "month", "valid_dimension_values": ["product_category"], "invalid_approximation": "mean basket size"},
+    {"id": "q014", "query": "New customers from the referral channel in H1", "governed_metric": "new_customer_count", "expected_dimensions": ["acquisition_channel"], "expected_time_grain": "half_year", "valid_dimension_values": ["acquisition_channel"], "invalid_approximation": "referred new buyers"},
+    {"id": "q015", "query": "Is our ltv cac ratio above the viability threshold of 3?", "governed_metric": "ltv_cac_ratio", "expected_dimensions": [], "expected_time_grain": null, "policy_threshold": 3.0, "valid_dimension_values": [], "invalid_approximation": "customer value ratio"},
+    {"id": "q016", "query": "What is gross margin by product category this quarter?", "governed_metric": "gross_margin", "expected_dimensions": ["product_category"], "expected_time_grain": "quarter", "valid_dimension_values": ["product_category"], "invalid_approximation": "profit dollars"},
+    {"id": "q017", "query": "Show gross margin for EMEA last month", "governed_metric": "gross_margin", "expected_dimensions": ["region"], "expected_time_grain": "month", "valid_dimension_values": ["region"], "invalid_approximation": "net profit"},
+    {"id": "q018", "query": "What is the repeat purchase rate by acquisition channel?", "governed_metric": "repeat_purchase_rate", "expected_dimensions": ["acquisition_channel"], "expected_time_grain": null, "valid_dimension_values": ["acquisition_channel"], "invalid_approximation": "retained customers"},
+    {"id": "q019", "query": "Repeat purchase rate for enterprise customers this year", "governed_metric": "repeat_purchase_rate", "expected_dimensions": ["customer_segment"], "expected_time_grain": "year", "valid_dimension_values": ["customer_segment"], "invalid_approximation": "renewal rate"},
+    {"id": "q020", "query": "What is net promoter score by region?", "governed_metric": "net_promoter_score", "expected_dimensions": ["region"], "expected_time_grain": null, "valid_dimension_values": ["region"], "invalid_approximation": "csat"},
+    {"id": "q021", "query": "Net promoter score trend by month for support channel", "governed_metric": "net_promoter_score", "expected_dimensions": ["channel"], "expected_time_grain": "month", "valid_dimension_values": ["channel"], "invalid_approximation": "satisfaction trend"},
+    {"id": "q022", "query": "How many support tickets were opened by priority this week?", "governed_metric": "support_ticket_volume", "expected_dimensions": ["priority"], "expected_time_grain": "week", "valid_dimension_values": ["priority"], "invalid_approximation": "agent workload"},
+    {"id": "q023", "query": "Support ticket volume for billing issues in APAC", "governed_metric": "support_ticket_volume", "expected_dimensions": ["issue_type", "region"], "expected_time_grain": null, "valid_dimension_values": ["issue_type", "region"], "invalid_approximation": "refund tickets only"},
+    {"id": "q024", "query": "What is average resolution time for high priority tickets?", "governed_metric": "avg_resolution_time", "expected_dimensions": ["priority"], "expected_time_grain": null, "valid_dimension_values": ["priority"], "invalid_approximation": "first response time"},
+    {"id": "q025", "query": "Average resolution time by region this month", "governed_metric": "avg_resolution_time", "expected_dimensions": ["region"], "expected_time_grain": "month", "valid_dimension_values": ["region"], "invalid_approximation": "delivery time"},
+    {"id": "q026", "query": "What is inventory turnover by warehouse this quarter?", "governed_metric": "inventory_turnover", "expected_dimensions": ["warehouse"], "expected_time_grain": "quarter", "valid_dimension_values": ["warehouse"], "invalid_approximation": "days on hand"},
+    {"id": "q027", "query": "Inventory turnover for apparel SKUs last quarter", "governed_metric": "inventory_turnover", "expected_dimensions": ["product_category"], "expected_time_grain": "quarter", "valid_dimension_values": ["product_category"], "invalid_approximation": "sell-through rate"},
+    {"id": "q028", "query": "What is customer acquisition cost by campaign name this month?", "governed_metric": "customer_acquisition_cost", "expected_dimensions": ["campaign_name"], "expected_time_grain": "month", "valid_dimension_values": ["campaign_name"], "invalid_approximation": "cost per click"},
+    {"id": "q029", "query": "Customer acquisition cost for paid social in Q2", "governed_metric": "customer_acquisition_cost", "expected_dimensions": ["acquisition_channel"], "expected_time_grain": "quarter", "valid_dimension_values": ["acquisition_channel"], "invalid_approximation": "ad spend"},
+    {"id": "q030", "query": "How many active customers do we have by customer segment?", "governed_metric": "active_customers", "expected_dimensions": ["customer_segment"], "expected_time_grain": null, "valid_dimension_values": ["customer_segment"], "invalid_approximation": "registered users"},
+    {"id": "q031", "query": "Active customers in North America this month", "governed_metric": "active_customers", "expected_dimensions": ["region"], "expected_time_grain": "month", "valid_dimension_values": ["region"], "invalid_approximation": "monthly visitors"},
+    {"id": "q032", "query": "Gross margin and refund rate are different, show gross margin for APAC", "governed_metric": "gross_margin", "expected_dimensions": ["region"], "expected_time_grain": null, "valid_dimension_values": ["region"], "invalid_approximation": "refund cost rate"},
+    {"id": "q033", "query": "Repeat buyers by region this quarter", "governed_metric": "repeat_purchase_rate", "expected_dimensions": ["region"], "expected_time_grain": "quarter", "valid_dimension_values": ["region"], "invalid_approximation": "customer retention dollars"},
+    {"id": "q034", "query": "Ticket turnaround for shipping issues last week", "governed_metric": "avg_resolution_time", "expected_dimensions": ["issue_type"], "expected_time_grain": "week", "valid_dimension_values": ["issue_type"], "invalid_approximation": "shipping time"},
+    {"id": "q035", "query": "CAC by region for referral campaigns", "governed_metric": "customer_acquisition_cost", "expected_dimensions": ["region", "acquisition_channel"], "expected_time_grain": null, "valid_dimension_values": ["region", "acquisition_channel"], "invalid_approximation": "referral spend only"}
   ],
   "dimension_conformance_tests": [
-    {
-      "id": "dc001",
-      "metric": "total_revenue",
-      "query_dimension": "region",
-      "is_valid": true,
-      "reason": "region is declared in metric dimensions list"
-    },
-    {
-      "id": "dc002",
-      "metric": "total_revenue",
-      "query_dimension": "salesperson_id",
-      "is_valid": false,
-      "reason": "salesperson_id is not declared in metric dimensions list"
-    },
-    {
-      "id": "dc003",
-      "metric": "customer_lifetime_value",
-      "query_dimension": "order_id",
-      "is_valid": false,
-      "reason": "grain is customer_id; slicing by order_id violates grain constraint"
-    },
-    {
-      "id": "dc004",
-      "metric": "churn_rate",
-      "query_dimension": "customer_segment",
-      "is_valid": true,
-      "reason": "customer_segment is declared in metric dimensions list"
-    },
-    {
-      "id": "dc005",
-      "metric": "order_count",
-      "query_dimension": "payment_method",
-      "is_valid": true,
-      "reason": "payment_method is declared in metric dimensions list"
-    },
-    {
-      "id": "dc006",
-      "metric": "ltv_cac_ratio",
-      "query_dimension": "region",
-      "is_valid": false,
-      "reason": "region not in ltv_cac_ratio dimensions; use acquisition_channel or customer_segment"
-    },
-    {
-      "id": "dc007",
-      "metric": "refund_rate",
-      "query_dimension": "product_category",
-      "is_valid": true,
-      "reason": "product_category is declared in metric dimensions list"
-    },
-    {
-      "id": "dc008",
-      "metric": "new_customer_count",
-      "query_dimension": "order_id",
-      "is_valid": false,
-      "reason": "grain is customer_id; order_id violates grain constraint"
-    }
+    {"id": "dc001", "metric": "total_revenue", "query_dimension": "region", "is_valid": true, "reason": "region is declared in metric dimensions list"},
+    {"id": "dc002", "metric": "total_revenue", "query_dimension": "salesperson_id", "is_valid": false, "reason": "salesperson_id is not declared in metric dimensions list"},
+    {"id": "dc003", "metric": "customer_lifetime_value", "query_dimension": "order_id", "is_valid": false, "reason": "grain is customer_id; slicing by order_id violates grain constraint"},
+    {"id": "dc004", "metric": "churn_rate", "query_dimension": "customer_segment", "is_valid": true, "reason": "customer_segment is declared in metric dimensions list"},
+    {"id": "dc005", "metric": "order_count", "query_dimension": "payment_method", "is_valid": true, "reason": "payment_method is declared in metric dimensions list"},
+    {"id": "dc006", "metric": "ltv_cac_ratio", "query_dimension": "region", "is_valid": false, "reason": "region not in ltv_cac_ratio dimensions; use acquisition_channel or customer_segment"},
+    {"id": "dc007", "metric": "refund_rate", "query_dimension": "product_category", "is_valid": true, "reason": "product_category is declared in metric dimensions list"},
+    {"id": "dc008", "metric": "new_customer_count", "query_dimension": "order_id", "is_valid": false, "reason": "grain is customer_id; order_id violates grain constraint"},
+    {"id": "dc009", "metric": "gross_margin", "query_dimension": "product_category", "is_valid": true, "reason": "product_category is declared in gross_margin dimensions"},
+    {"id": "dc010", "metric": "support_ticket_volume", "query_dimension": "customer_segment", "is_valid": false, "reason": "customer_segment is not declared in support_ticket_volume dimensions"},
+    {"id": "dc011", "metric": "avg_resolution_time", "query_dimension": "ticket_id", "is_valid": false, "reason": "grain is ticket_id; slicing by ticket_id violates grain constraint"},
+    {"id": "dc012", "metric": "customer_acquisition_cost", "query_dimension": "campaign_name", "is_valid": true, "reason": "campaign_name is declared in customer_acquisition_cost dimensions"}
   ]
 }

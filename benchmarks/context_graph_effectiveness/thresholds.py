@@ -108,8 +108,8 @@ THRESHOLDS: Dict[str, Tuple[str, float]] = {
     "entity_linker_recall":             (">=",  0.75),
     "graph_validator_false_positive_rate": ("<", 0.05),
 
-    # ── Composite SES (Track 20) ──────────────────────────────────────────────
-    "ses_composite":                    (">=",  0.70),
+    # ── Composite SES_v2 (Track 20) — weighted 0.7*CG + 0.3*SL ─────────────────
+    "ses_composite":                    (">=",  0.72),
     "ses_domain_minimum":               (">=",  0.50),
 
     # ── Semantic metric exactness (Track 21) ──────────────────────────────────

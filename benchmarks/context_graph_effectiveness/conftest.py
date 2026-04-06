@@ -136,6 +136,30 @@ def timeqa_dataset():
 
 
 @pytest.fixture(scope="session")
+def atomic_causal_dataset():
+    return _load_json(_FIXTURES / "causal" / "atomic_causal_subset.json")
+
+
+@pytest.fixture(scope="session")
+def ecare_causal_dataset():
+    return _load_json(_FIXTURES / "causal" / "ecare_subset.json")
+
+
+@pytest.fixture(scope="session")
+def metaqa_dataset():
+    return {
+        "1hop": _load_json(_FIXTURES / "kgqa" / "metaqa_1hop_subset.json"),
+        "2hop": _load_json(_FIXTURES / "kgqa" / "metaqa_2hop_subset.json"),
+        "3hop": _load_json(_FIXTURES / "kgqa" / "metaqa_3hop_subset.json"),
+    }
+
+
+@pytest.fixture(scope="session")
+def webqsp_dataset():
+    return _load_json(_FIXTURES / "kgqa" / "webqsp_subset.json")
+
+
+@pytest.fixture(scope="session")
 def copa_dataset():
     return _load_json(_FIXTURES / "reasoning" / "copa_subset.json")["records"]
 

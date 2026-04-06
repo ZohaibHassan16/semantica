@@ -169,7 +169,17 @@ def ses_report(
     if missing := sorted(required_components - set(available_components)):
         raise AssertionError(f"SES required components missing: {', '.join(missing)}")
 
-    ses_value = sum(available_components.values()) / len(available_components)
+    # SES_v2 = 0.7 * ContextGraphScore + 0.3 * SemanticLayerScore
+    # Pillar 1 — Context Graph components
+    _CG = {"retrieval_hit_rate", "decision_accuracy", "duplicate_detection_f1", "ner_f1"}
+    # Pillar 2 — Semantic Layer components
+    _SL = {"semantic_metric_exactness", "cross_turn_metric_consistency"}
+
+    cg_vals = [v for k, v in available_components.items() if k in _CG]
+    sl_vals = [v for k, v in available_components.items() if k in _SL]
+    cg_score = sum(cg_vals) / len(cg_vals) if cg_vals else 0.0
+    sl_score = sum(sl_vals) / len(sl_vals) if sl_vals else 0.0
+    ses_value = 0.7 * cg_score + 0.3 * sl_score
     domain_scores = {
         domain: sum(
             1.0

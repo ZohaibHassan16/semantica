@@ -1,173 +1,74 @@
 {
-  "description": "Before/after metric definition change pairs with gold impact labels. Used for Track 24 — Governance Impact & Change Propagation.",
+  "description": "Before/after metric definition change pairs with gold impact labels. Used for Track 24 - Governance Impact & Change Propagation.",
   "records": [
-    {
-      "id": "mc001",
-      "metric_name": "total_revenue",
-      "version_before": {
-        "expression": "sum(amount)",
-        "filters": [],
-        "grain": "order_id"
-      },
-      "version_after": {
-        "expression": "sum(amount * (1 - discount_rate))",
-        "filters": [{"field": "status", "operator": "=", "value": "completed"}],
-        "grain": "order_id"
-      },
-      "change_type": "expression_and_filter",
-      "affected_decisions": ["approve_deal_q1", "revenue_target_check", "commission_calc"],
-      "unaffected_decisions": ["churn_policy_check", "new_customer_bonus"],
-      "expected_impact_score": 1.0,
-      "expected_drift_decisions": []
-    },
-    {
-      "id": "mc002",
-      "metric_name": "customer_lifetime_value",
-      "version_before": {
-        "expression": "sum(amount) / count(distinct customer_id)",
-        "grain": "customer_id",
-        "time_window": null
-      },
-      "version_after": {
-        "expression": "sum(amount) / count(distinct customer_id)",
-        "grain": "customer_id",
-        "time_window": "365_days"
-      },
-      "change_type": "time_window_added",
-      "affected_decisions": ["ltv_threshold_approval", "segment_upgrade"],
-      "unaffected_decisions": ["order_count_check", "refund_policy"],
-      "expected_impact_score": 1.0,
-      "expected_drift_decisions": []
-    },
-    {
-      "id": "mc003",
-      "metric_name": "churn_rate",
-      "version_before": {
-        "expression": "count(churned_customers) / count(distinct customer_id)",
-        "churn_window_days": 90
-      },
-      "version_after": {
-        "expression": "count(churned_customers) / count(distinct customer_id)",
-        "churn_window_days": 60
-      },
-      "change_type": "window_tightened",
-      "affected_decisions": ["retention_campaign_trigger", "at_risk_flag", "churn_policy_check"],
-      "unaffected_decisions": ["revenue_target_check", "commission_calc"],
-      "expected_impact_score": 1.0,
-      "expected_drift_decisions": []
-    },
-    {
-      "id": "mc004",
-      "metric_name": "average_order_value",
-      "version_before": {
-        "expression": "sum(amount) / count(distinct order_id)",
-        "filters": [{"field": "status", "operator": "=", "value": "completed"}]
-      },
-      "version_after": {
-        "expression": "sum(amount) / count(distinct order_id)",
-        "filters": [
-          {"field": "status", "operator": "=", "value": "completed"},
-          {"field": "amount", "operator": ">", "value": 10}
-        ]
-      },
-      "change_type": "filter_added",
-      "affected_decisions": ["upsell_trigger", "vip_threshold"],
-      "unaffected_decisions": ["churn_policy_check", "new_customer_bonus"],
-      "expected_impact_score": 1.0,
-      "expected_drift_decisions": []
-    },
-    {
-      "id": "mc005",
-      "metric_name": "ltv_cac_ratio",
-      "version_before": {
-        "viability_threshold": 3.0,
-        "expression": "customer_lifetime_value / customer_acquisition_cost"
-      },
-      "version_after": {
-        "viability_threshold": 3.5,
-        "expression": "customer_lifetime_value / customer_acquisition_cost"
-      },
-      "change_type": "threshold_raised",
-      "affected_decisions": ["channel_investment_approval", "budget_allocation"],
-      "unaffected_decisions": ["order_count_check", "refund_policy", "churn_policy_check"],
-      "expected_impact_score": 1.0,
-      "expected_drift_decisions": []
-    },
-    {
-      "id": "mc006",
-      "metric_name": "new_customer_count",
-      "version_before": {
-        "expression": "count(distinct customer_id) filter (where is_first_order = true)",
-        "grain": "customer_id"
-      },
-      "version_after": {
-        "expression": "count(distinct customer_id) filter (where is_first_order = true and acquisition_channel != 'internal')",
-        "grain": "customer_id"
-      },
-      "change_type": "filter_exclusion_added",
-      "affected_decisions": ["growth_kpi_check", "acquisition_bonus", "new_customer_bonus"],
-      "unaffected_decisions": ["revenue_target_check", "ltv_threshold_approval"],
-      "expected_impact_score": 1.0,
-      "expected_drift_decisions": []
-    },
-    {
-      "id": "mc007",
-      "metric_name": "refund_rate",
-      "version_before": {
-        "expression": "count(refunded_orders) / count(distinct order_id)",
-        "dimensions": ["region", "product_category"]
-      },
-      "version_after": {
-        "expression": "sum(refund_amount) / sum(order_amount)",
-        "dimensions": ["region", "product_category"]
-      },
-      "change_type": "expression_restatement",
-      "affected_decisions": ["vendor_penalty_check", "quality_escalation", "refund_policy"],
-      "unaffected_decisions": ["new_customer_bonus", "segment_upgrade"],
-      "expected_impact_score": 1.0,
-      "expected_drift_decisions": []
-    },
-    {
-      "id": "mc008",
-      "metric_name": "order_count",
-      "version_before": {
-        "expression": "count(distinct order_id)",
-        "filters": [{"field": "status", "operator": "=", "value": "completed"}]
-      },
-      "version_after": {
-        "expression": "count(distinct order_id)",
-        "filters": [
-          {"field": "status", "operator": "in", "value": ["completed", "shipped"]}
-        ]
-      },
-      "change_type": "filter_broadened",
-      "affected_decisions": ["fulfillment_capacity_check", "ops_bonus", "order_count_check"],
-      "unaffected_decisions": ["churn_policy_check", "ltv_threshold_approval"],
-      "expected_impact_score": 1.0,
-      "expected_drift_decisions": []
-    }
+    {"id": "mc001", "metric_name": "total_revenue", "version_before": {"expression": "sum(amount)", "filters": [], "grain": "order_id"}, "version_after": {"expression": "sum(amount * (1 - discount_rate))", "filters": [{"field": "status", "operator": "=", "value": "completed"}], "grain": "order_id"}, "change_type": "expression_and_filter", "affected_decisions": ["approve_deal_q1", "revenue_target_check", "commission_calc"], "unaffected_decisions": ["churn_policy_check", "new_customer_bonus"], "expected_impact_score": 1.0, "expected_drift_decisions": []},
+    {"id": "mc002", "metric_name": "customer_lifetime_value", "version_before": {"expression": "sum(amount) / count(distinct customer_id)", "grain": "customer_id", "time_window": null}, "version_after": {"expression": "sum(amount) / count(distinct customer_id)", "grain": "customer_id", "time_window": "365_days"}, "change_type": "time_window_added", "affected_decisions": ["ltv_threshold_approval", "segment_upgrade"], "unaffected_decisions": ["order_count_check", "refund_policy"], "expected_impact_score": 1.0, "expected_drift_decisions": []},
+    {"id": "mc003", "metric_name": "churn_rate", "version_before": {"expression": "count(churned_customers) / count(distinct customer_id)", "churn_window_days": 90}, "version_after": {"expression": "count(churned_customers) / count(distinct customer_id)", "churn_window_days": 60}, "change_type": "window_tightened", "affected_decisions": ["retention_campaign_trigger", "at_risk_flag", "churn_policy_check"], "unaffected_decisions": ["revenue_target_check", "commission_calc"], "expected_impact_score": 1.0, "expected_drift_decisions": []},
+    {"id": "mc004", "metric_name": "average_order_value", "version_before": {"expression": "sum(amount) / count(distinct order_id)", "filters": [{"field": "status", "operator": "=", "value": "completed"}]}, "version_after": {"expression": "sum(amount) / count(distinct order_id)", "filters": [{"field": "status", "operator": "=", "value": "completed"}, {"field": "amount", "operator": ">", "value": 10}]}, "change_type": "filter_added", "affected_decisions": ["upsell_trigger", "vip_threshold"], "unaffected_decisions": ["churn_policy_check", "new_customer_bonus"], "expected_impact_score": 1.0, "expected_drift_decisions": []},
+    {"id": "mc005", "metric_name": "ltv_cac_ratio", "version_before": {"viability_threshold": 3.0, "expression": "customer_lifetime_value / customer_acquisition_cost"}, "version_after": {"viability_threshold": 3.5, "expression": "customer_lifetime_value / customer_acquisition_cost"}, "change_type": "threshold_raised", "affected_decisions": ["channel_investment_approval", "budget_allocation"], "unaffected_decisions": ["order_count_check", "refund_policy", "churn_policy_check"], "expected_impact_score": 1.0, "expected_drift_decisions": []},
+    {"id": "mc006", "metric_name": "new_customer_count", "version_before": {"expression": "count(distinct customer_id) filter (where is_first_order = true)", "grain": "customer_id"}, "version_after": {"expression": "count(distinct customer_id) filter (where is_first_order = true and acquisition_channel != 'internal')", "grain": "customer_id"}, "change_type": "filter_exclusion_added", "affected_decisions": ["growth_kpi_check", "acquisition_bonus", "new_customer_bonus"], "unaffected_decisions": ["revenue_target_check", "ltv_threshold_approval"], "expected_impact_score": 1.0, "expected_drift_decisions": []},
+    {"id": "mc007", "metric_name": "refund_rate", "version_before": {"expression": "count(refunded_orders) / count(distinct order_id)", "dimensions": ["region", "product_category"]}, "version_after": {"expression": "sum(refund_amount) / sum(order_amount)", "dimensions": ["region", "product_category"]}, "change_type": "expression_restatement", "affected_decisions": ["vendor_penalty_check", "quality_escalation", "refund_policy"], "unaffected_decisions": ["new_customer_bonus", "segment_upgrade"], "expected_impact_score": 1.0, "expected_drift_decisions": []},
+    {"id": "mc008", "metric_name": "order_count", "version_before": {"expression": "count(distinct order_id)", "filters": [{"field": "status", "operator": "=", "value": "completed"}]}, "version_after": {"expression": "count(distinct order_id)", "filters": [{"field": "status", "operator": "in", "value": ["completed", "shipped"]}]}, "change_type": "filter_broadened", "affected_decisions": ["fulfillment_capacity_check", "ops_bonus", "order_count_check"], "unaffected_decisions": ["churn_policy_check", "ltv_threshold_approval"], "expected_impact_score": 1.0, "expected_drift_decisions": []},
+    {"id": "mc009", "metric_name": "gross_margin", "version_before": {"expression": "(sum(amount) - sum(cost_amount)) / sum(amount)", "filters": []}, "version_after": {"expression": "(sum(amount) - sum(cost_amount)) / sum(amount)", "filters": [{"field": "status", "operator": "=", "value": "completed"}]}, "change_type": "filter_added", "affected_decisions": ["margin_guardrail", "markdown_approval"], "unaffected_decisions": ["support_staffing_trigger", "sla_credit_review"], "expected_impact_score": 1.0, "expected_drift_decisions": []},
+    {"id": "mc010", "metric_name": "gross_margin", "version_before": {"expression": "(sum(amount) - sum(cost_amount)) / sum(amount)", "margin_floor": 0.32}, "version_after": {"expression": "(sum(amount) - sum(cost_amount)) / sum(amount)", "margin_floor": 0.35}, "change_type": "threshold_raised", "affected_decisions": ["margin_guardrail", "markdown_approval"], "unaffected_decisions": ["loyalty_unlock", "retention_budget_release"], "expected_impact_score": 1.0, "expected_drift_decisions": []},
+    {"id": "mc011", "metric_name": "gross_margin", "version_before": {"expression": "(sum(amount) - sum(cost_amount)) / sum(amount)"}, "version_after": {"expression": "sum(gross_profit) / sum(amount)"}, "change_type": "expression_restatement", "affected_decisions": ["margin_guardrail", "markdown_approval"], "unaffected_decisions": ["channel_pause_check", "paid_efficiency_review"], "expected_impact_score": 1.0, "expected_drift_decisions": []},
+    {"id": "mc012", "metric_name": "repeat_purchase_rate", "version_before": {"expression": "count(distinct customer_id) filter (where completed_order_count >= 2) / count(distinct customer_id)", "time_window": null}, "version_after": {"expression": "count(distinct customer_id) filter (where completed_order_count >= 2) / count(distinct customer_id)", "time_window": "365_days"}, "change_type": "time_window_added", "affected_decisions": ["loyalty_unlock", "retention_budget_release"], "unaffected_decisions": ["vendor_penalty_check", "refund_policy"], "expected_impact_score": 1.0, "expected_drift_decisions": []},
+    {"id": "mc013", "metric_name": "repeat_purchase_rate", "version_before": {"expression": "count(distinct customer_id) filter (where completed_order_count >= 2) / count(distinct customer_id)", "filters": []}, "version_after": {"expression": "count(distinct customer_id) filter (where completed_order_count >= 2 and customer_status != 'test') / count(distinct customer_id)", "filters": [{"field": "customer_status", "operator": "!=", "value": "test"}]}, "change_type": "filter_exclusion_added", "affected_decisions": ["loyalty_unlock", "retention_budget_release"], "unaffected_decisions": ["margin_guardrail", "markdown_approval"], "expected_impact_score": 1.0, "expected_drift_decisions": []},
+    {"id": "mc014", "metric_name": "active_customers", "version_before": {"expression": "count(distinct customer_id) filter (where last_completed_order_at >= current_date - interval '60 days')"}, "version_after": {"expression": "count(distinct customer_id) filter (where last_completed_order_at >= current_date - interval '90 days')"}, "change_type": "filter_broadened", "affected_decisions": ["staffing_ramp_check", "lifecycle_campaign_trigger"], "unaffected_decisions": ["cx_escalation_gate", "voc_bonus_release"], "expected_impact_score": 1.0, "expected_drift_decisions": []},
+    {"id": "mc015", "metric_name": "active_customers", "version_before": {"expression": "count(distinct customer_id) filter (where last_completed_order_at >= current_date - interval '120 days')"}, "version_after": {"expression": "count(distinct customer_id) filter (where last_completed_order_at >= current_date - interval '90 days')"}, "change_type": "window_tightened", "affected_decisions": ["staffing_ramp_check", "lifecycle_campaign_trigger"], "unaffected_decisions": ["approve_deal_q1", "commission_calc"], "expected_impact_score": 1.0, "expected_drift_decisions": []},
+    {"id": "mc016", "metric_name": "net_promoter_score", "version_before": {"expression": "avg(nps_score)", "nps_target": 50}, "version_after": {"expression": "avg(nps_score)", "nps_target": 55}, "change_type": "threshold_raised", "affected_decisions": ["cx_escalation_gate", "voc_bonus_release"], "unaffected_decisions": ["growth_kpi_check", "acquisition_bonus"], "expected_impact_score": 1.0, "expected_drift_decisions": []},
+    {"id": "mc017", "metric_name": "net_promoter_score", "version_before": {"expression": "avg(nps_score)", "filters": []}, "version_after": {"expression": "avg(nps_score)", "filters": [{"field": "survey_status", "operator": "=", "value": "submitted"}]}, "change_type": "filter_added", "affected_decisions": ["cx_escalation_gate", "voc_bonus_release"], "unaffected_decisions": ["support_staffing_trigger", "vendor_sla_audit"], "expected_impact_score": 1.0, "expected_drift_decisions": []},
+    {"id": "mc018", "metric_name": "support_ticket_volume", "version_before": {"expression": "count(ticket_id)", "filters": []}, "version_after": {"expression": "count(ticket_id)", "filters": [{"field": "status", "operator": "!=", "value": "spam"}]}, "change_type": "filter_exclusion_added", "affected_decisions": ["support_staffing_trigger", "vendor_sla_audit"], "unaffected_decisions": ["loyalty_unlock", "segment_upgrade"], "expected_impact_score": 1.0, "expected_drift_decisions": []},
+    {"id": "mc019", "metric_name": "support_ticket_volume", "version_before": {"expression": "count(ticket_id)", "time_window": "7_days"}, "version_after": {"expression": "count(ticket_id)", "time_window": "14_days"}, "change_type": "time_window_added", "affected_decisions": ["support_staffing_trigger", "vendor_sla_audit"], "unaffected_decisions": ["retention_campaign_trigger", "at_risk_flag"], "expected_impact_score": 1.0, "expected_drift_decisions": []},
+    {"id": "mc020", "metric_name": "avg_resolution_time", "version_before": {"expression": "avg(resolution_hours)", "filters": []}, "version_after": {"expression": "avg(resolution_hours)", "filters": [{"field": "status", "operator": "=", "value": "resolved"}]}, "change_type": "expression_and_filter", "affected_decisions": ["sla_credit_review", "escalation_backlog_check"], "unaffected_decisions": ["budget_allocation", "channel_investment_approval"], "expected_impact_score": 1.0, "expected_drift_decisions": []},
+    {"id": "mc021", "metric_name": "avg_resolution_time", "version_before": {"expression": "avg(resolution_hours)", "sla_threshold_hours": 24}, "version_after": {"expression": "avg(resolution_hours)", "sla_threshold_hours": 36}, "change_type": "threshold_raised", "affected_decisions": ["sla_credit_review", "escalation_backlog_check"], "unaffected_decisions": ["upsell_trigger", "vip_threshold"], "expected_impact_score": 1.0, "expected_drift_decisions": []},
+    {"id": "mc022", "metric_name": "inventory_turnover", "version_before": {"expression": "sum(cost_of_goods_sold) / avg(average_inventory)", "filters": []}, "version_after": {"expression": "sum(cost_of_goods_sold) / avg(average_inventory)", "filters": [{"field": "sku_status", "operator": "!=", "value": "obsolete"}]}, "change_type": "filter_exclusion_added", "affected_decisions": ["replenishment_override", "slow_mover_discount"], "unaffected_decisions": ["support_staffing_trigger", "sla_credit_review"], "expected_impact_score": 1.0, "expected_drift_decisions": []},
+    {"id": "mc023", "metric_name": "inventory_turnover", "version_before": {"expression": "sum(cost_of_goods_sold) / avg(average_inventory)"}, "version_after": {"expression": "cost_of_goods_sold / avg_inventory"}, "change_type": "expression_restatement", "affected_decisions": ["replenishment_override", "slow_mover_discount"], "unaffected_decisions": ["retention_budget_release", "loyalty_unlock"], "expected_impact_score": 1.0, "expected_drift_decisions": []},
+    {"id": "mc024", "metric_name": "customer_acquisition_cost", "version_before": {"expression": "sum(marketing_spend) / count(distinct customer_id) filter (where is_first_order = true)", "filters": []}, "version_after": {"expression": "sum(marketing_spend) / count(distinct customer_id) filter (where is_first_order = true)", "filters": [{"field": "channel_status", "operator": "!=", "value": "internal"}]}, "change_type": "filter_added", "affected_decisions": ["channel_pause_check", "paid_efficiency_review"], "unaffected_decisions": ["staffing_ramp_check", "lifecycle_campaign_trigger"], "expected_impact_score": 1.0, "expected_drift_decisions": []},
+    {"id": "mc025", "metric_name": "customer_acquisition_cost", "version_before": {"expression": "sum(marketing_spend) / count(distinct customer_id) filter (where is_first_order = true)", "max_cac": 120}, "version_after": {"expression": "sum(marketing_spend) / count(distinct customer_id) filter (where is_first_order = true)", "max_cac": 140}, "change_type": "threshold_raised", "affected_decisions": ["channel_pause_check", "paid_efficiency_review"], "unaffected_decisions": ["margin_guardrail", "markdown_approval"], "expected_impact_score": 1.0, "expected_drift_decisions": []},
+    {"id": "mc026", "metric_name": "total_revenue", "version_before": {"expression": "sum(amount)", "time_window": null}, "version_after": {"expression": "sum(amount)", "time_window": "365_days"}, "change_type": "time_window_added", "affected_decisions": ["approve_deal_q1", "revenue_target_check", "commission_calc"], "unaffected_decisions": ["vendor_penalty_check", "quality_escalation"], "expected_impact_score": 1.0, "expected_drift_decisions": []},
+    {"id": "mc027", "metric_name": "order_count", "version_before": {"expression": "count(distinct order_id)", "filters": []}, "version_after": {"expression": "count(distinct order_id)", "filters": [{"field": "status", "operator": "=", "value": "completed"}]}, "change_type": "filter_added", "affected_decisions": ["fulfillment_capacity_check", "ops_bonus", "order_count_check"], "unaffected_decisions": ["cx_escalation_gate", "voc_bonus_release"], "expected_impact_score": 1.0, "expected_drift_decisions": []},
+    {"id": "mc028", "metric_name": "customer_lifetime_value", "version_before": {"expression": "sum(amount) / count(distinct customer_id)", "filters": [{"field": "status", "operator": "=", "value": "completed"}]}, "version_after": {"expression": "sum(amount) / count(distinct customer_id)", "filters": [{"field": "status", "operator": "in", "value": ["completed", "shipped"]}]}, "change_type": "filter_broadened", "affected_decisions": ["ltv_threshold_approval", "segment_upgrade"], "unaffected_decisions": ["support_staffing_trigger", "vendor_sla_audit"], "expected_impact_score": 1.0, "expected_drift_decisions": []},
+    {"id": "mc029", "metric_name": "refund_rate", "version_before": {"expression": "count(refunded_orders) / count(distinct order_id)", "time_window": null}, "version_after": {"expression": "count(refunded_orders) / count(distinct order_id)", "time_window": "90_days"}, "change_type": "time_window_added", "affected_decisions": ["vendor_penalty_check", "quality_escalation", "refund_policy"], "unaffected_decisions": ["channel_pause_check", "paid_efficiency_review"], "expected_impact_score": 1.0, "expected_drift_decisions": []},
+    {"id": "mc030", "metric_name": "new_customer_count", "version_before": {"expression": "count(distinct customer_id) filter (where is_first_order = true)", "lookback_days": 90}, "version_after": {"expression": "count(distinct customer_id) filter (where is_first_order = true)", "lookback_days": 60}, "change_type": "window_tightened", "affected_decisions": ["growth_kpi_check", "acquisition_bonus", "new_customer_bonus"], "unaffected_decisions": ["sla_credit_review", "escalation_backlog_check"], "expected_impact_score": 1.0, "expected_drift_decisions": []}
   ],
   "policy_decision_registry": {
-    "approve_deal_q1":          {"metric": "total_revenue",            "condition": ">=", "value": 100000},
-    "revenue_target_check":     {"metric": "total_revenue",            "condition": ">=", "value": 500000},
-    "commission_calc":          {"metric": "total_revenue",            "condition": ">=", "value": 0},
-    "churn_policy_check":       {"metric": "churn_rate",               "condition": "<=", "value": 0.10},
-    "new_customer_bonus":       {"metric": "new_customer_count",       "condition": ">=", "value": 50},
-    "ltv_threshold_approval":   {"metric": "customer_lifetime_value",  "condition": ">=", "value": 500},
-    "segment_upgrade":          {"metric": "customer_lifetime_value",  "condition": ">=", "value": 1000},
-    "order_count_check":        {"metric": "order_count",              "condition": ">=", "value": 100},
-    "refund_policy":            {"metric": "refund_rate",              "condition": "<=", "value": 0.05},
-    "retention_campaign_trigger": {"metric": "churn_rate",            "condition": ">=", "value": 0.08},
-    "at_risk_flag":             {"metric": "churn_rate",               "condition": ">=", "value": 0.12},
-    "upsell_trigger":           {"metric": "average_order_value",      "condition": ">=", "value": 75},
-    "vip_threshold":            {"metric": "average_order_value",      "condition": ">=", "value": 150},
-    "channel_investment_approval": {"metric": "ltv_cac_ratio",        "condition": ">=", "value": 3.0},
-    "budget_allocation":        {"metric": "ltv_cac_ratio",            "condition": ">=", "value": 3.0},
-    "growth_kpi_check":         {"metric": "new_customer_count",       "condition": ">=", "value": 200},
-    "acquisition_bonus":        {"metric": "new_customer_count",       "condition": ">=", "value": 100},
-    "vendor_penalty_check":     {"metric": "refund_rate",              "condition": ">=", "value": 0.08},
-    "quality_escalation":       {"metric": "refund_rate",              "condition": ">=", "value": 0.10},
-    "fulfillment_capacity_check": {"metric": "order_count",           "condition": ">=", "value": 500},
-    "ops_bonus":                {"metric": "order_count",              "condition": ">=", "value": 300}
+    "approve_deal_q1": {"metric": "total_revenue", "condition": ">=", "value": 100000},
+    "revenue_target_check": {"metric": "total_revenue", "condition": ">=", "value": 500000},
+    "commission_calc": {"metric": "total_revenue", "condition": ">=", "value": 0},
+    "churn_policy_check": {"metric": "churn_rate", "condition": "<=", "value": 0.1},
+    "new_customer_bonus": {"metric": "new_customer_count", "condition": ">=", "value": 50},
+    "ltv_threshold_approval": {"metric": "customer_lifetime_value", "condition": ">=", "value": 500},
+    "segment_upgrade": {"metric": "customer_lifetime_value", "condition": ">=", "value": 1000},
+    "order_count_check": {"metric": "order_count", "condition": ">=", "value": 100},
+    "refund_policy": {"metric": "refund_rate", "condition": "<=", "value": 0.05},
+    "retention_campaign_trigger": {"metric": "churn_rate", "condition": ">=", "value": 0.08},
+    "at_risk_flag": {"metric": "churn_rate", "condition": ">=", "value": 0.12},
+    "upsell_trigger": {"metric": "average_order_value", "condition": ">=", "value": 75},
+    "vip_threshold": {"metric": "average_order_value", "condition": ">=", "value": 150},
+    "channel_investment_approval": {"metric": "ltv_cac_ratio", "condition": ">=", "value": 3.0},
+    "budget_allocation": {"metric": "ltv_cac_ratio", "condition": ">=", "value": 3.0},
+    "growth_kpi_check": {"metric": "new_customer_count", "condition": ">=", "value": 200},
+    "acquisition_bonus": {"metric": "new_customer_count", "condition": ">=", "value": 100},
+    "vendor_penalty_check": {"metric": "refund_rate", "condition": ">=", "value": 0.08},
+    "quality_escalation": {"metric": "refund_rate", "condition": ">=", "value": 0.1},
+    "fulfillment_capacity_check": {"metric": "order_count", "condition": ">=", "value": 500},
+    "ops_bonus": {"metric": "order_count", "condition": ">=", "value": 300},
+    "margin_guardrail": {"metric": "gross_margin", "condition": ">=", "value": 0.35},
+    "markdown_approval": {"metric": "gross_margin", "condition": ">=", "value": 0.4},
+    "loyalty_unlock": {"metric": "repeat_purchase_rate", "condition": ">=", "value": 0.45},
+    "retention_budget_release": {"metric": "repeat_purchase_rate", "condition": ">=", "value": 0.5},
+    "staffing_ramp_check": {"metric": "active_customers", "condition": ">=", "value": 1000},
+    "lifecycle_campaign_trigger": {"metric": "active_customers", "condition": ">=", "value": 5000},
+    "cx_escalation_gate": {"metric": "net_promoter_score", "condition": "<=", "value": 30},
+    "voc_bonus_release": {"metric": "net_promoter_score", "condition": ">=", "value": 55},
+    "support_staffing_trigger": {"metric": "support_ticket_volume", "condition": ">=", "value": 200},
+    "vendor_sla_audit": {"metric": "support_ticket_volume", "condition": ">=", "value": 500},
+    "sla_credit_review": {"metric": "avg_resolution_time", "condition": ">=", "value": 48},
+    "escalation_backlog_check": {"metric": "avg_resolution_time", "condition": ">=", "value": 24},
+    "replenishment_override": {"metric": "inventory_turnover", "condition": "<=", "value": 2.0},
+    "slow_mover_discount": {"metric": "inventory_turnover", "condition": "<=", "value": 1.5},
+    "channel_pause_check": {"metric": "customer_acquisition_cost", "condition": ">=", "value": 150},
+    "paid_efficiency_review": {"metric": "customer_acquisition_cost", "condition": ">=", "value": 100}
   }
 }

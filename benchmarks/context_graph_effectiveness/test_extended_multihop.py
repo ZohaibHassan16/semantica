@@ -346,3 +346,151 @@ class TestExtendedMultihopReasoning:
         assert rate >= 0.90, (
             f"Answer node storage rate {rate:.3f} < 0.90"
         )
+
+
+# ── MetaQA knowledge-base tests (real KB, real QA pairs) ──────────────────────
+
+def _build_metaqa_graph(kb_records: list[dict]):
+    """
+    Build a ContextGraph from the MetaQA movie knowledge base.
+    Each movie becomes an Entity node; directors, actors, genres become linked nodes.
+    """
+    from semantica.context.context_graph import ContextGraph
+    graph = ContextGraph(advanced_analytics=True)
+    for movie in kb_records:
+        movie_id = movie["id"]
+        graph.add_node(
+            movie_id, "Movie",
+            content=movie["title"],
+            release_year=str(movie.get("release_year", "")),
+            genre=movie.get("has_genre", ""),
+        )
+        director = movie.get("directed_by")
+        if director:
+            dir_id = f"director_{director.replace(' ', '_')}"
+            graph.add_node(dir_id, "Person", content=director)
+            graph.add_edge(movie_id, dir_id, "DIRECTED_BY", weight=1.0)
+            graph.add_edge(dir_id, movie_id, "DIRECTED", weight=1.0)
+        genre = movie.get("has_genre")
+        if genre:
+            genre_id = f"genre_{genre}"
+            graph.add_node(genre_id, "Genre", content=genre)
+            graph.add_edge(movie_id, genre_id, "HAS_GENRE", weight=1.0)
+        for actor in movie.get("starred_actors", []):
+            actor_id = f"actor_{actor.replace(' ', '_')}"
+            graph.add_node(actor_id, "Person", content=actor)
+            graph.add_edge(movie_id, actor_id, "STARRED", weight=1.0)
+            graph.add_edge(actor_id, movie_id, "STARRED_IN", weight=1.0)
+    return graph
+
+
+def _metaqa_answer_nodes(answers: list[str]) -> set[str]:
+    """Expand answer strings into possible node ID forms used in the KB graph."""
+    nodes: set[str] = set()
+    for ans in answers:
+        nodes.add(f"director_{ans.replace(' ', '_')}")
+        nodes.add(f"actor_{ans.replace(' ', '_')}")
+        nodes.add(f"genre_{ans}")
+        nodes.add(ans)
+    return nodes
+
+
+class TestMetaQAKnowledgeGraph:
+    """MetaQA KB multi-hop retrieval tests. All data from committed JSON fixtures."""
+
+    def test_metaqa_1hop_answer_reachability(self, metaqa_dataset):
+        """
+        For MetaQA 1-hop QA pairs, verify each answer is reachable within
+        1 hop from the topic entity in the KB graph.
+        Recall >= hotpotqa_bridge_recall threshold (0.65).
+        """
+        kb = metaqa_dataset["1hop"]["movies_kb"]
+        qa_pairs = metaqa_dataset["1hop"]["qa_pairs"]
+        graph = _build_metaqa_graph(kb)
+
+        found = total = 0
+        for qa in qa_pairs:
+            answers = qa.get("answer", [])
+            if not answers:
+                continue
+            reachable = _reachable_from(graph, qa["topic_entity"], max_hops=1)
+            if reachable & _metaqa_answer_nodes(answers):
+                found += 1
+            total += 1
+
+        if total == 0:
+            pytest.skip("No MetaQA 1-hop QA pairs evaluated")
+
+        recall = found / total
+        threshold = get_threshold("hotpotqa_bridge_recall")
+        print(f"  MetaQA 1-hop recall: {recall:.3f} ({found}/{total})")
+        assert recall >= threshold, f"MetaQA 1-hop recall {recall:.3f} < {threshold}"
+
+    def test_metaqa_2hop_answer_reachability(self, metaqa_dataset):
+        """
+        For MetaQA 2-hop QA pairs (e.g. 'What genres are films directed by X?'),
+        answers require 2 relation hops in the KB graph.
+        Recall >= multi_hop_recall_2hop threshold (0.75).
+        """
+        kb = metaqa_dataset["1hop"]["movies_kb"]
+        qa_pairs = metaqa_dataset["2hop"]["qa_pairs"]
+        graph = _build_metaqa_graph(kb)
+
+        found = total = 0
+        for qa in qa_pairs:
+            answers = qa.get("answer", [])
+            if not answers:
+                continue
+            reachable = _reachable_from(graph, qa["topic_entity"], max_hops=2)
+            if reachable & _metaqa_answer_nodes(answers):
+                found += 1
+            total += 1
+
+        if total == 0:
+            pytest.skip("No MetaQA 2-hop QA pairs evaluated")
+
+        recall = found / total
+        threshold = get_threshold("multi_hop_recall_2hop")
+        print(f"  MetaQA 2-hop recall: {recall:.3f} ({found}/{total})")
+        assert recall >= threshold, f"MetaQA 2-hop recall {recall:.3f} < {threshold}"
+
+    def test_metaqa_3hop_answer_reachability(self, metaqa_dataset):
+        """
+        For MetaQA 3-hop QA pairs, answers require 3 relation hops.
+        Recall >= multi_hop_recall_3hop threshold (0.65).
+        """
+        kb = metaqa_dataset["1hop"]["movies_kb"]
+        qa_pairs = metaqa_dataset["3hop"]["qa_pairs"]
+        graph = _build_metaqa_graph(kb)
+
+        found = total = 0
+        for qa in qa_pairs:
+            answers = qa.get("answer", [])
+            if not answers:
+                continue
+            reachable = _reachable_from(graph, qa["topic_entity"], max_hops=3)
+            if reachable & _metaqa_answer_nodes(answers):
+                found += 1
+            total += 1
+
+        if total == 0:
+            pytest.skip("No MetaQA 3-hop QA pairs evaluated")
+
+        recall = found / total
+        threshold = get_threshold("multi_hop_recall_3hop")
+        print(f"  MetaQA 3-hop recall: {recall:.3f} ({found}/{total})")
+        assert recall >= threshold, f"MetaQA 3-hop recall {recall:.3f} < {threshold}"
+
+    def test_metaqa_kb_graph_node_coverage(self, metaqa_dataset):
+        """
+        All 100 MetaQA KB movies must be stored as graph nodes after build.
+        Node coverage rate >= 0.95.
+        """
+        kb = metaqa_dataset["1hop"]["movies_kb"]
+        graph = _build_metaqa_graph(kb)
+        stored = _all_node_ids(graph)
+        correct = sum(1 for movie in kb if movie["id"] in stored)
+        rate = correct / max(len(kb), 1)
+        assert rate >= 0.95, (
+            f"MetaQA KB movie node coverage {rate:.3f} < 0.95 ({correct}/{len(kb)})"
+        )

@@ -1,6 +1,6 @@
 {
-  "version": "1.0",
-  "description": "60-record synthesized decision evaluation set for Context Graph effectiveness benchmarking.",
+  "version": "1.1",
+  "description": "120-record synthesized decision evaluation set for Context Graph effectiveness benchmarking.",
   "sources": [
     "UCI German Credit CC-BY-4.0",
     "Kaggle Credit Risk CC0",
@@ -12,22 +12,22 @@
     "WNS HR Promotion CC0",
     "Magellan Amazon-Google research open"
   ],
-  "record_count": 60,
+  "record_count": 120,
   "domain_counts": {
-    "lending": 12,
-    "healthcare": 12,
-    "legal": 12,
-    "hr": 12,
-    "ecommerce": 12
+    "lending": 24,
+    "healthcare": 24,
+    "legal": 24,
+    "hr": 24,
+    "ecommerce": 24
   },
   "decision_counts": {
-    "approve": 25,
-    "reject": 13,
-    "escalate": 22
+    "approve": 49,
+    "escalate": 43,
+    "reject": 28
   },
-  "boundary_cases": 9,
-  "conflicting_policy_cases": 5,
-  "overturned_precedent_cases": 5,
+  "boundary_cases": 20,
+  "conflicting_policy_cases": 12,
+  "overturned_precedent_cases": 13,
   "records": [
     {
       "id": "DI_L001",
@@ -3138,6 +3138,3299 @@
           {
             "source": "p_ecommerce_fraud",
             "target": "ec_prec_11",
+            "type": "POLICY_APPLIED",
+            "weight": 1.0
+          }
+        ]
+      },
+      "boundary_case": false,
+      "has_conflicting_policies": false,
+      "has_overturned_precedent": false,
+      "tags": [
+        "ecommerce"
+      ]
+    },
+    {
+      "id": "DI_L013",
+      "domain": "lending",
+      "source_dataset": "UCI_German_Credit + synthetic",
+      "scenario": "Jennifer Park, 30, income $72k, credit score 715, DTI 32%, 5yr employment, personal loan $18k requested.",
+      "ground_truth_decision": "approve",
+      "ground_truth_reasoning": "Solid mid-range profile: DTI well below 43%, score above 680, stable employment.",
+      "applicable_policy_ids": [
+        "p_lending_dti",
+        "p_lending_credit_score"
+      ],
+      "context_graph": {
+        "nodes": [
+          {
+            "id": "p_lending_dti",
+            "type": "Policy",
+            "label": "DTI Limit Policy",
+            "rules": {
+              "max_dti": 0.43,
+              "category": "lending"
+            },
+            "category": "lending",
+            "version": "2.1"
+          },
+          {
+            "id": "p_lending_credit_score",
+            "type": "Policy",
+            "label": "Credit Score Policy",
+            "rules": {
+              "min_score": 680,
+              "category": "lending"
+            },
+            "category": "lending",
+            "version": "1.0"
+          },
+          {
+            "id": "prec_L013",
+            "type": "Precedent",
+            "label": "Similar approve case",
+            "outcome": "approve",
+            "similarity_score": 0.87
+          }
+        ],
+        "edges": [
+          {
+            "source": "p_lending_dti",
+            "target": "prec_L013",
+            "type": "POLICY_APPLIED",
+            "weight": 1.0
+          }
+        ]
+      },
+      "boundary_case": false,
+      "has_conflicting_policies": false,
+      "has_overturned_precedent": false,
+      "tags": [
+        "lending"
+      ]
+    },
+    {
+      "id": "DI_L014",
+      "domain": "lending",
+      "source_dataset": "UCI_German_Credit + synthetic",
+      "scenario": "Kevin Osei, 26, income $38k, score 598, DTI 51%, 1yr employment, auto loan $12k, two defaults in past 3yr.",
+      "ground_truth_decision": "reject",
+      "ground_truth_reasoning": "DTI exceeds 43%, score below 680 minimum, recent defaults disqualify.",
+      "applicable_policy_ids": [
+        "p_lending_dti",
+        "p_lending_credit_score"
+      ],
+      "context_graph": {
+        "nodes": [
+          {
+            "id": "p_lending_dti",
+            "type": "Policy",
+            "label": "DTI Limit Policy",
+            "rules": {
+              "max_dti": 0.43,
+              "category": "lending"
+            },
+            "category": "lending",
+            "version": "2.1"
+          },
+          {
+            "id": "p_lending_credit_score",
+            "type": "Policy",
+            "label": "Credit Score Policy",
+            "rules": {
+              "min_score": 680,
+              "category": "lending"
+            },
+            "category": "lending",
+            "version": "1.0"
+          },
+          {
+            "id": "prec_L014",
+            "type": "Precedent",
+            "label": "Similar reject case",
+            "outcome": "reject",
+            "similarity_score": 0.91
+          }
+        ],
+        "edges": [
+          {
+            "source": "p_lending_dti",
+            "target": "prec_L014",
+            "type": "POLICY_APPLIED",
+            "weight": 1.0
+          }
+        ]
+      },
+      "boundary_case": false,
+      "has_conflicting_policies": false,
+      "has_overturned_precedent": false,
+      "tags": [
+        "lending"
+      ]
+    },
+    {
+      "id": "DI_L015",
+      "domain": "lending",
+      "source_dataset": "UCI_German_Credit + synthetic",
+      "scenario": "Fatima Al-Hassan, 43, income $125k, score 755, DTI 19%, 12yr employment, mortgage refinance $320k.",
+      "ground_truth_decision": "approve",
+      "ground_truth_reasoning": "Strong financials: low DTI, high credit score, long stable employment.",
+      "applicable_policy_ids": [
+        "p_lending_dti",
+        "p_lending_credit_score"
+      ],
+      "context_graph": {
+        "nodes": [
+          {
+            "id": "p_lending_dti",
+            "type": "Policy",
+            "label": "DTI Limit Policy",
+            "rules": {
+              "max_dti": 0.43,
+              "category": "lending"
+            },
+            "category": "lending",
+            "version": "2.1"
+          },
+          {
+            "id": "p_lending_credit_score",
+            "type": "Policy",
+            "label": "Credit Score Policy",
+            "rules": {
+              "min_score": 680,
+              "category": "lending"
+            },
+            "category": "lending",
+            "version": "1.0"
+          },
+          {
+            "id": "prec_L015",
+            "type": "Precedent",
+            "label": "Similar approve case",
+            "outcome": "approve",
+            "similarity_score": 0.92
+          }
+        ],
+        "edges": [
+          {
+            "source": "p_lending_dti",
+            "target": "prec_L015",
+            "type": "POLICY_APPLIED",
+            "weight": 1.0
+          }
+        ]
+      },
+      "boundary_case": false,
+      "has_conflicting_policies": false,
+      "has_overturned_precedent": false,
+      "tags": [
+        "lending"
+      ]
+    },
+    {
+      "id": "DI_L016",
+      "domain": "lending",
+      "source_dataset": "UCI_German_Credit + synthetic",
+      "scenario": "Nathan Burke, 31, income $58k, score 682, DTI 42.5%, 3yr employment, home equity loan $30k. Score barely above minimum; DTI nearly at cap.",
+      "ground_truth_decision": "escalate",
+      "ground_truth_reasoning": "Boundary: score only 2 points above minimum, DTI 0.5% below cap; marginal profile requires human review.",
+      "applicable_policy_ids": [
+        "p_lending_dti",
+        "p_lending_credit_score"
+      ],
+      "context_graph": {
+        "nodes": [
+          {
+            "id": "p_lending_dti",
+            "type": "Policy",
+            "label": "DTI Limit Policy",
+            "rules": {
+              "max_dti": 0.43,
+              "category": "lending"
+            },
+            "category": "lending",
+            "version": "2.1"
+          },
+          {
+            "id": "p_lending_credit_score",
+            "type": "Policy",
+            "label": "Credit Score Policy",
+            "rules": {
+              "min_score": 680,
+              "category": "lending"
+            },
+            "category": "lending",
+            "version": "1.0"
+          },
+          {
+            "id": "prec_L016",
+            "type": "Precedent",
+            "label": "Similar escalate case",
+            "outcome": "escalate",
+            "similarity_score": 0.89
+          }
+        ],
+        "edges": [
+          {
+            "source": "p_lending_dti",
+            "target": "prec_L016",
+            "type": "POLICY_APPLIED",
+            "weight": 1.0
+          }
+        ]
+      },
+      "boundary_case": true,
+      "has_conflicting_policies": false,
+      "has_overturned_precedent": false,
+      "tags": [
+        "lending"
+      ]
+    },
+    {
+      "id": "DI_L017",
+      "domain": "lending",
+      "source_dataset": "UCI_German_Credit + synthetic",
+      "scenario": "Rachel Torres, 52, income $185k, score 795, DTI 16%, 18yr employment, jumbo mortgage $900k. Investor policy limits jumbo loans to DTI <20%; standard policy caps at 43%.",
+      "ground_truth_decision": "escalate",
+      "ground_truth_reasoning": "Conflicting policies: investor-grade jumbo policy (DTI <20%) triggers secondary review; standard policy also applies; dual-policy requires supervisory sign-off.",
+      "applicable_policy_ids": [
+        "p_lending_dti",
+        "p_lending_credit_score",
+        "p_lending_jumbo_investor"
+      ],
+      "context_graph": {
+        "nodes": [
+          {
+            "id": "p_lending_dti",
+            "type": "Policy",
+            "label": "DTI Limit Policy",
+            "rules": {
+              "max_dti": 0.43,
+              "category": "lending"
+            },
+            "category": "lending",
+            "version": "2.1"
+          },
+          {
+            "id": "p_lending_credit_score",
+            "type": "Policy",
+            "label": "Credit Score Policy",
+            "rules": {
+              "min_score": 680,
+              "category": "lending"
+            },
+            "category": "lending",
+            "version": "1.0"
+          },
+          {
+            "id": "p_lending_jumbo_investor",
+            "type": "Policy",
+            "label": "Jumbo Investor DTI Policy",
+            "rules": {
+              "max_dti": 0.2,
+              "loan_type": "jumbo",
+              "category": "lending"
+            },
+            "category": "lending",
+            "version": "1.2"
+          },
+          {
+            "id": "prec_L017",
+            "type": "Precedent",
+            "label": "Similar escalate case",
+            "outcome": "escalate",
+            "similarity_score": 0.84
+          }
+        ],
+        "edges": [
+          {
+            "source": "p_lending_dti",
+            "target": "prec_L017",
+            "type": "POLICY_APPLIED",
+            "weight": 1.0
+          },
+          {
+            "source": "p_lending_jumbo_investor",
+            "target": "prec_L017",
+            "type": "POLICY_APPLIED",
+            "weight": 0.8
+          }
+        ]
+      },
+      "boundary_case": false,
+      "has_conflicting_policies": true,
+      "has_overturned_precedent": false,
+      "tags": [
+        "lending"
+      ]
+    },
+    {
+      "id": "DI_L018",
+      "domain": "lending",
+      "source_dataset": "UCI_German_Credit + synthetic",
+      "scenario": "Victor Nguyen, 38, income $88k, score 728, DTI 29%, 6yr employment, small business loan $75k. Prior similar case rejected due to self-employment; new policy removed that exclusion.",
+      "ground_truth_decision": "approve",
+      "ground_truth_reasoning": "Overturned precedent: self-employment exclusion removed in 2025 policy update; profile otherwise qualifies.",
+      "applicable_policy_ids": [
+        "p_lending_dti",
+        "p_lending_credit_score"
+      ],
+      "context_graph": {
+        "nodes": [
+          {
+            "id": "p_lending_dti",
+            "type": "Policy",
+            "label": "DTI Limit Policy",
+            "rules": {
+              "max_dti": 0.43,
+              "category": "lending"
+            },
+            "category": "lending",
+            "version": "2.1"
+          },
+          {
+            "id": "p_lending_credit_score",
+            "type": "Policy",
+            "label": "Credit Score Policy",
+            "rules": {
+              "min_score": 680,
+              "category": "lending"
+            },
+            "category": "lending",
+            "version": "1.0"
+          },
+          {
+            "id": "prec_overturned_L018",
+            "type": "Precedent",
+            "label": "Overturned self-employment rejection",
+            "outcome": "reject",
+            "overturned_by": "policy_update_2025_self_employment",
+            "similarity_score": 0.86
+          }
+        ],
+        "edges": [
+          {
+            "source": "p_lending_dti",
+            "target": "prec_overturned_L018",
+            "type": "POLICY_APPLIED",
+            "weight": 1.0
+          }
+        ]
+      },
+      "boundary_case": false,
+      "has_conflicting_policies": false,
+      "has_overturned_precedent": true,
+      "tags": [
+        "lending"
+      ]
+    },
+    {
+      "id": "DI_L019",
+      "domain": "lending",
+      "source_dataset": "UCI_German_Credit + synthetic",
+      "scenario": "Chloe Martin, 24, income $32k, score 631, DTI 47%, first job 8 months, student loan refinance $22k.",
+      "ground_truth_decision": "reject",
+      "ground_truth_reasoning": "DTI exceeds cap, score below minimum, limited employment history.",
+      "applicable_policy_ids": [
+        "p_lending_dti",
+        "p_lending_credit_score"
+      ],
+      "context_graph": {
+        "nodes": [
+          {
+            "id": "p_lending_dti",
+            "type": "Policy",
+            "label": "DTI Limit Policy",
+            "rules": {
+              "max_dti": 0.43,
+              "category": "lending"
+            },
+            "category": "lending",
+            "version": "2.1"
+          },
+          {
+            "id": "p_lending_credit_score",
+            "type": "Policy",
+            "label": "Credit Score Policy",
+            "rules": {
+              "min_score": 680,
+              "category": "lending"
+            },
+            "category": "lending",
+            "version": "1.0"
+          },
+          {
+            "id": "prec_L019",
+            "type": "Precedent",
+            "label": "Similar reject case",
+            "outcome": "reject",
+            "similarity_score": 0.9
+          }
+        ],
+        "edges": [
+          {
+            "source": "p_lending_dti",
+            "target": "prec_L019",
+            "type": "POLICY_APPLIED",
+            "weight": 1.0
+          }
+        ]
+      },
+      "boundary_case": false,
+      "has_conflicting_policies": false,
+      "has_overturned_precedent": false,
+      "tags": [
+        "lending"
+      ]
+    },
+    {
+      "id": "DI_L020",
+      "domain": "lending",
+      "source_dataset": "UCI_German_Credit + synthetic",
+      "scenario": "Michael Adeyemi, 47, income $145k, score 771, DTI 24%, 14yr employment, mortgage $450k, co-applicant score 680.",
+      "ground_truth_decision": "approve",
+      "ground_truth_reasoning": "Joint application with strong primary applicant; both meet all thresholds.",
+      "applicable_policy_ids": [
+        "p_lending_dti",
+        "p_lending_credit_score"
+      ],
+      "context_graph": {
+        "nodes": [
+          {
+            "id": "p_lending_dti",
+            "type": "Policy",
+            "label": "DTI Limit Policy",
+            "rules": {
+              "max_dti": 0.43,
+              "category": "lending"
+            },
+            "category": "lending",
+            "version": "2.1"
+          },
+          {
+            "id": "p_lending_credit_score",
+            "type": "Policy",
+            "label": "Credit Score Policy",
+            "rules": {
+              "min_score": 680,
+              "category": "lending"
+            },
+            "category": "lending",
+            "version": "1.0"
+          },
+          {
+            "id": "prec_L020",
+            "type": "Precedent",
+            "label": "Similar approve case",
+            "outcome": "approve",
+            "similarity_score": 0.88
+          }
+        ],
+        "edges": [
+          {
+            "source": "p_lending_dti",
+            "target": "prec_L020",
+            "type": "POLICY_APPLIED",
+            "weight": 1.0
+          }
+        ]
+      },
+      "boundary_case": false,
+      "has_conflicting_policies": false,
+      "has_overturned_precedent": false,
+      "tags": [
+        "lending"
+      ]
+    },
+    {
+      "id": "DI_L021",
+      "domain": "lending",
+      "source_dataset": "UCI_German_Credit + synthetic",
+      "scenario": "Ling Zhang, 36, income $65k, score 688, DTI 43.1%, 4yr employment, credit card $8k. DTI marginally exceeds 43% threshold.",
+      "ground_truth_decision": "reject",
+      "ground_truth_reasoning": "DTI exceeds 43% cap by 0.1%; strict policy application results in rejection.",
+      "applicable_policy_ids": [
+        "p_lending_dti",
+        "p_lending_credit_score"
+      ],
+      "context_graph": {
+        "nodes": [
+          {
+            "id": "p_lending_dti",
+            "type": "Policy",
+            "label": "DTI Limit Policy",
+            "rules": {
+              "max_dti": 0.43,
+              "category": "lending"
+            },
+            "category": "lending",
+            "version": "2.1"
+          },
+          {
+            "id": "p_lending_credit_score",
+            "type": "Policy",
+            "label": "Credit Score Policy",
+            "rules": {
+              "min_score": 680,
+              "category": "lending"
+            },
+            "category": "lending",
+            "version": "1.0"
+          },
+          {
+            "id": "prec_L021",
+            "type": "Precedent",
+            "label": "Similar reject case - boundary DTI",
+            "outcome": "reject",
+            "similarity_score": 0.93
+          }
+        ],
+        "edges": [
+          {
+            "source": "p_lending_dti",
+            "target": "prec_L021",
+            "type": "POLICY_APPLIED",
+            "weight": 1.0
+          }
+        ]
+      },
+      "boundary_case": true,
+      "has_conflicting_policies": false,
+      "has_overturned_precedent": false,
+      "tags": [
+        "lending"
+      ]
+    },
+    {
+      "id": "DI_L022",
+      "domain": "lending",
+      "source_dataset": "UCI_German_Credit + synthetic",
+      "scenario": "Anna Kowalski, 40, income $95k, score 743, DTI 27%, 9yr employment, debt consolidation $55k. Similar case was escalated under old workflow; automated workflow update now resolves cleanly.",
+      "ground_truth_decision": "approve",
+      "ground_truth_reasoning": "Overturned escalation precedent: system rule update enables automated approval for this profile class.",
+      "applicable_policy_ids": [
+        "p_lending_dti",
+        "p_lending_credit_score"
+      ],
+      "context_graph": {
+        "nodes": [
+          {
+            "id": "p_lending_dti",
+            "type": "Policy",
+            "label": "DTI Limit Policy",
+            "rules": {
+              "max_dti": 0.43,
+              "category": "lending"
+            },
+            "category": "lending",
+            "version": "2.1"
+          },
+          {
+            "id": "p_lending_credit_score",
+            "type": "Policy",
+            "label": "Credit Score Policy",
+            "rules": {
+              "min_score": 680,
+              "category": "lending"
+            },
+            "category": "lending",
+            "version": "1.0"
+          },
+          {
+            "id": "prec_overturned_L022",
+            "type": "Precedent",
+            "label": "Overturned escalation precedent",
+            "outcome": "escalate",
+            "overturned_by": "workflow_update_2025_auto_approve",
+            "similarity_score": 0.85
+          }
+        ],
+        "edges": [
+          {
+            "source": "p_lending_dti",
+            "target": "prec_overturned_L022",
+            "type": "POLICY_APPLIED",
+            "weight": 1.0
+          }
+        ]
+      },
+      "boundary_case": false,
+      "has_conflicting_policies": false,
+      "has_overturned_precedent": true,
+      "tags": [
+        "lending"
+      ]
+    },
+    {
+      "id": "DI_L023",
+      "domain": "lending",
+      "source_dataset": "UCI_German_Credit + synthetic",
+      "scenario": "Jerome Washington, 33, income $53k, score 700, DTI 38%, 4yr employment, HELOC $40k. CRA community reinvestment policy mandates leniency; standard underwriting policy applies normal thresholds.",
+      "ground_truth_decision": "escalate",
+      "ground_truth_reasoning": "Conflicting policies: CRA leniency mandate vs standard underwriting thresholds require supervisory review.",
+      "applicable_policy_ids": [
+        "p_lending_dti",
+        "p_lending_credit_score",
+        "p_lending_cra_community"
+      ],
+      "context_graph": {
+        "nodes": [
+          {
+            "id": "p_lending_dti",
+            "type": "Policy",
+            "label": "DTI Limit Policy",
+            "rules": {
+              "max_dti": 0.43,
+              "category": "lending"
+            },
+            "category": "lending",
+            "version": "2.1"
+          },
+          {
+            "id": "p_lending_credit_score",
+            "type": "Policy",
+            "label": "Credit Score Policy",
+            "rules": {
+              "min_score": 680,
+              "category": "lending"
+            },
+            "category": "lending",
+            "version": "1.0"
+          },
+          {
+            "id": "p_lending_cra_community",
+            "type": "Policy",
+            "label": "CRA Community Reinvestment Policy",
+            "rules": {
+              "allow_score_exception": true,
+              "category": "lending"
+            },
+            "category": "lending",
+            "version": "1.0"
+          },
+          {
+            "id": "prec_L023",
+            "type": "Precedent",
+            "label": "Similar escalate case",
+            "outcome": "escalate",
+            "similarity_score": 0.82
+          }
+        ],
+        "edges": [
+          {
+            "source": "p_lending_dti",
+            "target": "prec_L023",
+            "type": "POLICY_APPLIED",
+            "weight": 1.0
+          },
+          {
+            "source": "p_lending_cra_community",
+            "target": "prec_L023",
+            "type": "POLICY_APPLIED",
+            "weight": 0.9
+          }
+        ]
+      },
+      "boundary_case": false,
+      "has_conflicting_policies": true,
+      "has_overturned_precedent": false,
+      "tags": [
+        "lending"
+      ]
+    },
+    {
+      "id": "DI_L024",
+      "domain": "lending",
+      "source_dataset": "UCI_German_Credit + synthetic",
+      "scenario": "Sandra Ivanova, 28, income $48k, score 693, DTI 40%, 3yr employment, personal loan $15k. DTI and score both near but within limits.",
+      "ground_truth_decision": "escalate",
+      "ground_truth_reasoning": "Boundary profile: both DTI and score near limits simultaneously; combination warrants human review.",
+      "applicable_policy_ids": [
+        "p_lending_dti",
+        "p_lending_credit_score"
+      ],
+      "context_graph": {
+        "nodes": [
+          {
+            "id": "p_lending_dti",
+            "type": "Policy",
+            "label": "DTI Limit Policy",
+            "rules": {
+              "max_dti": 0.43,
+              "category": "lending"
+            },
+            "category": "lending",
+            "version": "2.1"
+          },
+          {
+            "id": "p_lending_credit_score",
+            "type": "Policy",
+            "label": "Credit Score Policy",
+            "rules": {
+              "min_score": 680,
+              "category": "lending"
+            },
+            "category": "lending",
+            "version": "1.0"
+          },
+          {
+            "id": "prec_L024",
+            "type": "Precedent",
+            "label": "Similar escalate case - dual boundary",
+            "outcome": "escalate",
+            "similarity_score": 0.88
+          }
+        ],
+        "edges": [
+          {
+            "source": "p_lending_dti",
+            "target": "prec_L024",
+            "type": "POLICY_APPLIED",
+            "weight": 1.0
+          }
+        ]
+      },
+      "boundary_case": true,
+      "has_conflicting_policies": false,
+      "has_overturned_precedent": false,
+      "tags": [
+        "lending"
+      ]
+    },
+    {
+      "id": "DI_H013",
+      "domain": "healthcare",
+      "source_dataset": "TREC_CT_2022 + TrialGPT + synthetic",
+      "scenario": "52yo male, type 2 diabetes, HbA1c 9.2%, BMI 33, on metformin only, eGFR 68. Requesting enrollment in SGLT2 inhibitor outcomes trial.",
+      "ground_truth_decision": "approve",
+      "ground_truth_reasoning": "Elevated HbA1c meets inclusion; eGFR above 60 threshold; no exclusion criteria.",
+      "applicable_policy_ids": [
+        "p_clinical_eligibility"
+      ],
+      "context_graph": {
+        "nodes": [
+          {
+            "id": "p_clinical_eligibility",
+            "type": "Policy",
+            "label": "Clinical Trial Eligibility Policy",
+            "rules": {
+              "require_no_contraindications": true
+            },
+            "category": "healthcare",
+            "version": "1.0"
+          },
+          {
+            "id": "hc_prec_L013",
+            "type": "Precedent",
+            "label": "Similar approve case",
+            "outcome": "approve",
+            "similarity_score": 0.88
+          }
+        ],
+        "edges": [
+          {
+            "source": "p_clinical_eligibility",
+            "target": "hc_prec_L013",
+            "type": "POLICY_APPLIED",
+            "weight": 1.0
+          }
+        ]
+      },
+      "boundary_case": false,
+      "has_conflicting_policies": false,
+      "has_overturned_precedent": false,
+      "tags": [
+        "healthcare"
+      ]
+    },
+    {
+      "id": "DI_H014",
+      "domain": "healthcare",
+      "source_dataset": "TREC_CT_2022 + TrialGPT + synthetic",
+      "scenario": "67yo female, HbA1c 10.1%, eGFR 44 (stage 3b CKD), insulin-dependent diabetes. Requesting GLP-1 agonist trial enrollment.",
+      "ground_truth_decision": "reject",
+      "ground_truth_reasoning": "eGFR < 45 is an exclusion criterion for this renal function-sensitive trial.",
+      "applicable_policy_ids": [
+        "p_clinical_eligibility"
+      ],
+      "context_graph": {
+        "nodes": [
+          {
+            "id": "p_clinical_eligibility",
+            "type": "Policy",
+            "label": "Clinical Trial Eligibility Policy",
+            "rules": {
+              "require_no_contraindications": true
+            },
+            "category": "healthcare",
+            "version": "1.0"
+          },
+          {
+            "id": "hc_prec_L014",
+            "type": "Precedent",
+            "label": "Similar reject case",
+            "outcome": "reject",
+            "similarity_score": 0.86
+          }
+        ],
+        "edges": [
+          {
+            "source": "p_clinical_eligibility",
+            "target": "hc_prec_L014",
+            "type": "POLICY_APPLIED",
+            "weight": 1.0
+          }
+        ]
+      },
+      "boundary_case": false,
+      "has_conflicting_policies": false,
+      "has_overturned_precedent": false,
+      "tags": [
+        "healthcare"
+      ]
+    },
+    {
+      "id": "DI_H015",
+      "domain": "healthcare",
+      "source_dataset": "TREC_CT_2022 + TrialGPT + synthetic",
+      "scenario": "44yo male, HbA1c 6.6%, newly diagnosed type 2 diabetes, no medications yet. HbA1c just 0.1% above the 6.5% inclusion cutoff for early intervention trial.",
+      "ground_truth_decision": "escalate",
+      "ground_truth_reasoning": "Boundary: HbA1c marginally above inclusion threshold; borderline case warrants principal investigator review.",
+      "applicable_policy_ids": [
+        "p_clinical_eligibility"
+      ],
+      "context_graph": {
+        "nodes": [
+          {
+            "id": "p_clinical_eligibility",
+            "type": "Policy",
+            "label": "Clinical Trial Eligibility Policy",
+            "rules": {
+              "require_no_contraindications": true
+            },
+            "category": "healthcare",
+            "version": "1.0"
+          },
+          {
+            "id": "hc_prec_L015",
+            "type": "Precedent",
+            "label": "Similar escalate case - boundary HbA1c",
+            "outcome": "escalate",
+            "similarity_score": 0.91
+          }
+        ],
+        "edges": [
+          {
+            "source": "p_clinical_eligibility",
+            "target": "hc_prec_L015",
+            "type": "POLICY_APPLIED",
+            "weight": 1.0
+          }
+        ]
+      },
+      "boundary_case": true,
+      "has_conflicting_policies": false,
+      "has_overturned_precedent": false,
+      "tags": [
+        "healthcare"
+      ]
+    },
+    {
+      "id": "DI_H016",
+      "domain": "healthcare",
+      "source_dataset": "TREC_CT_2022 + TrialGPT + synthetic",
+      "scenario": "58yo female, STEMI 6wk ago, EF 38%, stable on dual antiplatelet therapy. Requesting enrollment in cardiac rehabilitation remote monitoring trial.",
+      "ground_truth_decision": "approve",
+      "ground_truth_reasoning": "Post-MI rehabilitation trial: 6 weeks post-event meets washout requirement, EF within inclusion range.",
+      "applicable_policy_ids": [
+        "p_clinical_eligibility"
+      ],
+      "context_graph": {
+        "nodes": [
+          {
+            "id": "p_clinical_eligibility",
+            "type": "Policy",
+            "label": "Clinical Trial Eligibility Policy",
+            "rules": {
+              "require_no_contraindications": true
+            },
+            "category": "healthcare",
+            "version": "1.0"
+          },
+          {
+            "id": "hc_prec_L016",
+            "type": "Precedent",
+            "label": "Similar approve case",
+            "outcome": "approve",
+            "similarity_score": 0.83
+          }
+        ],
+        "edges": [
+          {
+            "source": "p_clinical_eligibility",
+            "target": "hc_prec_L016",
+            "type": "POLICY_APPLIED",
+            "weight": 1.0
+          }
+        ]
+      },
+      "boundary_case": false,
+      "has_conflicting_policies": false,
+      "has_overturned_precedent": false,
+      "tags": [
+        "healthcare"
+      ]
+    },
+    {
+      "id": "DI_H017",
+      "domain": "healthcare",
+      "source_dataset": "TREC_CT_2022 + TrialGPT + synthetic",
+      "scenario": "72yo male, NYHA class III heart failure, EF 22%, on ACE inhibitor + beta-blocker. Requesting HFrEF device trial. Original protocol excludes >70yo; amended protocol raised limit to 75yo.",
+      "ground_truth_decision": "escalate",
+      "ground_truth_reasoning": "Conflicting protocol versions: original excludes >70yo; amended allows up to 75yo; IRB clarification required.",
+      "applicable_policy_ids": [
+        "p_clinical_eligibility",
+        "p_clinical_amended_protocol"
+      ],
+      "context_graph": {
+        "nodes": [
+          {
+            "id": "p_clinical_eligibility",
+            "type": "Policy",
+            "label": "Clinical Trial Eligibility Policy",
+            "rules": {
+              "require_no_contraindications": true
+            },
+            "category": "healthcare",
+            "version": "1.0"
+          },
+          {
+            "id": "p_clinical_amended_protocol",
+            "type": "Policy",
+            "label": "Amended HFrEF Protocol v2",
+            "rules": {
+              "max_age": 75,
+              "category": "healthcare"
+            },
+            "category": "healthcare",
+            "version": "2.0"
+          },
+          {
+            "id": "hc_prec_L017",
+            "type": "Precedent",
+            "label": "Similar escalate case - protocol conflict",
+            "outcome": "escalate",
+            "similarity_score": 0.87
+          }
+        ],
+        "edges": [
+          {
+            "source": "p_clinical_eligibility",
+            "target": "hc_prec_L017",
+            "type": "POLICY_APPLIED",
+            "weight": 1.0
+          },
+          {
+            "source": "p_clinical_amended_protocol",
+            "target": "hc_prec_L017",
+            "type": "POLICY_APPLIED",
+            "weight": 0.9
+          }
+        ]
+      },
+      "boundary_case": false,
+      "has_conflicting_policies": true,
+      "has_overturned_precedent": false,
+      "tags": [
+        "healthcare"
+      ]
+    },
+    {
+      "id": "DI_H018",
+      "domain": "healthcare",
+      "source_dataset": "TREC_CT_2022 + TrialGPT + synthetic",
+      "scenario": "49yo female, stage III NSCLC, EGFR mutation positive, no prior targeted therapy. Requesting osimertinib trial enrollment.",
+      "ground_truth_decision": "approve",
+      "ground_truth_reasoning": "EGFR+ NSCLC stage III meets biomarker inclusion; treatment-naive criterion satisfied.",
+      "applicable_policy_ids": [
+        "p_clinical_eligibility"
+      ],
+      "context_graph": {
+        "nodes": [
+          {
+            "id": "p_clinical_eligibility",
+            "type": "Policy",
+            "label": "Clinical Trial Eligibility Policy",
+            "rules": {
+              "require_no_contraindications": true
+            },
+            "category": "healthcare",
+            "version": "1.0"
+          },
+          {
+            "id": "hc_prec_L018",
+            "type": "Precedent",
+            "label": "Similar approve case - NSCLC EGFR+",
+            "outcome": "approve",
+            "similarity_score": 0.9
+          }
+        ],
+        "edges": [
+          {
+            "source": "p_clinical_eligibility",
+            "target": "hc_prec_L018",
+            "type": "POLICY_APPLIED",
+            "weight": 1.0
+          }
+        ]
+      },
+      "boundary_case": false,
+      "has_conflicting_policies": false,
+      "has_overturned_precedent": false,
+      "tags": [
+        "healthcare"
+      ]
+    },
+    {
+      "id": "DI_H019",
+      "domain": "healthcare",
+      "source_dataset": "TREC_CT_2022 + TrialGPT + synthetic",
+      "scenario": "61yo male, colorectal cancer stage IV, MSI-H, prior immunotherapy 14 months ago. Requesting pembrolizumab combination trial. Prior policy set 12mo washout; amended protocol reduced to 6mo.",
+      "ground_truth_decision": "approve",
+      "ground_truth_reasoning": "Overturned precedent: washout period reduced from 12mo to 6mo by protocol amendment; 14mo since last treatment clears both thresholds.",
+      "applicable_policy_ids": [
+        "p_clinical_eligibility"
+      ],
+      "context_graph": {
+        "nodes": [
+          {
+            "id": "p_clinical_eligibility",
+            "type": "Policy",
+            "label": "Clinical Trial Eligibility Policy",
+            "rules": {
+              "require_no_contraindications": true
+            },
+            "category": "healthcare",
+            "version": "1.0"
+          },
+          {
+            "id": "hc_prec_overturned_L019",
+            "type": "Precedent",
+            "label": "Overturned exclusion - washout period amended",
+            "outcome": "reject",
+            "overturned_by": "protocol_amendment_2025_washout",
+            "similarity_score": 0.88
+          }
+        ],
+        "edges": [
+          {
+            "source": "p_clinical_eligibility",
+            "target": "hc_prec_overturned_L019",
+            "type": "POLICY_APPLIED",
+            "weight": 1.0
+          }
+        ]
+      },
+      "boundary_case": false,
+      "has_conflicting_policies": false,
+      "has_overturned_precedent": true,
+      "tags": [
+        "healthcare"
+      ]
+    },
+    {
+      "id": "DI_H020",
+      "domain": "healthcare",
+      "source_dataset": "TREC_CT_2022 + TrialGPT + synthetic",
+      "scenario": "35yo female, RA with moderate disease activity, DAS28 4.1, MTX-experienced but discontinued due to hepatotoxicity. Requesting JAK inhibitor trial.",
+      "ground_truth_decision": "reject",
+      "ground_truth_reasoning": "MTX discontinuation due to toxicity classifies patient as MTX-intolerant, not MTX-inadequate-responder; mismatches trial inclusion criteria.",
+      "applicable_policy_ids": [
+        "p_clinical_eligibility"
+      ],
+      "context_graph": {
+        "nodes": [
+          {
+            "id": "p_clinical_eligibility",
+            "type": "Policy",
+            "label": "Clinical Trial Eligibility Policy",
+            "rules": {
+              "require_no_contraindications": true
+            },
+            "category": "healthcare",
+            "version": "1.0"
+          },
+          {
+            "id": "hc_prec_L020",
+            "type": "Precedent",
+            "label": "Similar reject case - MTX intolerant",
+            "outcome": "reject",
+            "similarity_score": 0.84
+          }
+        ],
+        "edges": [
+          {
+            "source": "p_clinical_eligibility",
+            "target": "hc_prec_L020",
+            "type": "POLICY_APPLIED",
+            "weight": 1.0
+          }
+        ]
+      },
+      "boundary_case": false,
+      "has_conflicting_policies": false,
+      "has_overturned_precedent": false,
+      "tags": [
+        "healthcare"
+      ]
+    },
+    {
+      "id": "DI_H021",
+      "domain": "healthcare",
+      "source_dataset": "TREC_CT_2022 + TrialGPT + synthetic",
+      "scenario": "28yo male, Crohn's disease, CDAI 320, failed adalimumab. Requesting vedolizumab trial. One protocol arm requires age >= 30; another arm accepts age >= 18.",
+      "ground_truth_decision": "escalate",
+      "ground_truth_reasoning": "Boundary: patient 2yr below one arm age cutoff; protocol arm assignment ambiguous; trial coordinator clarification required.",
+      "applicable_policy_ids": [
+        "p_clinical_eligibility"
+      ],
+      "context_graph": {
+        "nodes": [
+          {
+            "id": "p_clinical_eligibility",
+            "type": "Policy",
+            "label": "Clinical Trial Eligibility Policy",
+            "rules": {
+              "require_no_contraindications": true
+            },
+            "category": "healthcare",
+            "version": "1.0"
+          },
+          {
+            "id": "hc_prec_L021",
+            "type": "Precedent",
+            "label": "Similar escalate case - age boundary",
+            "outcome": "escalate",
+            "similarity_score": 0.85
+          }
+        ],
+        "edges": [
+          {
+            "source": "p_clinical_eligibility",
+            "target": "hc_prec_L021",
+            "type": "POLICY_APPLIED",
+            "weight": 1.0
+          }
+        ]
+      },
+      "boundary_case": true,
+      "has_conflicting_policies": false,
+      "has_overturned_precedent": false,
+      "tags": [
+        "healthcare"
+      ]
+    },
+    {
+      "id": "DI_H022",
+      "domain": "healthcare",
+      "source_dataset": "TREC_CT_2022 + TrialGPT + synthetic",
+      "scenario": "70yo female, COPD GOLD II, FEV1 62%, current smoker 10 cigarettes/day. Requesting inhaled corticosteroid withdrawal trial.",
+      "ground_truth_decision": "reject",
+      "ground_truth_reasoning": "Active smoking is an explicit exclusion criterion; patient does not qualify.",
+      "applicable_policy_ids": [
+        "p_clinical_eligibility"
+      ],
+      "context_graph": {
+        "nodes": [
+          {
+            "id": "p_clinical_eligibility",
+            "type": "Policy",
+            "label": "Clinical Trial Eligibility Policy",
+            "rules": {
+              "require_no_contraindications": true
+            },
+            "category": "healthcare",
+            "version": "1.0"
+          },
+          {
+            "id": "hc_prec_L022",
+            "type": "Precedent",
+            "label": "Similar reject case - active smoker exclusion",
+            "outcome": "reject",
+            "similarity_score": 0.87
+          }
+        ],
+        "edges": [
+          {
+            "source": "p_clinical_eligibility",
+            "target": "hc_prec_L022",
+            "type": "POLICY_APPLIED",
+            "weight": 1.0
+          }
+        ]
+      },
+      "boundary_case": false,
+      "has_conflicting_policies": false,
+      "has_overturned_precedent": false,
+      "tags": [
+        "healthcare"
+      ]
+    },
+    {
+      "id": "DI_H023",
+      "domain": "healthcare",
+      "source_dataset": "TREC_CT_2022 + TrialGPT + synthetic",
+      "scenario": "55yo male, prostate cancer Gleason 7 (3+4), PSA 8.2, localized. Requesting active surveillance protocol. Prior policy excluded Gleason >6; updated criteria include Gleason 7 low-risk.",
+      "ground_truth_decision": "approve",
+      "ground_truth_reasoning": "Overturned precedent: Gleason 7 (3+4) now included per updated active surveillance protocol criteria.",
+      "applicable_policy_ids": [
+        "p_clinical_eligibility"
+      ],
+      "context_graph": {
+        "nodes": [
+          {
+            "id": "p_clinical_eligibility",
+            "type": "Policy",
+            "label": "Clinical Trial Eligibility Policy",
+            "rules": {
+              "require_no_contraindications": true
+            },
+            "category": "healthcare",
+            "version": "1.0"
+          },
+          {
+            "id": "hc_prec_overturned_L023",
+            "type": "Precedent",
+            "label": "Overturned Gleason exclusion - updated criteria",
+            "outcome": "reject",
+            "overturned_by": "protocol_update_2024_gleason7",
+            "similarity_score": 0.89
+          }
+        ],
+        "edges": [
+          {
+            "source": "p_clinical_eligibility",
+            "target": "hc_prec_overturned_L023",
+            "type": "POLICY_APPLIED",
+            "weight": 1.0
+          }
+        ]
+      },
+      "boundary_case": false,
+      "has_conflicting_policies": false,
+      "has_overturned_precedent": true,
+      "tags": [
+        "healthcare"
+      ]
+    },
+    {
+      "id": "DI_H024",
+      "domain": "healthcare",
+      "source_dataset": "TREC_CT_2022 + TrialGPT + synthetic",
+      "scenario": "41yo female, major depressive disorder, PHQ-9 score 19, failed 2 SSRIs. Active passive suicidal ideation noted at last visit (no plan). Requesting TMS trial enrollment.",
+      "ground_truth_decision": "escalate",
+      "ground_truth_reasoning": "Active suicidal ideation requires mandatory psychiatrist safety assessment before enrollment per protocol.",
+      "applicable_policy_ids": [
+        "p_clinical_eligibility"
+      ],
+      "context_graph": {
+        "nodes": [
+          {
+            "id": "p_clinical_eligibility",
+            "type": "Policy",
+            "label": "Clinical Trial Eligibility Policy",
+            "rules": {
+              "require_no_contraindications": true
+            },
+            "category": "healthcare",
+            "version": "1.0"
+          },
+          {
+            "id": "hc_prec_L024",
+            "type": "Precedent",
+            "label": "Similar escalate case - safety review required",
+            "outcome": "escalate",
+            "similarity_score": 0.86
+          }
+        ],
+        "edges": [
+          {
+            "source": "p_clinical_eligibility",
+            "target": "hc_prec_L024",
+            "type": "POLICY_APPLIED",
+            "weight": 1.0
+          }
+        ]
+      },
+      "boundary_case": false,
+      "has_conflicting_policies": false,
+      "has_overturned_precedent": false,
+      "tags": [
+        "healthcare"
+      ]
+    },
+    {
+      "id": "DI_LG013",
+      "domain": "legal",
+      "source_dataset": "CUAD + LexGLUE_LEDGAR + synthetic",
+      "scenario": "IP licensing agreement: royalty 8%, worldwide territory, sublicensing restrictions, termination-for-breach clause, governing law Delaware.",
+      "ground_truth_decision": "approve",
+      "ground_truth_reasoning": "Complete IP license with all required fields; terms within acceptable range.",
+      "applicable_policy_ids": [
+        "p_legal_ip_license",
+        "p_contract_review"
+      ],
+      "context_graph": {
+        "nodes": [
+          {
+            "id": "p_legal_ip_license",
+            "type": "Policy",
+            "label": "IP Licensing Policy",
+            "rules": {
+              "require_royalty_rate": true,
+              "require_territory": true,
+              "category": "legal"
+            },
+            "category": "legal",
+            "version": "2.0"
+          },
+          {
+            "id": "p_contract_review",
+            "type": "Policy",
+            "label": "Contract Review Policy",
+            "rules": {
+              "require_governing_law": true,
+              "require_limitation_of_liability": true
+            },
+            "category": "legal",
+            "version": "3.0"
+          },
+          {
+            "id": "lg_prec_L013",
+            "type": "Precedent",
+            "label": "Similar approve case - IP license",
+            "outcome": "approve",
+            "similarity_score": 0.87
+          }
+        ],
+        "edges": [
+          {
+            "source": "p_legal_ip_license",
+            "target": "lg_prec_L013",
+            "type": "POLICY_APPLIED",
+            "weight": 1.0
+          },
+          {
+            "source": "p_contract_review",
+            "target": "lg_prec_L013",
+            "type": "POLICY_APPLIED",
+            "weight": 0.8
+          }
+        ]
+      },
+      "boundary_case": false,
+      "has_conflicting_policies": false,
+      "has_overturned_precedent": false,
+      "tags": [
+        "legal"
+      ]
+    },
+    {
+      "id": "DI_LG014",
+      "domain": "legal",
+      "source_dataset": "CUAD + LexGLUE_LEDGAR + synthetic",
+      "scenario": "Data processing agreement: lacks 72hr breach notification timeframe (specifies \"reasonable time\"). No DPA processor clause present.",
+      "ground_truth_decision": "reject",
+      "ground_truth_reasoning": "Missing mandatory GDPR-compliant breach notification timeframe and processor clause; contract non-compliant.",
+      "applicable_policy_ids": [
+        "p_contract_review",
+        "p_legal_data_privacy"
+      ],
+      "context_graph": {
+        "nodes": [
+          {
+            "id": "p_contract_review",
+            "type": "Policy",
+            "label": "Contract Review Policy",
+            "rules": {
+              "require_governing_law": true,
+              "require_limitation_of_liability": true
+            },
+            "category": "legal",
+            "version": "3.0"
+          },
+          {
+            "id": "p_legal_data_privacy",
+            "type": "Policy",
+            "label": "Data Privacy Compliance Policy",
+            "rules": {
+              "require_breach_notification_hrs": 72,
+              "require_dpa_clause": true
+            },
+            "category": "legal",
+            "version": "1.5"
+          },
+          {
+            "id": "lg_prec_L014",
+            "type": "Precedent",
+            "label": "Similar reject case - GDPR non-compliance",
+            "outcome": "reject",
+            "similarity_score": 0.85
+          }
+        ],
+        "edges": [
+          {
+            "source": "p_contract_review",
+            "target": "lg_prec_L014",
+            "type": "POLICY_APPLIED",
+            "weight": 1.0
+          },
+          {
+            "source": "p_legal_data_privacy",
+            "target": "lg_prec_L014",
+            "type": "POLICY_APPLIED",
+            "weight": 1.0
+          }
+        ]
+      },
+      "boundary_case": false,
+      "has_conflicting_policies": false,
+      "has_overturned_precedent": false,
+      "tags": [
+        "legal"
+      ]
+    },
+    {
+      "id": "DI_LG015",
+      "domain": "legal",
+      "source_dataset": "CUAD + LexGLUE_LEDGAR + synthetic",
+      "scenario": "Senior executive employment agreement: non-solicitation 18mo, perpetual confidentiality, severance 12mo. Perpetual confidentiality may be unenforceable under state trade secret law.",
+      "ground_truth_decision": "escalate",
+      "ground_truth_reasoning": "Perpetual confidentiality clause potentially unenforceable under state law; counsel review required.",
+      "applicable_policy_ids": [
+        "p_contract_review"
+      ],
+      "context_graph": {
+        "nodes": [
+          {
+            "id": "p_contract_review",
+            "type": "Policy",
+            "label": "Contract Review Policy",
+            "rules": {
+              "require_governing_law": true,
+              "require_limitation_of_liability": true
+            },
+            "category": "legal",
+            "version": "3.0"
+          },
+          {
+            "id": "lg_prec_L015",
+            "type": "Precedent",
+            "label": "Similar escalate case - perpetual clause review",
+            "outcome": "escalate",
+            "similarity_score": 0.84
+          }
+        ],
+        "edges": [
+          {
+            "source": "p_contract_review",
+            "target": "lg_prec_L015",
+            "type": "POLICY_APPLIED",
+            "weight": 1.0
+          }
+        ]
+      },
+      "boundary_case": false,
+      "has_conflicting_policies": false,
+      "has_overturned_precedent": false,
+      "tags": [
+        "legal"
+      ]
+    },
+    {
+      "id": "DI_LG016",
+      "domain": "legal",
+      "source_dataset": "CUAD + LexGLUE_LEDGAR + synthetic",
+      "scenario": "SaaS MSA: data processing addendum included, limitation of liability at 12 months fees, governing law New York, 30-day cure period, auto-renewal with 60-day notice.",
+      "ground_truth_decision": "approve",
+      "ground_truth_reasoning": "All required enterprise SaaS contract clauses present and compliant with policy.",
+      "applicable_policy_ids": [
+        "p_contract_review"
+      ],
+      "context_graph": {
+        "nodes": [
+          {
+            "id": "p_contract_review",
+            "type": "Policy",
+            "label": "Contract Review Policy",
+            "rules": {
+              "require_governing_law": true,
+              "require_limitation_of_liability": true
+            },
+            "category": "legal",
+            "version": "3.0"
+          },
+          {
+            "id": "lg_prec_L016",
+            "type": "Precedent",
+            "label": "Similar approve case - SaaS MSA",
+            "outcome": "approve",
+            "similarity_score": 0.89
+          }
+        ],
+        "edges": [
+          {
+            "source": "p_contract_review",
+            "target": "lg_prec_L016",
+            "type": "POLICY_APPLIED",
+            "weight": 1.0
+          }
+        ]
+      },
+      "boundary_case": false,
+      "has_conflicting_policies": false,
+      "has_overturned_precedent": false,
+      "tags": [
+        "legal"
+      ]
+    },
+    {
+      "id": "DI_LG017",
+      "domain": "legal",
+      "source_dataset": "CUAD + LexGLUE_LEDGAR + synthetic",
+      "scenario": "Patent cross-license: royalty rate 12%. Legal policy caps at 10%; Finance strategic-deal policy allows up to 15%.",
+      "ground_truth_decision": "escalate",
+      "ground_truth_reasoning": "Conflicting policies: legal cap 10% vs finance strategic exception 15%; joint approval required.",
+      "applicable_policy_ids": [
+        "p_legal_ip_license",
+        "p_legal_finance_strategic"
+      ],
+      "context_graph": {
+        "nodes": [
+          {
+            "id": "p_legal_ip_license",
+            "type": "Policy",
+            "label": "IP Licensing Policy",
+            "rules": {
+              "require_royalty_rate": true,
+              "max_royalty_pct": 0.1,
+              "category": "legal"
+            },
+            "category": "legal",
+            "version": "2.0"
+          },
+          {
+            "id": "p_legal_finance_strategic",
+            "type": "Policy",
+            "label": "Finance Strategic Deal Policy",
+            "rules": {
+              "max_royalty_pct_strategic": 0.15,
+              "category": "legal"
+            },
+            "category": "legal",
+            "version": "1.0"
+          },
+          {
+            "id": "lg_prec_L017",
+            "type": "Precedent",
+            "label": "Similar escalate case - royalty conflict",
+            "outcome": "escalate",
+            "similarity_score": 0.83
+          }
+        ],
+        "edges": [
+          {
+            "source": "p_legal_ip_license",
+            "target": "lg_prec_L017",
+            "type": "POLICY_APPLIED",
+            "weight": 1.0
+          },
+          {
+            "source": "p_legal_finance_strategic",
+            "target": "lg_prec_L017",
+            "type": "POLICY_APPLIED",
+            "weight": 0.9
+          }
+        ]
+      },
+      "boundary_case": false,
+      "has_conflicting_policies": true,
+      "has_overturned_precedent": false,
+      "tags": [
+        "legal"
+      ]
+    },
+    {
+      "id": "DI_LG018",
+      "domain": "legal",
+      "source_dataset": "CUAD + LexGLUE_LEDGAR + synthetic",
+      "scenario": "Vendor contract: limitation of liability capped at $50k; contract value $2M. Policy requires cap at minimum 1x contract value or $100k.",
+      "ground_truth_decision": "reject",
+      "ground_truth_reasoning": "Liability cap $50k below required minimum ($100k or 1x contract value); protective clause threshold unmet.",
+      "applicable_policy_ids": [
+        "p_contract_review"
+      ],
+      "context_graph": {
+        "nodes": [
+          {
+            "id": "p_contract_review",
+            "type": "Policy",
+            "label": "Contract Review Policy",
+            "rules": {
+              "require_governing_law": true,
+              "require_limitation_of_liability": true
+            },
+            "category": "legal",
+            "version": "3.0"
+          },
+          {
+            "id": "lg_prec_L018",
+            "type": "Precedent",
+            "label": "Similar reject case - liability cap insufficient",
+            "outcome": "reject",
+            "similarity_score": 0.8
+          }
+        ],
+        "edges": [
+          {
+            "source": "p_contract_review",
+            "target": "lg_prec_L018",
+            "type": "POLICY_APPLIED",
+            "weight": 1.0
+          }
+        ]
+      },
+      "boundary_case": false,
+      "has_conflicting_policies": false,
+      "has_overturned_precedent": false,
+      "tags": [
+        "legal"
+      ]
+    },
+    {
+      "id": "DI_LG019",
+      "domain": "legal",
+      "source_dataset": "CUAD + LexGLUE_LEDGAR + synthetic",
+      "scenario": "Open source license: Apache 2.0 combined with GPL v3 components in commercial product. Prior review rejected as incompatible; new OSS isolation policy permits GPL in isolated modules.",
+      "ground_truth_decision": "approve",
+      "ground_truth_reasoning": "Overturned precedent: new OSS isolation policy permits GPL components in isolated modules; architecture review confirms compliance.",
+      "applicable_policy_ids": [
+        "p_contract_review",
+        "p_legal_ip_license"
+      ],
+      "context_graph": {
+        "nodes": [
+          {
+            "id": "p_contract_review",
+            "type": "Policy",
+            "label": "Contract Review Policy",
+            "rules": {
+              "require_governing_law": true,
+              "require_limitation_of_liability": true
+            },
+            "category": "legal",
+            "version": "3.0"
+          },
+          {
+            "id": "p_legal_ip_license",
+            "type": "Policy",
+            "label": "IP Licensing Policy",
+            "rules": {
+              "require_royalty_rate": true,
+              "require_territory": true,
+              "category": "legal"
+            },
+            "category": "legal",
+            "version": "2.0"
+          },
+          {
+            "id": "lg_prec_overturned_L019",
+            "type": "Precedent",
+            "label": "Overturned OSS rejection - isolation policy",
+            "outcome": "reject",
+            "overturned_by": "oss_policy_update_2025_isolation",
+            "similarity_score": 0.85
+          }
+        ],
+        "edges": [
+          {
+            "source": "p_contract_review",
+            "target": "lg_prec_overturned_L019",
+            "type": "POLICY_APPLIED",
+            "weight": 1.0
+          },
+          {
+            "source": "p_legal_ip_license",
+            "target": "lg_prec_overturned_L019",
+            "type": "POLICY_APPLIED",
+            "weight": 0.8
+          }
+        ]
+      },
+      "boundary_case": false,
+      "has_conflicting_policies": false,
+      "has_overturned_precedent": true,
+      "tags": [
+        "legal"
+      ]
+    },
+    {
+      "id": "DI_LG020",
+      "domain": "legal",
+      "source_dataset": "CUAD + LexGLUE_LEDGAR + synthetic",
+      "scenario": "Construction subcontract: lien waiver present, mutual indemnification, $5M general liability insurance, change order process defined, governing law California.",
+      "ground_truth_decision": "approve",
+      "ground_truth_reasoning": "All required construction contract provisions present; risk allocation appropriate.",
+      "applicable_policy_ids": [
+        "p_contract_review"
+      ],
+      "context_graph": {
+        "nodes": [
+          {
+            "id": "p_contract_review",
+            "type": "Policy",
+            "label": "Contract Review Policy",
+            "rules": {
+              "require_governing_law": true,
+              "require_limitation_of_liability": true
+            },
+            "category": "legal",
+            "version": "3.0"
+          },
+          {
+            "id": "lg_prec_L020",
+            "type": "Precedent",
+            "label": "Similar approve case - construction subcontract",
+            "outcome": "approve",
+            "similarity_score": 0.82
+          }
+        ],
+        "edges": [
+          {
+            "source": "p_contract_review",
+            "target": "lg_prec_L020",
+            "type": "POLICY_APPLIED",
+            "weight": 1.0
+          }
+        ]
+      },
+      "boundary_case": false,
+      "has_conflicting_policies": false,
+      "has_overturned_precedent": false,
+      "tags": [
+        "legal"
+      ]
+    },
+    {
+      "id": "DI_LG021",
+      "domain": "legal",
+      "source_dataset": "CUAD + LexGLUE_LEDGAR + synthetic",
+      "scenario": "Distribution agreement: 5yr exclusivity in EU market, minimum purchase $500k/yr, no price adjustment mechanism. EU competition law may flag 5yr exclusivity as restrictive.",
+      "ground_truth_decision": "escalate",
+      "ground_truth_reasoning": "Boundary: 5yr EU exclusivity may trigger Article 101 TFEU scrutiny; antitrust counsel review required.",
+      "applicable_policy_ids": [
+        "p_contract_review"
+      ],
+      "context_graph": {
+        "nodes": [
+          {
+            "id": "p_contract_review",
+            "type": "Policy",
+            "label": "Contract Review Policy",
+            "rules": {
+              "require_governing_law": true,
+              "require_limitation_of_liability": true
+            },
+            "category": "legal",
+            "version": "3.0"
+          },
+          {
+            "id": "lg_prec_L021",
+            "type": "Precedent",
+            "label": "Similar escalate case - antitrust review",
+            "outcome": "escalate",
+            "similarity_score": 0.81
+          }
+        ],
+        "edges": [
+          {
+            "source": "p_contract_review",
+            "target": "lg_prec_L021",
+            "type": "POLICY_APPLIED",
+            "weight": 1.0
+          }
+        ]
+      },
+      "boundary_case": true,
+      "has_conflicting_policies": false,
+      "has_overturned_precedent": false,
+      "tags": [
+        "legal"
+      ]
+    },
+    {
+      "id": "DI_LG022",
+      "domain": "legal",
+      "source_dataset": "CUAD + LexGLUE_LEDGAR + synthetic",
+      "scenario": "Employment termination agreement: ADEA waiver for 58yo employee. OWBPA mandates 21-day review period and 7-day revocation right. Agreement provides only 14-day review.",
+      "ground_truth_decision": "reject",
+      "ground_truth_reasoning": "ADEA/OWBPA requires 21-day review period; 14-day period renders waiver void under federal law.",
+      "applicable_policy_ids": [
+        "p_contract_review"
+      ],
+      "context_graph": {
+        "nodes": [
+          {
+            "id": "p_contract_review",
+            "type": "Policy",
+            "label": "Contract Review Policy",
+            "rules": {
+              "require_governing_law": true,
+              "require_limitation_of_liability": true
+            },
+            "category": "legal",
+            "version": "3.0"
+          },
+          {
+            "id": "lg_prec_L022",
+            "type": "Precedent",
+            "label": "Similar reject case - ADEA violation",
+            "outcome": "reject",
+            "similarity_score": 0.88
+          }
+        ],
+        "edges": [
+          {
+            "source": "p_contract_review",
+            "target": "lg_prec_L022",
+            "type": "POLICY_APPLIED",
+            "weight": 1.0
+          }
+        ]
+      },
+      "boundary_case": false,
+      "has_conflicting_policies": false,
+      "has_overturned_precedent": false,
+      "tags": [
+        "legal"
+      ]
+    },
+    {
+      "id": "DI_LG023",
+      "domain": "legal",
+      "source_dataset": "CUAD + LexGLUE_LEDGAR + synthetic",
+      "scenario": "Technology transfer agreement for dual-use semiconductor IP: export control clause missing. EAR/ITAR compliance required; GDPR data transfer clause present but export clause absent.",
+      "ground_truth_decision": "reject",
+      "ground_truth_reasoning": "Missing mandatory export control clause for dual-use technology; ITAR/EAR compliance non-negotiable.",
+      "applicable_policy_ids": [
+        "p_contract_review",
+        "p_legal_export_control"
+      ],
+      "context_graph": {
+        "nodes": [
+          {
+            "id": "p_contract_review",
+            "type": "Policy",
+            "label": "Contract Review Policy",
+            "rules": {
+              "require_governing_law": true,
+              "require_limitation_of_liability": true
+            },
+            "category": "legal",
+            "version": "3.0"
+          },
+          {
+            "id": "p_legal_export_control",
+            "type": "Policy",
+            "label": "Export Control Compliance Policy",
+            "rules": {
+              "require_ear_itar_clause": true,
+              "category": "legal"
+            },
+            "category": "legal",
+            "version": "1.0"
+          },
+          {
+            "id": "lg_prec_L023",
+            "type": "Precedent",
+            "label": "Similar reject case - export control missing",
+            "outcome": "reject",
+            "similarity_score": 0.86
+          }
+        ],
+        "edges": [
+          {
+            "source": "p_contract_review",
+            "target": "lg_prec_L023",
+            "type": "POLICY_APPLIED",
+            "weight": 1.0
+          },
+          {
+            "source": "p_legal_export_control",
+            "target": "lg_prec_L023",
+            "type": "POLICY_APPLIED",
+            "weight": 1.0
+          }
+        ]
+      },
+      "boundary_case": false,
+      "has_conflicting_policies": false,
+      "has_overturned_precedent": false,
+      "tags": [
+        "legal"
+      ]
+    },
+    {
+      "id": "DI_LG024",
+      "domain": "legal",
+      "source_dataset": "CUAD + LexGLUE_LEDGAR + synthetic",
+      "scenario": "Franchise agreement: FTC FDD disclosure delivered 14 days before signing, territorial rights defined, fee schedule present, 5yr renewal with right of first refusal.",
+      "ground_truth_decision": "approve",
+      "ground_truth_reasoning": "FTC franchise disclosure rule satisfied; all material terms present and compliant.",
+      "applicable_policy_ids": [
+        "p_contract_review"
+      ],
+      "context_graph": {
+        "nodes": [
+          {
+            "id": "p_contract_review",
+            "type": "Policy",
+            "label": "Contract Review Policy",
+            "rules": {
+              "require_governing_law": true,
+              "require_limitation_of_liability": true
+            },
+            "category": "legal",
+            "version": "3.0"
+          },
+          {
+            "id": "lg_prec_L024",
+            "type": "Precedent",
+            "label": "Similar approve case - franchise agreement",
+            "outcome": "approve",
+            "similarity_score": 0.84
+          }
+        ],
+        "edges": [
+          {
+            "source": "p_contract_review",
+            "target": "lg_prec_L024",
+            "type": "POLICY_APPLIED",
+            "weight": 1.0
+          }
+        ]
+      },
+      "boundary_case": false,
+      "has_conflicting_policies": false,
+      "has_overturned_precedent": false,
+      "tags": [
+        "legal"
+      ]
+    },
+    {
+      "id": "DI_HR013",
+      "domain": "hr",
+      "source_dataset": "IBM_HR + WNS_HR_Promotion + synthetic",
+      "scenario": "Employee M13: 5yr tenure, perf 4/5, KPIs 87%, no disciplinary record, requested promotion to Senior Analyst.",
+      "ground_truth_decision": "approve",
+      "ground_truth_reasoning": "Meets all promotion criteria: tenure > 3yr, performance >= 4, KPIs > 80%.",
+      "applicable_policy_ids": [
+        "p_hr_promotion"
+      ],
+      "context_graph": {
+        "nodes": [
+          {
+            "id": "p_hr_promotion",
+            "type": "Policy",
+            "label": "HR Promotion Policy",
+            "rules": {
+              "min_tenure_years": 3,
+              "min_perf_rating": 4,
+              "min_kpi_pct": 80
+            },
+            "category": "hr",
+            "version": "2.0"
+          },
+          {
+            "id": "hr_prec_L013",
+            "type": "Precedent",
+            "label": "Similar approve case",
+            "outcome": "approve",
+            "similarity_score": 0.9
+          }
+        ],
+        "edges": [
+          {
+            "source": "p_hr_promotion",
+            "target": "hr_prec_L013",
+            "type": "POLICY_APPLIED",
+            "weight": 1.0
+          }
+        ]
+      },
+      "boundary_case": false,
+      "has_conflicting_policies": false,
+      "has_overturned_precedent": false,
+      "tags": [
+        "hr"
+      ]
+    },
+    {
+      "id": "DI_HR014",
+      "domain": "hr",
+      "source_dataset": "IBM_HR + WNS_HR_Promotion + synthetic",
+      "scenario": "Employee M14: 1.5yr tenure, perf 5/5, KPIs 95%, recognized as star performer. Does not meet 3yr tenure requirement.",
+      "ground_truth_decision": "reject",
+      "ground_truth_reasoning": "Tenure 1.5yr below required 3yr minimum; performance excellence cannot override tenure requirement.",
+      "applicable_policy_ids": [
+        "p_hr_promotion"
+      ],
+      "context_graph": {
+        "nodes": [
+          {
+            "id": "p_hr_promotion",
+            "type": "Policy",
+            "label": "HR Promotion Policy",
+            "rules": {
+              "min_tenure_years": 3,
+              "min_perf_rating": 4,
+              "min_kpi_pct": 80
+            },
+            "category": "hr",
+            "version": "2.0"
+          },
+          {
+            "id": "hr_prec_L014",
+            "type": "Precedent",
+            "label": "Similar reject case - tenure shortfall",
+            "outcome": "reject",
+            "similarity_score": 0.88
+          }
+        ],
+        "edges": [
+          {
+            "source": "p_hr_promotion",
+            "target": "hr_prec_L014",
+            "type": "POLICY_APPLIED",
+            "weight": 1.0
+          }
+        ]
+      },
+      "boundary_case": false,
+      "has_conflicting_policies": false,
+      "has_overturned_precedent": false,
+      "tags": [
+        "hr"
+      ]
+    },
+    {
+      "id": "DI_HR015",
+      "domain": "hr",
+      "source_dataset": "IBM_HR + WNS_HR_Promotion + synthetic",
+      "scenario": "Employee M15: 8yr tenure, perf 4/5, KPIs 82%, completed PIP successfully 2yr ago. Post-PIP policy bars promotion for 3yr.",
+      "ground_truth_decision": "reject",
+      "ground_truth_reasoning": "Post-PIP promotion bar: 3yr restriction not elapsed (2yr since PIP); otherwise qualified.",
+      "applicable_policy_ids": [
+        "p_hr_promotion",
+        "p_hr_pip_restriction"
+      ],
+      "context_graph": {
+        "nodes": [
+          {
+            "id": "p_hr_promotion",
+            "type": "Policy",
+            "label": "HR Promotion Policy",
+            "rules": {
+              "min_tenure_years": 3,
+              "min_perf_rating": 4,
+              "min_kpi_pct": 80
+            },
+            "category": "hr",
+            "version": "2.0"
+          },
+          {
+            "id": "p_hr_pip_restriction",
+            "type": "Policy",
+            "label": "Post-PIP Promotion Restriction Policy",
+            "rules": {
+              "post_pip_restriction_years": 3,
+              "category": "hr"
+            },
+            "category": "hr",
+            "version": "1.0"
+          },
+          {
+            "id": "hr_prec_L015",
+            "type": "Precedent",
+            "label": "Similar reject case - post-PIP bar",
+            "outcome": "reject",
+            "similarity_score": 0.86
+          }
+        ],
+        "edges": [
+          {
+            "source": "p_hr_promotion",
+            "target": "hr_prec_L015",
+            "type": "POLICY_APPLIED",
+            "weight": 1.0
+          },
+          {
+            "source": "p_hr_pip_restriction",
+            "target": "hr_prec_L015",
+            "type": "POLICY_APPLIED",
+            "weight": 1.0
+          }
+        ]
+      },
+      "boundary_case": false,
+      "has_conflicting_policies": false,
+      "has_overturned_precedent": false,
+      "tags": [
+        "hr"
+      ]
+    },
+    {
+      "id": "DI_HR016",
+      "domain": "hr",
+      "source_dataset": "IBM_HR + WNS_HR_Promotion + synthetic",
+      "scenario": "Employee M16: 3yr tenure exactly, perf 4/5, KPIs 80% exactly. Both tenure and KPIs precisely at minimum thresholds.",
+      "ground_truth_decision": "escalate",
+      "ground_truth_reasoning": "Boundary: both tenure and KPIs at exact minimum; dual-threshold boundary requires manager confirmation.",
+      "applicable_policy_ids": [
+        "p_hr_promotion"
+      ],
+      "context_graph": {
+        "nodes": [
+          {
+            "id": "p_hr_promotion",
+            "type": "Policy",
+            "label": "HR Promotion Policy",
+            "rules": {
+              "min_tenure_years": 3,
+              "min_perf_rating": 4,
+              "min_kpi_pct": 80
+            },
+            "category": "hr",
+            "version": "2.0"
+          },
+          {
+            "id": "hr_prec_L016",
+            "type": "Precedent",
+            "label": "Similar escalate case - dual boundary",
+            "outcome": "escalate",
+            "similarity_score": 0.92
+          }
+        ],
+        "edges": [
+          {
+            "source": "p_hr_promotion",
+            "target": "hr_prec_L016",
+            "type": "POLICY_APPLIED",
+            "weight": 1.0
+          }
+        ]
+      },
+      "boundary_case": true,
+      "has_conflicting_policies": false,
+      "has_overturned_precedent": false,
+      "tags": [
+        "hr"
+      ]
+    },
+    {
+      "id": "DI_HR017",
+      "domain": "hr",
+      "source_dataset": "IBM_HR + WNS_HR_Promotion + synthetic",
+      "scenario": "Employee M17: 12yr tenure, perf 2/5 for 2 consecutive years, KPIs 55%. Termination for persistent underperformance recommended.",
+      "ground_truth_decision": "escalate",
+      "ground_truth_reasoning": "Termination recommendation for long-tenure employee requires HR Director and legal review per policy.",
+      "applicable_policy_ids": [
+        "p_hr_termination"
+      ],
+      "context_graph": {
+        "nodes": [
+          {
+            "id": "p_hr_termination",
+            "type": "Policy",
+            "label": "HR Termination Policy",
+            "rules": {
+              "require_pip_first": true,
+              "min_perf_trigger": 3,
+              "require_legal_review": true
+            },
+            "category": "hr",
+            "version": "1.5"
+          },
+          {
+            "id": "hr_prec_L017",
+            "type": "Precedent",
+            "label": "Similar escalate case - long tenure termination",
+            "outcome": "escalate",
+            "similarity_score": 0.87
+          }
+        ],
+        "edges": [
+          {
+            "source": "p_hr_termination",
+            "target": "hr_prec_L017",
+            "type": "POLICY_APPLIED",
+            "weight": 1.0
+          }
+        ]
+      },
+      "boundary_case": false,
+      "has_conflicting_policies": false,
+      "has_overturned_precedent": false,
+      "tags": [
+        "hr"
+      ]
+    },
+    {
+      "id": "DI_HR018",
+      "domain": "hr",
+      "source_dataset": "IBM_HR + WNS_HR_Promotion + synthetic",
+      "scenario": "Employee M18: 6yr tenure, perf 4/5, KPIs 91%, requests 3-month parental leave. FMLA entitles 12wk; company policy offers 16wk paid parental leave.",
+      "ground_truth_decision": "approve",
+      "ground_truth_reasoning": "Parental leave request within company 16wk paid policy; FMLA eligibility also confirmed.",
+      "applicable_policy_ids": [
+        "p_hr_leave"
+      ],
+      "context_graph": {
+        "nodes": [
+          {
+            "id": "p_hr_leave",
+            "type": "Policy",
+            "label": "HR Leave Policy",
+            "rules": {
+              "fmla_weeks": 12,
+              "paid_parental_weeks": 16,
+              "category": "hr"
+            },
+            "category": "hr",
+            "version": "2.0"
+          },
+          {
+            "id": "hr_prec_L018",
+            "type": "Precedent",
+            "label": "Similar approve case - parental leave",
+            "outcome": "approve",
+            "similarity_score": 0.93
+          }
+        ],
+        "edges": [
+          {
+            "source": "p_hr_leave",
+            "target": "hr_prec_L018",
+            "type": "POLICY_APPLIED",
+            "weight": 1.0
+          }
+        ]
+      },
+      "boundary_case": false,
+      "has_conflicting_policies": false,
+      "has_overturned_precedent": false,
+      "tags": [
+        "hr"
+      ]
+    },
+    {
+      "id": "DI_HR019",
+      "domain": "hr",
+      "source_dataset": "IBM_HR + WNS_HR_Promotion + synthetic",
+      "scenario": "Employee M19: 4yr tenure, perf 3/5, KPIs 72%, requests permanent remote work. Department policy requires on-site; HR remote work policy permits hybrid up to 3 days/wk.",
+      "ground_truth_decision": "escalate",
+      "ground_truth_reasoning": "Conflicting policies: department on-site mandate vs HR hybrid allowance; director arbitration required.",
+      "applicable_policy_ids": [
+        "p_hr_remote_work",
+        "p_hr_dept_onsite"
+      ],
+      "context_graph": {
+        "nodes": [
+          {
+            "id": "p_hr_remote_work",
+            "type": "Policy",
+            "label": "HR Remote Work Policy",
+            "rules": {
+              "max_remote_days": 3,
+              "category": "hr"
+            },
+            "category": "hr",
+            "version": "1.0"
+          },
+          {
+            "id": "p_hr_dept_onsite",
+            "type": "Policy",
+            "label": "Department On-Site Mandate",
+            "rules": {
+              "require_onsite": true,
+              "category": "hr"
+            },
+            "category": "hr",
+            "version": "1.0"
+          },
+          {
+            "id": "hr_prec_L019",
+            "type": "Precedent",
+            "label": "Similar escalate case - policy conflict",
+            "outcome": "escalate",
+            "similarity_score": 0.85
+          }
+        ],
+        "edges": [
+          {
+            "source": "p_hr_remote_work",
+            "target": "hr_prec_L019",
+            "type": "POLICY_APPLIED",
+            "weight": 1.0
+          },
+          {
+            "source": "p_hr_dept_onsite",
+            "target": "hr_prec_L019",
+            "type": "POLICY_APPLIED",
+            "weight": 1.0
+          }
+        ]
+      },
+      "boundary_case": false,
+      "has_conflicting_policies": true,
+      "has_overturned_precedent": false,
+      "tags": [
+        "hr"
+      ]
+    },
+    {
+      "id": "DI_HR020",
+      "domain": "hr",
+      "source_dataset": "IBM_HR + WNS_HR_Promotion + synthetic",
+      "scenario": "Employee M20: 9yr tenure, perf 5/5, KPIs 96%, promotion to Director. Prior Director promotions required 10yr; updated policy reduced requirement to 8yr.",
+      "ground_truth_decision": "approve",
+      "ground_truth_reasoning": "Overturned precedent: Director tenure requirement reduced from 10yr to 8yr; employee at 9yr exceeds new threshold.",
+      "applicable_policy_ids": [
+        "p_hr_promotion"
+      ],
+      "context_graph": {
+        "nodes": [
+          {
+            "id": "p_hr_promotion",
+            "type": "Policy",
+            "label": "HR Promotion Policy",
+            "rules": {
+              "min_tenure_years": 3,
+              "min_perf_rating": 4,
+              "min_kpi_pct": 80
+            },
+            "category": "hr",
+            "version": "2.0"
+          },
+          {
+            "id": "hr_prec_overturned_L020",
+            "type": "Precedent",
+            "label": "Overturned Director-level tenure requirement",
+            "outcome": "reject",
+            "overturned_by": "hr_policy_update_2025_director_tenure",
+            "similarity_score": 0.88
+          }
+        ],
+        "edges": [
+          {
+            "source": "p_hr_promotion",
+            "target": "hr_prec_overturned_L020",
+            "type": "POLICY_APPLIED",
+            "weight": 1.0
+          }
+        ]
+      },
+      "boundary_case": false,
+      "has_conflicting_policies": false,
+      "has_overturned_precedent": true,
+      "tags": [
+        "hr"
+      ]
+    },
+    {
+      "id": "DI_HR021",
+      "domain": "hr",
+      "source_dataset": "IBM_HR + WNS_HR_Promotion + synthetic",
+      "scenario": "Employee M21: 3.1yr tenure, perf 4/5, KPIs 81%. Manager who submitted request is on probation and not yet authorized to approve promotions.",
+      "ground_truth_decision": "escalate",
+      "ground_truth_reasoning": "Manager authorization pending probation completion; promotion valid on merits but approval chain incomplete.",
+      "applicable_policy_ids": [
+        "p_hr_promotion"
+      ],
+      "context_graph": {
+        "nodes": [
+          {
+            "id": "p_hr_promotion",
+            "type": "Policy",
+            "label": "HR Promotion Policy",
+            "rules": {
+              "min_tenure_years": 3,
+              "min_perf_rating": 4,
+              "min_kpi_pct": 80
+            },
+            "category": "hr",
+            "version": "2.0"
+          },
+          {
+            "id": "hr_prec_L021",
+            "type": "Precedent",
+            "label": "Similar escalate case - authorization chain",
+            "outcome": "escalate",
+            "similarity_score": 0.84
+          }
+        ],
+        "edges": [
+          {
+            "source": "p_hr_promotion",
+            "target": "hr_prec_L021",
+            "type": "POLICY_APPLIED",
+            "weight": 1.0
+          }
+        ]
+      },
+      "boundary_case": false,
+      "has_conflicting_policies": false,
+      "has_overturned_precedent": false,
+      "tags": [
+        "hr"
+      ]
+    },
+    {
+      "id": "DI_HR022",
+      "domain": "hr",
+      "source_dataset": "IBM_HR + WNS_HR_Promotion + synthetic",
+      "scenario": "Employee M22: 2.9yr tenure, perf 4/5, KPIs 84%, excellent 360 feedback. Tenure 0.1yr short of 3yr requirement.",
+      "ground_truth_decision": "reject",
+      "ground_truth_reasoning": "Tenure marginally below 3yr threshold; exceptional performance does not override minimum tenure.",
+      "applicable_policy_ids": [
+        "p_hr_promotion"
+      ],
+      "context_graph": {
+        "nodes": [
+          {
+            "id": "p_hr_promotion",
+            "type": "Policy",
+            "label": "HR Promotion Policy",
+            "rules": {
+              "min_tenure_years": 3,
+              "min_perf_rating": 4,
+              "min_kpi_pct": 80
+            },
+            "category": "hr",
+            "version": "2.0"
+          },
+          {
+            "id": "hr_prec_L022",
+            "type": "Precedent",
+            "label": "Similar reject case - near-threshold tenure",
+            "outcome": "reject",
+            "similarity_score": 0.91
+          }
+        ],
+        "edges": [
+          {
+            "source": "p_hr_promotion",
+            "target": "hr_prec_L022",
+            "type": "POLICY_APPLIED",
+            "weight": 1.0
+          }
+        ]
+      },
+      "boundary_case": true,
+      "has_conflicting_policies": false,
+      "has_overturned_precedent": false,
+      "tags": [
+        "hr"
+      ]
+    },
+    {
+      "id": "DI_HR023",
+      "domain": "hr",
+      "source_dataset": "IBM_HR + WNS_HR_Promotion + synthetic",
+      "scenario": "Employee M23: 5yr tenure, perf 4/5, KPIs 85%, on intermittent FMLA leave for chronic condition. Old policy excluded FMLA-leave employees from promotion review; updated ADA/FMLA policy prohibits exclusion.",
+      "ground_truth_decision": "approve",
+      "ground_truth_reasoning": "Overturned precedent: FMLA leave exclusion removed per ADA-aligned policy update; employee qualifies on merits.",
+      "applicable_policy_ids": [
+        "p_hr_promotion"
+      ],
+      "context_graph": {
+        "nodes": [
+          {
+            "id": "p_hr_promotion",
+            "type": "Policy",
+            "label": "HR Promotion Policy",
+            "rules": {
+              "min_tenure_years": 3,
+              "min_perf_rating": 4,
+              "min_kpi_pct": 80
+            },
+            "category": "hr",
+            "version": "2.0"
+          },
+          {
+            "id": "hr_prec_overturned_L023",
+            "type": "Precedent",
+            "label": "Overturned FMLA leave promotion exclusion",
+            "outcome": "reject",
+            "overturned_by": "hr_ada_fmla_policy_update_2025",
+            "similarity_score": 0.87
+          }
+        ],
+        "edges": [
+          {
+            "source": "p_hr_promotion",
+            "target": "hr_prec_overturned_L023",
+            "type": "POLICY_APPLIED",
+            "weight": 1.0
+          }
+        ]
+      },
+      "boundary_case": false,
+      "has_conflicting_policies": false,
+      "has_overturned_precedent": true,
+      "tags": [
+        "hr"
+      ]
+    },
+    {
+      "id": "DI_HR024",
+      "domain": "hr",
+      "source_dataset": "IBM_HR + WNS_HR_Promotion + synthetic",
+      "scenario": "Employee M24: 4yr tenure, perf 3/5, KPIs 60%, issued final written warning 3mo ago. Requesting voluntary severance package.",
+      "ground_truth_decision": "escalate",
+      "ground_truth_reasoning": "Voluntary severance during active final warning period requires HR legal and finance joint approval.",
+      "applicable_policy_ids": [
+        "p_hr_termination"
+      ],
+      "context_graph": {
+        "nodes": [
+          {
+            "id": "p_hr_termination",
+            "type": "Policy",
+            "label": "HR Termination Policy",
+            "rules": {
+              "require_pip_first": true,
+              "min_perf_trigger": 3,
+              "require_legal_review": true
+            },
+            "category": "hr",
+            "version": "1.5"
+          },
+          {
+            "id": "hr_prec_L024",
+            "type": "Precedent",
+            "label": "Similar escalate case - voluntary severance during warning",
+            "outcome": "escalate",
+            "similarity_score": 0.83
+          }
+        ],
+        "edges": [
+          {
+            "source": "p_hr_termination",
+            "target": "hr_prec_L024",
+            "type": "POLICY_APPLIED",
+            "weight": 1.0
+          }
+        ]
+      },
+      "boundary_case": false,
+      "has_conflicting_policies": false,
+      "has_overturned_precedent": false,
+      "tags": [
+        "hr"
+      ]
+    },
+    {
+      "id": "DI_EC013",
+      "domain": "ecommerce",
+      "source_dataset": "Magellan_Amazon_Google + synthetic",
+      "scenario": "Order #77001: $340 electronics, 4yr account, 180 prior orders, billing/shipping match, known device fingerprint. Standard domestic order.",
+      "ground_truth_decision": "approve",
+      "ground_truth_reasoning": "Established customer, consistent device and address, well within fraud thresholds.",
+      "applicable_policy_ids": [
+        "p_ecommerce_fraud",
+        "p_ecommerce_refund"
+      ],
+      "context_graph": {
+        "nodes": [
+          {
+            "id": "p_ecommerce_fraud",
+            "type": "Policy",
+            "label": "Fraud Detection Policy",
+            "rules": {
+              "new_account_threshold_days": 30,
+              "max_gift_card_velocity": 2
+            },
+            "category": "ecommerce",
+            "version": "1.5"
+          },
+          {
+            "id": "p_ecommerce_refund",
+            "type": "Policy",
+            "label": "Refund Policy",
+            "rules": {
+              "return_window_days": 30,
+              "require_defect_evidence": true
+            },
+            "category": "ecommerce",
+            "version": "2.0"
+          },
+          {
+            "id": "ec_prec_L013",
+            "type": "Precedent",
+            "label": "Similar approve case",
+            "outcome": "approve",
+            "similarity_score": 0.9
+          }
+        ],
+        "edges": [
+          {
+            "source": "p_ecommerce_fraud",
+            "target": "ec_prec_L013",
+            "type": "POLICY_APPLIED",
+            "weight": 1.0
+          }
+        ]
+      },
+      "boundary_case": false,
+      "has_conflicting_policies": false,
+      "has_overturned_precedent": false,
+      "tags": [
+        "ecommerce"
+      ]
+    },
+    {
+      "id": "DI_EC014",
+      "domain": "ecommerce",
+      "source_dataset": "Magellan_Amazon_Google + synthetic",
+      "scenario": "Account created 5 days ago, attempts to purchase $1,800 in gift cards. Device fingerprint linked to 3 prior fraud cases. IP from high-risk region.",
+      "ground_truth_decision": "reject",
+      "ground_truth_reasoning": "New account (<30 days), gift card velocity 3 (exceeds max 2), known fraud device - automatic block.",
+      "applicable_policy_ids": [
+        "p_ecommerce_fraud"
+      ],
+      "context_graph": {
+        "nodes": [
+          {
+            "id": "p_ecommerce_fraud",
+            "type": "Policy",
+            "label": "Fraud Detection Policy",
+            "rules": {
+              "new_account_threshold_days": 30,
+              "max_gift_card_velocity": 2
+            },
+            "category": "ecommerce",
+            "version": "1.5"
+          },
+          {
+            "id": "ec_prec_L014",
+            "type": "Precedent",
+            "label": "Similar reject case - fraud signals",
+            "outcome": "reject",
+            "similarity_score": 0.94
+          }
+        ],
+        "edges": [
+          {
+            "source": "p_ecommerce_fraud",
+            "target": "ec_prec_L014",
+            "type": "POLICY_APPLIED",
+            "weight": 1.0
+          }
+        ]
+      },
+      "boundary_case": false,
+      "has_conflicting_policies": false,
+      "has_overturned_precedent": false,
+      "tags": [
+        "ecommerce"
+      ]
+    },
+    {
+      "id": "DI_EC015",
+      "domain": "ecommerce",
+      "source_dataset": "Magellan_Amazon_Google + synthetic",
+      "scenario": "Return request: item purchased 28 days ago (within 30-day window), customer claims not as described, no photo evidence. Customer has 2 prior returns in last 6 months.",
+      "ground_truth_decision": "escalate",
+      "ground_truth_reasoning": "Within return window but missing defect evidence and elevated return frequency; agent review required.",
+      "applicable_policy_ids": [
+        "p_ecommerce_fraud",
+        "p_ecommerce_refund"
+      ],
+      "context_graph": {
+        "nodes": [
+          {
+            "id": "p_ecommerce_fraud",
+            "type": "Policy",
+            "label": "Fraud Detection Policy",
+            "rules": {
+              "new_account_threshold_days": 30,
+              "max_gift_card_velocity": 2
+            },
+            "category": "ecommerce",
+            "version": "1.5"
+          },
+          {
+            "id": "p_ecommerce_refund",
+            "type": "Policy",
+            "label": "Refund Policy",
+            "rules": {
+              "return_window_days": 30,
+              "require_defect_evidence": true
+            },
+            "category": "ecommerce",
+            "version": "2.0"
+          },
+          {
+            "id": "ec_prec_L015",
+            "type": "Precedent",
+            "label": "Similar escalate case - missing evidence",
+            "outcome": "escalate",
+            "similarity_score": 0.86
+          }
+        ],
+        "edges": [
+          {
+            "source": "p_ecommerce_fraud",
+            "target": "ec_prec_L015",
+            "type": "POLICY_APPLIED",
+            "weight": 1.0
+          }
+        ]
+      },
+      "boundary_case": true,
+      "has_conflicting_policies": false,
+      "has_overturned_precedent": false,
+      "tags": [
+        "ecommerce"
+      ]
+    },
+    {
+      "id": "DI_EC016",
+      "domain": "ecommerce",
+      "source_dataset": "Magellan_Amazon_Google + synthetic",
+      "scenario": "New seller application: valid business registration, 2yr trading history on external platform, bank verification passed, product category electronics accessories.",
+      "ground_truth_decision": "approve",
+      "ground_truth_reasoning": "Seller meets all verification criteria: valid registration, documented history, bank verified.",
+      "applicable_policy_ids": [
+        "p_ecommerce_fraud",
+        "p_ecommerce_seller_verify"
+      ],
+      "context_graph": {
+        "nodes": [
+          {
+            "id": "p_ecommerce_fraud",
+            "type": "Policy",
+            "label": "Fraud Detection Policy",
+            "rules": {
+              "new_account_threshold_days": 30,
+              "max_gift_card_velocity": 2
+            },
+            "category": "ecommerce",
+            "version": "1.5"
+          },
+          {
+            "id": "p_ecommerce_seller_verify",
+            "type": "Policy",
+            "label": "Seller Verification Policy",
+            "rules": {
+              "require_business_registration": true,
+              "require_bank_verification": true
+            },
+            "category": "ecommerce",
+            "version": "1.0"
+          },
+          {
+            "id": "ec_prec_L016",
+            "type": "Precedent",
+            "label": "Similar approve case - new seller",
+            "outcome": "approve",
+            "similarity_score": 0.82
+          }
+        ],
+        "edges": [
+          {
+            "source": "p_ecommerce_fraud",
+            "target": "ec_prec_L016",
+            "type": "POLICY_APPLIED",
+            "weight": 1.0
+          },
+          {
+            "source": "p_ecommerce_seller_verify",
+            "target": "ec_prec_L016",
+            "type": "POLICY_APPLIED",
+            "weight": 1.0
+          }
+        ]
+      },
+      "boundary_case": false,
+      "has_conflicting_policies": false,
+      "has_overturned_precedent": false,
+      "tags": [
+        "ecommerce"
+      ]
+    },
+    {
+      "id": "DI_EC017",
+      "domain": "ecommerce",
+      "source_dataset": "Magellan_Amazon_Google + synthetic",
+      "scenario": "Order #78500: $12,400 luxury watch, 8mo account history, billing/shipping mismatch (gift shipping), CVV verified, 3DS authentication passed.",
+      "ground_truth_decision": "escalate",
+      "ground_truth_reasoning": "High-value order >$10k with billing/shipping mismatch triggers mandatory manual review despite 3DS success.",
+      "applicable_policy_ids": [
+        "p_ecommerce_fraud",
+        "p_ecommerce_high_value"
+      ],
+      "context_graph": {
+        "nodes": [
+          {
+            "id": "p_ecommerce_fraud",
+            "type": "Policy",
+            "label": "Fraud Detection Policy",
+            "rules": {
+              "new_account_threshold_days": 30,
+              "max_gift_card_velocity": 2
+            },
+            "category": "ecommerce",
+            "version": "1.5"
+          },
+          {
+            "id": "p_ecommerce_high_value",
+            "type": "Policy",
+            "label": "High-Value Order Review Policy",
+            "rules": {
+              "high_value_threshold": 10000,
+              "require_manual_review": true
+            },
+            "category": "ecommerce",
+            "version": "1.0"
+          },
+          {
+            "id": "ec_prec_L017",
+            "type": "Precedent",
+            "label": "Similar escalate case - high value mismatch",
+            "outcome": "escalate",
+            "similarity_score": 0.88
+          }
+        ],
+        "edges": [
+          {
+            "source": "p_ecommerce_fraud",
+            "target": "ec_prec_L017",
+            "type": "POLICY_APPLIED",
+            "weight": 1.0
+          },
+          {
+            "source": "p_ecommerce_high_value",
+            "target": "ec_prec_L017",
+            "type": "POLICY_APPLIED",
+            "weight": 0.9
+          }
+        ]
+      },
+      "boundary_case": false,
+      "has_conflicting_policies": false,
+      "has_overturned_precedent": false,
+      "tags": [
+        "ecommerce"
+      ]
+    },
+    {
+      "id": "DI_EC018",
+      "domain": "ecommerce",
+      "source_dataset": "Magellan_Amazon_Google + synthetic",
+      "scenario": "Chargeback dispute: customer claims $620 order never delivered. Carrier tracking shows delivered. Customer has 0 prior chargebacks in 3yr account history.",
+      "ground_truth_decision": "escalate",
+      "ground_truth_reasoning": "Delivery evidence conflicts with claim; first-time chargeback from established account warrants manual verification.",
+      "applicable_policy_ids": [
+        "p_ecommerce_fraud",
+        "p_ecommerce_refund"
+      ],
+      "context_graph": {
+        "nodes": [
+          {
+            "id": "p_ecommerce_fraud",
+            "type": "Policy",
+            "label": "Fraud Detection Policy",
+            "rules": {
+              "new_account_threshold_days": 30,
+              "max_gift_card_velocity": 2
+            },
+            "category": "ecommerce",
+            "version": "1.5"
+          },
+          {
+            "id": "p_ecommerce_refund",
+            "type": "Policy",
+            "label": "Refund Policy",
+            "rules": {
+              "return_window_days": 30,
+              "require_defect_evidence": true
+            },
+            "category": "ecommerce",
+            "version": "2.0"
+          },
+          {
+            "id": "ec_prec_L018",
+            "type": "Precedent",
+            "label": "Similar escalate case - delivery dispute",
+            "outcome": "escalate",
+            "similarity_score": 0.85
+          }
+        ],
+        "edges": [
+          {
+            "source": "p_ecommerce_fraud",
+            "target": "ec_prec_L018",
+            "type": "POLICY_APPLIED",
+            "weight": 1.0
+          }
+        ]
+      },
+      "boundary_case": false,
+      "has_conflicting_policies": false,
+      "has_overturned_precedent": false,
+      "tags": [
+        "ecommerce"
+      ]
+    },
+    {
+      "id": "DI_EC019",
+      "domain": "ecommerce",
+      "source_dataset": "Magellan_Amazon_Google + synthetic",
+      "scenario": "Account age 25 days, single gift card purchase $50, email verified. Old policy blocked all purchases on accounts <30 days; new policy permits gift cards up to $100 for email-verified accounts.",
+      "ground_truth_decision": "approve",
+      "ground_truth_reasoning": "Overturned precedent: email-verified accounts <30 days now permitted gift card purchases up to $100 per updated fraud policy.",
+      "applicable_policy_ids": [
+        "p_ecommerce_fraud"
+      ],
+      "context_graph": {
+        "nodes": [
+          {
+            "id": "p_ecommerce_fraud",
+            "type": "Policy",
+            "label": "Fraud Detection Policy",
+            "rules": {
+              "new_account_threshold_days": 30,
+              "max_gift_card_velocity": 2
+            },
+            "category": "ecommerce",
+            "version": "1.5"
+          },
+          {
+            "id": "ec_prec_overturned_L019",
+            "type": "Precedent",
+            "label": "Overturned new-account gift card block",
+            "outcome": "reject",
+            "overturned_by": "fraud_policy_update_2025_email_verify",
+            "similarity_score": 0.87
+          }
+        ],
+        "edges": [
+          {
+            "source": "p_ecommerce_fraud",
+            "target": "ec_prec_overturned_L019",
+            "type": "POLICY_APPLIED",
+            "weight": 1.0
+          }
+        ]
+      },
+      "boundary_case": false,
+      "has_conflicting_policies": false,
+      "has_overturned_precedent": true,
+      "tags": [
+        "ecommerce"
+      ]
+    },
+    {
+      "id": "DI_EC020",
+      "domain": "ecommerce",
+      "source_dataset": "Magellan_Amazon_Google + synthetic",
+      "scenario": "Seller M20: 500 sales, 4.1/5 rating, 12% return rate. Quality policy triggers probation >10%; fraud policy triggers suspension >15%.",
+      "ground_truth_decision": "escalate",
+      "ground_truth_reasoning": "Conflicting thresholds: quality policy triggers probation (>10%), fraud suspension not yet reached (>15%); competing remedies require arbitration.",
+      "applicable_policy_ids": [
+        "p_ecommerce_fraud",
+        "p_ecommerce_seller_quality"
+      ],
+      "context_graph": {
+        "nodes": [
+          {
+            "id": "p_ecommerce_fraud",
+            "type": "Policy",
+            "label": "Fraud Detection Policy",
+            "rules": {
+              "new_account_threshold_days": 30,
+              "max_gift_card_velocity": 2
+            },
+            "category": "ecommerce",
+            "version": "1.5"
+          },
+          {
+            "id": "p_ecommerce_seller_quality",
+            "type": "Policy",
+            "label": "Seller Quality Policy",
+            "rules": {
+              "probation_return_rate_pct": 10,
+              "suspension_return_rate_pct": 15
+            },
+            "category": "ecommerce",
+            "version": "1.0"
+          },
+          {
+            "id": "ec_prec_L020",
+            "type": "Precedent",
+            "label": "Similar escalate case - threshold conflict",
+            "outcome": "escalate",
+            "similarity_score": 0.83
+          }
+        ],
+        "edges": [
+          {
+            "source": "p_ecommerce_fraud",
+            "target": "ec_prec_L020",
+            "type": "POLICY_APPLIED",
+            "weight": 1.0
+          },
+          {
+            "source": "p_ecommerce_seller_quality",
+            "target": "ec_prec_L020",
+            "type": "POLICY_APPLIED",
+            "weight": 1.0
+          }
+        ]
+      },
+      "boundary_case": true,
+      "has_conflicting_policies": true,
+      "has_overturned_precedent": false,
+      "tags": [
+        "ecommerce"
+      ]
+    },
+    {
+      "id": "DI_EC021",
+      "domain": "ecommerce",
+      "source_dataset": "Magellan_Amazon_Google + synthetic",
+      "scenario": "Seller account: 50 reviews all 5-star posted within 72hrs of account creation, identical review text pattern, suspected incentivized reviews.",
+      "ground_truth_decision": "reject",
+      "ground_truth_reasoning": "Review manipulation detected: velocity, uniformity, and timing indicate policy violation; seller account suspended.",
+      "applicable_policy_ids": [
+        "p_ecommerce_fraud",
+        "p_ecommerce_review_integrity"
+      ],
+      "context_graph": {
+        "nodes": [
+          {
+            "id": "p_ecommerce_fraud",
+            "type": "Policy",
+            "label": "Fraud Detection Policy",
+            "rules": {
+              "new_account_threshold_days": 30,
+              "max_gift_card_velocity": 2
+            },
+            "category": "ecommerce",
+            "version": "1.5"
+          },
+          {
+            "id": "p_ecommerce_review_integrity",
+            "type": "Policy",
+            "label": "Review Integrity Policy",
+            "rules": {
+              "require_organic_reviews": true,
+              "flag_velocity_threshold": 20
+            },
+            "category": "ecommerce",
+            "version": "1.0"
+          },
+          {
+            "id": "ec_prec_L021",
+            "type": "Precedent",
+            "label": "Similar reject case - review manipulation",
+            "outcome": "reject",
+            "similarity_score": 0.92
+          }
+        ],
+        "edges": [
+          {
+            "source": "p_ecommerce_fraud",
+            "target": "ec_prec_L021",
+            "type": "POLICY_APPLIED",
+            "weight": 1.0
+          },
+          {
+            "source": "p_ecommerce_review_integrity",
+            "target": "ec_prec_L021",
+            "type": "POLICY_APPLIED",
+            "weight": 1.0
+          }
+        ]
+      },
+      "boundary_case": false,
+      "has_conflicting_policies": false,
+      "has_overturned_precedent": false,
+      "tags": [
+        "ecommerce"
+      ]
+    },
+    {
+      "id": "DI_EC022",
+      "domain": "ecommerce",
+      "source_dataset": "Magellan_Amazon_Google + synthetic",
+      "scenario": "Bulk order: business account, $8,700 office supplies, purchase order attached, shipping to verified business address, 2yr account with 40 prior orders.",
+      "ground_truth_decision": "approve",
+      "ground_truth_reasoning": "Business account with PO documentation, verified destination, strong order history - all criteria met.",
+      "applicable_policy_ids": [
+        "p_ecommerce_fraud",
+        "p_ecommerce_refund"
+      ],
+      "context_graph": {
+        "nodes": [
+          {
+            "id": "p_ecommerce_fraud",
+            "type": "Policy",
+            "label": "Fraud Detection Policy",
+            "rules": {
+              "new_account_threshold_days": 30,
+              "max_gift_card_velocity": 2
+            },
+            "category": "ecommerce",
+            "version": "1.5"
+          },
+          {
+            "id": "p_ecommerce_refund",
+            "type": "Policy",
+            "label": "Refund Policy",
+            "rules": {
+              "return_window_days": 30,
+              "require_defect_evidence": true
+            },
+            "category": "ecommerce",
+            "version": "2.0"
+          },
+          {
+            "id": "ec_prec_L022",
+            "type": "Precedent",
+            "label": "Similar approve case - business bulk order",
+            "outcome": "approve",
+            "similarity_score": 0.87
+          }
+        ],
+        "edges": [
+          {
+            "source": "p_ecommerce_fraud",
+            "target": "ec_prec_L022",
+            "type": "POLICY_APPLIED",
+            "weight": 1.0
+          }
+        ]
+      },
+      "boundary_case": false,
+      "has_conflicting_policies": false,
+      "has_overturned_precedent": false,
+      "tags": [
+        "ecommerce"
+      ]
+    },
+    {
+      "id": "DI_EC023",
+      "domain": "ecommerce",
+      "source_dataset": "Magellan_Amazon_Google + synthetic",
+      "scenario": "Return request: item purchased 31 days ago, 1 day outside 30-day window. Customer is Prime member (5yr, 0 prior returns). Premium membership policy offers 35-day return window.",
+      "ground_truth_decision": "escalate",
+      "ground_truth_reasoning": "Conflicting policies: standard 30-day window exceeded; premium 35-day window may apply; agent must confirm membership tier.",
+      "applicable_policy_ids": [
+        "p_ecommerce_refund",
+        "p_ecommerce_premium_return"
+      ],
+      "context_graph": {
+        "nodes": [
+          {
+            "id": "p_ecommerce_refund",
+            "type": "Policy",
+            "label": "Refund Policy",
+            "rules": {
+              "return_window_days": 30,
+              "require_defect_evidence": true
+            },
+            "category": "ecommerce",
+            "version": "2.0"
+          },
+          {
+            "id": "p_ecommerce_premium_return",
+            "type": "Policy",
+            "label": "Premium Membership Return Policy",
+            "rules": {
+              "return_window_days": 35,
+              "category": "ecommerce"
+            },
+            "category": "ecommerce",
+            "version": "1.0"
+          },
+          {
+            "id": "ec_prec_L023",
+            "type": "Precedent",
+            "label": "Similar escalate case - window boundary",
+            "outcome": "escalate",
+            "similarity_score": 0.89
+          }
+        ],
+        "edges": [
+          {
+            "source": "p_ecommerce_refund",
+            "target": "ec_prec_L023",
+            "type": "POLICY_APPLIED",
+            "weight": 1.0
+          },
+          {
+            "source": "p_ecommerce_premium_return",
+            "target": "ec_prec_L023",
+            "type": "POLICY_APPLIED",
+            "weight": 0.9
+          }
+        ]
+      },
+      "boundary_case": true,
+      "has_conflicting_policies": true,
+      "has_overturned_precedent": false,
+      "tags": [
+        "ecommerce"
+      ]
+    },
+    {
+      "id": "DI_EC024",
+      "domain": "ecommerce",
+      "source_dataset": "Magellan_Amazon_Google + synthetic",
+      "scenario": "Order #82999: $95 clothing purchase, account 18mo old, 25 prior orders, standard domestic shipping. Card BIN matches account country. No risk signals.",
+      "ground_truth_decision": "approve",
+      "ground_truth_reasoning": "Low-value routine order from established account with no fraud signals; automated approval.",
+      "applicable_policy_ids": [
+        "p_ecommerce_fraud"
+      ],
+      "context_graph": {
+        "nodes": [
+          {
+            "id": "p_ecommerce_fraud",
+            "type": "Policy",
+            "label": "Fraud Detection Policy",
+            "rules": {
+              "new_account_threshold_days": 30,
+              "max_gift_card_velocity": 2
+            },
+            "category": "ecommerce",
+            "version": "1.5"
+          },
+          {
+            "id": "ec_prec_L024",
+            "type": "Precedent",
+            "label": "Similar approve case - routine order",
+            "outcome": "approve",
+            "similarity_score": 0.95
+          }
+        ],
+        "edges": [
+          {
+            "source": "p_ecommerce_fraud",
+            "target": "ec_prec_L024",
             "type": "POLICY_APPLIED",
             "weight": 1.0
           }

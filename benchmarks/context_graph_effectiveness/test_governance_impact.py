@@ -123,7 +123,7 @@ class TestGovernanceImpact:
         assert governance_impact_report["impact_precision"] >= 0.85
 
     def test_change_breakdown_is_reported(self, governance_impact_report):
-        assert governance_impact_report["sample_size"] == 8
+        assert governance_impact_report["sample_size"] >= 8
         assert "expression_and_filter" in governance_impact_report["change_type_breakdown"]
 
     def test_graph_impact_matches_or_beats_baseline(self, governance_impact_report):
