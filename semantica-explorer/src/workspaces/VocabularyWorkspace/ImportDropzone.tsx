@@ -1,8 +1,14 @@
+/**
+ * ImportDropzone.tsx
+ *
+ * Drag & drop upload zone for SKOS .ttl / .rdf files.
+ * Styled for the Palantir dark theme.
+ */
 import React, { useCallback, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { UploadCloud, CheckCircle2, Loader2 } from 'lucide-react';
 import { useImportVocabulary } from './queries';
-import type { ImportResponse } from './types'; 
+import type { ImportResponse } from './types';
 
 export const ImportDropzone: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
@@ -17,11 +23,11 @@ export const ImportDropzone: React.FC = () => {
 
       importMutation.mutate(selectedFile, {
         onSuccess: (data) => {
-          setImportResult(data); 
+          setImportResult(data);
           setTimeout(() => {
             setFile(null);
             setImportResult(null);
-          }, 4000); 
+          }, 4000);
         },
         onError: (err) => {
           console.error("Upload failed:", err);
@@ -41,46 +47,46 @@ export const ImportDropzone: React.FC = () => {
   });
 
   return (
-    <div style={{ marginTop: '20px' }}>
-      <div 
-        {...getRootProps()} 
+    <div>
+      <div
+        {...getRootProps()}
         style={{
-          border: `2px dashed ${isDragActive ? '#3b82f6' : '#d1d5db'}`,
-          backgroundColor: isDragActive ? '#eff6ff' : '#f9fafb',
-          borderRadius: '6px',
-          padding: '24px 16px',
+          border: `2px dashed ${isDragActive ? '#58a6ff' : 'rgba(88,166,255,0.25)'}`,
+          backgroundColor: isDragActive ? 'rgba(88,166,255,0.06)' : 'rgba(0,0,0,0.2)',
+          borderRadius: 8,
+          padding: '16px 12px',
           textAlign: 'center',
           cursor: 'pointer',
-          transition: 'all 0.2s ease'
+          transition: 'all 0.2s ease',
         }}
       >
         <input {...getInputProps()} />
-        
+
         {importMutation.isPending ? (
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', color: '#6b7280' }}>
-            <Loader2 className="animate-spin" size={24} style={{ marginBottom: '8px' }} />
-            <span style={{ fontSize: '14px' }}>Uploading {file?.name}...</span>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', color: '#8b949e' }}>
+            <Loader2 className="animate-spin" size={20} style={{ marginBottom: 6 }} />
+            <span style={{ fontSize: 12 }}>Uploading {file?.name}…</span>
           </div>
         ) : importResult ? (
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', color: '#10b981' }}>
-            <CheckCircle2 size={24} style={{ marginBottom: '8px' }} />
-            <span style={{ fontSize: '14px', fontWeight: 500 }}>Import Successful!</span>
-            <span style={{ fontSize: '12px', marginTop: '4px', color: '#059669' }}>
-              Added {importResult.nodes_added} concepts & {importResult.edges_added} links.
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', color: '#3fb950' }}>
+            <CheckCircle2 size={20} style={{ marginBottom: 6 }} />
+            <span style={{ fontSize: 12, fontWeight: 500 }}>Import Successful!</span>
+            <span style={{ fontSize: 11, marginTop: 2, color: '#56d364' }}>
+              +{importResult.nodes_added} concepts · +{importResult.edges_added} links
             </span>
           </div>
         ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', color: '#6b7280' }}>
-            <UploadCloud size={24} style={{ marginBottom: '8px', color: isDragActive ? '#3b82f6' : '#9ca3af' }} />
-            <span style={{ fontSize: '14px', fontWeight: 500, color: '#374151' }}>
-              {isDragActive ? "Drop file here..." : "Import Vocabulary"}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', color: '#8b949e' }}>
+            <UploadCloud size={20} style={{ marginBottom: 6, color: isDragActive ? '#58a6ff' : '#484f58' }} />
+            <span style={{ fontSize: 12, fontWeight: 500, color: '#c9d1d9' }}>
+              {isDragActive ? "Drop here…" : "Import Vocabulary"}
             </span>
-            <span style={{ fontSize: '12px', marginTop: '4px' }}>Drag & drop .ttl or .rdf</span>
+            <span style={{ fontSize: 11, marginTop: 2 }}>.ttl or .rdf</span>
           </div>
         )}
       </div>
       {importMutation.isError && (
-        <p style={{ color: '#ef4444', fontSize: '12px', marginTop: '8px', textAlign: 'center' }}>
+        <p style={{ color: '#f85149', fontSize: 11, marginTop: 6, textAlign: 'center' }}>
           Upload failed. Check console.
         </p>
       )}

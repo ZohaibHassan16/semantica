@@ -1,10 +1,12 @@
-// ConceptTree.tsx
+/**
+ * ConceptTree.tsx — react-arborist SKOS hierarchy viewer.
+ *
+ * Styled for the Palantir/Glassmorphism dark theme rather than
+ * the default light-mode colours.
+ */
 import React from 'react';
-
-
 import { Tree } from 'react-arborist';
 import type { NodeRendererProps } from 'react-arborist';
-
 import { ChevronRight, ChevronDown, Folder, FileText } from 'lucide-react';
 import type { ConceptNode } from './types';
 
@@ -15,7 +17,11 @@ interface ConceptTreeProps {
 
 export const ConceptTree: React.FC<ConceptTreeProps> = ({ data, onSelectConcept }) => {
   return (
-    <div style={{ height: '600px', width: '100%', backgroundColor: '#f9fafb', borderRadius: '6px', border: '1px solid #e5e7eb', overflow: 'hidden' }}>
+    <div style={{
+      height: '100%', width: '100%',
+      backgroundColor: 'transparent',
+      overflow: 'hidden',
+    }}>
       <Tree
         data={data}
         idAccessor="uri"
@@ -23,41 +29,63 @@ export const ConceptTree: React.FC<ConceptTreeProps> = ({ data, onSelectConcept 
         height={600}
         indent={24}
         rowHeight={36}
+        childrenAccessor="children"
       >
         {(nodeProps: NodeRendererProps<ConceptNode>) => {
           const { node, style, dragHandle } = nodeProps;
           const isFolder = node.children && node.children.length > 0;
 
           return (
-            <div 
-              ref={dragHandle} 
+            <div
+              ref={dragHandle}
               onClick={() => {
-                node.toggle(); 
-                onSelectConcept(node.data); 
+                node.toggle();
+                onSelectConcept(node.data);
               }}
-        
               style={{
                 ...style,
                 display: 'flex',
                 alignItems: 'center',
                 padding: '0 8px',
                 cursor: 'pointer',
-                backgroundColor: node.isSelected ? '#e0f2fe' : 'transparent',
+                backgroundColor: node.isSelected
+                  ? 'rgba(88,166,255,0.12)'
+                  : 'transparent',
                 userSelect: 'none',
-                borderBottom: '1px solid #f3f4f6'
+                borderBottom: '1px solid rgba(255,255,255,0.04)',
+                transition: 'background 0.15s',
+              }}
+              onMouseEnter={(e) => {
+                if (!node.isSelected) {
+                  (e.currentTarget as HTMLDivElement).style.background = 'rgba(88,166,255,0.06)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!node.isSelected) {
+                  (e.currentTarget as HTMLDivElement).style.background = 'transparent';
+                }
               }}
             >
-              <span style={{ width: '20px', display: 'flex', justifyContent: 'center' }}>
+              <span style={{ width: 20, display: 'flex', justifyContent: 'center' }}>
                 {isFolder ? (
-                  node.isOpen ? <ChevronDown size={16} color="#6b7280" /> : <ChevronRight size={16} color="#6b7280" />
+                  node.isOpen
+                    ? <ChevronDown size={14} color="#8b949e" />
+                    : <ChevronRight size={14} color="#8b949e" />
                 ) : null}
               </span>
-              
-              <span style={{ marginRight: '8px', display: 'flex', alignItems: 'center' }}>
-                {isFolder ? <Folder size={16} color="#3b82f6" /> : <FileText size={16} color="#9ca3af" />}
+
+              <span style={{ marginRight: 8, display: 'flex', alignItems: 'center' }}>
+                {isFolder
+                  ? <Folder size={14} color="#d2a8ff" />
+                  : <FileText size={14} color="#484f58" />
+                }
               </span>
-              
-              <span style={{ fontSize: '14px', color: '#1f2937', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+
+              <span style={{
+                fontSize: 13, color: '#c9d1d9',
+                whiteSpace: 'nowrap', overflow: 'hidden',
+                textOverflow: 'ellipsis',
+              }}>
                 {node.data.pref_label}
               </span>
             </div>

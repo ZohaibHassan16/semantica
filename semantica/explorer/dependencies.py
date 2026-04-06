@@ -5,7 +5,6 @@ Provides ``Depends()``-compatible callables for injecting the
 current ``GraphSession`` and ``ConnectionManager`` into route handlers.
 """
 
-from fastapi import Request
 from fastapi import Request, HTTPException, status
 
 from .session import GraphSession

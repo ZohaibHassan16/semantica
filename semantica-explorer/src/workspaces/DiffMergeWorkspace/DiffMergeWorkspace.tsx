@@ -21,7 +21,7 @@ export function DiffMergeWorkspace() {
 
   const handleMerge = async () => {
     try {
-      const res = await fetch("http://localhost:8000/api/enrich/merge", {
+      const res = await fetch("/api/enrich/merge", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ primary_id: primaryId, duplicate_ids: [duplicateId] })

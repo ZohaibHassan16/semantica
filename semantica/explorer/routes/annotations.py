@@ -53,9 +53,6 @@ async def create_annotation(
         tags=body.tags,
         visibility=body.visibility,
     )
-    # add_annotation mutates ann_data in-place, adding annotation_id and created_at.
-    await asyncio.to_thread(session.add_annotation, ann_data)
-    return AnnotationResponse(**ann_data)
 
 
 @router.delete("/{annotation_id}", status_code=204)

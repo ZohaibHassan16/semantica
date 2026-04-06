@@ -26,7 +26,6 @@ try:
 except ImportError:
     EXPLORER_AVAILABLE = False
 
-# Initialize logging
 setup_logging()
 
 STATIC_DIR = Path(__file__).parent / "static"
@@ -65,7 +64,7 @@ app = FastAPI(
     lifespan=lifespan 
 )
 
-# Global framework instance
+
 framework = Semantica()
 
 class BuildRequest(BaseModel):
@@ -96,7 +95,7 @@ async def build_kb(request: BuildRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-# -Mount explorer routes
+
 if EXPLORER_AVAILABLE:
     try:
         from .explorer.routes import (
@@ -107,7 +106,9 @@ if EXPLORER_AVAILABLE:
             export_import,
             graph,
             temporal,
-            vocabulary
+            vocabulary,
+            provenance, 
+            sparql      
         )
 
         app.include_router(analytics.router)
@@ -118,8 +119,10 @@ if EXPLORER_AVAILABLE:
         app.include_router(graph.router)
         app.include_router(temporal.router)
         app.include_router(vocabulary.router)
+        app.include_router(provenance.router) 
+        app.include_router(sparql.router)    
 
-        logging.info("Explorer and Vocabulary API routes successfully mounted.")
+        logging.info("Explorer, Vocabulary, SPARQL, and Provenance API routes successfully mounted.")
     except Exception as exc:
         logging.error(f"Failed to mount explorer routes: {exc}")
 else:
@@ -129,19 +132,20 @@ else:
     )
 
 # SPA catch all 
-
-@app.get("/{full_path:path}")
+@app.get("/{full_path:path}", include_in_schema=False)
 async def serve_spa(full_path: str):
     """
     Catch-all route that serves React assets and index.html for React Router.
     """
+
+    if full_path.startswith("api/"):
+        raise HTTPException(status_code=404, detail="API route not found")
+
     requested_file = STATIC_DIR / full_path
     
-
     if requested_file.is_file():
         return FileResponse(requested_file)
     
-
     index_file = STATIC_DIR / "index.html"
     if index_file.is_file():
         return FileResponse(index_file)

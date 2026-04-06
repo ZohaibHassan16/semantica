@@ -66,10 +66,10 @@ export function SparqlWorkspace() {
     monaco?.editor.setModelMarkers(editorRef.current.getModel(), "sparql", []);
 
     try {
-      const response = await fetch("http://localhost:8000/api/sparql", {
+      const response = await fetch("/api/sparql", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query, session_id: "default" })
+        body: JSON.stringify({ query })
       });
       const data = await response.json();
 

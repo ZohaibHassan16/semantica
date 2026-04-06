@@ -32,7 +32,7 @@ export function DecisionWorkspace() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    fetch("http://localhost:8000/api/decisions")
+    fetch("/api/decisions")
       .then(res => res.json())
       .then(data => {
         setDecisions(data);
@@ -45,7 +45,7 @@ export function DecisionWorkspace() {
     setSelectedDecision(d);
     setLoading(true);
     try {
-      const res = await fetch(`http://localhost:8000/api/decisions/${d.decision_id}/chain`);
+      const res = await fetch(`/api/decisions/${d.decision_id}/chain`);
       const data = await res.json();
       setChain(data.chain || []);
     } catch (e) {

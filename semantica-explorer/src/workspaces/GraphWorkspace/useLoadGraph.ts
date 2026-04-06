@@ -1,36 +1,131 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { batchMergeEdges, batchMergeNodes, clearGraph, graph } from "../../store/graphStore";
+﻿import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { batchMergeEdges, batchMergeNodes, clearGraph } from "../../store/graphStore";
 import type { EdgeAttributes, NodeAttributes } from "../../store/graphStore";
 
-// colors and hasher
-const CYBER_PALETTE = [
-  "#58a6ff",
-  "#3fb950",
-  "#d2a8ff",
-  "#f0883e",
-  "#ff7b72",
-  "#79c0ff",
-  "#d29922",
-  "#bc8cff",
-  "#56d364",
-  "#f778ba"
+const GRAPH_PALETTE = [
+  "#61afef",
+  "#56b6c2",
+  "#98c379",
+  "#e5c07b",
+  "#d19a66",
+  "#e06c75",
+  "#c678dd",
+  "#7aa2f7",
+  "#4fd1c5",
+  "#f59e0b",
+  "#fb7185",
+  "#a3e635",
 ];
 
+const SEMANTIC_COLOR_FIELDS = [
+  "community",
+  "cluster",
+  "module",
+  "group",
+  "category",
+  "domain",
+  "layer",
+  "source",
+  "nodeType",
+] as const;
 
-const hashCategory = (str: string): number => {
+const hashCategory = (value: string): number => {
   let hash = 0;
-  for (let i = 0; i < str.length; i++) {
-    hash = (hash << 5) - hash + str.charCodeAt(i);
+  for (let index = 0; index < value.length; index += 1) {
+    hash = (hash << 5) - hash + value.charCodeAt(index);
     hash |= 0;
   }
   return Math.abs(hash);
 };
 
+function getSemanticFieldValue(attributes: NodeAttributes, field: (typeof SEMANTIC_COLOR_FIELDS)[number]): string | null {
+  if (field === "nodeType") {
+    const value = attributes.nodeType;
+    return typeof value === "string" && value.trim() ? value : null;
+  }
+
+  const value = attributes.properties?.[field];
+  return typeof value === "string" && value.trim() ? value : null;
+}
+
+function normalizedEntropy(counts: number[], total: number): number {
+  if (counts.length <= 1 || total <= 0) {
+    return 0;
+  }
+
+  let entropy = 0;
+  for (const count of counts) {
+    const probability = count / total;
+    entropy -= probability * Math.log(probability);
+  }
+
+  return entropy / Math.log(counts.length);
+}
+
+function chooseColorAccessor(
+  nodes: Array<{ id: string; attributes: NodeAttributes }>,
+): (nodeId: string, attributes: NodeAttributes) => string {
+  let bestField: (typeof SEMANTIC_COLOR_FIELDS)[number] | null = null;
+  let bestScore = 0;
+
+  for (const field of SEMANTIC_COLOR_FIELDS) {
+    const counts = new Map<string, number>();
+    let covered = 0;
+
+    for (const node of nodes) {
+      const value = getSemanticFieldValue(node.attributes, field);
+      if (!value) {
+        continue;
+      }
+      covered += 1;
+      counts.set(value, (counts.get(value) ?? 0) + 1);
+    }
+
+    const uniqueCount = counts.size;
+    if (covered === 0 || uniqueCount <= 1) {
+      continue;
+    }
+
+    const countValues = [...counts.values()];
+    const coverage = covered / nodes.length;
+    const dominantRatio = Math.max(...countValues) / covered;
+    const entropy = normalizedEntropy(countValues, covered);
+    const diversity = Math.min(uniqueCount, GRAPH_PALETTE.length) / GRAPH_PALETTE.length;
+    const score = entropy * 0.65 + diversity * 0.2 + coverage * 0.15;
+
+    const isInformative =
+      coverage >= 0.45 &&
+      entropy >= 0.45 &&
+      dominantRatio <= 0.88;
+
+    if (!isInformative) {
+      continue;
+    }
+
+    if (score > bestScore) {
+      bestField = field;
+      bestScore = score;
+    }
+  }
+
+  if (bestField) {
+    return (_nodeId: string, attributes: NodeAttributes) =>
+      getSemanticFieldValue(attributes, bestField) ?? structuralColorKey(_nodeId, attributes);
+  }
+
+  return (nodeId: string, attributes: NodeAttributes) => structuralColorKey(nodeId, attributes);
+}
+
+function structuralColorKey(nodeId: string, attributes: NodeAttributes): string {
+  const shard = hashCategory(nodeId) % GRAPH_PALETTE.length;
+  return `${attributes.nodeType || "entity"}:${shard}`;
+}
+
 interface ApiNode {
   id: string;
   type: string;
   content: string;
-  properties: Record<string, any>;
+  properties: Record<string, unknown>;
   valid_from?: string | null;
   valid_until?: string | null;
 }
@@ -40,7 +135,7 @@ interface ApiEdge {
   target: string;
   type: string;
   weight: number;
-  properties: Record<string, any>;
+  properties: Record<string, unknown>;
 }
 
 interface NodeListResponse {
@@ -48,6 +143,7 @@ interface NodeListResponse {
   total: number;
   skip: number;
   limit: number;
+  next_cursor?: string | null;
 }
 
 interface EdgeListResponse {
@@ -55,6 +151,7 @@ interface EdgeListResponse {
   total: number;
   skip: number;
   limit: number;
+  next_cursor?: string | null;
 }
 
 export interface GraphLoadSummary {
@@ -63,127 +160,122 @@ export interface GraphLoadSummary {
   loadTimeMs: number;
 }
 
-const PAGE_LIMIT = 1000;
-
-async function fetchAllNodes(signal: AbortSignal): Promise<number> {
-  let skip = 0;
-  let totalMerged = 0;
-  let hasMore = true;
-
-  while (hasMore) {
-    const url = new URL("/api/graph/nodes", window.location.origin);
-    url.searchParams.set("limit", String(PAGE_LIMIT));
-    url.searchParams.set("skip", String(skip));
-
-    const res = await fetch(url.toString(), { signal });
-    if (!res.ok) {
-      const errorBody = await res.text();
-      if (res.status === 422) {
-        console.error(`🚨 FastAPI 422 Crash Report at skip=${skip}:`, errorBody);
-        break;
-      }
-      throw new Error(`Fetch failed: ${res.status}`);
-    }
-
-    const data: NodeListResponse = await res.json();
-
-    if (!data.nodes || data.nodes.length === 0) {
-      break;
-    }
-
-    const nodesToMerge = data.nodes.map((n) => {
-      const x = n.properties?.x ?? (Math.random() * 1000 - 500);
-      const y = n.properties?.y ?? (Math.random() * 1000 - 500);
-
-      return {
-        id: n.id,
-        attributes: {
-          label: n.content || n.id,
-          x,
-          y,
-          nodeType: n.type,
-          content: n.content,
-          valid_from: n.valid_from,
-          valid_until: n.valid_until,
-          properties: n.properties,
-        } as NodeAttributes,
-      };
-    });
-
-    batchMergeNodes(nodesToMerge);
-    totalMerged += nodesToMerge.length;
-    skip += PAGE_LIMIT;
-
-    if (data.nodes.length < PAGE_LIMIT) {
-      hasMore = false;
-    }
-
-    await yieldToMain();
-  }
-
-  return totalMerged;
+export interface GraphLoadProgress {
+  phase: "nodes" | "edges" | "styling" | "rendering";
+  nodesLoaded: number;
+  nodesTotal: number | null;
+  edgesLoaded: number;
+  edgesTotal: number | null;
+  message: string;
+  progress: number;
 }
 
-async function fetchAllEdges(signal: AbortSignal): Promise<number> {
-  let skip = 0;
-  let totalMerged = 0;
-  let hasMore = true;
+const PAGE_LIMIT = 1000;
 
-  while (hasMore) {
-    const url = new URL("/api/graph/edges", window.location.origin);
+async function fetchAllNodes(
+  signal: AbortSignal,
+  onProgress?: (progress: GraphLoadProgress) => void,
+): Promise<ApiNode[]> {
+  let cursor: string | null = null;
+  const collected: ApiNode[] = [];
+  let total: number | null = null;
+
+  while (true) {
+    const url = new URL("/api/graph/nodes", window.location.origin);
     url.searchParams.set("limit", String(PAGE_LIMIT));
-    url.searchParams.set("skip", String(skip));
-
-    const res = await fetch(url.toString(), { signal });
-    if (!res.ok) {
-      const errorBody = await res.text();
-      if (res.status === 422) {
-        console.error(`🚨 FastAPI 422 Crash Report at skip=${skip}:`, errorBody);
-        break;
-      }
-      throw new Error(`Fetch failed: ${res.status}`);
+    if (cursor) {
+      url.searchParams.set("cursor", cursor);
     }
 
-    const data: EdgeListResponse = await res.json();
+    const response = await fetch(url.toString(), { signal });
+    if (!response.ok) {
+      throw new Error(`Fetch failed: ${response.status}`);
+    }
 
-    if (!data.edges || data.edges.length === 0) {
+    const data: NodeListResponse = await response.json();
+    if (!data.nodes?.length) {
       break;
     }
 
-    // Filter out edges pointing to missing nodes
-    const validEdges = data.edges.filter((e) => {
-      return graph.hasNode(e.source) && graph.hasNode(e.target);
+    total = data.total ?? total;
+    collected.push(...data.nodes);
+    onProgress?.({
+      phase: "nodes",
+      nodesLoaded: collected.length,
+      nodesTotal: total,
+      edgesLoaded: 0,
+      edgesTotal: null,
+      message: total
+        ? `Loading nodes ${collected.length.toLocaleString()} of ${total.toLocaleString()}`
+        : `Loading nodes ${collected.length.toLocaleString()}`,
+      progress: total ? Math.min(collected.length / Math.max(total, 1), 0.45) : 0.18,
     });
 
-    const edgesToMerge = validEdges.map((e) => ({
-      source: e.source,
-      target: e.target,
-      attributes: {
-        weight: e.weight,
-        edgeType: e.type,
-        properties: e.properties,
-        size: e.properties?.size ?? 1,
-        color: e.properties?.color ?? "#444C56",
-      } as EdgeAttributes,
-    }));
-
-    batchMergeEdges(edgesToMerge);
-    totalMerged += edgesToMerge.length;
-    skip += PAGE_LIMIT;
-
-    if (data.edges.length < PAGE_LIMIT) {
-      hasMore = false;
+    if (!data.next_cursor) {
+      break;
     }
-
+    cursor = data.next_cursor;
     await yieldToMain();
   }
 
-  return totalMerged;
+  return collected;
+}
+
+async function fetchAllEdges(
+  signal: AbortSignal,
+  nodeIds: Set<string>,
+  nodeProgress: { loaded: number; total: number | null },
+  onProgress?: (progress: GraphLoadProgress) => void,
+): Promise<ApiEdge[]> {
+  let cursor: string | null = null;
+  const collected: ApiEdge[] = [];
+  let total: number | null = null;
+
+  while (true) {
+    const url = new URL("/api/graph/edges", window.location.origin);
+    url.searchParams.set("limit", String(PAGE_LIMIT));
+    if (cursor) {
+      url.searchParams.set("cursor", cursor);
+    }
+
+    const response = await fetch(url.toString(), { signal });
+    if (!response.ok) {
+      throw new Error(`Fetch failed: ${response.status}`);
+    }
+
+    const data: EdgeListResponse = await response.json();
+    if (!data.edges?.length) {
+      break;
+    }
+
+    total = data.total ?? total;
+    const validEdges = data.edges.filter((edge) => nodeIds.has(edge.source) && nodeIds.has(edge.target));
+    collected.push(...validEdges);
+    onProgress?.({
+      phase: "edges",
+      nodesLoaded: nodeProgress.loaded,
+      nodesTotal: nodeProgress.total,
+      edgesLoaded: collected.length,
+      edgesTotal: total,
+      message: total
+        ? `Loading edges ${collected.length.toLocaleString()} of ${total.toLocaleString()}`
+        : `Loading edges ${collected.length.toLocaleString()}`,
+      progress: total ? 0.45 + Math.min(collected.length / Math.max(total, 1), 1) * 0.35 : 0.62,
+    });
+
+    if (!data.next_cursor) {
+      break;
+    }
+    cursor = data.next_cursor;
+    await yieldToMain();
+  }
+
+  return collected;
 }
 
 function yieldToMain(): Promise<void> {
-  if ("scheduler" in window && typeof (window as any).scheduler.yield === "function") {
-    return (window as any).scheduler.yield();
+  if ("scheduler" in window && typeof (window as Window & { scheduler?: { yield?: () => Promise<void> } }).scheduler?.yield === "function") {
+    return (window as Window & { scheduler: { yield: () => Promise<void> } }).scheduler.yield();
   }
   return new Promise((resolve) => setTimeout(resolve, 0));
 }
@@ -191,57 +283,140 @@ function yieldToMain(): Promise<void> {
 interface UseLoadGraphOptions {
   enabled?: boolean;
   onGraphReady?: (summary: GraphLoadSummary) => void;
+  onProgress?: (progress: GraphLoadProgress) => void;
 }
 
 export function useLoadGraph(options: UseLoadGraphOptions = {}) {
-  const { enabled = true, onGraphReady } = options;
+  const { enabled = true, onGraphReady, onProgress } = options;
 
   return useQuery<GraphLoadSummary>({
     queryKey: ["graph", "full-load"],
     enabled,
     staleTime: Infinity,
-
     queryFn: async ({ signal }): Promise<GraphLoadSummary> => {
-      const t0 = performance.now();
+      const startedAt = performance.now();
+      onProgress?.({
+        phase: "nodes",
+        nodesLoaded: 0,
+        nodesTotal: null,
+        edgesLoaded: 0,
+        edgesTotal: null,
+        message: "Preparing graph load",
+        progress: 0.06,
+      });
 
-      clearGraph();
+      const fetchedNodes = await fetchAllNodes(signal, onProgress);
+      const nodeIds = new Set(fetchedNodes.map((node) => node.id));
+      const fetchedEdges = await fetchAllEdges(
+        signal,
+        nodeIds,
+        { loaded: fetchedNodes.length, total: fetchedNodes.length },
+        onProgress,
+      );
 
-      const nodeCount = await fetchAllNodes(signal);
-      const edgeCount = await fetchAllEdges(signal);
+      const degreeByNode = new Map<string, number>();
+      for (const nodeId of nodeIds) {
+        degreeByNode.set(nodeId, 0);
+      }
+      for (const edge of fetchedEdges) {
+        degreeByNode.set(edge.source, (degreeByNode.get(edge.source) ?? 0) + 1);
+        degreeByNode.set(edge.target, (degreeByNode.get(edge.target) ?? 0) + 1);
+      }
 
-      // Sizing and color mapper
-      const maxDegree = graph.nodes().reduce((max, node) => Math.max(max, graph.degree(node)), 1);
-
-      graph.updateEachNodeAttributes((node, attr) => {
-        const categoryStr = String(attr.nodeType || attr.properties?.community || attr.properties?.category || "default");
-        const colorIndex = hashCategory(categoryStr) % CYBER_PALETTE.length;
-
-
-        const degree = graph.degree(node);
-        const minSize = 2;
-        const maxSize = 25;
-
-
-        const sizeRatio = Math.log(degree + 1) / Math.log(maxDegree + 1);
-        const dynamicSize = minSize + (maxSize - minSize) * sizeRatio;
-
+      const maxDegree = Math.max(...degreeByNode.values(), 1);
+      const draftAttributes = fetchedNodes.map((node) => {
+        const x = Number((node.properties as Record<string, unknown>)?.x ?? Math.random() * 1000 - 500);
+        const y = Number((node.properties as Record<string, unknown>)?.y ?? Math.random() * 1000 - 500);
         return {
-          ...attr,
-          color: CYBER_PALETTE[colorIndex],
-          size: dynamicSize,
-          borderColor: "#0d1117",
-          borderSize: 0.5,
+          id: node.id,
+          attributes: {
+            label: node.content || node.id,
+            x,
+            y,
+            nodeType: node.type,
+            content: node.content,
+            valid_from: node.valid_from,
+            valid_until: node.valid_until,
+            properties: node.properties,
+          } as NodeAttributes,
         };
       });
 
-      const summary: GraphLoadSummary = {
-        nodeCount,
-        edgeCount,
-        loadTimeMs: Math.round(performance.now() - t0),
-      };
+      onProgress?.({
+        phase: "styling",
+        nodesLoaded: fetchedNodes.length,
+        nodesTotal: fetchedNodes.length,
+        edgesLoaded: fetchedEdges.length,
+        edgesTotal: fetchedEdges.length,
+        message: "Computing graph styling",
+        progress: 0.86,
+      });
+
+      const colorAccessor = chooseColorAccessor(draftAttributes);
+
+      const nodesToMerge = draftAttributes.map(({ id, attributes }) => {
+        const colorKey = colorAccessor(id, attributes);
+        const colorIndex = hashCategory(colorKey) % GRAPH_PALETTE.length;
+        const degree = degreeByNode.get(id) ?? 0;
+        const minSize = 2;
+        const maxSize = 25;
+        const sizeRatio = Math.log(degree + 1) / Math.log(maxDegree + 1);
+        const dynamicSize = minSize + (maxSize - minSize) * sizeRatio;
+        return {
+          id,
+          attributes: {
+            ...attributes,
+            color: GRAPH_PALETTE[colorIndex],
+            size: dynamicSize,
+            borderColor: "#0d1117",
+            borderSize: 0.5,
+          } as NodeAttributes,
+        };
+      });
+
+      const edgesToMerge = fetchedEdges.map((edge) => ({
+        source: edge.source,
+        target: edge.target,
+        attributes: {
+          weight: edge.weight,
+          edgeType: edge.type,
+          properties: edge.properties,
+          size: Number((edge.properties as Record<string, unknown>)?.size ?? 1),
+          color: String((edge.properties as Record<string, unknown>)?.color ?? "#444C56"),
+        } as EdgeAttributes,
+      }));
+
+      onProgress?.({
+        phase: "rendering",
+        nodesLoaded: nodesToMerge.length,
+        nodesTotal: nodesToMerge.length,
+        edgesLoaded: edgesToMerge.length,
+        edgesTotal: edgesToMerge.length,
+        message: "Rendering graph",
+        progress: 0.96,
+      });
+
+      clearGraph();
+      batchMergeNodes(nodesToMerge);
+      batchMergeEdges(edgesToMerge);
+
+      const summary = {
+        nodeCount: nodesToMerge.length,
+        edgeCount: edgesToMerge.length,
+        loadTimeMs: Math.round(performance.now() - startedAt),
+      } satisfies GraphLoadSummary;
+
+      onProgress?.({
+        phase: "rendering",
+        nodesLoaded: summary.nodeCount,
+        nodesTotal: summary.nodeCount,
+        edgesLoaded: summary.edgeCount,
+        edgesTotal: summary.edgeCount,
+        message: "Graph ready",
+        progress: 1,
+      });
 
       onGraphReady?.(summary);
-
       return summary;
     },
   });

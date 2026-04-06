@@ -1,126 +1,415 @@
-/**
- * src/App.tsx
- */
-import { useState } from 'react';
+﻿import { lazy, Suspense, useState, type ReactNode } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { VocabularyWorkspace } from './workspaces/VocabularyWorkspace/VocabularyWorkspace';
-import { GraphWorkspace } from './workspaces/GraphWorkspace/GraphWorkspace';
-import { DecisionWorkspace } from './workspaces/DecisionWorkspace/DecisionWorkspace';
-import { SparqlWorkspace } from './workspaces/SparqlWorkspace/SparqlWorkspace';
-import { LineageDiagram } from './workspaces/LineageWorkspace/LineageDiagram';
-import { DiffMergeWorkspace } from './workspaces/DiffMergeWorkspace/DiffMergeWorkspace';
-import { ImportExportWorkspace } from './workspaces/ImportExportWorkspace/ImportExportWorkspace'; // <-- IMPORT ADDED
+import { Database, FileSearch, GitBranchPlus, Scale, Settings2 } from 'lucide-react';
+
+const DecisionWorkspace = lazy(() => import('./workspaces/DecisionWorkspace/DecisionWorkspace').then((module) => ({ default: module.DecisionWorkspace })));
+const DiffMergeWorkspace = lazy(() => import('./workspaces/DiffMergeWorkspace/DiffMergeWorkspace').then((module) => ({ default: module.DiffMergeWorkspace })));
+const GraphWorkspace = lazy(() => import('./workspaces/GraphWorkspace/GraphWorkspace').then((module) => ({ default: module.GraphWorkspace })));
+const ImportExportWorkspace = lazy(() => import('./workspaces/ImportExportWorkspace/ImportExportWorkspace').then((module) => ({ default: module.ImportExportWorkspace })));
+const LineageDiagram = lazy(() => import('./workspaces/LineageWorkspace/LineageDiagram').then((module) => ({ default: module.LineageDiagram })));
+const ReasoningWorkspace = lazy(() => import('./workspaces/ReasoningWorkspace').then((module) => ({ default: module.ReasoningWorkspace })));
+const SparqlWorkspace = lazy(() => import('./workspaces/SparqlWorkspace/SparqlWorkspace').then((module) => ({ default: module.SparqlWorkspace })));
+const VocabularyWorkspace = lazy(() => import('./workspaces/VocabularyWorkspace/VocabularyWorkspace').then((module) => ({ default: module.VocabularyWorkspace })));
+
+type WorkspaceId = 'explore' | 'analyze' | 'decisions' | 'enrich' | 'manage';
+type ExploreView = 'graph' | 'vocabulary';
+type AnalyzeView = 'sparql' | 'reasoning';
+type EnrichView = 'import' | 'merge';
+
+type NavItem = {
+  id: WorkspaceId;
+  label: string;
+  hint: string;
+  icon: typeof Database;
+};
 
 const queryClient = new QueryClient();
 
-export default function App() {
+const navItems: NavItem[] = [
+  { id: 'explore', label: 'Explore', hint: 'Graph and vocabulary browsing', icon: Database },
+  { id: 'analyze', label: 'Analyze', hint: 'Query and inspect the dataset', icon: FileSearch },
+  { id: 'decisions', label: 'Decisions', hint: 'Decision chains and precedent review', icon: Scale },
+  { id: 'enrich', label: 'Enrich', hint: 'Import, export, and merge workflows', icon: GitBranchPlus },
+  { id: 'manage', label: 'Manage', hint: 'Lineage and governance tooling', icon: Settings2 },
+];
 
-  const [activeWorkspace, setActiveWorkspace] = useState<'vocabulary' | 'graph' | 'decisions' | 'sparql' | 'lineage' | 'merge' | 'import'>('graph');
+const shellStyles = `
+  :root {
+    --app-bg: #07111f;
+    --panel-bg: rgba(7, 17, 31, 0.82);
+    --panel-border: rgba(140, 192, 255, 0.14);
+    --text-main: #ebf3ff;
+    --text-muted: #8fa8c6;
+    --accent: #4aa3ff;
+    --accent-strong: #7fd0ff;
+    --warm: #f2b66d;
+    --success: #4cc38a;
+  }
 
+  .app-shell {
+    display: flex;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    color: var(--text-main);
+    background:
+      radial-gradient(circle at top left, rgba(74, 163, 255, 0.12), transparent 32%),
+      radial-gradient(circle at bottom right, rgba(242, 182, 109, 0.08), transparent 26%),
+      linear-gradient(180deg, #091322 0%, #050b15 100%);
+    font-family: "Segoe UI", "SF Pro Display", sans-serif;
+  }
+
+  .app-rail {
+    width: 88px;
+    padding: 20px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    border-right: 1px solid var(--panel-border);
+    background: rgba(3, 9, 18, 0.92);
+    backdrop-filter: blur(18px);
+  }
+
+  .brand-pill {
+    width: 100%;
+    min-height: 56px;
+    border-radius: 18px;
+    display: grid;
+    place-items: center;
+    color: var(--text-main);
+    background: linear-gradient(135deg, rgba(74, 163, 255, 0.22), rgba(127, 208, 255, 0.08));
+    border: 1px solid rgba(127, 208, 255, 0.18);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+  }
+
+  .nav-button {
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--text-muted);
+    border-radius: 18px;
+    min-height: 72px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: 160ms ease;
+  }
+
+  .nav-button:hover {
+    color: var(--text-main);
+    background: rgba(74, 163, 255, 0.08);
+    border-color: rgba(74, 163, 255, 0.12);
+  }
+
+  .nav-button[data-active='true'] {
+    color: var(--text-main);
+    background: linear-gradient(180deg, rgba(74, 163, 255, 0.18), rgba(74, 163, 255, 0.08));
+    border-color: rgba(127, 208, 255, 0.22);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+  }
+
+  .nav-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+
+  .workspace-shell {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .workspace-header {
+    padding: 14px 22px;
+    border-bottom: 1px solid var(--panel-border);
+    background: linear-gradient(180deg, rgba(7, 17, 31, 0.94), rgba(7, 17, 31, 0.82));
+    backdrop-filter: blur(18px);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    min-height: 68px;
+  }
+
+  .workspace-header-main {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .workspace-kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: rgba(74, 163, 255, 0.08);
+    border: 1px solid rgba(127, 208, 255, 0.14);
+    color: var(--text-muted);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .workspace-kicker::before {
+    content: "";
+    width: 7px;
+    height: 7px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, var(--accent-strong), var(--warm));
+    box-shadow: 0 0 14px rgba(127, 208, 255, 0.45);
+  }
+
+  .workspace-title-block {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .workspace-title {
+    margin: 0;
+    font-size: 20px;
+    line-height: 1;
+    letter-spacing: -0.03em;
+  }
+
+  .workspace-subtitle {
+    color: var(--text-muted);
+    font-size: 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .workspace-tabs {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  .workspace-tab {
+    border: 1px solid rgba(127, 208, 255, 0.18);
+    background: rgba(9, 19, 34, 0.56);
+    color: var(--text-muted);
+    border-radius: 999px;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    transition: 160ms ease;
+    white-space: nowrap;
+  }
+
+  .workspace-tab[data-active='true'] {
+    color: var(--text-main);
+    background: rgba(74, 163, 255, 0.16);
+    border-color: rgba(127, 208, 255, 0.3);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+  }
+
+  .workspace-body {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .workspace-loading {
+    height: 100%;
+    display: grid;
+    place-items: center;
+    color: var(--text-muted);
+    background: linear-gradient(180deg, rgba(7, 17, 31, 0.8), rgba(5, 11, 21, 0.92));
+    font-size: 14px;
+  }
+
+  @media (max-width: 980px) {
+    .workspace-header {
+      flex-direction: column;
+      align-items: stretch;
+      min-height: auto;
+      padding: 12px 18px;
+    }
+
+    .workspace-header-main {
+      justify-content: space-between;
+    }
+
+    .workspace-subtitle {
+      white-space: normal;
+    }
+
+    .workspace-tabs {
+      justify-content: flex-start;
+    }
+  }
+`;
+
+function WorkspaceShell({
+  title,
+  subtitle,
+  tabs,
+  children,
+}: {
+  title: string;
+  subtitle?: string;
+  tabs?: ReactNode;
+  children: ReactNode;
+}) {
   return (
-    <QueryClientProvider client={queryClient}>
-      <div style={{ display: 'flex', width: '100vw', height: '100vh', margin: 0, padding: 0, backgroundColor: '#0d1117', fontFamily: "system-ui, -apple-system, sans-serif" }}>
-
-
-        <nav style={{
-          width: '64px',
-          backgroundColor: '#010409',
-          borderRight: '1px solid #30363d',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          paddingTop: '16px',
-          gap: '16px'
-        }}>
-
-          <div style={{ width: '32px', height: '32px', backgroundColor: '#238636', borderRadius: '8px', marginBottom: '24px' }} title="Semantica" />
-
-          {/* Graph Icon Button */}
-          <button
-            onClick={() => setActiveWorkspace('graph')}
-            title="Graph Explorer"
-            style={navItemStyle(activeWorkspace === 'graph')}
-          >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
-          </button>
-
-          {/* Vocabulary Icon Button */}
-          <button
-            onClick={() => setActiveWorkspace('vocabulary')}
-            title="Vocabulary & Ontology"
-            style={navItemStyle(activeWorkspace === 'vocabulary')}
-          >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"></path></svg>
-          </button>
-
-          {/* Decisions */}
-          <button
-            onClick={() => setActiveWorkspace('decisions')}
-            title="Decision Tree"
-            style={navItemStyle(activeWorkspace === 'decisions')}
-          >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="6" y1="3" x2="6" y2="15"></line><circle cx="18" cy="6" r="3"></circle><circle cx="6" cy="18" r="3"></circle><path d="M18 9a9 9 0 0 1-9 9"></path></svg>
-          </button>
-
-          {/* SPARQL */}
-          <button
-            onClick={() => setActiveWorkspace('sparql')}
-            title="SPARQL Engine"
-            style={navItemStyle(activeWorkspace === 'sparql')}
-          >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>
-          </button>
-
-          {/* Lineage */}
-          <button
-            onClick={() => setActiveWorkspace('lineage')}
-            title="PROV-O Lineage"
-            style={navItemStyle(activeWorkspace === 'lineage')}
-          >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
-          </button>
-
-          {/* Merge */}
-          <button
-            onClick={() => setActiveWorkspace('merge')}
-            title="Diff / Merge"
-            style={navItemStyle(activeWorkspace === 'merge')}
-          >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 7v4a1 1 0 0 0 1 1h3"></path><path d="M12 2v20"></path><path d="M21 7v4a1 1 0 0 1-1 1h-3"></path><circle cx="3" cy="4" r="3"></circle><circle cx="21" cy="4" r="3"></circle><circle cx="12" cy="19" r="3"></circle></svg>
-          </button>
-
-          {/* IMPORT / EXPORT BUTTON */}
-          <button
-            onClick={() => setActiveWorkspace('import')}
-            title="Data Import / Export"
-            style={navItemStyle(activeWorkspace === 'import')}
-          >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
-          </button>
-
-        </nav>
-
-
-        <div style={{ flex: 1, position: 'relative', overflow: 'hidden' }}>
-          {activeWorkspace === 'graph' && <GraphWorkspace />}
-          {activeWorkspace === 'vocabulary' && <VocabularyWorkspace />}
-          {activeWorkspace === 'decisions' && <DecisionWorkspace />}
-          {activeWorkspace === 'sparql' && <SparqlWorkspace />}
-          {activeWorkspace === 'lineage' && <LineageDiagram />}
-          {activeWorkspace === 'merge' && <DiffMergeWorkspace />}
-          {activeWorkspace === 'import' && <ImportExportWorkspace />}
+    <section className="workspace-shell">
+      <header className="workspace-header">
+        <div className="workspace-header-main">
+          <div className="workspace-kicker">Workspace</div>
+          <div className="workspace-title-block">
+            <h1 className="workspace-title">{title}</h1>
+            {subtitle ? <div className="workspace-subtitle">{subtitle}</div> : null}
+          </div>
         </div>
-      </div>
-    </QueryClientProvider>
+        {tabs ? <div className="workspace-tabs">{tabs}</div> : null}
+      </header>
+      <div className="workspace-body">{children}</div>
+    </section>
   );
 }
 
-function navItemStyle(active: boolean): React.CSSProperties {
-  return {
-    width: '40px', height: '40px', borderRadius: '8px', cursor: 'pointer',
-    border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center',
-    backgroundColor: active ? '#1f6feb' : 'transparent',
-    color: active ? '#fff' : '#8b949e',
-    transition: 'all 0.2s'
+function WorkspaceFallback() {
+  return <div className="workspace-loading">Loading workspace…</div>;
+}
+
+export default function App() {
+  const [activeWorkspace, setActiveWorkspace] = useState<WorkspaceId>('explore');
+  const [exploreView, setExploreView] = useState<ExploreView>('graph');
+  const [analyzeView, setAnalyzeView] = useState<AnalyzeView>('reasoning');
+  const [enrichView, setEnrichView] = useState<EnrichView>('import');
+
+  const renderWorkspace = () => {
+    if (activeWorkspace === 'explore') {
+      return (
+        <WorkspaceShell
+          title="Explore"
+          subtitle="Browse the graph and switch views without leaving the workspace."
+          tabs={
+            <>
+              <button className="workspace-tab" data-active={exploreView === 'graph'} onClick={() => setExploreView('graph')}>
+                Network Explorer
+              </button>
+              <button className="workspace-tab" data-active={exploreView === 'vocabulary'} onClick={() => setExploreView('vocabulary')}>
+                Vocabulary Browser
+              </button>
+            </>
+          }
+        >
+          <Suspense fallback={<WorkspaceFallback />}>
+            {exploreView === 'graph' ? <GraphWorkspace /> : <VocabularyWorkspace />}
+          </Suspense>
+        </WorkspaceShell>
+      );
+    }
+
+    if (activeWorkspace === 'analyze') {
+      return (
+        <WorkspaceShell
+          title="Analyze"
+          subtitle="Query the active graph and test inference rules."
+          tabs={
+            <>
+              <button className="workspace-tab" data-active={analyzeView === 'reasoning'} onClick={() => setAnalyzeView('reasoning')}>
+                Reasoning Playground
+              </button>
+              <button className="workspace-tab" data-active={analyzeView === 'sparql'} onClick={() => setAnalyzeView('sparql')}>
+                SPARQL Querying
+              </button>
+            </>
+          }
+        >
+          <Suspense fallback={<WorkspaceFallback />}>
+            {analyzeView === 'reasoning' ? <ReasoningWorkspace /> : <SparqlWorkspace />}
+          </Suspense>
+        </WorkspaceShell>
+      );
+    }
+
+    if (activeWorkspace === 'decisions') {
+      return (
+        <WorkspaceShell
+          title="Decisions"
+          subtitle="Inspect decision chains, causal context, and precedent matches."
+        >
+          <Suspense fallback={<WorkspaceFallback />}>
+            <DecisionWorkspace />
+          </Suspense>
+        </WorkspaceShell>
+      );
+    }
+
+    if (activeWorkspace === 'enrich') {
+      return (
+        <WorkspaceShell
+          title="Enrich"
+          subtitle="Import, export, and reconcile graph entities."
+          tabs={
+            <>
+              <button className="workspace-tab" data-active={enrichView === 'import'} onClick={() => setEnrichView('import')}>
+                Import and Export
+              </button>
+              <button className="workspace-tab" data-active={enrichView === 'merge'} onClick={() => setEnrichView('merge')}>
+                Diff and Merge
+              </button>
+            </>
+          }
+        >
+          <Suspense fallback={<WorkspaceFallback />}>
+            {enrichView === 'import' ? <ImportExportWorkspace /> : <DiffMergeWorkspace />}
+          </Suspense>
+        </WorkspaceShell>
+      );
+    }
+
+    return (
+      <WorkspaceShell
+        title="Manage"
+        subtitle="Review provenance, lineage, and governance context."
+      >
+        <Suspense fallback={<WorkspaceFallback />}>
+          <LineageDiagram />
+        </Suspense>
+      </WorkspaceShell>
+    );
   };
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <style>{shellStyles}</style>
+      <div className="app-shell">
+        <aside className="app-rail">
+          <div className="brand-pill">SEM</div>
+          {navItems.map(({ id, label, hint, icon: Icon }) => (
+            <button
+              key={id}
+              className="nav-button"
+              data-active={activeWorkspace === id}
+              onClick={() => setActiveWorkspace(id)}
+              title={hint}
+            >
+              <Icon size={20} />
+              <span className="nav-label">{label}</span>
+            </button>
+          ))}
+        </aside>
+        {renderWorkspace()}
+      </div>
+    </QueryClientProvider>
+  );
 }
