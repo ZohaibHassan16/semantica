@@ -7,6 +7,9 @@ import type { GraphCanvasHandle } from "./GraphCanvas";
 import { TimelinePanel } from "./TimelinePanel";
 import { useLoadGraph, useReloadGraph } from "./useLoadGraph";
 import { graph } from "../../store/graphStore";
+import { HybridSemanticSearch } from "./components/HybridSemanticSearch";
+import { AnalyticsDashboard } from "./components/AnalyticsDashboard";
+import { EnrichmentPanel } from "./components/EnrichmentPanel";
 
 // Utils
 
@@ -135,6 +138,8 @@ function NodePanel({ nodeId }: { nodeId: string }) {
 
 export function GraphWorkspace() {
   const [selectedNodeId, setSelectedNodeId] = useState<string>("");
+  const [targetCameraNodeId, setTargetCameraNodeId] = useState<string>("");
+  const [isolatedClusterId, setIsolatedClusterId] = useState<string | null>(null);
   const [isLayoutRunning, setIsLayoutRunning] = useState(false);
   const reload = useReloadGraph();
 
@@ -156,10 +161,25 @@ export function GraphWorkspace() {
     setSelectedNodeId(nodeId);
   }, []);
 
+  const handleSearchSelect = useCallback((nodeId: string) => {
+    setSelectedNodeId(nodeId);
+    setTargetCameraNodeId(nodeId);
+  }, []);
+
+  const handleAnalyticsNodeSelect = useCallback((nodeId: string) => {
+    setSelectedNodeId(nodeId);
+    setTargetCameraNodeId(nodeId);
+  }, []);
+
+  const handleClusterIsolation = useCallback((clusterId: string | null) => {
+    setIsolatedClusterId(clusterId);
+  }, []);
+
   const { data: summary, isLoading, isError, error } = useLoadGraph({
     enabled: true,
     onGraphReady: () => {
       setIsLayoutRunning(true);
+      setIsolatedClusterId(null);
     },
   });
 
@@ -232,6 +252,8 @@ export function GraphWorkspace() {
           ref={canvasRef}
           onNodeClick={handleNodeClick}
           selectedNodeId={selectedNodeId}
+          targetCameraNodeId={targetCameraNodeId}
+          isolatedClusterId={isolatedClusterId}
           isLayoutRunning={isLayoutRunning}
         />
       </div>
@@ -249,10 +271,11 @@ export function GraphWorkspace() {
           <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
             <h2 style={{ margin: 0, fontSize: 18, color: "#fff", fontWeight: 600 }}>Graph Explorer</h2>
 
+            <HybridSemanticSearch onSelectNode={handleSearchSelect} disabled={isLoading} />
+
             {isLoading && (
               <span style={{ color: "rgba(88,166,255,0.8)", fontSize: 13 }}>Loading graph…</span>
             )}
-
             {summary && (
               <span style={{
                 background: "rgba(88,166,255,0.1)",
@@ -319,6 +342,13 @@ export function GraphWorkspace() {
             transform: selectedNodeId ? "translateX(0)" : "translateX(100%)",
           }}
         >
+          <AnalyticsDashboard
+            onSelectNode={handleAnalyticsNodeSelect}
+            onIsolateCluster={handleClusterIsolation}
+            isolatedClusterId={isolatedClusterId}
+            refreshKey={summary?.nodeCount}
+          />
+          <EnrichmentPanel />
           <NodePanel nodeId={selectedNodeId} />
         </div>
 

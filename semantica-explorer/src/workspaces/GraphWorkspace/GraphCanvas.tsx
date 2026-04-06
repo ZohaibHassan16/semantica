@@ -18,8 +18,26 @@ export interface GraphCanvasHandle {
 export interface GraphCanvasProps {
   onNodeClick: (nodeId: string) => void;
   selectedNodeId: string;
+  targetCameraNodeId?: string;
+  isolatedClusterId?: string | null;
   isLayoutRunning: boolean;
   className?: string;
+}
+
+function extractClusterId(properties: Record<string, unknown> | null | undefined): string | null {
+  if (!properties || typeof properties !== "object") return null;
+
+  const raw =
+    properties.clusterId ??
+    properties.cluster_id ??
+    properties.cluster ??
+    properties.community ??
+    properties.community_id ??
+    properties.group;
+
+  if (raw == null) return null;
+  const text = String(raw).trim();
+  return text ? text : null;
 }
 
 const FA2_SETTINGS = {
@@ -43,10 +61,11 @@ const SIGMA_SETTINGS = {
 };
 
 export const GraphCanvas = forwardRef<GraphCanvasHandle, GraphCanvasProps>(
-  function GraphCanvas({ onNodeClick, selectedNodeId, isLayoutRunning, className }, ref) {
+  function GraphCanvas({ onNodeClick, selectedNodeId, targetCameraNodeId, isolatedClusterId, isLayoutRunning, className }, ref) {
     const containerRef = useRef<HTMLDivElement>(null);
     const sigmaRef = useRef<Sigma | null>(null);
     const fa2Ref = useRef<FA2Layout | null>(null);
+    const isolatedNodeSetRef = useRef<Set<string> | null>(null);
     const [hoveredNode, setHoveredNode] = useState<string | null>(null);
 
 
@@ -54,6 +73,24 @@ export const GraphCanvas = forwardRef<GraphCanvasHandle, GraphCanvasProps>(
       getSigma: () => sigmaRef.current,
       fitView: () => sigmaRef.current?.getCamera().animatedReset({ duration: 500 }),
     }));
+
+    useEffect(() => {
+      if (!isolatedClusterId) {
+        isolatedNodeSetRef.current = null;
+        return;
+      }
+
+      const nodeSet = new Set<string>();
+      graph.forEachNode((nodeId) => {
+        const attrs = graph.getNodeAttributes(nodeId) as { properties?: Record<string, unknown> };
+        const clusterId = extractClusterId(attrs?.properties);
+        if (clusterId === isolatedClusterId) {
+          nodeSet.add(nodeId);
+        }
+      });
+
+      isolatedNodeSetRef.current = nodeSet;
+    }, [isolatedClusterId]);
 
 
     useEffect(() => {
@@ -87,12 +124,21 @@ export const GraphCanvas = forwardRef<GraphCanvasHandle, GraphCanvasProps>(
       if (!sigma) return;
 
       const activeNode = hoveredNode || selectedNodeId;
-      const isValidActiveNode = activeNode && graph.hasNode(activeNode);
+      const isClusterFilterActive = !!isolatedClusterId;
+      const isolatedNodeSet = isolatedNodeSetRef.current;
+
+      const isNodeAllowedByCluster = (nodeId: string): boolean => {
+        if (!isClusterFilterActive) return true;
+        return isolatedNodeSet?.has(nodeId) ?? false;
+      };
+
+      const isValidActiveNode =
+        !!activeNode && graph.hasNode(activeNode) && isNodeAllowedByCluster(activeNode);
       const activeNeighbors = isValidActiveNode
-        ? new Set(graph.neighbors(activeNode))
+        ? new Set(graph.neighbors(activeNode as string))
         : new Set<string>();
 
-      if (!isValidActiveNode) {
+      if (!isValidActiveNode && !isClusterFilterActive) {
         sigma.setSetting("nodeReducer", null);
         sigma.setSetting("edgeReducer", (_edge, data) => ({
           ...data,
@@ -102,6 +148,16 @@ export const GraphCanvas = forwardRef<GraphCanvasHandle, GraphCanvasProps>(
         }));
       } else {
         sigma.setSetting("nodeReducer", (node, data) => {
+          if (!isNodeAllowedByCluster(node)) {
+            return {
+              ...data,
+              color: "#10151b",
+              borderColor: "#0d1117",
+              label: "",
+              zIndex: 0,
+            };
+          }
+
           const isFocused = node === activeNode;
           const isNeighbor = activeNeighbors.has(node);
 
@@ -116,6 +172,7 @@ export const GraphCanvas = forwardRef<GraphCanvasHandle, GraphCanvasProps>(
           if (isNeighbor) {
             return { ...data, zIndex: 1 };
           }
+
           return {
             ...data,
             color: "#1c2128",
@@ -126,7 +183,15 @@ export const GraphCanvas = forwardRef<GraphCanvasHandle, GraphCanvasProps>(
         });
 
         sigma.setSetting("edgeReducer", (edge, data) => {
-          if (graph.hasExtremity(edge, activeNode)) {
+          if (isClusterFilterActive) {
+            const source = graph.source(edge);
+            const target = graph.target(edge);
+            if (!isNodeAllowedByCluster(source) || !isNodeAllowedByCluster(target)) {
+              return { ...data, hidden: true };
+            }
+          }
+
+          if (isValidActiveNode && graph.hasExtremity(edge, activeNode as string)) {
             return {
               ...data,
               color: "#58a6ff",
@@ -134,12 +199,39 @@ export const GraphCanvas = forwardRef<GraphCanvasHandle, GraphCanvasProps>(
               zIndex: 1,
             };
           }
+
+          if (isClusterFilterActive && !isValidActiveNode) {
+            return {
+              ...data,
+              color: data.color || "#444C56",
+              size: data.size || 1,
+              hidden: false,
+            };
+          }
+
           return { ...data, hidden: true };
         });
       }
 
       sigma.refresh();
-    }, [hoveredNode, selectedNodeId]);
+    }, [hoveredNode, selectedNodeId, isolatedClusterId]);
+
+    useEffect(() => {
+      const sigma = sigmaRef.current;
+      if (!sigma || !targetCameraNodeId) return;
+      if (!graph.hasNode(targetCameraNodeId)) return;
+
+      const attrs = graph.getNodeAttributes(targetCameraNodeId);
+      const x = attrs?.x;
+      const y = attrs?.y;
+
+      if (typeof x !== "number" || typeof y !== "number") return;
+
+      sigma.getCamera().animate(
+        { x, y, ratio: 0.25 },
+        { duration: 500 }
+      );
+    }, [targetCameraNodeId]);
 
     // ForceAtlas2 layout 
 
