@@ -350,7 +350,7 @@ class NamingConventions:
     def _is_noun_phrase(self, name: str) -> bool:
         """Check if name is a noun phrase (basic heuristic)."""
         # Basic heuristic: PascalCase words are typically nouns
-        return bool(re.match(r"^[A-Z][a-zA-Z0-9]*([A-Z][a-zA-Z0-9]*)*$", name))
+        return bool(name and name[0].isupper() and re.match(r"^[A-Za-z0-9]+$", name))
 
     def _is_verb_phrase(self, name: str) -> bool:
         """Check if name is a verb phrase (basic heuristic)."""

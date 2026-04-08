@@ -10,6 +10,9 @@ on:
       - '**/*.md'
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   performance-test:
     name: Benchmark Runner (Ubuntu/Python 3.12)

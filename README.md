@@ -71,10 +71,132 @@ Everything you need to reason about *when* — not just *what*.
 - **Named checkpoints** — snapshot the full agent context at any moment and diff two snapshots to see exactly what changed.
 
 → [Temporal docs](docs/reference/) · [Temporal examples](cookbook/)
+## Unreleased / Coming Next
+
+| Area | Highlights |
+|------|-----------|
+| **SHACL Constraints** | `OntologyEngine.to_shacl()` auto-derives SHACL shapes from any OWL ontology; `validate_graph()` returns structured `SHACLValidationReport` with plain-English violation explanations; three quality tiers (`"basic"`, `"standard"`, `"strict"`); three output formats (Turtle, JSON-LD, N-Triples); 3-level inheritance propagation |
+
+---
+
+## Features
+
+### Context & Decision Intelligence
+- **Context Graphs** — structured graph of entities, relationships, and decisions; queryable, causal, persistent
+- **Decision tracking** — record, link, and analyze every agent decision with `add_decision()`, `record_decision()`
+- **Causal chains** — link decisions with `add_causal_relationship()`, trace lineage with `trace_decision_chain()`
+- **Precedent search** — hybrid similarity search over past decisions with `find_similar_decisions()`
+- **Influence analysis** — `analyze_decision_impact()`, `analyze_decision_influence()` — understand downstream effects
+- **Policy engine** — enforce business rules with `check_decision_rules()`; automated compliance validation
+- **Agent memory** — `AgentMemory` with short/long-term storage, conversation history, and statistics
+- **Cross-system context capture** — `capture_cross_system_inputs()` for multi-agent pipelines
+
+### Knowledge Graphs
+- **Knowledge graph construction** — entities, relationships, properties, typed edges
+- **Graph algorithms** — PageRank, betweenness centrality, clustering coefficient, community detection
+- **Node embeddings** — Node2Vec embeddings via `NodeEmbedder`
+- **Similarity** — cosine similarity via `SimilarityCalculator`
+- **Link prediction** — score potential new edges via `LinkPredictor`
+- **Temporal graphs** — time-aware nodes and edges
+- **Incremental / delta processing** — update graphs without full recompute
+
+### Semantic Extraction
+- **Entity extraction** — named entity recognition, normalization, classification
+- **Relation extraction** — triplet generation from raw text using LLMs or rule-based methods
+- **LLM-typed extraction** — extraction with typed relation metadata
+- **Deduplication v1** — Jaro-Winkler similarity, basic blocking
+- **Deduplication v2** — `blocking_v2`, `hybrid_v2`, `semantic_v2` strategies with `max_candidates_per_entity`
+- **Triplet deduplication** — `dedup_triplets()` for removing duplicate (subject, predicate, object) triples
+
+### Reasoning Engines
+- **Forward chaining** — `Reasoner` with IF/THEN string rules and dict facts
+- **Rete network** — `ReteEngine` for high-throughput production rule matching
+- **Deductive reasoning** — `DeductiveReasoner` for classical inference
+- **Abductive reasoning** — `AbductiveReasoner` for hypothesis generation from observations
+- **SPARQL reasoning** — `SPARQLReasoner` for query-based inference over RDF graphs
+
+### Provenance & Auditability
+- **Entity provenance** — `ProvenanceTracker.track_entity(id, source_url, metadata)`
+- **Algorithm provenance** — `AlgorithmTrackerWithProvenance` tracks computation lineage
+- **Graph builder provenance** — `GraphBuilderWithProvenance` records entity source lineage from URLs
+- **W3C PROV-O compliant** — lineage tracking across all modules
+- **Change management** — version control with checksums, audit trails, compliance support
+
+### Vector Store
+- **Backends** — FAISS, Pinecone, Weaviate, Qdrant, Milvus, PgVector, in-memory
+- **Semantic search** — top-k retrieval by embedding similarity
+- **Hybrid search** — vector + keyword with configurable weights
+- **Filtered search** — metadata-based filtering on any field
+- **Custom similarity weights** — tune retrieval per use case
+
+### 🌐 Graph Database Support
+- **AWS Neptune** — Amazon Neptune graph database with IAM authentication
+- **Apache AGE** — PostgreSQL graph extension with openCypher via SQL
+- **FalkorDB** — native support; `DecisionQuery` and `CausalChainAnalyzer` work directly with FalkorDB row/header shapes
+
+### Data Ingestion
+- **File formats** — PDF, DOCX, HTML, JSON, CSV, Excel, PPTX, archives
+- **Web crawl** — `WebIngestor` with configurable depth
+- **Databases** — `DBIngestor` with SQL query support
+- **Snowflake** — `SnowflakeIngestor` with table/query ingestion, pagination, and key-pair/OAuth auth
+- **Docling** — advanced document parsing with table and layout extraction (PDF, DOCX, PPTX, XLSX)
+- **Media** — image OCR, audio/video metadata extraction
+
+### Export Formats
+- **RDF** — Turtle (`.ttl`), JSON-LD, N-Triples (`.nt`), XML via `RDFExporter`
+- **Parquet** — `ParquetExporter` for entities, relationships, and full KG export
+- **ArangoDB AQL** — ready-to-run INSERT statements via `ArangoAQLExporter`
+- **OWL ontologies** — export generated ontologies in Turtle or RDF/XML
+- **SHACL shapes** — export auto-derived constraint shapes via `RDFExporter.export_shacl()` (`.ttl`, `.jsonld`, `.nt`, `.shacl`)
+
+### Pipeline & Production
+- **Pipeline builder** — `PipelineBuilder` with stage chaining and parallel workers
+- **Validation** — `PipelineValidator` returns `ValidationResult(valid, errors, warnings)` before execution
+- **Failure handling** — `FailureHandler` with `RetryPolicy` and `RetryStrategy` (exponential backoff, fixed, etc.)
+- **Parallel processing** — configurable worker count per pipeline stage
+- **LLM providers** — 100+ models via LiteLLM (OpenAI, Anthropic, Cohere, Mistral, Ollama, and more)
+
+### Ontology
+- **Auto-generation** — derive OWL ontologies from knowledge graphs via `OntologyGenerator`
+- **Import** — load existing OWL, RDF, Turtle, JSON-LD ontologies via `OntologyImporter`
+- **Validation** — HermiT/Pellet compatible consistency checking
+- **SHACL shape generation** — `OntologyEngine.to_shacl()` auto-derives SHACL node and property shapes from any Semantica ontology dict; zero hand-authoring; deterministic (same ontology → same shapes)
+- **SHACL validation** — `OntologyEngine.validate_graph()` runs shapes against a data graph and returns a `SHACLValidationReport` with machine-readable violations and plain-English explanations
+- **Quality tiers** — `"basic"` (structure + cardinality), `"standard"` (+ enumerations, inheritance), `"strict"` (+ `sh:closed` rejects undeclared properties)
+- **Inheritance propagation** — child shapes automatically include all ancestor property shapes (up to 3+ levels), cycle-safe
+- **Three output formats** — Turtle (`.ttl`), JSON-LD, N-Triples; file export via `export_shacl()`
 
 ### 📚 SKOS Vocabulary Management
 
 Build and query controlled vocabularies inside your knowledge graph.
+## Modules
+
+| Module | What it provides |
+|---|---|
+| `semantica.context` | Context graphs, agent memory, decision tracking, causal analysis, precedent search, policy engine |
+| `semantica.kg` | Knowledge graph construction, graph algorithms, centrality, community detection, embeddings, link prediction, provenance |
+| `semantica.semantic_extract` | NER, relation extraction, event extraction, coreference, triplet generation, LLM-enhanced extraction |
+| `semantica.reasoning` | Forward chaining, Rete network, deductive, abductive, SPARQL reasoning, explanation generation |
+| `semantica.vector_store` | FAISS, Pinecone, Weaviate, Qdrant, Milvus, PgVector, in-memory; hybrid & filtered search |
+| `semantica.export` | RDF (Turtle/JSON-LD/N-Triples/XML), Parquet, ArangoDB AQL, CSV, YAML, OWL, graph formats |
+| `semantica.ingest` | Files (PDF, DOCX, CSV, HTML), web crawl, feeds, databases, Snowflake, MCP, email, repositories |
+| `semantica.ontology` | Auto-generation (6-stage pipeline), OWL/RDF export, import (OWL/RDF/Turtle/JSON-LD), validation, versioning, **SHACL shape generation & validation** |
+| `semantica.pipeline` | Pipeline DSL, parallel workers, validation, retry policies, failure handling, resource scheduling |
+| `semantica.graph_store` | Graph database backends — Neo4j, FalkorDB, Apache AGE, Amazon Neptune; Cypher queries |
+| `semantica.embeddings` | Text embedding generation — Sentence-Transformers, FastEmbed, OpenAI, BGE; similarity calculation |
+| `semantica.deduplication` | Entity deduplication, similarity scoring, merging, clustering; blocking and semantic strategies |
+| `semantica.provenance` | W3C PROV-O compliant end-to-end lineage tracking, source attribution, audit trails |
+| `semantica.parse` | Document parsing — PDF, DOCX, PPTX, HTML, code, email, structured data, media with OCR |
+| `semantica.split` | Document chunking — recursive, semantic, entity-aware, relation-aware, graph-based, ontology-aware |
+| `semantica.normalize` | Data normalization for text, entities, dates, numbers, quantities, languages, encodings |
+| `semantica.conflicts` | Multi-source conflict detection (value, type, relationship, temporal, logical) with resolution strategies |
+| `semantica.change_management` | Version storage, change tracking, checksums, audit trails, compliance support for KGs and ontologies |
+| `semantica.triplet_store` | RDF triplet store integration — Blazegraph, Jena, RDF4J; SPARQL queries and bulk loading |
+| `semantica.visualization` | Interactive and static visualization of KGs, ontologies, embeddings, analytics, and temporal graphs |
+| `semantica.seed` | Seed data management for initial KG construction from CSV, JSON, databases, and APIs |
+| `semantica.core` | Framework orchestration, configuration management, knowledge base construction, plugin system |
+| `semantica.llms` | LLM provider integrations — Groq, OpenAI, Novita AI, HuggingFace, LiteLLM |
+| `semantica.utils` | Shared utilities — logging, validation, exception handling, constants, types, progress tracking |
 
 - Add SKOS concepts with labels, alt-labels, broader/narrower hierarchy, and definitions — all required triples assembled automatically.
 - Query and search vocabularies with SPARQL-backed APIs (injection-sanitized).
@@ -278,6 +400,15 @@ result   = rewriter.rewrite("What decisions were made before the 2024 merger?")
 retriever = TemporalGraphRetriever(
     base_retriever=your_retriever,
     at_time=datetime(2024, 3, 1, tzinfo=timezone.utc),
+from semantica.context import AgentContext, AgentMemory
+from semantica.vector_store import VectorStore
+
+context = AgentContext(
+    vector_store=VectorStore(backend="inmemory"),
+    knowledge_graph=ContextGraph(advanced_analytics=True),
+    decision_tracking=True,
+    graph_expansion=True,
+    kg_algorithms=True,
 )
 ctx = retriever.retrieve("supplier approval decisions")
 
@@ -462,6 +593,85 @@ if result.valid:
 - **`semantica.visualization`** — KG, ontology, embedding, and temporal graph visualization
 - **`semantica.llms`** — Groq, OpenAI, Novita AI, HuggingFace, LiteLLM
 
+### SHACL Shape Generation & Validation
+
+Semantica turns ontologies into executable data contracts. The constraints layer completes a hybrid reasoning system — symbolic constraints (SHACL) alongside semantic retrieval (embeddings).
+
+**Phase 1 — Generate shapes from any ontology dict:**
+
+```python
+from semantica.ontology import OntologyEngine
+
+engine   = OntologyEngine()
+ontology = engine.from_data(data)          # or engine.from_text(...) / engine.to_owl(...)
+
+# Generate SHACL shapes — zero hand-authoring
+shacl_ttl  = engine.to_shacl(ontology)                        # Turtle string (default)
+shacl_jld  = engine.to_shacl(ontology, format="json-ld")      # JSON-LD string
+shacl_nt   = engine.to_shacl(ontology, format="n-triples")    # N-Triples string
+
+# Write to file
+engine.export_shacl(ontology, path="shapes/domain.ttl")
+```
+
+**Quality tiers — control constraint strictness:**
+
+```python
+# "basic"    — node shapes, property paths, datatypes, cardinality
+# "standard" — + enumerations (sh:in), patterns, inheritance propagation  [DEFAULT]
+# "strict"   — + sh:closed true on all shapes (rejects undeclared properties)
+
+shacl = engine.to_shacl(ontology, quality_tier="strict")
+```
+
+**Phase 2 — Validate a graph against the shapes:**
+
+```python
+import pathlib
+
+report = engine.validate_graph(
+    data_graph=pathlib.Path("data/graph.ttl").read_text(),
+    ontology=ontology,   # auto-generates SHACL before validating
+    explain=True,        # populate plain-English explanations on each violation
+)
+
+print(report.summary())
+# → "Graph does NOT conform: 2 violation(s)."
+
+for v in report.violations:
+    print(v.explanation)
+# → "Node <https://example.com/john> is missing required property <ex:name>. At least 1 value(s) are required."
+# → "Node <https://example.com/acme> has value '999' for <ex:employeeCount> but the expected datatype is xsd:string."
+
+import json
+print(json.dumps(report.to_dict(), indent=2))  # machine-readable — feed to LLM or pipeline
+```
+
+**Or validate against a pre-built SHACL file:**
+
+```python
+report = engine.validate_graph(
+    data_graph=graph_turtle_string,
+    shacl="shapes/domain.ttl",   # path or SHACL string
+)
+```
+
+**Regenerate shapes in CI to detect breaking ontology changes:**
+
+```bash
+python -c "
+from semantica.ontology import OntologyEngine
+import json, pathlib
+engine = OntologyEngine()
+onto = engine.from_data(json.loads(pathlib.Path('ontology.json').read_text()))
+engine.export_shacl(onto, 'shapes/shapes.ttl')
+"
+git diff shapes/shapes.ttl   # detects breaking ontology changes
+```
+
+> **Requires pyshacl for `validate_graph()`:** `pip install semantica[shacl]`
+> Shape generation (`to_shacl`, `export_shacl`) works without any optional dependencies.
+
 ---
 
 ## 🔌 Integrations
@@ -522,6 +732,12 @@ pip install semantica[vectorstore-pgvector]
 pip install semantica[shacl]          # SHACL validation
 pip install semantica[db-snowflake]   # Snowflake ingestion
 pip install semantica[agno]           # Agno integration
+
+# SHACL validation (validate_graph)
+pip install semantica[shacl]
+
+# Snowflake ingestion
+pip install semantica[db-snowflake]
 
 # From source
 git clone https://github.com/Hawksight-AI/semantica.git

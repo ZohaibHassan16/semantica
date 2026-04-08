@@ -243,5 +243,387 @@ class TestOntologyComprehensive(unittest.TestCase):
         self.assertEqual(mod.name, "PersonModule")
         self.assertIn("Person", mod.classes)
 
+class TestSHACLGeneration(unittest.TestCase):
+    """Tests 1-16: SHACL shape generation from flat ontologies."""
+
+    # Shared flat ontology fixture
+    _ONTOLOGY = {
+        "classes": [
+            {"name": "Person", "label": "Person", "description": "A human individual"},
+            {"name": "Organization", "label": "Organization"},
+        ],
+        "properties": [
+            {
+                "name": "name",
+                "type": "datatype",
+                "range": "string",
+                "domain": "Person",
+                "required": True,
+            },
+            {
+                "name": "age",
+                "type": "datatype",
+                "range": "integer",
+                "domain": "Person",
+                "cardinality": {"min": 0, "max": 1},
+            },
+            {
+                "name": "worksFor",
+                "type": "object",
+                "range": "Organization",
+                "domain": "Person",
+            },
+            {
+                "name": "legalName",
+                "type": "datatype",
+                "range": "string",
+                "domain": "Organization",
+                "required": True,
+            },
+        ],
+    }
+
+    def setUp(self):
+        self.mock_logger = MagicMock()
+        self.mock_tracker = MagicMock()
+        self.mock_tracker.start_tracking.return_value = "track_shacl"
+        self.patchers = [
+            patch(
+                "semantica.ontology.ontology_generator.get_logger",
+                return_value=self.mock_logger,
+            ),
+            patch(
+                "semantica.ontology.ontology_generator.get_progress_tracker",
+                return_value=self.mock_tracker,
+            ),
+        ]
+        for p in self.patchers:
+            p.start()
+        from semantica.ontology.ontology_generator import SHACLGenerator
+        self.gen = SHACLGenerator(
+            base_uri="https://semantica.dev/shapes/",
+            quality_tier="standard",
+        )
+
+    def tearDown(self):
+        for p in self.patchers:
+            p.stop()
+
+    # 1
+    def test_generate_returns_shacl_graph(self):
+        from semantica.ontology.ontology_generator import SHACLGraph
+        graph = self.gen.generate(self._ONTOLOGY)
+        self.assertIsInstance(graph, SHACLGraph)
+
+    # 2
+    def test_node_shape_count_matches_class_count(self):
+        graph = self.gen.generate(self._ONTOLOGY)
+        self.assertEqual(len(graph.node_shapes), 2)
+
+    # 3
+    def test_node_shape_target_classes(self):
+        graph = self.gen.generate(self._ONTOLOGY)
+        classes = {ns.target_class for ns in graph.node_shapes}
+        self.assertIn("Person", classes)
+        self.assertIn("Organization", classes)
+
+    # 4
+    def test_required_property_gets_min_count_1(self):
+        graph = self.gen.generate(self._ONTOLOGY)
+        person = next(ns for ns in graph.node_shapes if ns.target_class == "Person")
+        name_ps = next(ps for ps in person.property_shapes if ps.path == "name")
+        self.assertEqual(name_ps.min_count, 1)
+
+    # 5
+    def test_cardinality_min_max(self):
+        graph = self.gen.generate(self._ONTOLOGY)
+        person = next(ns for ns in graph.node_shapes if ns.target_class == "Person")
+        age_ps = next(ps for ps in person.property_shapes if ps.path == "age")
+        self.assertEqual(age_ps.min_count, 0)
+        self.assertEqual(age_ps.max_count, 1)
+
+    # 6
+    def test_datatype_property_gets_xsd_datatype(self):
+        graph = self.gen.generate(self._ONTOLOGY)
+        person = next(ns for ns in graph.node_shapes if ns.target_class == "Person")
+        name_ps = next(ps for ps in person.property_shapes if ps.path == "name")
+        self.assertEqual(name_ps.datatype, "xsd:string")
+        self.assertIsNone(name_ps.class_)
+
+    # 7
+    def test_object_property_gets_sh_class(self):
+        graph = self.gen.generate(self._ONTOLOGY)
+        person = next(ns for ns in graph.node_shapes if ns.target_class == "Person")
+        wf_ps = next(ps for ps in person.property_shapes if ps.path == "worksFor")
+        self.assertEqual(wf_ps.class_, "Organization")
+        self.assertIsNone(wf_ps.datatype)
+
+    # 8
+    def test_turtle_contains_sh_node_shape(self):
+        graph = self.gen.generate(self._ONTOLOGY)
+        ttl = self.gen.serialize(graph, format="turtle")
+        self.assertIn("sh:NodeShape", ttl)
+        self.assertIn("sh:targetClass", ttl)
+        self.assertIn("sh:property", ttl)
+
+    # 9
+    def test_jsonld_is_valid_json(self):
+        import json
+        graph = self.gen.generate(self._ONTOLOGY)
+        jld = self.gen.serialize(graph, format="json-ld")
+        parsed = json.loads(jld)
+        self.assertIn("@context", parsed)
+        self.assertIn("@graph", parsed)
+
+    # 10
+    def test_ntriples_uses_expanded_uris(self):
+        graph = self.gen.generate(self._ONTOLOGY)
+        nt = self.gen.serialize(graph, format="n-triples")
+        self.assertNotIn("@prefix", nt)
+        self.assertIn("<http://www.w3.org/ns/shacl#NodeShape>", nt)
+
+    # 11
+    def test_unknown_format_raises_value_error(self):
+        graph = self.gen.generate(self._ONTOLOGY)
+        with self.assertRaises(ValueError):
+            self.gen.serialize(graph, format="csv")
+
+    # 12
+    def test_non_dict_ontology_raises_value_error(self):
+        with self.assertRaises(ValueError):
+            self.gen.generate("not a dict")
+
+    # 13
+    def test_ontology_missing_both_keys_raises_value_error(self):
+        with self.assertRaises(ValueError):
+            self.gen.generate({"namespace": {}})
+
+    # 14
+    def test_enumeration_produces_sh_in(self):
+        onto = {
+            "classes": [{"name": "Order"}],
+            "properties": [
+                {
+                    "name": "status",
+                    "type": "datatype",
+                    "range": "string",
+                    "domain": "Order",
+                    "one_of": ["pending", "shipped", "delivered", "cancelled"],
+                }
+            ],
+        }
+        graph = self.gen.generate(onto)
+        ttl = self.gen.serialize(graph, format="turtle")
+        self.assertIn("sh:in", ttl)
+        self.assertIn('"pending"', ttl)
+
+    # 15
+    def test_custom_namespace_in_prefixes(self):
+        onto = dict(self._ONTOLOGY)
+        onto["namespace"] = {"base_uri": "https://custom.org/onto/"}
+        graph = self.gen.generate(onto)
+        self.assertIn("https://custom.org/onto/", graph.prefixes.values())
+
+    # 16
+    def test_standard_tier_is_default(self):
+        from semantica.ontology.ontology_generator import SHACLGenerator
+        gen = SHACLGenerator()
+        self.assertEqual(gen.quality_tier, "standard")
+
+
+class TestSKOSOntologyEngine(unittest.TestCase):
+    """Tests for SKOS vocabulary management APIs in OntologyEngine."""
+
+    def setUp(self):
+        self.mock_logger = MagicMock()
+        self.mock_tracker = MagicMock()
+        self.mock_tracker.start_tracking.return_value = "track_id"
+
+        patchers = [
+            patch('semantica.ontology.engine.get_logger', return_value=self.mock_logger),
+            patch('semantica.ontology.engine.get_progress_tracker', return_value=self.mock_tracker),
+            patch('semantica.ontology.ontology_generator.get_logger', return_value=self.mock_logger),
+            patch('semantica.ontology.ontology_generator.get_progress_tracker', return_value=self.mock_tracker),
+            patch('semantica.ontology.class_inferrer.get_logger', return_value=self.mock_logger),
+            patch('semantica.ontology.class_inferrer.get_progress_tracker', return_value=self.mock_tracker),
+            patch('semantica.ontology.property_generator.get_logger', return_value=self.mock_logger),
+            patch('semantica.ontology.property_generator.get_progress_tracker', return_value=self.mock_tracker),
+            patch('semantica.ontology.owl_generator.get_logger', return_value=self.mock_logger),
+            patch('semantica.ontology.owl_generator.get_progress_tracker', return_value=self.mock_tracker),
+            patch('semantica.ontology.ontology_evaluator.get_logger', return_value=self.mock_logger),
+            patch('semantica.ontology.ontology_evaluator.get_progress_tracker', return_value=self.mock_tracker),
+            patch('semantica.ontology.ontology_validator.get_logger', return_value=self.mock_logger),
+            patch('semantica.ontology.llm_generator.get_logger', return_value=self.mock_logger),
+            patch('semantica.ontology.llm_generator.get_progress_tracker', return_value=self.mock_tracker),
+            patch('semantica.change_management.ontology_version_manager.get_logger', return_value=self.mock_logger),
+            patch('semantica.change_management.ontology_version_manager.get_progress_tracker', return_value=self.mock_tracker),
+        ]
+        self.patchers = patchers
+        for p in self.patchers:
+            p.start()
+
+        # Mock store with a controllable execute_query
+        self.mock_store = MagicMock()
+        from semantica.ontology.engine import OntologyEngine
+        self.engine = OntologyEngine(store=self.mock_store)
+
+    def tearDown(self):
+        for p in self.patchers:
+            p.stop()
+
+    def _make_result(self, bindings):
+        """Build a fake QueryResult-like object."""
+        result = MagicMock()
+        result.bindings = bindings
+        return result
+
+    # --- NamespaceManager SKOS helpers ---
+
+    def test_get_skos_uri(self):
+        from semantica.ontology.namespace_manager import NamespaceManager
+        nm = NamespaceManager()
+        self.assertEqual(
+            nm.get_skos_uri("Concept"),
+            "http://www.w3.org/2004/02/skos/core#Concept",
+        )
+        self.assertEqual(
+            nm.get_skos_uri("prefLabel"),
+            "http://www.w3.org/2004/02/skos/core#prefLabel",
+        )
+
+    def test_build_concept_scheme_uri(self):
+        from semantica.ontology.namespace_manager import NamespaceManager
+        nm = NamespaceManager(base_uri="https://example.org/onto/")
+        uri = nm.build_concept_scheme_uri("My Vocabulary")
+        self.assertIn("my-vocabulary", uri)
+        self.assertTrue(uri.startswith("https://example.org/onto/"))
+
+    def test_build_concept_scheme_uri_special_chars(self):
+        from semantica.ontology.namespace_manager import NamespaceManager
+        nm = NamespaceManager()
+        uri = nm.build_concept_scheme_uri("ISO 3166 Countries")
+        self.assertIn("iso-3166-countries", uri)
+
+    # --- list_vocabularies ---
+
+    def test_list_vocabularies_returns_schemes(self):
+        self.mock_store.execute_query.return_value = self._make_result([
+            {"scheme": {"value": "http://example.org/vocab/colours"},
+             "label":  {"value": "Colours"}},
+            {"scheme": {"value": "http://example.org/vocab/sizes"},
+             "label":  None},
+        ])
+        vocabs = self.engine.list_vocabularies()
+        self.assertEqual(len(vocabs), 2)
+        uris = [v["uri"] for v in vocabs]
+        self.assertIn("http://example.org/vocab/colours", uris)
+        self.assertIn("http://example.org/vocab/sizes", uris)
+        colours = next(v for v in vocabs if "colours" in v["uri"])
+        self.assertEqual(colours["label"], "Colours")
+
+    def test_list_vocabularies_deduplicates(self):
+        # Same scheme URI appearing twice (multi-valued label rows)
+        self.mock_store.execute_query.return_value = self._make_result([
+            {"scheme": {"value": "http://example.org/vocab/colours"},
+             "label":  {"value": "Colours"}},
+            {"scheme": {"value": "http://example.org/vocab/colours"},
+             "label":  {"value": "Colors"}},
+        ])
+        vocabs = self.engine.list_vocabularies()
+        self.assertEqual(len(vocabs), 1)
+
+    def test_list_vocabularies_no_store_raises(self):
+        from semantica.utils.exceptions import ProcessingError
+        from semantica.ontology.engine import OntologyEngine
+        engine_no_store = OntologyEngine()
+        with self.assertRaises(ProcessingError):
+            engine_no_store.list_vocabularies()
+
+    # --- list_concepts ---
+
+    def test_list_concepts_returns_concepts(self):
+        self.mock_store.execute_query.return_value = self._make_result([
+            {"concept": {"value": "http://example.org/concept/red"},
+             "prefLabel": {"value": "Red"},
+             "altLabel":  {"value": "Crimson"}},
+            {"concept": {"value": "http://example.org/concept/red"},
+             "prefLabel": {"value": "Red"},
+             "altLabel":  {"value": "Rouge"}},
+            {"concept": {"value": "http://example.org/concept/blue"},
+             "prefLabel": {"value": "Blue"},
+             "altLabel":  None},
+        ])
+        concepts = self.engine.list_concepts("http://example.org/vocab/colours")
+        self.assertEqual(len(concepts), 2)
+        red = next(c for c in concepts if "red" in c["uri"])
+        self.assertEqual(red["pref_label"], "Red")
+        self.assertIn("Crimson", red["alt_labels"])
+        self.assertIn("Rouge", red["alt_labels"])
+        blue = next(c for c in concepts if "blue" in c["uri"])
+        self.assertEqual(blue["alt_labels"], [])
+
+    def test_list_concepts_no_store_raises(self):
+        from semantica.utils.exceptions import ProcessingError
+        from semantica.ontology.engine import OntologyEngine
+        engine_no_store = OntologyEngine()
+        with self.assertRaises(ProcessingError):
+            engine_no_store.list_concepts("http://example.org/vocab/colours")
+
+    # --- search_concepts ---
+
+    def test_search_concepts_returns_matches(self):
+        self.mock_store.execute_query.return_value = self._make_result([
+            {"concept": {"value": "http://example.org/concept/red"},
+             "label":   {"value": "Red"}},
+            {"concept": {"value": "http://example.org/concept/infrared"},
+             "label":   {"value": "Infrared"}},
+        ])
+        results = self.engine.search_concepts("red")
+        self.assertEqual(len(results), 2)
+        uris = [r["uri"] for r in results]
+        self.assertIn("http://example.org/concept/red", uris)
+        self.assertIn("http://example.org/concept/infrared", uris)
+
+    def test_search_concepts_with_scheme_filter(self):
+        self.mock_store.execute_query.return_value = self._make_result([
+            {"concept": {"value": "http://example.org/concept/red"},
+             "label":   {"value": "Red"}},
+        ])
+        results = self.engine.search_concepts("red", scheme_uri="http://example.org/vocab/colours")
+        self.assertEqual(len(results), 1)
+        # Scheme URI should appear in the SPARQL issued to the store
+        issued_sparql = self.mock_store.execute_query.call_args[0][0]
+        self.assertIn("http://example.org/vocab/colours", issued_sparql)
+
+    def test_search_concepts_empty_result(self):
+        self.mock_store.execute_query.return_value = self._make_result([])
+        results = self.engine.search_concepts("zzznomatch")
+        self.assertEqual(results, [])
+
+    def test_search_concepts_no_store_raises(self):
+        from semantica.utils.exceptions import ProcessingError
+        from semantica.ontology.engine import OntologyEngine
+        engine_no_store = OntologyEngine()
+        with self.assertRaises(ProcessingError):
+            engine_no_store.search_concepts("red")
+
+    def test_search_concepts_sanitizes_query(self):
+        """Ensure user input containing SPARQL-special chars doesn't break the query."""
+        self.mock_store.execute_query.return_value = self._make_result([])
+        # Should not raise
+        self.engine.search_concepts('red" } MALICIOUS { ?x ?y ?z')
+
+    def test_search_concepts_deduplicates(self):
+        # Same concept URI matched by both prefLabel and altLabel
+        self.mock_store.execute_query.return_value = self._make_result([
+            {"concept": {"value": "http://example.org/concept/red"},
+             "label":   {"value": "Red"}},
+            {"concept": {"value": "http://example.org/concept/red"},
+             "label":   {"value": "Reddish"}},
+        ])
+        results = self.engine.search_concepts("red")
+        self.assertEqual(len(results), 1)
+
+
 if __name__ == '__main__':
     unittest.main()
