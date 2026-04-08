@@ -116,7 +116,7 @@ Everything you need to reason about *when* — not just *what*.
 - **SPARQL reasoning** — `SPARQLReasoner` for query-based inference over RDF graphs
 
 ### Provenance & Auditability
-- **Entity provenance** — `ProvenanceTracker.track_entity(id, source_url, metadata)`
+- **Entity provenance** — `ProvenanceTracker.track_entity(entity_id, source, metadata)`
 - **Algorithm provenance** — `AlgorithmTrackerWithProvenance` tracks computation lineage
 - **Graph builder provenance** — `GraphBuilderWithProvenance` records entity source lineage from URLs
 - **W3C PROV-O compliant** — lineage tracking across all modules
@@ -396,27 +396,22 @@ rewriter = TemporalQueryRewriter()
 result   = rewriter.rewrite("What decisions were made before the 2024 merger?")
 # result.temporal_intent → "before"
 # result.at_time         → datetime(2024, ..., tzinfo=UTC)
+# result.rewritten_query → "What decisions were made"
 
-# Filter any retriever to a point in time
+# Filter any retriever to a point in time — drop-in wrapper
 retriever = TemporalGraphRetriever(
     base_retriever=your_retriever,
     at_time=datetime(2024, 3, 1, tzinfo=timezone.utc),
-from semantica.context import AgentContext, AgentMemory
-from semantica.vector_store import VectorStore
-
-context = AgentContext(
-    vector_store=VectorStore(backend="inmemory"),
-    knowledge_graph=ContextGraph(advanced_analytics=True),
-    decision_tracking=True,
-    graph_expansion=True,
-    kg_algorithms=True,
 )
 ctx = retriever.retrieve("supplier approval decisions")
 
-# Normalize any date expression to UTC
+# Normalize any date expression to UTC — zero LLM calls
 normalizer = TemporalNormalizer()
 start, end = normalizer.normalize("Q1 2024")
 # → (datetime(2024, 1, 1, UTC), datetime(2024, 3, 31, UTC))
+
+start, end = normalizer.normalize("effective from 2023-09-01")
+# → (datetime(2023, 9, 1, UTC), None)
 ```
 
 → [Temporal GraphRAG docs](docs/reference/) · [Temporal cookbook](cookbook/)
@@ -456,15 +451,44 @@ diff = context.diff_checkpoints("before_merge", "after_merge")
 # → {"decisions_added": [...], "relationships_added": [...], ...}
 ```
 
+### Semantic Extraction
+
+```python
+from semantica.semantic_extract import NERExtractor, RelationExtractor, TripletExtractor
+
+text = """
+OpenAI released GPT-4 in March 2023. Microsoft integrated GPT-4 into Azure.
+Anthropic, founded by former OpenAI researchers, released Claude as a competing model.
+"""
+
+# Step 1 — extract entities
+entities = NERExtractor().extract_entities(text)
+# → [Entity(label="OpenAI", ...), Entity(label="GPT-4", ...), ...]
+
+# Step 2 — extract relations (requires entities)
+relations = RelationExtractor().extract_relations(text, entities=entities)
+# → [Relation(source="OpenAI", type="released", target="GPT-4"), ...]
+
+# Step 3 — extract full (subject, predicate, object) triplets
+triplets = TripletExtractor().extract_triplets(text)
+```
+
 ### Semantic Extraction with Temporal Bounds
 
 ```python
-from semantica.semantic_extract import extract_relations_llm
+from semantica.semantic_extract import NERExtractor
+from semantica.semantic_extract.methods import extract_relations_llm
 
 text = "The partnership was effective from January 2022 until the merger in Q3 2024."
 
-# LLM extracts relations AND annotates each one with temporal validity
-relations = extract_relations_llm(text, extract_temporal_bounds=True)
+# extract_relations_llm requires pre-extracted entities as second arg
+entities  = NERExtractor().extract_entities(text)
+relations = extract_relations_llm(
+    text,
+    entities,
+    provider="openai",
+    extract_temporal_bounds=True,   # LLM annotates each relation with validity window
+)
 
 for rel in relations:
     print(f"{rel.source} → {rel.target}")
@@ -514,17 +538,25 @@ reasoner.add_rule("IF Person(?x) THEN Mortal(?x)")
 results = reasoner.infer_facts(["Person(Socrates)"])
 # → ["Mortal(Socrates)"]
 
-# Rete network — real-time production rule matching
+# Rete network — build a rule network, add facts, then run pattern matching
+from semantica.reasoning import Rule, Fact, RuleType
+
 rete = ReteEngine()
-rete.add_rule({
-    "name": "flag_high_risk",
-    "conditions": [
+rule = Rule(
+    rule_id="r1",
+    name="flag_high_risk",
+    conditions=[
         {"field": "amount",  "operator": ">",  "value": 10000},
         {"field": "country", "operator": "in", "value": ["IR", "KP", "SY"]},
     ],
-    "action": "flag_for_compliance_review",
-})
-matches = rete.match({"amount": 15000, "country": "IR", "id": "txn_9921"})
+    conclusion="flag_for_compliance_review",
+    rule_type=RuleType.IMPLICATION,
+)
+rete.build_network([rule])
+
+fact = Fact(fact_id="f1", predicate="transaction", arguments=[{"amount": 15000, "country": "IR"}])
+rete.add_fact(fact)
+matches = rete.match_patterns()   # returns List[Match]
 ```
 
 → [Reasoning docs](docs/reference/)
@@ -560,21 +592,23 @@ owl_str = engine.to_owl(ontology, format="turtle")
 from semantica.pipeline import PipelineBuilder, PipelineValidator
 from semantica.pipeline import RetryPolicy, RetryStrategy
 
-# Build a multi-stage pipeline
-pipeline = (
+# Build a multi-stage pipeline using add_step(name, type, **config)
+builder = (
     PipelineBuilder()
-    .add_stage("ingest",      FileIngestor(recursive=True))
-    .add_stage("extract",     extract_triplets)
-    .add_stage("deduplicate", DuplicateDetector())
-    .add_stage("build_kg",    GraphBuilder())
-    .add_stage("export",      RDFExporter())
-    .with_parallel_workers(4)
+    .add_step("ingest",      "file_ingest",   source="./documents/", recursive=True)
+    .add_step("extract",     "triplet_extract")
+    .add_step("deduplicate", "entity_dedup",  threshold=0.85)
+    .add_step("build_kg",    "kg_build")
+    .add_step("export",      "rdf_export",    format="turtle", output="output/kg.ttl")
+    .set_parallelism(4)              # set_parallelism(), not with_parallel_workers()
 )
+
+pipeline = builder.build(name="kg_pipeline")
 
 # Validate before running — catches config errors early
 result = PipelineValidator().validate(pipeline)
 if result.valid:
-    pipeline.build().run(input_path="./documents/")
+    pipeline.run()
 ```
 
 → [Pipeline docs](docs/reference/)
@@ -604,84 +638,6 @@ if result.valid:
 - **`semantica.visualization`** — KG, ontology, embedding, and temporal graph visualization
 - **`semantica.llms`** — Groq, OpenAI, Novita AI, HuggingFace, LiteLLM
 
-### SHACL Shape Generation & Validation
-
-Semantica turns ontologies into executable data contracts. The constraints layer completes a hybrid reasoning system — symbolic constraints (SHACL) alongside semantic retrieval (embeddings).
-
-**Phase 1 — Generate shapes from any ontology dict:**
-
-```python
-from semantica.ontology import OntologyEngine
-
-engine   = OntologyEngine()
-ontology = engine.from_data(data)          # or engine.from_text(...) / engine.to_owl(...)
-
-# Generate SHACL shapes — zero hand-authoring
-shacl_ttl  = engine.to_shacl(ontology)                        # Turtle string (default)
-shacl_jld  = engine.to_shacl(ontology, format="json-ld")      # JSON-LD string
-shacl_nt   = engine.to_shacl(ontology, format="n-triples")    # N-Triples string
-
-# Write to file
-engine.export_shacl(ontology, path="shapes/domain.ttl")
-```
-
-**Quality tiers — control constraint strictness:**
-
-```python
-# "basic"    — node shapes, property paths, datatypes, cardinality
-# "standard" — + enumerations (sh:in), patterns, inheritance propagation  [DEFAULT]
-# "strict"   — + sh:closed true on all shapes (rejects undeclared properties)
-
-shacl = engine.to_shacl(ontology, quality_tier="strict")
-```
-
-**Phase 2 — Validate a graph against the shapes:**
-
-```python
-import pathlib
-
-report = engine.validate_graph(
-    data_graph=pathlib.Path("data/graph.ttl").read_text(),
-    ontology=ontology,   # auto-generates SHACL before validating
-    explain=True,        # populate plain-English explanations on each violation
-)
-
-print(report.summary())
-# → "Graph does NOT conform: 2 violation(s)."
-
-for v in report.violations:
-    print(v.explanation)
-# → "Node <https://example.com/john> is missing required property <ex:name>. At least 1 value(s) are required."
-# → "Node <https://example.com/acme> has value '999' for <ex:employeeCount> but the expected datatype is xsd:string."
-
-import json
-print(json.dumps(report.to_dict(), indent=2))  # machine-readable — feed to LLM or pipeline
-```
-
-**Or validate against a pre-built SHACL file:**
-
-```python
-report = engine.validate_graph(
-    data_graph=graph_turtle_string,
-    shacl="shapes/domain.ttl",   # path or SHACL string
-)
-```
-
-**Regenerate shapes in CI to detect breaking ontology changes:**
-
-```bash
-python -c "
-from semantica.ontology import OntologyEngine
-import json, pathlib
-engine = OntologyEngine()
-onto = engine.from_data(json.loads(pathlib.Path('ontology.json').read_text()))
-engine.export_shacl(onto, 'shapes/shapes.ttl')
-"
-git diff shapes/shapes.ttl   # detects breaking ontology changes
-```
-
-> **Requires pyshacl for `validate_graph()`:** `pip install semantica[shacl]`
-> Shape generation (`to_shacl`, `export_shacl`) works without any optional dependencies.
 
 ---
 
@@ -740,15 +696,8 @@ pip install semantica[vectorstore-weaviate]
 pip install semantica[vectorstore-qdrant]
 pip install semantica[vectorstore-milvus]
 pip install semantica[vectorstore-pgvector]
-pip install semantica[shacl]          # pyshacl for SHACL validation (optional)
 pip install semantica[db-snowflake]   # Snowflake ingestion
 pip install semantica[agno]           # Agno integration
-
-# SHACL validation (validate_graph)
-pip install semantica[shacl]
-
-# Snowflake ingestion
-pip install semantica[db-snowflake]
 
 # From source
 git clone https://github.com/Hawksight-AI/semantica.git
