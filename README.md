@@ -213,7 +213,7 @@ Turn ontologies into executable data contracts — no hand-authoring.
 - Validate any RDF graph and get back a report with plain-English violation explanations ready to feed into an LLM or pipeline.
 - Use in CI to catch breaking ontology changes before they reach production.
 
-→ `pip install semantica[shacl]`
+→ SHACL shape generation and validation are available via the `OntologyEngine` — see [ontology docs](docs/reference/ontology.md)
 
 ### 🔧 Infrastructure & Fixes
 
@@ -323,7 +323,7 @@ Build, import, and enforce data contracts for your knowledge graphs.
 - Derive SHACL shapes from any ontology and validate graphs against them.
 - Manage SKOS controlled vocabularies with hierarchy, search, and REST APIs.
 
-→ [Ontology docs](docs/reference/ontology.md) · `pip install semantica[shacl]`
+→ [Ontology docs](docs/reference/ontology.md)
 
 ### 🏭 Pipeline & Production
 
@@ -356,14 +356,15 @@ from semantica.context import ContextGraph
 graph = ContextGraph(advanced_analytics=True)
 
 # Record decisions with full reasoning context
-loan_id = graph.add_decision(
+# record_decision() accepts keyword args and returns the decision ID
+loan_id = graph.record_decision(
     category="loan_approval",
     scenario="Mortgage — 780 credit score, 28% DTI",
     reasoning="Strong credit history, stable 8-year income, low DTI",
     outcome="approved",
     confidence=0.95,
 )
-rate_id = graph.add_decision(
+rate_id = graph.record_decision(
     category="interest_rate",
     scenario="Set rate for approved mortgage",
     reasoning="Prime applicant qualifies for lowest tier",
@@ -424,12 +425,13 @@ start, end = normalizer.normalize("Q1 2024")
 
 ```python
 from semantica.context import ContextGraph, AgentContext
+from semantica.vector_store import VectorStore
 from datetime import datetime, timezone
 
 graph = ContextGraph()
 
-# Decisions carry explicit validity windows
-graph.add_decision(
+# record_decision() accepts keyword args and supports validity windows
+graph.record_decision(
     category="policy",
     scenario="Approve supplier A",
     outcome="approved",
@@ -442,7 +444,12 @@ graph.add_decision(
 # The source graph is never mutated
 snapshot = graph.state_at(datetime(2024, 3, 15, tzinfo=timezone.utc))
 
-# Named checkpoints — snapshot context, then diff what changed
+# Named checkpoints — checkpoint() and diff_checkpoints() live on AgentContext
+context = AgentContext(
+    vector_store=VectorStore(backend="inmemory"),
+    knowledge_graph=graph,
+    decision_tracking=True,
+)
 context.checkpoint("before_merge")
 # ... make changes ...
 diff = context.diff_checkpoints("before_merge", "after_merge")
@@ -470,18 +477,28 @@ for rel in relations:
 ### Knowledge Graphs & Algorithms
 
 ```python
-from semantica.kg import KnowledgeGraph, Entity, Relationship
-from semantica.kg import CentralityAnalyzer, NodeEmbedder, LinkPredictor
+from semantica.kg import GraphBuilder, CentralityCalculator, NodeEmbedder, LinkPredictor
 
-kg = KnowledgeGraph()
-kg.add_entity(Entity(id="bert",        label="BERT",        type="Model"))
-kg.add_entity(Entity(id="transformer", label="Transformer", type="Architecture"))
-kg.add_relationship(Relationship(source="bert", target="transformer", type="based_on"))
+# Build a KG from entity/relationship dicts
+builder = GraphBuilder()
+graph   = builder.build({
+    "entities": [
+        {"id": "bert",        "label": "BERT",        "type": "Model"},
+        {"id": "transformer", "label": "Transformer", "type": "Architecture"},
+        {"id": "gpt4",        "label": "GPT-4",       "type": "Model"},
+    ],
+    "relationships": [
+        {"source": "bert", "target": "transformer", "type": "based_on"},
+        {"source": "gpt4", "target": "transformer", "type": "based_on"},
+    ],
+})
 
 # Graph algorithms
-centrality  = CentralityAnalyzer(kg).compute_pagerank()
-embeddings  = NodeEmbedder().compute_embeddings(kg, node_labels=["Model"], relationship_types=["based_on"])
-link_score  = LinkPredictor().score_link(kg, "gpt4", "bert", method="common_neighbors")
+centrality = CentralityCalculator().calculate_pagerank(graph)
+embeddings = NodeEmbedder().compute_embeddings(
+    graph, node_labels=["Model"], relationship_types=["based_on"]
+)
+link_score = LinkPredictor().score_link(graph, "gpt4", "bert", method="common_neighbors")
 ```
 
 → [KG algorithm docs](docs/reference/) · [KG cookbook](cookbook/)
@@ -512,36 +529,30 @@ matches = rete.match({"amount": 15000, "country": "IR", "id": "txn_9921"})
 
 → [Reasoning docs](docs/reference/)
 
-### SHACL — Ontology to Data Contract
+### Ontology Generation & Validation
 
 ```python
 from semantica.ontology import OntologyEngine
-import pathlib
 
 engine   = OntologyEngine()
-ontology = engine.from_data(your_ontology_dict)
 
-# Generate shapes — zero hand-authoring, fully deterministic
-engine.export_shacl(ontology, path="shapes/domain.ttl")
+# Derive an OWL ontology from any data dict
+ontology = engine.from_data(your_data_dict)
 
-# Validate a graph and get plain-English explanations
-report = engine.validate_graph(
-    data_graph=pathlib.Path("data/graph.ttl").read_text(),
-    ontology=ontology,
-    explain=True,
-)
+# Export as OWL (Turtle or RDF/XML)
+engine.export_owl(ontology, path="domain_ontology.owl", format="turtle")
 
-print(report.summary())
-# → "Graph does NOT conform: 2 violation(s)."
+# Validate ontology consistency
+result = engine.validate(ontology)
 
-for v in report.violations:
-    print(v.explanation)
-# → "Node <.../john> is missing required property <ex:name>. At least 1 value required."
+# Generate ontology from raw text using an LLM
+ontology = engine.from_text("Employees work at companies. Companies have departments.")
+
+# Convert ontology to OWL string
+owl_str = engine.to_owl(ontology, format="turtle")
 ```
 
-> Requires `pip install semantica[shacl]` for validation. Shape generation works with no extras.
-
-→ [SHACL docs](docs/reference/ontology.md)
+→ [Ontology docs](docs/reference/ontology.md)
 
 ### Pipeline Orchestration
 
@@ -555,7 +566,7 @@ pipeline = (
     .add_stage("ingest",      FileIngestor(recursive=True))
     .add_stage("extract",     extract_triplets)
     .add_stage("deduplicate", DuplicateDetector())
-    .add_stage("build_kg",    KnowledgeGraph())
+    .add_stage("build_kg",    GraphBuilder())
     .add_stage("export",      RDFExporter())
     .with_parallel_workers(4)
 )
@@ -729,7 +740,7 @@ pip install semantica[vectorstore-weaviate]
 pip install semantica[vectorstore-qdrant]
 pip install semantica[vectorstore-milvus]
 pip install semantica[vectorstore-pgvector]
-pip install semantica[shacl]          # SHACL validation
+pip install semantica[shacl]          # pyshacl for SHACL validation (optional)
 pip install semantica[db-snowflake]   # Snowflake ingestion
 pip install semantica[agno]           # Agno integration
 
