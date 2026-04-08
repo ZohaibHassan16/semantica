@@ -43,9 +43,9 @@ export interface GraphLoadSummary {
   nodeCount: number;
   edgeCount: number;
   loadTimeMs: number;
-  hasCoordinates: boolean;
-  layoutSource: GraphLayoutSource;
-  layoutReady: boolean;
+  hasCoordinates?: boolean;
+  layoutSource?: GraphLayoutSource;
+  layoutReady?: boolean;
 }
 
 export interface GraphLoadProgress {

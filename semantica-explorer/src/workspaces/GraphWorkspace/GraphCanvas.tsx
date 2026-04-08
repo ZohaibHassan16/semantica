@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useCallback, forwardRef, useImperativeHandle, useState } from "react";
+import { useEffect, useMemo, useRef, useCallback, forwardRef, useImperativeHandle, useState, type ReactNode } from "react";
 import Graph from "graphology";
 import Sigma from "sigma";
 import FA2Layout from "graphology-layout-forceatlas2/worker";
@@ -21,6 +21,7 @@ import {
   withAlpha,
 } from "./graphTheme";
 import type { GraphCameraState, GraphInteractionState, GraphLayoutStatus, GraphViewMode } from "./types";
+import type { GraphPluginRuntime } from "./plugins";
 
 export type { GraphViewMode } from "./types";
 
@@ -40,6 +41,9 @@ export interface GraphCanvasProps {
   onLayoutStatusChange?: (status: GraphLayoutStatus) => void;
   viewMode: GraphViewMode;
   className?: string;
+  pluginOverlays?: ReactNode[];
+  onPluginRuntimeChange?: (runtime: GraphPluginRuntime | null) => void;
+  onInteractionStateChange?: (interactionState: GraphInteractionState) => void;
 }
 
 const FA2_SETTINGS = {
@@ -467,7 +471,20 @@ function dispatchBehaviorAction(
 }
 
 export const GraphCanvas = forwardRef<GraphCanvasHandle, GraphCanvasProps>(
-  function GraphCanvas({ onNodeClick, selectedNodeId, activePath = [], isLayoutRunning, viewMode, className }, ref) {
+  function GraphCanvas(
+    {
+      onNodeClick,
+      selectedNodeId,
+      activePath = [],
+      isLayoutRunning,
+      viewMode,
+      className,
+      pluginOverlays = [],
+      onPluginRuntimeChange,
+      onInteractionStateChange,
+    },
+    ref,
+  ) {
     const containerRef = useRef<HTMLDivElement>(null);
     const overlayRef = useRef<HTMLCanvasElement>(null);
     const sigmaRef = useRef<Sigma | null>(null);
@@ -600,6 +617,11 @@ export const GraphCanvas = forwardRef<GraphCanvasHandle, GraphCanvasProps>(
 
       const sigma = new Sigma(displayGraph, containerRef.current, SIGMA_SETTINGS);
       sigmaRef.current = sigma;
+      onPluginRuntimeChange?.({
+        sigma,
+        graph,
+        displayGraph,
+      });
       const camera = sigma.getCamera();
       const context = getBehaviorContext(sigma);
 
@@ -649,8 +671,9 @@ export const GraphCanvas = forwardRef<GraphCanvasHandle, GraphCanvasProps>(
         sigma.kill();
         behaviorContextRef.current = null;
         sigmaRef.current = null;
+        onPluginRuntimeChange?.(null);
       };
-    }, [behaviors, dispatchAction, dispatchToBehaviors, displayGraph, getBehaviorContext]);
+    }, [behaviors, dispatchAction, dispatchToBehaviors, displayGraph, getBehaviorContext, onPluginRuntimeChange]);
 
     useEffect(() => {
       const context = getBehaviorContext();
@@ -665,7 +688,8 @@ export const GraphCanvas = forwardRef<GraphCanvasHandle, GraphCanvasProps>(
       for (const behavior of behaviors) {
         behavior.apply?.(context, interactionState);
       }
-    }, [behaviors, getBehaviorContext, interactionState]);
+      onInteractionStateChange?.(interactionState);
+    }, [behaviors, getBehaviorContext, interactionState, onInteractionStateChange]);
 
     useEffect(() => {
       const sigma = sigmaRef.current;
@@ -813,6 +837,22 @@ export const GraphCanvas = forwardRef<GraphCanvasHandle, GraphCanvasProps>(
             zIndex: 4,
           }}
         />
+        {pluginOverlays.length ? (
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              pointerEvents: "none",
+              zIndex: 6,
+            }}
+          >
+            {pluginOverlays.map((overlay, index) => (
+              <div key={`graph-plugin-overlay-${index}`} style={{ position: "absolute", inset: 0 }}>
+                {overlay}
+              </div>
+            ))}
+          </div>
+        ) : null}
         <button
           id="graph-fit-view-btn"
           onClick={handleFitView}

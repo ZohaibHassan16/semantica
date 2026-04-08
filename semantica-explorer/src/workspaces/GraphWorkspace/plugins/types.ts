@@ -1,0 +1,93 @@
+import type { ReactNode } from "react";
+import type Graph from "graphology";
+import type Sigma from "sigma";
+
+import { graph, type EdgeAttributes, type NodeAttributes } from "../../../store/graphStore";
+import type { GraphTheme } from "../graphTheme";
+import type {
+  GraphInteractionState,
+  GraphLoadSummary,
+  GraphSelectedNodeState,
+  GraphViewMode,
+} from "../types";
+
+export type GraphPluginId = string;
+export type GraphPluginPanelPlacement = "side" | "bottom";
+
+export interface GraphTemporalState {
+  currentTime: Date | null;
+  activeNodeCount: number | null;
+  minDate?: string;
+  maxDate?: string;
+}
+
+export type GraphPluginActionRequest =
+  | { type: "fitView" }
+  | { type: "focusNode"; nodeId: string }
+  | { type: "selectNode"; nodeId: string }
+  | { type: "setViewMode"; viewMode: GraphViewMode }
+  | { type: "togglePanel"; panelId: string }
+  | { type: "openPanel"; panelId: string }
+  | { type: "closePanel"; panelId: string };
+
+export interface GraphPluginToolbarItem {
+  id: string;
+  label: string;
+  title?: string;
+  active?: boolean;
+  order?: number;
+  onClick: () => void;
+}
+
+export interface GraphPluginPanelDescriptor {
+  id: string;
+  title: string;
+  placement: GraphPluginPanelPlacement;
+  order?: number;
+  content: ReactNode;
+}
+
+export interface GraphPluginOverlayDescriptor {
+  id: string;
+  layer?: number;
+  order?: number;
+  element: ReactNode;
+}
+
+export interface GraphPluginRuntime {
+  sigma: Sigma;
+  graph: typeof graph | Graph<NodeAttributes, EdgeAttributes>;
+  displayGraph: typeof graph | Graph<NodeAttributes, EdgeAttributes>;
+}
+
+export interface GraphPluginContext {
+  readonly sigma: Sigma | null;
+  readonly graph: typeof graph | Graph<NodeAttributes, EdgeAttributes>;
+  readonly displayGraph: typeof graph | Graph<NodeAttributes, EdgeAttributes>;
+  readonly theme: GraphTheme;
+  getInteractionState: () => GraphInteractionState;
+  getSelectedNodeState: () => GraphSelectedNodeState | null;
+  getGraphSummary: () => GraphLoadSummary | null;
+  getTemporalState: () => GraphTemporalState | null;
+  isPanelOpen: (panelId: string) => boolean;
+  dispatchAction: (action: GraphPluginActionRequest) => void;
+}
+
+export interface GraphPlugin {
+  id: GraphPluginId;
+  mount: (context: GraphPluginContext) => void;
+  unmount: (context: GraphPluginContext) => void;
+  onStateChange: (context: GraphPluginContext, interactionState: GraphInteractionState) => void;
+  renderOverlay?: (
+    context: GraphPluginContext,
+  ) => GraphPluginOverlayDescriptor | GraphPluginOverlayDescriptor[] | null;
+  renderPanel?: (
+    context: GraphPluginContext,
+  ) => GraphPluginPanelDescriptor | GraphPluginPanelDescriptor[] | null;
+  toolbarItems?: (context: GraphPluginContext) => GraphPluginToolbarItem[];
+}
+
+export interface GraphPluginRegistryEntry {
+  plugin: GraphPlugin;
+  enabled?: boolean;
+}

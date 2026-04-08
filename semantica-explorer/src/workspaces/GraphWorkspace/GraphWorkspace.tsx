@@ -7,6 +7,20 @@ import { TimelinePanel } from "./TimelinePanel";
 import { useLoadGraph, useReloadGraph } from "./useLoadGraph";
 import type { GraphLoadProgress } from "./useLoadGraph";
 import { GRAPH_THEME, withAlpha } from "./graphTheme";
+import {
+  legendPlugin,
+  neighborhoodPanelPlugin,
+  temporalOverlayPlugin,
+  type GraphPlugin,
+  type GraphPluginActionRequest,
+  type GraphPluginContext,
+  type GraphPluginOverlayDescriptor,
+  type GraphPluginPanelDescriptor,
+  type GraphPluginRegistryEntry,
+  type GraphPluginRuntime,
+  type GraphPluginToolbarItem,
+} from "./plugins";
+import type { GraphInteractionState, GraphLoadSummary, GraphSelectedNodeState } from "./types";
 
 type SearchResult = {
   node: {
@@ -271,6 +285,107 @@ function sourceAttribution(properties: Record<string, unknown>) {
     .map((key) => ({ key, value: properties[key] }));
 }
 
+function buildSelectedNodeState(nodeId: string): GraphSelectedNodeState | null {
+  if (!nodeId || !graph.hasNode(nodeId)) {
+    return null;
+  }
+
+  const attributes = graph.getNodeAttributes(nodeId) as {
+    label?: string;
+    content?: string;
+    nodeType?: string;
+    color?: string;
+    valid_from?: string | null;
+    valid_until?: string | null;
+    properties?: Record<string, unknown>;
+  };
+
+  return {
+    id: nodeId,
+    label: String(attributes.label ?? nodeId),
+    content: String(attributes.content ?? attributes.label ?? nodeId),
+    nodeType: String(attributes.nodeType ?? "Entity"),
+    color: typeof attributes.color === "string" ? attributes.color : undefined,
+    valid_from: attributes.valid_from ?? null,
+    valid_until: attributes.valid_until ?? null,
+    properties: attributes.properties ?? {},
+    neighborCount: graph.neighbors(nodeId).length,
+  };
+}
+
+function collectPluginToolbarItems(
+  plugins: GraphPlugin[],
+  context: GraphPluginContext,
+): GraphPluginToolbarItem[] {
+  const items: GraphPluginToolbarItem[] = [];
+
+  for (const plugin of plugins) {
+    try {
+      const nextItems = plugin.toolbarItems?.(context) ?? [];
+      items.push(...nextItems);
+    } catch (error) {
+      console.error(`[GraphPlugin:${plugin.id}] toolbar collection failed`, error);
+    }
+  }
+
+  return items.sort((left, right) => (left.order ?? 0) - (right.order ?? 0));
+}
+
+function collectPluginPanels(
+  plugins: GraphPlugin[],
+  context: GraphPluginContext,
+): GraphPluginPanelDescriptor[] {
+  const panels: GraphPluginPanelDescriptor[] = [];
+
+  for (const plugin of plugins) {
+    try {
+      const result = plugin.renderPanel?.(context);
+      if (!result) {
+        continue;
+      }
+      if (Array.isArray(result)) {
+        panels.push(...result);
+      } else {
+        panels.push(result);
+      }
+    } catch (error) {
+      console.error(`[GraphPlugin:${plugin.id}] panel render failed`, error);
+    }
+  }
+
+  return panels.sort((left, right) => (left.order ?? 0) - (right.order ?? 0));
+}
+
+function collectPluginOverlays(
+  plugins: GraphPlugin[],
+  context: GraphPluginContext,
+): GraphPluginOverlayDescriptor[] {
+  const overlays: GraphPluginOverlayDescriptor[] = [];
+
+  for (const plugin of plugins) {
+    try {
+      const result = plugin.renderOverlay?.(context);
+      if (!result) {
+        continue;
+      }
+      if (Array.isArray(result)) {
+        overlays.push(...result);
+      } else {
+        overlays.push(result);
+      }
+    } catch (error) {
+      console.error(`[GraphPlugin:${plugin.id}] overlay render failed`, error);
+    }
+  }
+
+  return overlays.sort((left, right) => {
+    if ((left.layer ?? 0) !== (right.layer ?? 0)) {
+      return (left.layer ?? 0) - (right.layer ?? 0);
+    }
+    return (left.order ?? 0) - (right.order ?? 0);
+  });
+}
+
 function NodePanel({
   nodeId,
   predictions,
@@ -508,10 +623,26 @@ export function GraphWorkspace() {
   const [temporalBounds, setTemporalBounds] = useState<TemporalBounds | null>(null);
   const [scrubberTime, setScrubberTime] = useState<Date | null>(null);
   const [loadingProgress, setLoadingProgress] = useState<GraphLoadProgress | null>(null);
+  const [pluginPanelState, setPluginPanelState] = useState<Record<string, boolean>>({
+    "legend-panel": false,
+    "neighborhood-panel": false,
+    "temporal-panel": false,
+  });
+  const [pluginRuntimeVersion, setPluginRuntimeVersion] = useState(0);
 
   const debouncedTime = useDebounce(scrubberTime, 150);
   const prevActiveIdsRef = useRef<Set<string>>(new Set());
   const canvasRef = useRef<GraphCanvasHandle>(null);
+  const pluginRuntimeRef = useRef<GraphPluginRuntime | null>(null);
+  const pluginInteractionStateRef = useRef<GraphInteractionState>({
+    hoveredNodeId: null,
+    selectedNodeId: "",
+    focusedNodeId: "",
+    activePath: [],
+    viewMode: "focused",
+    zoomTier: "overview",
+    isLayoutRunning: false,
+  });
   const reload = useReloadGraph();
 
   const { data: summary, isLoading, isFetching, isError, error } = useLoadGraph({
@@ -794,6 +925,144 @@ export function GraphWorkspace() {
   const showLoadingOverlay = isLoading || isFetching;
   const hasGraphContent = Boolean(summary?.nodeCount);
   const activePath = pathResult?.path ?? [];
+  const graphSummary = summary as GraphLoadSummary | null;
+  const selectedNodeState = useMemo(
+    () => buildSelectedNodeState(selectedNodeId),
+    [selectedNodeId, summary?.nodeCount, summary?.edgeCount],
+  );
+  const temporalState = useMemo(
+    () => ({
+      currentTime: scrubberTime,
+      activeNodeCount,
+      minDate: temporalBounds?.min ?? undefined,
+      maxDate: temporalBounds?.max ?? undefined,
+    }),
+    [activeNodeCount, scrubberTime, temporalBounds?.max, temporalBounds?.min],
+  );
+
+  const pluginRegistry = useMemo<GraphPluginRegistryEntry[]>(
+    () => [
+      { plugin: legendPlugin, enabled: true },
+      { plugin: neighborhoodPanelPlugin, enabled: true },
+      { plugin: temporalOverlayPlugin, enabled: true },
+    ],
+    [],
+  );
+  const activePlugins = useMemo(
+    () => pluginRegistry.filter((entry) => entry.enabled !== false).map((entry) => entry.plugin),
+    [pluginRegistry],
+  );
+
+  const handlePluginAction = useCallback((action: GraphPluginActionRequest) => {
+    switch (action.type) {
+      case "fitView":
+        canvasRef.current?.fitView();
+        return;
+      case "focusNode":
+        canvasRef.current?.focusNode(action.nodeId);
+        return;
+      case "selectNode":
+        focusNode(action.nodeId);
+        return;
+      case "setViewMode":
+        setViewMode(action.viewMode);
+        return;
+      case "togglePanel":
+        setPluginPanelState((current) => ({
+          ...current,
+          [action.panelId]: !current[action.panelId],
+        }));
+        return;
+      case "openPanel":
+        setPluginPanelState((current) => ({
+          ...current,
+          [action.panelId]: true,
+        }));
+        return;
+      case "closePanel":
+        setPluginPanelState((current) => ({
+          ...current,
+          [action.panelId]: false,
+        }));
+        return;
+    }
+  }, [focusNode]);
+
+  const pluginContext = useMemo<GraphPluginContext>(() => ({
+    get sigma() {
+      return pluginRuntimeRef.current?.sigma ?? null;
+    },
+    get graph() {
+      return graph;
+    },
+    get displayGraph() {
+      return pluginRuntimeRef.current?.displayGraph ?? graph;
+    },
+    theme: GRAPH_THEME,
+    getInteractionState: () => pluginInteractionStateRef.current,
+    getSelectedNodeState: () => selectedNodeState,
+    getGraphSummary: () => graphSummary,
+    getTemporalState: () => temporalState,
+    isPanelOpen: (panelId: string) => Boolean(pluginPanelState[panelId]),
+    dispatchAction: handlePluginAction,
+  }), [graphSummary, handlePluginAction, pluginPanelState, selectedNodeState, temporalState]);
+
+  const handlePluginRuntimeChange = useCallback((runtime: GraphPluginRuntime | null) => {
+    pluginRuntimeRef.current = runtime;
+    setPluginRuntimeVersion((version) => version + 1);
+  }, []);
+
+  const handleInteractionStateChange = useCallback((interactionState: GraphInteractionState) => {
+    pluginInteractionStateRef.current = interactionState;
+    for (const plugin of activePlugins) {
+      try {
+        plugin.onStateChange(pluginContext, interactionState);
+      } catch (error) {
+        console.error(`[GraphPlugin:${plugin.id}] state update failed`, error);
+      }
+    }
+  }, [activePlugins, pluginContext]);
+
+  useEffect(() => {
+    if (!pluginRuntimeRef.current) {
+      return;
+    }
+
+    const mountedPlugins: GraphPlugin[] = [];
+    for (const plugin of activePlugins) {
+      try {
+        plugin.mount(pluginContext);
+        mountedPlugins.push(plugin);
+      } catch (error) {
+        console.error(`[GraphPlugin:${plugin.id}] mount failed`, error);
+      }
+    }
+
+    return () => {
+      for (const plugin of mountedPlugins.reverse()) {
+        try {
+          plugin.unmount(pluginContext);
+        } catch (error) {
+          console.error(`[GraphPlugin:${plugin.id}] unmount failed`, error);
+        }
+      }
+    };
+  }, [activePlugins, pluginContext, pluginRuntimeVersion]);
+
+  const pluginToolbarItems = useMemo(
+    () => collectPluginToolbarItems(activePlugins, pluginContext),
+    [activePlugins, pluginContext],
+  );
+  const pluginPanels = useMemo(
+    () => collectPluginPanels(activePlugins, pluginContext),
+    [activePlugins, pluginContext],
+  );
+  const pluginOverlays = useMemo(
+    () => collectPluginOverlays(activePlugins, pluginContext),
+    [activePlugins, pluginContext],
+  );
+  const sidePluginPanels = pluginPanels.filter((panel) => panel.placement === "side");
+  const bottomPluginPanels = pluginPanels.filter((panel) => panel.placement === "bottom");
 
   return (
     <div className="palantir-bg" style={{ position: "relative", width: "100%", height: "100%", overflow: "hidden", display: "flex", flexDirection: "column" }}>
@@ -809,6 +1078,9 @@ export function GraphWorkspace() {
           activePath={activePath}
           isLayoutRunning={isLayoutRunning}
           viewMode={viewMode}
+          pluginOverlays={pluginOverlays.map((overlay) => overlay.element)}
+          onPluginRuntimeChange={handlePluginRuntimeChange}
+          onInteractionStateChange={handleInteractionStateChange}
         />
         {showLoadingOverlay ? (
           <LoadingOverlay progress={loadingProgress} showGraphBehind={hasGraphContent} />
@@ -888,6 +1160,25 @@ export function GraphWorkspace() {
               {isLayoutRunning ? "Pause Layout" : "Run Layout"}
             </button>
             <button onClick={reload} style={actionButtonStyle} disabled={showLoadingOverlay}>Reload</button>
+            {pluginToolbarItems.length ? (
+              <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+                {pluginToolbarItems.map((item) => (
+                  <button
+                    key={item.id}
+                    onClick={item.onClick}
+                    title={item.title}
+                      style={{
+                        ...secondaryActionButtonStyle,
+                        background: item.active ? "rgba(31, 111, 235, 0.28)" : secondaryActionButtonStyle.background,
+                        borderColor: item.active ? "rgba(127, 208, 255, 0.35)" : "rgba(255, 255, 255, 0.08)",
+                        color: item.active ? "#e6f2ff" : secondaryActionButtonStyle.color,
+                      }}
+                    >
+                      {item.label}
+                  </button>
+                ))}
+              </div>
+            ) : null}
           </div>
         </header>
 
@@ -912,6 +1203,56 @@ export function GraphWorkspace() {
                 </button>
               ))}
             </div>
+          </div>
+        ) : null}
+
+        {sidePluginPanels.length ? (
+          <div
+            className="glass-hud hud-scrollbar"
+            style={{
+              pointerEvents: "auto",
+              position: "absolute",
+              left: 24,
+              top: searchResults.length ? 370 : 72,
+              width: 320,
+              maxHeight: selectedNodeId ? 280 : 340,
+              overflowY: "auto",
+              borderRadius: 14,
+              border: "1px solid rgba(88, 166, 255, 0.14)",
+              padding: 12,
+              display: "flex",
+              flexDirection: "column",
+              gap: 12,
+            }}
+          >
+            {sidePluginPanels.map((panel) => (
+              <div key={panel.id} style={pluginPanelCardStyle}>
+                <div style={pluginPanelTitleStyle}>{panel.title}</div>
+                {panel.content}
+              </div>
+            ))}
+          </div>
+        ) : null}
+
+        {bottomPluginPanels.length ? (
+          <div
+            style={{
+              position: "absolute",
+              left: 24,
+              bottom: 104,
+              width: 340,
+              display: "flex",
+              flexDirection: "column",
+              gap: 12,
+              pointerEvents: "auto",
+            }}
+          >
+            {bottomPluginPanels.map((panel) => (
+              <div key={panel.id} className="glass-hud" style={{ ...pluginPanelCardStyle, padding: 14 }}>
+                <div style={pluginPanelTitleStyle}>{panel.title}</div>
+                {panel.content}
+              </div>
+            ))}
           </div>
         ) : null}
 
@@ -1046,6 +1387,25 @@ const subtleChipStyle: React.CSSProperties = {
   borderRadius: 999,
   fontSize: 11,
   border: "1px solid rgba(255, 255, 255, 0.06)",
+};
+
+const pluginPanelCardStyle: React.CSSProperties = {
+  borderRadius: 14,
+  border: "1px solid rgba(88, 166, 255, 0.14)",
+  background: "linear-gradient(180deg, rgba(7, 14, 25, 0.76), rgba(10, 18, 31, 0.66))",
+  boxShadow: "0 14px 38px rgba(0, 0, 0, 0.24)",
+  padding: 14,
+  display: "flex",
+  flexDirection: "column",
+  gap: 12,
+};
+
+const pluginPanelTitleStyle: React.CSSProperties = {
+  color: "#f3f7fd",
+  fontSize: 12,
+  fontWeight: 700,
+  letterSpacing: "0.08em",
+  textTransform: "uppercase",
 };
 
 const loadingMetricStyle: React.CSSProperties = {

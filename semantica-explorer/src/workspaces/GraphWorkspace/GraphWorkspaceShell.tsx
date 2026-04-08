@@ -462,9 +462,9 @@ export function GraphWorkspaceShell() {
       setActiveNodeCount(null);
       setLayoutStatus({
         state: snapshot.summary.layoutReady ? "interactive" : "idle",
-        source: snapshot.summary.layoutSource,
-        hasCoordinates: snapshot.summary.hasCoordinates,
-        layoutReady: snapshot.summary.layoutReady,
+        source: snapshot.summary.layoutSource ?? "runtime",
+        hasCoordinates: snapshot.summary.hasCoordinates ?? false,
+        layoutReady: snapshot.summary.layoutReady ?? false,
         displacement: null,
         elapsedMs: 0,
         stableSamples: 0,
