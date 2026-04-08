@@ -1,7 +1,8 @@
 {
   "hooks": {
     "PostToolUse": [
-      {"matcher": "Write|Edit", "hooks": [{"type": "command", "command": "FILE=$(jq -r .tool_input.file_path 2>/dev/null); if echo $FILE | grep -qE semantica/; then python -c "import ast,sys; ast.parse(open(sys.argv[1]).read())" $FILE 2>&1; fi"}]},
+      {"matcher": "Write|Edit", "hooks": [{"type": "command", "command": "FILE=$(jq -r .tool_input.file_path 2>/dev/null); if echo $FILE | grep -qE semantica/; then python -c 'import ast,sys; ast.parse(open(sys.argv[1]).read())' $FILE 2>&1; fi"}]},
+
       {"matcher": "Write|Edit", "hooks": [{"type": "command", "command": "echo PostToolUse provenance check"}]}
     ],
     "PreToolUse": [

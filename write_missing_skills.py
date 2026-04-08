@@ -1,6 +1,9 @@
 import os
 
-base = r'c:\Users\Mohd Kaif\semantica\plugins\skills'
+base = os.getenv(
+    'SKILLS_OUT_DIR',
+    os.path.join(os.path.dirname(os.path.abspath(__file__)), 'plugins', 'skills')
+)
 
 SKILLS = {}
 
@@ -1025,7 +1028,7 @@ Flag as WARNING if gap rate > 5%.
 for skill_name, content in SKILLS.items():
     path = os.path.join(base, skill_name, 'SKILL.md')
     os.makedirs(os.path.dirname(path), exist_ok=True)
-    with open(path, 'w') as f:
+    with open(path, 'w', encoding='utf-8', newline='\n') as f:
         f.write(content)
     print(f'written: {skill_name}')
 

@@ -1,6 +1,6 @@
 ---
 name: deduplicate
-description: Identify and merge duplicate entities, relations, and graph objects in Semantica using fuzzy matching, schema heuristics, and graph similarity.
+description: Detect duplicate entities, duplicate groups, and relationship duplicates in Semantica using fuzzy matching, schema heuristics, and graph similarity.
 ---
 
 # /semantica:deduplicate
@@ -13,25 +13,29 @@ Remove duplicates from the knowledge graph. Usage: `/semantica:deduplicate <stra
 
 ## `entities [--threshold <score>] [--field <name>]`
 
-Find and merge duplicate entities.
+Detect duplicate entities and group them by similarity.
 
 ```python
 from semantica.deduplication import DuplicateDetector
 
 finder = DuplicateDetector()
-merged = finder.merge_duplicates(entity_type=entity_type, threshold=threshold)
+candidates = finder.detect_duplicates(entities, threshold=threshold)
+groups = finder.detect_duplicate_groups(entities, threshold=threshold)
 ```
 
-Output: merged entity IDs, discarded duplicates, and merge confidence.
+Output: duplicate candidate list, duplicate groups, and representative merge recommendations.
 
 ---
 
 ## `relations [--similarity <score>]`
 
-Detect duplicate relationships and normalize edges.
+Detect duplicate relationships and normalize edge representations.
 
 ```python
-relations = finder.find_duplicate_relations(similarity=similarity)
+from semantica.deduplication import DuplicateDetector
+
+finder = DuplicateDetector()
+relations = finder.detect_duplicates(relation_list, threshold=similarity)
 ```
 
-Result: relation clusters, normalized relation set, and cleanup summary.
+Result: duplicate relation candidates, normalized relationship groups, and cleanup summary.

@@ -16,22 +16,23 @@ Export knowledge graph data. Usage: `/semantica:export <format> [args]`
 Export graph data as JSON.
 
 ```python
-from semantica.export import GraphExporter
+from semantica.export.methods import export_json
 
-exporter = GraphExporter()
-exporter.export_json(output_path=output, filter_query=filter_query)
+export_json(data=graph_data, file_path=output, format='json')
 ```
 
 Output: JSON file or inline JSON payload.
 
 ---
 
-## `rdf [--format turtle|xml|ntriples] [--output <path>]`
+## `rdf [--format turtle|rdfxml|jsonld|ntriples|n3] [--output <path>]`
 
 Export the graph in RDF serialization.
 
 ```python
-exporter.export_rdf(format='turtle', output_path=output)
+from semantica.export.methods import export_rdf
+
+export_rdf(data=graph_data, file_path=output, format='turtle')
 ```
 
 Return: RDF text or file path.
@@ -43,7 +44,24 @@ Return: RDF text or file path.
 Export nodes and edges to Parquet for analytics.
 
 ```python
-exporter.export_parquet(output_path=output)
+from semantica.export.methods import export_parquet
+
+export_parquet(data=graph_data, file_path=output, compression='snappy')
 ```
 
 Output: Parquet dataset ready for downstream processing.
+
+---
+
+## `graphml|gexf|dot [--output <path>]`
+
+Export the graph to a supported graph format.
+
+```python
+from semantica.export import GraphExporter
+
+exporter = GraphExporter(format='graphml', include_attributes=True)
+exporter.export(graph_data, output)
+```
+
+Output: Graph format file suitable for visualization tools.

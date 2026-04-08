@@ -16,7 +16,6 @@ This folder contains the plugin metadata for the Semantica Claude/Cursor/Codex p
 ```bash
 /plugin marketplace add <owner>/semantica
 ```
-```
 
 ## Supported platforms
 

@@ -16,10 +16,9 @@ Ingest new data into the knowledge graph. Usage: `/semantica:ingest <source> [ar
 Ingest structured data from a local file.
 
 ```python
-from semantica.ingest import DataIngestor
+from semantica.ingest import ingest_file
 
-ingestor = DataIngestor()
-ingestor.ingest_file(file_path=path, file_format=file_format)
+data = ingest_file(file_path=path, method='file', file_format=file_format)
 ```
 
 Output: imported node/edge count and ingestion summary.
@@ -31,7 +30,9 @@ Output: imported node/edge count and ingestion summary.
 Ingest data from a database source.
 
 ```python
-ingestor.ingest_database(connection_string=conn, query=query)
+from semantica.ingest import ingest_database
+
+result = ingest_database(connection_string=conn, query=query)
 ```
 
 Return: rows ingested, mapped entities, and warnings.
