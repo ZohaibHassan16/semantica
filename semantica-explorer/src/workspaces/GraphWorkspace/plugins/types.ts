@@ -14,6 +14,11 @@ import type {
 export type GraphPluginId = string;
 export type GraphPluginPanelPlacement = "side" | "bottom";
 
+export interface GraphInspectorState {
+  selectedNodeId: string | null;
+  ownsSelectionDetails: boolean;
+}
+
 export interface GraphTemporalState {
   currentTime: Date | null;
   activeNodeCount: number | null;
@@ -44,6 +49,9 @@ export interface GraphPluginPanelDescriptor {
   title: string;
   placement: GraphPluginPanelPlacement;
   order?: number;
+  defaultOpen?: boolean;
+  preferredHeight?: number;
+  preferredWidth?: number;
   content: ReactNode;
 }
 
@@ -67,6 +75,7 @@ export interface GraphPluginContext {
   readonly theme: GraphTheme;
   getInteractionState: () => GraphInteractionState;
   getSelectedNodeState: () => GraphSelectedNodeState | null;
+  getInspectorState: () => GraphInspectorState;
   getGraphSummary: () => GraphLoadSummary | null;
   getTemporalState: () => GraphTemporalState | null;
   isPanelOpen: (panelId: string) => boolean;

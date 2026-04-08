@@ -78,6 +78,9 @@ export const temporalOverlayPlugin: GraphPlugin = {
       title: "Temporal Context",
       placement: "bottom",
       order: 30,
+      defaultOpen: false,
+      preferredWidth: 320,
+      preferredHeight: 220,
       content: (
         <div style={panelBodyStyle}>
           <div style={panelEyebrowStyle}>Current scrubber state</div>

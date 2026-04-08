@@ -5,6 +5,14 @@ import type { GraphPlugin } from "./types";
 const NEIGHBORHOOD_PANEL_ID = "neighborhood-panel";
 const MAX_NEIGHBORS = 10;
 
+function formatNeighborMeta(neighbor: { nodeType: string; degree: number; weight: number }) {
+  const parts = [neighbor.nodeType, `degree ${neighbor.degree}`];
+  if (neighbor.weight > 0) {
+    parts.push(`weight ${neighbor.weight.toFixed(2)}`);
+  }
+  return parts.join(" · ");
+}
+
 export const neighborhoodPanelPlugin: GraphPlugin = {
   id: "neighborhood-panel",
   mount: () => {},
@@ -32,6 +40,9 @@ export const neighborhoodPanelPlugin: GraphPlugin = {
         title: "Neighborhood",
         placement: "bottom",
         order: 20,
+        defaultOpen: false,
+        preferredWidth: 360,
+        preferredHeight: 260,
         content: <div style={emptyTextStyle}>Select a node to inspect its local neighborhood.</div>,
       };
     }
@@ -74,6 +85,9 @@ export const neighborhoodPanelPlugin: GraphPlugin = {
       title: "Neighborhood",
       placement: "bottom",
       order: 20,
+      defaultOpen: false,
+      preferredWidth: 360,
+      preferredHeight: 260,
       content: (
         <div style={panelBodyStyle}>
           <div style={panelEyebrowStyle}>{selected.label}</div>
@@ -98,10 +112,7 @@ export const neighborhoodPanelPlugin: GraphPlugin = {
                   />
                   <div style={{ minWidth: 0, flex: 1, textAlign: "left" }}>
                     <div style={rowTitleStyle}>{neighbor.label}</div>
-                    <div style={rowMetaStyle}>
-                      {neighbor.nodeType} · degree {neighbor.degree}
-                      {neighbor.weight > 0 ? ` · weight ${neighbor.weight.toFixed(2)}` : ""}
-                    </div>
+                    <div style={rowMetaStyle}>{formatNeighborMeta(neighbor)}</div>
                   </div>
                 </button>
               ))}

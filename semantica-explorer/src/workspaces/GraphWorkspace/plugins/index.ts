@@ -5,6 +5,7 @@ export type {
   GraphPlugin,
   GraphPluginActionRequest,
   GraphPluginContext,
+  GraphInspectorState,
   GraphPluginId,
   GraphPluginOverlayDescriptor,
   GraphPluginPanelDescriptor,

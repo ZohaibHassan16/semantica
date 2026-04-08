@@ -47,6 +47,7 @@ export interface GraphCanvasProps {
   onLayoutStatusChange?: (status: GraphLayoutStatus) => void;
   viewMode: GraphViewMode;
   className?: string;
+  showFitViewButton?: boolean;
   pluginOverlays?: ReactNode[];
   onPluginRuntimeChange?: (runtime: GraphPluginRuntime | null) => void;
   onInteractionStateChange?: (interactionState: GraphInteractionState) => void;
@@ -762,6 +763,7 @@ export const GraphCanvas = forwardRef<GraphCanvasHandle, GraphCanvasProps>(
       isLayoutRunning,
       viewMode,
       className,
+      showFitViewButton = true,
       pluginOverlays = [],
       onPluginRuntimeChange,
       onInteractionStateChange,
@@ -1226,29 +1228,31 @@ export const GraphCanvas = forwardRef<GraphCanvasHandle, GraphCanvasProps>(
             ))}
           </div>
         ) : null}
-        <button
-          id="graph-fit-view-btn"
-          onClick={handleFitView}
-          style={{
-            position: "absolute",
-            bottom: 24,
-            left: 24,
-            padding: "8px 16px",
-            background: "linear-gradient(135deg, rgba(27, 79, 170, 0.9), rgba(53, 123, 255, 0.84))",
-            color: "#fff",
-            border: `1px solid ${GRAPH_THEME.palette.background.shellBorder}`,
-            borderRadius: 10,
-            cursor: "pointer",
-            fontWeight: 700,
-            zIndex: 10,
-            backdropFilter: "blur(10px)",
-            boxShadow: `0 10px 28px ${GRAPH_THEME.palette.background.shellGlow}`,
-            fontSize: 12,
-            letterSpacing: "0.01em",
-          }}
-        >
-          Fit View
-        </button>
+        {showFitViewButton ? (
+          <button
+            id="graph-fit-view-btn"
+            onClick={handleFitView}
+            style={{
+              position: "absolute",
+              bottom: 24,
+              left: 24,
+              padding: "8px 16px",
+              background: "linear-gradient(135deg, rgba(27, 79, 170, 0.9), rgba(53, 123, 255, 0.84))",
+              color: "#fff",
+              border: `1px solid ${GRAPH_THEME.palette.background.shellBorder}`,
+              borderRadius: 10,
+              cursor: "pointer",
+              fontWeight: 700,
+              zIndex: 10,
+              backdropFilter: "blur(10px)",
+              boxShadow: `0 10px 28px ${GRAPH_THEME.palette.background.shellGlow}`,
+              fontSize: 12,
+              letterSpacing: "0.01em",
+            }}
+          >
+            Fit View
+          </button>
+        ) : null}
       </div>
     );
   }

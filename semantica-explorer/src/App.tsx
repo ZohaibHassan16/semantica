@@ -138,6 +138,20 @@ const shellStyles = `
     min-height: 68px;
   }
 
+  .workspace-header--compact {
+    min-height: 60px;
+    padding: 10px 18px;
+    background: linear-gradient(180deg, rgba(7, 17, 31, 0.92), rgba(7, 17, 31, 0.72));
+  }
+
+  .workspace-header--compact .workspace-title {
+    font-size: 16px;
+  }
+
+  .workspace-header--compact .workspace-subtitle {
+    font-size: 11px;
+  }
+
   .workspace-header-main {
     min-width: 0;
     display: flex;
@@ -260,16 +274,18 @@ function WorkspaceShell({
   title,
   subtitle,
   tabs,
+  compact = false,
   children,
 }: {
   title: string;
   subtitle?: string;
   tabs?: ReactNode;
+  compact?: boolean;
   children: ReactNode;
 }) {
   return (
     <section className="workspace-shell">
-      <header className="workspace-header">
+      <header className={`workspace-header${compact ? " workspace-header--compact" : ""}`}>
         <div className="workspace-header-main">
           <div className="workspace-kicker">Workspace</div>
           <div className="workspace-title-block">
@@ -299,7 +315,8 @@ export default function App() {
       return (
         <WorkspaceShell
           title="Explore"
-          subtitle="Browse the graph and switch views without leaving the workspace."
+          subtitle={exploreView === 'graph' ? undefined : "Browse the graph and switch views without leaving the workspace."}
+          compact
           tabs={
             <>
               <button className="workspace-tab" data-active={exploreView === 'graph'} onClick={() => setExploreView('graph')}>

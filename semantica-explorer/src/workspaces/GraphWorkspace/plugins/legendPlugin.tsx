@@ -46,6 +46,9 @@ export const legendPlugin: GraphPlugin = {
       title: "Legend",
       placement: "bottom",
       order: 10,
+      defaultOpen: false,
+      preferredWidth: 320,
+      preferredHeight: 220,
       content: (
         <div style={panelBodyStyle}>
           <div style={panelEyebrowStyle}>Semantic groups</div>

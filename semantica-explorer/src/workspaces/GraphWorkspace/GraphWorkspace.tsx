@@ -2,6 +2,7 @@
 
 import { batchMergeEdges, batchMergeNodes, graph } from "../../store/graphStore";
 import type { EdgeAttributes, NodeAttributes } from "../../store/graphStore";
+import { InspectorPanel, MetricChip, SurfaceCard } from "../../ui/primitives";
 import { GraphCanvas } from "./GraphCanvas";
 import type { GraphCanvasHandle, GraphViewMode } from "./GraphCanvas";
 import { TimelinePanel } from "./TimelinePanel";
@@ -48,6 +49,26 @@ type PathResponse = {
 type TemporalBounds = {
   min?: string | null;
   max?: string | null;
+};
+
+type ExploreLayoutState = {
+  showInspector: boolean;
+  showPluginDock: boolean;
+};
+
+type GraphToolbarItem = {
+  id: string;
+  label: string;
+  title?: string;
+  active?: boolean;
+  disabled?: boolean;
+  tone?: "primary" | "secondary";
+  onClick: () => void;
+};
+
+type GraphToolbarGroup = {
+  id: string;
+  items: GraphToolbarItem[];
 };
 
 const PROVENANCE_KEYS = ["source", "source_url", "pmid", "pmids", "evidence", "provenance", "confidence"] as const;
@@ -201,6 +222,151 @@ const HUD_CSS = `
     background: linear-gradient(90deg, rgba(74, 163, 255, 0.9), rgba(127, 208, 255, 0.95), rgba(242, 182, 109, 0.92));
     box-shadow: 0 0 28px rgba(74, 163, 255, 0.3);
     transition: width 180ms ease;
+  }
+  .explore-shell {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .explore-command-deck {
+    position: relative;
+    z-index: 3;
+  }
+  .explore-command-grid {
+    display: grid;
+    grid-template-columns: minmax(260px, 0.9fr) minmax(0, 1.4fr);
+    gap: 16px;
+  }
+  .explore-main-grid {
+    position: relative;
+    z-index: 3;
+    min-height: 0;
+    flex: 1;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(340px, 380px);
+    gap: 12px;
+  }
+  .explore-scene-stack {
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .explore-scene-card {
+    min-height: 0;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .explore-scene-shell {
+    position: relative;
+    min-height: 0;
+    flex: 1;
+    overflow: hidden;
+    border-radius: 20px 20px 0 0;
+  }
+  .explore-scene-stage {
+    position: relative;
+    z-index: 3;
+    width: 100%;
+    height: 100%;
+  }
+  .explore-scene-footer {
+    position: relative;
+    z-index: 3;
+    border-top: 1px solid rgba(112, 196, 255, 0.1);
+    background: linear-gradient(180deg, rgba(5, 11, 20, 0.94), rgba(5, 11, 20, 0.82));
+  }
+  .explore-plugin-dock {
+    position: relative;
+    z-index: 3;
+  }
+  .explore-plugin-dock-tabs {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .explore-plugin-dock-tab {
+    border: 1px solid rgba(127, 208, 255, 0.14);
+    background: rgba(255, 255, 255, 0.03);
+    color: #a9bfd7;
+    border-radius: 999px;
+    padding: 6px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .explore-plugin-dock-tab[data-active="true"] {
+    color: #eef6ff;
+    background: rgba(74, 163, 255, 0.16);
+    border-color: rgba(127, 208, 255, 0.28);
+  }
+  .explore-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .explore-toolbar-groups {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    flex: 1;
+    justify-content: flex-end;
+  }
+  .explore-toolbar-group {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 3px;
+    border-radius: 14px;
+    border: 1px solid rgba(127, 208, 255, 0.08);
+    background: rgba(255, 255, 255, 0.02);
+  }
+  .explore-search-results {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 260px;
+    overflow-y: auto;
+    padding-right: 4px;
+  }
+  .explore-inspector-shell {
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .explore-inspector-card {
+    min-height: 0;
+    flex: 1;
+    overflow: hidden;
+  }
+  .explore-inspector-scroll {
+    height: 100%;
+    overflow-y: auto;
+  }
+  @media (max-width: 1260px) {
+    .explore-main-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  @media (max-width: 980px) {
+    .explore-shell {
+      padding: 10px;
+      gap: 10px;
+    }
+    .explore-command-grid {
+      grid-template-columns: 1fr;
+    }
   }
 `;
 
@@ -714,6 +880,7 @@ export function GraphWorkspace() {
     "neighborhood-panel": false,
     "temporal-panel": false,
   });
+  const [activeDockPanelId, setActiveDockPanelId] = useState<string | null>(null);
   const [pluginRuntimeVersion, setPluginRuntimeVersion] = useState(0);
 
   const debouncedTime = useDebounce(scrubberTime, 150);
@@ -731,7 +898,7 @@ export function GraphWorkspace() {
   });
   const reload = useReloadGraph();
 
-  const { data: summary, isLoading, isFetching, isError, error } = useLoadGraph({
+  const { data: summary, isLoading, isFetching } = useLoadGraph({
     enabled: true,
     onGraphReady: () => {
       setIsLayoutRunning(true);
@@ -809,6 +976,8 @@ export function GraphWorkspace() {
   const focusNode = useCallback((nodeId: string) => {
     setSelectedNodeId(nodeId);
     setPathResult(null);
+    setSearchResults([]);
+    setSearchError("");
     if (nodeId) {
       setIsLayoutRunning(false);
     }
@@ -831,13 +1000,10 @@ export function GraphWorkspace() {
       }
       const data = await response.json();
       setSearchResults(data.results || []);
-      if (data.results?.length) {
-        focusNode(data.results[0].node.id);
-      }
     } catch (searchFetchError) {
       setSearchError(searchFetchError instanceof Error ? searchFetchError.message : "Search failed");
     }
-  }, [focusNode, searchQuery]);
+  }, [searchQuery]);
 
   const handleRunPredictions = useCallback(async () => {
     if (!selectedNodeId) return;
@@ -948,11 +1114,6 @@ export function GraphWorkspace() {
     };
   }, []);
 
-  const searchSummary = useMemo(() => {
-    if (!searchResults.length) return null;
-    return `${searchResults.length} search result${searchResults.length === 1 ? "" : "s"}`;
-  }, [searchResults.length]);
-
   const focusedSummary = useMemo(() => {
     if (!selectedNodeId || !graph.hasNode(selectedNodeId)) {
       return null;
@@ -1013,12 +1174,22 @@ export function GraphWorkspace() {
         setViewMode(action.viewMode);
         return;
       case "togglePanel":
-        setPluginPanelState((current) => ({
-          ...current,
-          [action.panelId]: !current[action.panelId],
-        }));
+        setPluginPanelState((current) => {
+          const nextOpen = !current[action.panelId];
+          setActiveDockPanelId((previous) => {
+            if (nextOpen) {
+              return action.panelId;
+            }
+            return previous === action.panelId ? null : previous;
+          });
+          return {
+            ...current,
+            [action.panelId]: nextOpen,
+          };
+        });
         return;
       case "openPanel":
+        setActiveDockPanelId(action.panelId);
         setPluginPanelState((current) => ({
           ...current,
           [action.panelId]: true,
@@ -1029,6 +1200,7 @@ export function GraphWorkspace() {
           ...current,
           [action.panelId]: false,
         }));
+        setActiveDockPanelId((previous) => (previous === action.panelId ? null : previous));
         return;
     }
   }, [focusNode]);
@@ -1046,11 +1218,15 @@ export function GraphWorkspace() {
     theme: GRAPH_THEME,
     getInteractionState: () => pluginInteractionStateRef.current,
     getSelectedNodeState: () => selectedNodeState,
+    getInspectorState: () => ({
+      selectedNodeId: selectedNodeId || null,
+      ownsSelectionDetails: true,
+    }),
     getGraphSummary: () => graphSummary,
     getTemporalState: () => temporalState,
     isPanelOpen: (panelId: string) => Boolean(pluginPanelState[panelId]),
     dispatchAction: handlePluginAction,
-  }), [graphSummary, handlePluginAction, pluginPanelState, selectedNodeState, temporalState]);
+  }), [graphSummary, handlePluginAction, pluginPanelState, selectedNodeId, selectedNodeState, temporalState]);
 
   const handlePluginRuntimeChange = useCallback((runtime: GraphPluginRuntime | null) => {
     pluginRuntimeRef.current = runtime;
@@ -1106,260 +1282,296 @@ export function GraphWorkspace() {
     () => collectPluginOverlays(activePlugins, pluginContext),
     [activePlugins, pluginContext],
   );
-  const sidePluginPanels = pluginPanels.filter((panel) => panel.placement === "side");
-  const bottomPluginPanels = pluginPanels.filter((panel) => panel.placement === "bottom");
+  const dockPanels = pluginPanels.filter((panel) => panel.placement === "bottom" || panel.placement === "side");
+  const openDockPanels = dockPanels.filter((panel) => pluginPanelState[panel.id]);
+  const activeDockPanel =
+    openDockPanels.find((panel) => panel.id === activeDockPanelId)
+    ?? openDockPanels[0]
+    ?? null;
+  const layoutState: ExploreLayoutState = {
+    showInspector: Boolean(selectedNodeId),
+    showPluginDock: openDockPanels.length > 0,
+  };
+
+  useEffect(() => {
+    if (!openDockPanels.length) {
+      setActiveDockPanelId(null);
+      return;
+    }
+
+    if (!activeDockPanelId || !openDockPanels.some((panel) => panel.id === activeDockPanelId)) {
+      setActiveDockPanelId(openDockPanels[0].id);
+    }
+  }, [activeDockPanelId, openDockPanels]);
+
+  const coreToolbarGroups = useMemo<GraphToolbarGroup[]>(() => {
+    const groups: GraphToolbarGroup[] = [];
+
+    if (selectedNodeId) {
+      groups.push({
+        id: "view-mode",
+        items: [
+          {
+            id: "view-focused",
+            label: "Focused",
+            title: "Inspect the selected node in a focused local graph",
+            active: viewMode === "focused",
+            onClick: () => setViewMode("focused"),
+          },
+          {
+            id: "view-full",
+            label: "Full Graph",
+            title: "Return to the full graph context",
+            active: viewMode === "full",
+            onClick: () => setViewMode("full"),
+          },
+        ],
+      });
+    }
+
+    groups.push({
+      id: "graph-actions",
+      items: [
+        {
+          id: "search-submit",
+          label: "Search",
+          title: "Search for the current query",
+          tone: "primary",
+          disabled: showLoadingOverlay || !searchQuery.trim(),
+          onClick: () => void handleSearch(),
+        },
+        {
+          id: "fit-view",
+          label: "Fit View",
+          title: "Reset the camera to the current view",
+          onClick: () => canvasRef.current?.fitView(),
+        },
+        {
+          id: "layout-toggle",
+          label: isLayoutRunning ? "Pause Layout" : "Run Layout",
+          title: "Toggle the layout worker",
+          active: isLayoutRunning,
+          disabled: showLoadingOverlay,
+          onClick: () => setIsLayoutRunning((value) => !value),
+        },
+        {
+          id: "reload",
+          label: "Reload",
+          title: "Reload the graph data",
+          disabled: showLoadingOverlay,
+          onClick: reload,
+        },
+      ],
+    });
+
+    if (pluginToolbarItems.length) {
+      groups.push({
+        id: "plugin-tools",
+        items: pluginToolbarItems.map((item) => ({
+          id: item.id,
+          label: item.label,
+          title: item.title,
+          active: item.active,
+          onClick: item.onClick,
+        })),
+      });
+    }
+
+    return groups;
+  }, [isLayoutRunning, pluginToolbarItems, reload, searchQuery, selectedNodeId, showLoadingOverlay, viewMode]);
 
   return (
-    <div className="palantir-bg" style={{ position: "relative", width: "100%", height: "100%", overflow: "hidden", display: "flex", flexDirection: "column" }}>
+    <div className="palantir-bg" style={{ position: "relative", width: "100%", height: "100%", overflow: "hidden" }}>
       <style>{HUD_CSS}</style>
       <div className="palantir-grid" />
       <div className="palantir-vignette" />
 
-      <div style={{ flex: 1, position: "relative", zIndex: 3, minHeight: 0 }}>
-        <GraphCanvas
-          ref={canvasRef}
-          onNodeClick={focusNode}
-          selectedNodeId={selectedNodeId}
-          activePath={activePath}
-          isLayoutRunning={isLayoutRunning}
-          viewMode={viewMode}
-          pluginOverlays={pluginOverlays.map((overlay) => overlay.element)}
-          onPluginRuntimeChange={handlePluginRuntimeChange}
-          onInteractionStateChange={handleInteractionStateChange}
-        />
-        {showLoadingOverlay ? (
-          <LoadingOverlay progress={loadingProgress} showGraphBehind={hasGraphContent} />
-        ) : null}
-      </div>
-
-      <TimelinePanel
-        onTimeChange={setScrubberTime}
-        minDate={temporalBounds?.min ?? undefined}
-        maxDate={temporalBounds?.max ?? undefined}
-      />
-
-      <div style={{ position: "absolute", inset: 0, pointerEvents: "none", zIndex: 10 }}>
-        <header className="glass-header" style={{ pointerEvents: "auto", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 24px", gap: 20 }}>
-          <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
-            {showLoadingOverlay && loadingProgress ? (
-              <span style={{ color: "rgba(127, 208, 255, 0.9)", fontSize: 13 }}>{phaseLabel(loadingProgress.phase)}</span>
-            ) : null}
-            {summary ? (
-              <span style={metricPillStyle}>
-                {summary.nodeCount.toLocaleString()} nodes · {summary.edgeCount.toLocaleString()} edges
-              </span>
-            ) : null}
-            {activeNodeCount !== null ? (
-              <span style={{ ...metricPillStyle, color: "#3fb950", borderColor: "rgba(63, 185, 80, 0.25)" }}>
-                {activeNodeCount.toLocaleString()} active at selected time
-              </span>
-            ) : null}
-            {searchSummary ? <span style={metricPillStyle}>{searchSummary}</span> : null}
-            {focusedSummary ? (
-              <span style={{ ...metricPillStyle, color: "#f2b66d", borderColor: "rgba(242, 182, 109, 0.24)" }}>
-                {focusedSummary}
-              </span>
-            ) : null}
-            {isError ? <span style={{ color: "#ff7b72", fontSize: 13 }}>{(error as Error).message}</span> : null}
-          </div>
-
-          <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap", justifyContent: "flex-end" }}>
-            {selectedNodeId ? (
-              <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                <button
-                  onClick={() => setViewMode("focused")}
-                  style={{
-                    ...actionButtonStyle,
-                    background: viewMode === "focused" ? "rgba(31, 111, 235, 0.38)" : actionButtonStyle.background,
-                    borderColor: viewMode === "focused" ? "rgba(127, 208, 255, 0.42)" : "rgba(88, 166, 255, 0.3)",
-                  }}
-                  title="Inspect the selected node in a local focused graph"
-                >
-                  Focused View
-                </button>
-                <button
-                  onClick={() => setViewMode("full")}
-                  style={{
-                    ...actionButtonStyle,
-                    background: viewMode === "full" ? "rgba(31, 111, 235, 0.38)" : actionButtonStyle.background,
-                    borderColor: viewMode === "full" ? "rgba(127, 208, 255, 0.42)" : "rgba(88, 166, 255, 0.3)",
-                  }}
-                >
-                  Full Graph
-                </button>
-              </div>
-            ) : null}
-            <input
-              value={searchQuery}
-              onChange={(event) => setSearchQuery(event.target.value)}
-              onKeyDown={(event) => {
-                if (event.key === "Enter") {
-                  void handleSearch();
-                }
-              }}
-              placeholder="Search a node, e.g. Metformin"
-              style={{ ...inputStyle, minWidth: 280, margin: 0 }}
-            />
-            <button onClick={() => void handleSearch()} style={actionButtonStyle} disabled={showLoadingOverlay}>Search</button>
-            <button onClick={() => setIsLayoutRunning((value) => !value)} style={actionButtonStyle} disabled={showLoadingOverlay}>
-              {isLayoutRunning ? "Pause Layout" : "Run Layout"}
-            </button>
-            <button onClick={reload} style={actionButtonStyle} disabled={showLoadingOverlay}>Reload</button>
-            {pluginToolbarItems.length ? (
-              <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
-                {pluginToolbarItems.map((item) => (
-                  <button
-                    key={item.id}
-                    onClick={item.onClick}
-                    title={item.title}
-                      style={{
-                        ...secondaryActionButtonStyle,
-                        background: item.active ? "rgba(31, 111, 235, 0.28)" : secondaryActionButtonStyle.background,
-                        borderColor: item.active ? "rgba(127, 208, 255, 0.35)" : "rgba(255, 255, 255, 0.08)",
-                        color: item.active ? "#e6f2ff" : secondaryActionButtonStyle.color,
+      <div className="explore-shell">
+        <section className="explore-command-deck">
+          <SurfaceCard tone="subtle">
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              <div className="explore-toolbar">
+                <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+                  {showLoadingOverlay && loadingProgress ? (
+                    <MetricChip>{phaseLabel(loadingProgress.phase)}</MetricChip>
+                  ) : null}
+                  {summary ? (
+                    <MetricChip>{summary.nodeCount.toLocaleString()} nodes · {summary.edgeCount.toLocaleString()} edges</MetricChip>
+                  ) : null}
+                  {activeNodeCount !== null ? (
+                    <MetricChip tone="success">{activeNodeCount.toLocaleString()} active</MetricChip>
+                  ) : null}
+                  {focusedSummary ? <MetricChip tone="warm">{focusedSummary}</MetricChip> : null}
+                </div>
+                <div className="explore-toolbar-groups">
+                  <div style={{ minWidth: 280, flex: "1 1 320px" }}>
+                    <input
+                      value={searchQuery}
+                      onChange={(event) => setSearchQuery(event.target.value)}
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter") {
+                          void handleSearch();
+                        }
                       }}
-                    >
-                      {item.label}
-                  </button>
-                ))}
+                      placeholder="Search a node, e.g. Metformin"
+                      style={{ ...inputStyle, margin: 0, minHeight: 38 }}
+                    />
+                  </div>
+                  {coreToolbarGroups.map((group) => (
+                    <div key={group.id} className="explore-toolbar-group">
+                      {group.items.map((item) => {
+                        const baseStyle = item.tone === "primary" ? actionButtonStyle : secondaryActionButtonStyle;
+                        return (
+                          <button
+                            key={item.id}
+                            onClick={item.onClick}
+                            title={item.title}
+                            disabled={item.disabled}
+                            style={{
+                              ...baseStyle,
+                              minHeight: 36,
+                              padding: "8px 12px",
+                              background: item.active
+                                ? "rgba(31, 111, 235, 0.28)"
+                                : baseStyle.background,
+                              border: item.active
+                                ? "1px solid rgba(127, 208, 255, 0.35)"
+                                : baseStyle.border,
+                              color: item.active ? "#e6f2ff" : baseStyle.color,
+                              boxShadow: item.active ? `0 0 0 1px rgba(127, 208, 255, 0.12)` : baseStyle.boxShadow,
+                            }}
+                          >
+                            {item.label}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  ))}
+                </div>
               </div>
-            ) : null}
-          </div>
-        </header>
 
-        {searchError ? (
-          <div style={{ position: "absolute", top: 70, left: 24, color: "#ff7b72", fontSize: 12, pointerEvents: "auto" }}>
-            {searchError}
-          </div>
-        ) : null}
+              {searchError ? <div style={{ color: "#ff7b72", fontSize: 12 }}>{searchError}</div> : null}
 
-        {searchResults.length ? (
-          <div
-            className="glass-hud hud-scrollbar"
-            style={{ position: "absolute", top: 72, left: 24, width: 320, maxHeight: 280, overflowY: "auto", pointerEvents: "auto", borderRadius: 12, border: "1px solid rgba(88, 166, 255, 0.14)", padding: 12 }}
-          >
-            <div style={{ color: "#8b949e", fontSize: 12, marginBottom: 8 }}>Search results</div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-              {searchResults.map((result) => (
-                <button key={result.node.id} style={predictionCardStyle} onClick={() => focusNode(result.node.id)}>
-                  <div style={{ color: "#fff", fontWeight: 600 }}>{result.node.content || result.node.id}</div>
-                  <div style={{ color: "#8b949e", fontSize: 12 }}>{result.node.type}</div>
-                  <div style={{ color: "#58a6ff", fontSize: 12, marginTop: 4 }}>score {result.score.toFixed(3)}</div>
-                </button>
-              ))}
+              {searchResults.length ? (
+                <div className="explore-search-results hud-scrollbar" style={searchResultsStripStyle}>
+                  {searchResults.map((result) => (
+                    <button key={result.node.id} style={predictionCardStyle} onClick={() => focusNode(result.node.id)}>
+                      <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
+                        <div style={{ minWidth: 0 }}>
+                          <div style={{ color: "#fff", fontWeight: 600 }}>{result.node.content || result.node.id}</div>
+                          <div style={{ color: "#8b949e", fontSize: 12 }}>{result.node.type}</div>
+                        </div>
+                        <div style={{ color: "#58a6ff", fontSize: 12, whiteSpace: "nowrap" }}>
+                          {result.score.toFixed(3)}
+                        </div>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              ) : null}
             </div>
-          </div>
-        ) : null}
-
-        {sidePluginPanels.length ? (
-          <div
-            className="glass-hud hud-scrollbar"
-            style={{
-              pointerEvents: "auto",
-              position: "absolute",
-              left: 24,
-              top: searchResults.length ? 370 : 72,
-              width: 320,
-              maxHeight: selectedNodeId ? 280 : 340,
-              overflowY: "auto",
-              borderRadius: 14,
-              border: "1px solid rgba(88, 166, 255, 0.14)",
-              padding: 12,
-              display: "flex",
-              flexDirection: "column",
-              gap: 12,
-            }}
-          >
-            {sidePluginPanels.map((panel) => (
-              <div key={panel.id} style={pluginPanelCardStyle}>
-                <div style={pluginPanelTitleStyle}>{panel.title}</div>
-                {panel.content}
-              </div>
-            ))}
-          </div>
-        ) : null}
-
-        {bottomPluginPanels.length ? (
-          <div
-            style={{
-              position: "absolute",
-              left: 24,
-              bottom: 104,
-              width: 340,
-              display: "flex",
-              flexDirection: "column",
-              gap: 12,
-              pointerEvents: "auto",
-            }}
-          >
-            {bottomPluginPanels.map((panel) => (
-              <div key={panel.id} className="glass-hud" style={{ ...pluginPanelCardStyle, padding: 14 }}>
-                <div style={pluginPanelTitleStyle}>{panel.title}</div>
-                {panel.content}
-              </div>
-            ))}
-          </div>
-        ) : null}
+          </SurfaceCard>
+        </section>
 
         <div
-          className="glass-hud hud-scrollbar"
+          className="explore-main-grid"
           style={{
-            pointerEvents: "auto",
-            position: "absolute",
-            right: 0,
-            top: 52,
-            bottom: 90,
-            width: 380,
-            overflowY: "auto",
-            transition: "transform 0.3s cubic-bezier(0.16,1,0.3,1)",
-            transform: selectedNodeId ? "translateX(0)" : "translateX(100%)",
+            gridTemplateColumns: layoutState.showInspector ? "minmax(0, 1fr) minmax(320px, 360px)" : "minmax(0, 1fr)",
           }}
         >
-          <NodePanel
-            nodeId={selectedNodeId}
-            predictions={predictions}
-            predictionType={predictionType}
-            onPredictionTypeChange={setPredictionType}
-            onRunPredictions={() => void handleRunPredictions()}
-            pathTargetId={pathTargetId}
-            onPathTargetChange={setPathTargetId}
-            onTracePath={() => void handleTracePath()}
-            pathResult={pathResult}
-            onDownloadProvenance={(format) => void handleDownloadProvenance(format)}
-          />
+          <div className="explore-scene-stack">
+            <SurfaceCard padding="none" className="explore-scene-card">
+              <div className="explore-scene-shell">
+                <div className="palantir-grid" />
+                <div className="palantir-vignette" />
+                <div className="explore-scene-stage">
+                  <GraphCanvas
+                    ref={canvasRef}
+                    onNodeClick={focusNode}
+                    selectedNodeId={selectedNodeId}
+                    activePath={activePath}
+                    isLayoutRunning={isLayoutRunning}
+                    viewMode={viewMode}
+                    showFitViewButton={false}
+                    pluginOverlays={pluginOverlays.map((overlay) => overlay.element)}
+                    onPluginRuntimeChange={handlePluginRuntimeChange}
+                    onInteractionStateChange={handleInteractionStateChange}
+                  />
+                  {showLoadingOverlay ? (
+                    <LoadingOverlay progress={loadingProgress} showGraphBehind={hasGraphContent} />
+                  ) : null}
+                </div>
+              </div>
+
+              {layoutState.showPluginDock ? (
+                <div className="explore-plugin-dock">
+                  <SurfaceCard tone="subtle" style={{ borderRadius: 0, borderLeft: "none", borderRight: "none", borderBottom: "none" }}>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center" }}>
+                        <div className="explore-plugin-dock-tabs">
+                          {openDockPanels.map((panel) => (
+                            <button
+                              key={panel.id}
+                              className="explore-plugin-dock-tab"
+                              data-active={activeDockPanel?.id === panel.id}
+                              onClick={() => setActiveDockPanelId(panel.id)}
+                            >
+                              {panel.title}
+                            </button>
+                          ))}
+                          {activeDockPanel ? (
+                            <button
+                              className="explore-plugin-dock-tab"
+                              onClick={() => handlePluginAction({ type: "closePanel", panelId: activeDockPanel.id })}
+                            >
+                              ×
+                            </button>
+                          ) : null}
+                        </div>
+                      </div>
+                      {activeDockPanel ? (
+                        <div style={pluginDockContentStyle}>{activeDockPanel.content}</div>
+                      ) : null}
+                    </div>
+                  </SurfaceCard>
+                </div>
+              ) : null}
+
+              <div className="explore-scene-footer">
+                <TimelinePanel
+                  onTimeChange={setScrubberTime}
+                  minDate={temporalBounds?.min ?? undefined}
+                  maxDate={temporalBounds?.max ?? undefined}
+                />
+              </div>
+            </SurfaceCard>
+          </div>
+
+          {layoutState.showInspector ? (
+            <div className="explore-inspector-shell">
+              <InspectorPanel open={layoutState.showInspector} className="explore-inspector-card">
+                <div className="explore-inspector-scroll hud-scrollbar">
+                  <NodePanel
+                    nodeId={selectedNodeId}
+                    predictions={predictions}
+                    predictionType={predictionType}
+                    onPredictionTypeChange={setPredictionType}
+                    onRunPredictions={() => void handleRunPredictions()}
+                    pathTargetId={pathTargetId}
+                    onPathTargetChange={setPathTargetId}
+                    onTracePath={() => void handleTracePath()}
+                    pathResult={pathResult}
+                    onDownloadProvenance={(format) => void handleDownloadProvenance(format)}
+                  />
+                </div>
+              </InspectorPanel>
+            </div>
+          ) : null}
         </div>
       </div>
     </div>
   );
 }
-
-const metricPillStyle: React.CSSProperties = {
-  background: "rgba(77, 157, 255, 0.09)",
-  color: "#7fc6ff",
-  padding: "4px 10px",
-  borderRadius: 999,
-  fontSize: 11,
-  border: `1px solid ${GRAPH_THEME.palette.background.shellBorder}`,
-  backdropFilter: "blur(8px)",
-};
-
-const sectionStyle: React.CSSProperties = {
-  display: "flex",
-  flexDirection: "column",
-  gap: 10,
-  padding: 14,
-  background: "linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.015))",
-  border: "1px solid rgba(255, 255, 255, 0.06)",
-  borderRadius: 14,
-};
-
-const sectionTitleStyle: React.CSSProperties = {
-  color: "#8b949e",
-  fontSize: 11,
-  fontWeight: 700,
-  textTransform: "uppercase",
-  letterSpacing: "0.08em",
-};
 
 const inputStyle: React.CSSProperties = {
   width: "100%",
@@ -1434,23 +1646,37 @@ const subtleChipStyle: React.CSSProperties = {
   border: "1px solid rgba(255, 255, 255, 0.06)",
 };
 
-const pluginPanelCardStyle: React.CSSProperties = {
-  borderRadius: 14,
-  border: "1px solid rgba(88, 166, 255, 0.14)",
-  background: "linear-gradient(180deg, rgba(7, 14, 25, 0.76), rgba(10, 18, 31, 0.66))",
-  boxShadow: "0 14px 38px rgba(0, 0, 0, 0.24)",
-  padding: 14,
+const sectionStyle: React.CSSProperties = {
   display: "flex",
   flexDirection: "column",
-  gap: 12,
+  gap: 10,
+  padding: 14,
+  background: "linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.015))",
+  border: "1px solid rgba(255, 255, 255, 0.06)",
+  borderRadius: 14,
 };
 
-const pluginPanelTitleStyle: React.CSSProperties = {
-  color: "#f3f7fd",
-  fontSize: 12,
+const sectionTitleStyle: React.CSSProperties = {
+  color: "#8b949e",
+  fontSize: 11,
   fontWeight: 700,
-  letterSpacing: "0.08em",
   textTransform: "uppercase",
+  letterSpacing: "0.08em",
+};
+
+const pluginDockContentStyle: React.CSSProperties = {
+  borderRadius: 16,
+  border: "1px solid rgba(255, 255, 255, 0.06)",
+  background: "rgba(255, 255, 255, 0.02)",
+  padding: 14,
+};
+
+const searchResultsStripStyle: React.CSSProperties = {
+  display: "grid",
+  gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+  gap: 10,
+  maxHeight: 186,
+  overflowY: "auto",
 };
 
 const loadingMetricStyle: React.CSSProperties = {
