@@ -6,6 +6,7 @@ import type { GraphCanvasHandle, GraphViewMode } from "./GraphCanvas";
 import { TimelinePanel } from "./TimelinePanel";
 import { useLoadGraph, useReloadGraph } from "./useLoadGraph";
 import type { GraphLoadProgress } from "./useLoadGraph";
+import { GRAPH_THEME, withAlpha } from "./graphTheme";
 
 type SearchResult = {
   node: {
@@ -45,37 +46,39 @@ function useDebounce<T>(value: T, delay: number): T {
 
 const HUD_CSS = `
   .palantir-bg {
-    background: radial-gradient(ellipse at center, #0d1117 0%, #010409 100%);
+    background:
+      radial-gradient(circle at top, rgba(77, 157, 255, 0.08), transparent 22%),
+      linear-gradient(180deg, #060b17 0%, #02060d 100%);
   }
   .palantir-grid {
     position: absolute;
     inset: 0;
     background-image:
-      linear-gradient(rgba(88, 166, 255, 0.05) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(88, 166, 255, 0.05) 1px, transparent 1px);
-    background-size: 40px 40px;
+      linear-gradient(rgba(88, 166, 255, 0.038) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(88, 166, 255, 0.038) 1px, transparent 1px);
+    background-size: 42px 42px;
     pointer-events: none;
     z-index: 1;
   }
   .palantir-vignette {
     position: absolute;
     inset: 0;
-    background: radial-gradient(ellipse at center, transparent 30%, rgba(1, 4, 9, 0.85) 100%);
+    background: radial-gradient(ellipse at center, transparent 34%, rgba(1, 4, 10, 0.78) 100%);
     pointer-events: none;
     z-index: 2;
   }
   .glass-header {
-    background: linear-gradient(180deg, rgba(13, 17, 23, 0.95) 0%, rgba(13, 17, 23, 0.72) 100%);
-    border-bottom: 1px solid rgba(88, 166, 255, 0.1);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    background: linear-gradient(180deg, rgba(7, 14, 25, 0.88) 0%, rgba(10, 18, 31, 0.62) 100%);
+    border-bottom: 1px solid rgba(112, 196, 255, 0.1);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
   }
   .glass-hud {
-    background: linear-gradient(135deg, rgba(13, 17, 23, 0.82), rgba(22, 27, 34, 0.66));
-    backdrop-filter: blur(16px) saturate(1.15);
-    -webkit-backdrop-filter: blur(16px) saturate(1.15);
-    border-left: 1px solid rgba(88, 166, 255, 0.2);
-    box-shadow: -8px 0 32px rgba(0, 0, 0, 0.5), inset 1px 0 0 rgba(255, 255, 255, 0.05);
+    background: linear-gradient(135deg, rgba(8, 15, 27, 0.76), rgba(10, 19, 32, 0.58));
+    backdrop-filter: blur(14px) saturate(1.08);
+    -webkit-backdrop-filter: blur(14px) saturate(1.08);
+    border-left: 1px solid rgba(112, 196, 255, 0.14);
+    box-shadow: -10px 0 28px rgba(0, 0, 0, 0.34), inset 1px 0 0 rgba(255, 255, 255, 0.04);
   }
   .hud-scrollbar::-webkit-scrollbar { width: 6px; }
   .hud-scrollbar::-webkit-scrollbar-track { background: transparent; }
@@ -713,7 +716,17 @@ export function GraphWorkspace() {
                 valid_until: payload.properties?.valid_until ?? null,
                 properties: payload.properties || {},
                 size: 8,
-                color: "#f2b66d",
+                baseSize: 8,
+                semanticGroup: payload.type || "inferred",
+                color: GRAPH_THEME.palette.accent.path,
+                baseColor: GRAPH_THEME.palette.accent.path,
+                mutedColor: withAlpha(GRAPH_THEME.palette.accent.path, GRAPH_THEME.nodes.mutedAlpha),
+                glowColor: withAlpha(GRAPH_THEME.palette.accent.path, 0.36),
+                visualPriority: 0.82,
+                labelPriority: 0.82,
+                strokeColor: GRAPH_THEME.palette.background.nodeBorder,
+                borderColor: GRAPH_THEME.palette.background.nodeBorder,
+                borderSize: 0.85,
               },
             },
           ]);
@@ -729,7 +742,21 @@ export function GraphWorkspace() {
                 edgeType: payload.type,
                 properties: payload.properties || {},
                 size: 1,
-                color: payload.properties?.inferred ? "#f2b66d" : "#444C56",
+                baseSize: 1,
+                color: payload.properties?.inferred ? GRAPH_THEME.palette.accent.path : GRAPH_THEME.palette.muted.edgeStructure,
+                baseColor: payload.properties?.inferred ? GRAPH_THEME.palette.accent.path : GRAPH_THEME.palette.muted.edgeStructure,
+                mutedColor: GRAPH_THEME.palette.muted.edgeOverview,
+                visualPriority: payload.properties?.inferred ? 0.95 : 0.5,
+                isBidirectional: graph.hasDirectedEdge(payload.target_id, payload.source_id),
+                edgeFamily: payload.properties?.inferred
+                  ? "path"
+                  : graph.hasDirectedEdge(payload.target_id, payload.source_id)
+                    ? "bidirectional"
+                    : "line",
+                curveGroup: graph.hasDirectedEdge(payload.target_id, payload.source_id)
+                  ? [payload.source_id, payload.target_id].sort().join("::")
+                  : null,
+                type: payload.properties?.inferred ? "arrow" : "line",
               },
             },
           ]);
@@ -766,6 +793,7 @@ export function GraphWorkspace() {
 
   const showLoadingOverlay = isLoading || isFetching;
   const hasGraphContent = Boolean(summary?.nodeCount);
+  const activePath = pathResult?.path ?? [];
 
   return (
     <div className="palantir-bg" style={{ position: "relative", width: "100%", height: "100%", overflow: "hidden", display: "flex", flexDirection: "column" }}>
@@ -778,6 +806,7 @@ export function GraphWorkspace() {
           ref={canvasRef}
           onNodeClick={focusNode}
           selectedNodeId={selectedNodeId}
+          activePath={activePath}
           isLayoutRunning={isLayoutRunning}
           viewMode={viewMode}
         />
@@ -852,7 +881,7 @@ export function GraphWorkspace() {
                 }
               }}
               placeholder="Search a node, e.g. Metformin"
-              style={{ ...inputStyle, minWidth: 260, margin: 0 }}
+              style={{ ...inputStyle, minWidth: 280, margin: 0 }}
             />
             <button onClick={() => void handleSearch()} style={actionButtonStyle} disabled={showLoadingOverlay}>Search</button>
             <button onClick={() => setIsLayoutRunning((value) => !value)} style={actionButtonStyle} disabled={showLoadingOverlay}>
@@ -919,12 +948,13 @@ export function GraphWorkspace() {
 }
 
 const metricPillStyle: React.CSSProperties = {
-  background: "rgba(88, 166, 255, 0.1)",
-  color: "#58a6ff",
+  background: "rgba(77, 157, 255, 0.09)",
+  color: "#7fc6ff",
   padding: "4px 10px",
   borderRadius: 999,
-  fontSize: 12,
-  border: "1px solid rgba(88, 166, 255, 0.2)",
+  fontSize: 11,
+  border: `1px solid ${GRAPH_THEME.palette.background.shellBorder}`,
+  backdropFilter: "blur(8px)",
 };
 
 const sectionStyle: React.CSSProperties = {
@@ -932,9 +962,9 @@ const sectionStyle: React.CSSProperties = {
   flexDirection: "column",
   gap: 10,
   padding: 14,
-  background: "rgba(0, 0, 0, 0.16)",
-  border: "1px solid rgba(255, 255, 255, 0.05)",
-  borderRadius: 12,
+  background: "linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.015))",
+  border: "1px solid rgba(255, 255, 255, 0.06)",
+  borderRadius: 14,
 };
 
 const sectionTitleStyle: React.CSSProperties = {
@@ -947,26 +977,28 @@ const sectionTitleStyle: React.CSSProperties = {
 
 const inputStyle: React.CSSProperties = {
   width: "100%",
-  background: "rgba(0, 0, 0, 0.28)",
-  border: "1px solid rgba(88, 166, 255, 0.2)",
-  color: "#fff",
-  borderRadius: 10,
-  padding: "10px 12px",
+  background: "rgba(4, 10, 18, 0.5)",
+  border: `1px solid ${GRAPH_THEME.palette.background.shellBorder}`,
+  color: "#edf5ff",
+  borderRadius: 12,
+  padding: "11px 13px",
   fontSize: 13,
+  boxShadow: "inset 0 1px 0 rgba(255,255,255,0.03)",
 };
 
 const actionButtonStyle: React.CSSProperties = {
-  background: "rgba(31, 111, 235, 0.2)",
+  background: "linear-gradient(135deg, rgba(24, 63, 133, 0.42), rgba(35, 85, 176, 0.28))",
   color: "#fff",
-  border: "1px solid rgba(88, 166, 255, 0.3)",
-  borderRadius: 10,
+  border: `1px solid ${GRAPH_THEME.palette.background.shellBorder}`,
+  borderRadius: 12,
   padding: "9px 12px",
   cursor: "pointer",
-  fontWeight: 600,
+  fontWeight: 700,
   fontSize: 12,
   display: "inline-flex",
   alignItems: "center",
   justifyContent: "center",
+  boxShadow: `0 8px 22px ${GRAPH_THEME.palette.background.shellGlow}`,
 };
 
 const secondaryActionButtonStyle: React.CSSProperties = {
@@ -974,7 +1006,7 @@ const secondaryActionButtonStyle: React.CSSProperties = {
   background: "rgba(255, 255, 255, 0.03)",
   border: "1px solid rgba(255, 255, 255, 0.08)",
   color: "#c6d4e3",
-  fontWeight: 500,
+  fontWeight: 600,
 };
 
 const predictionCardStyle: React.CSSProperties = {

@@ -16,6 +16,16 @@ export interface NodeAttributes {
   y: number;
   size: number;
   color: string;
+  baseColor?: string;
+  mutedColor?: string;
+  glowColor?: string;
+  baseSize?: number;
+  visualPriority?: number;
+  labelPriority?: number;
+  semanticGroup?: string;
+  strokeColor?: string;
+  borderColor?: string;
+  borderSize?: number;
   highlighted?: boolean;
 
   nodeType: string;
@@ -28,7 +38,15 @@ export interface NodeAttributes {
 export interface EdgeAttributes {
  
   size?: number;
+  baseSize?: number;
   color?: string;
+  baseColor?: string;
+  mutedColor?: string;
+  type?: string;
+  visualPriority?: number;
+  edgeFamily?: "line" | "parallel" | "bidirectional" | "path";
+  isBidirectional?: boolean;
+  curveGroup?: string | null;
   
  
   edgeType: string;

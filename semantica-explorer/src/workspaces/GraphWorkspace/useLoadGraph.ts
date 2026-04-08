@@ -1,21 +1,7 @@
 ﻿import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { batchMergeEdges, batchMergeNodes, clearGraph } from "../../store/graphStore";
 import type { EdgeAttributes, NodeAttributes } from "../../store/graphStore";
-
-const GRAPH_PALETTE = [
-  "#61afef",
-  "#56b6c2",
-  "#98c379",
-  "#e5c07b",
-  "#d19a66",
-  "#e06c75",
-  "#c678dd",
-  "#7aa2f7",
-  "#4fd1c5",
-  "#f59e0b",
-  "#fb7185",
-  "#a3e635",
-];
+import { GRAPH_THEME, clamp, darkenHex, hashString, withAlpha } from "./graphTheme";
 
 const SEMANTIC_COLOR_FIELDS = [
   "community",
@@ -28,15 +14,6 @@ const SEMANTIC_COLOR_FIELDS = [
   "source",
   "nodeType",
 ] as const;
-
-const hashCategory = (value: string): number => {
-  let hash = 0;
-  for (let index = 0; index < value.length; index += 1) {
-    hash = (hash << 5) - hash + value.charCodeAt(index);
-    hash |= 0;
-  }
-  return Math.abs(hash);
-};
 
 function getSemanticFieldValue(attributes: NodeAttributes, field: (typeof SEMANTIC_COLOR_FIELDS)[number]): string | null {
   if (field === "nodeType") {
@@ -90,7 +67,7 @@ function chooseColorAccessor(
     const coverage = covered / nodes.length;
     const dominantRatio = Math.max(...countValues) / covered;
     const entropy = normalizedEntropy(countValues, covered);
-    const diversity = Math.min(uniqueCount, GRAPH_PALETTE.length) / GRAPH_PALETTE.length;
+    const diversity = Math.min(uniqueCount, GRAPH_THEME.palette.semantic.length) / GRAPH_THEME.palette.semantic.length;
     const score = entropy * 0.65 + diversity * 0.2 + coverage * 0.15;
 
     const isInformative =
@@ -117,7 +94,7 @@ function chooseColorAccessor(
 }
 
 function structuralColorKey(nodeId: string, attributes: NodeAttributes): string {
-  const shard = hashCategory(nodeId) % GRAPH_PALETTE.length;
+  const shard = hashString(nodeId) % GRAPH_THEME.palette.semantic.length;
   return `${attributes.nodeType || "entity"}:${shard}`;
 }
 
@@ -353,26 +330,41 @@ export function useLoadGraph(options: UseLoadGraphOptions = {}) {
       });
 
       const colorAccessor = chooseColorAccessor(draftAttributes);
+      const nodePriorityById = new Map<string, number>();
+
+      for (const nodeId of nodeIds) {
+        const degree = degreeByNode.get(nodeId) ?? 0;
+        const sizeRatio = Math.log(degree + 1) / Math.log(maxDegree + 1);
+        nodePriorityById.set(nodeId, sizeRatio);
+      }
 
       const nodesToMerge = draftAttributes.map(({ id, attributes }) => {
-        const colorKey = colorAccessor(id, attributes);
-        const colorIndex = hashCategory(colorKey) % GRAPH_PALETTE.length;
-        const degree = degreeByNode.get(id) ?? 0;
-        const minSize = 2;
-        const maxSize = 25;
-        const sizeRatio = Math.log(degree + 1) / Math.log(maxDegree + 1);
-        const dynamicSize = minSize + (maxSize - minSize) * sizeRatio;
+        const semanticGroup = colorAccessor(id, attributes);
+        const colorIndex = hashString(semanticGroup) % GRAPH_THEME.palette.semantic.length;
+        const baseColor = GRAPH_THEME.palette.semantic[colorIndex];
+        const sizeRatio = nodePriorityById.get(id) ?? 0;
+        const dynamicSize = clamp(2.6, 2.6 + 12.4 * sizeRatio, 15.8);
         return {
           id,
           attributes: {
             ...attributes,
-            color: GRAPH_PALETTE[colorIndex],
+            semanticGroup,
+            color: baseColor,
+            baseColor,
+            mutedColor: withAlpha(baseColor, GRAPH_THEME.nodes.mutedAlpha),
+            glowColor: withAlpha(baseColor, 0.34),
             size: dynamicSize,
-            borderColor: "#0d1117",
-            borderSize: 0.5,
+            baseSize: dynamicSize,
+            visualPriority: sizeRatio,
+            labelPriority: sizeRatio,
+            strokeColor: darkenHex(baseColor, 112),
+            borderColor: darkenHex(baseColor, 112),
+            borderSize: 0.85,
           } as NodeAttributes,
         };
       });
+
+      const edgeKeys = new Set(fetchedEdges.map((edge) => `${edge.source}::${edge.target}`));
 
       const edgesToMerge = fetchedEdges.map((edge) => ({
         source: edge.source,
@@ -381,8 +373,21 @@ export function useLoadGraph(options: UseLoadGraphOptions = {}) {
           weight: edge.weight,
           edgeType: edge.type,
           properties: edge.properties,
-          size: Number((edge.properties as Record<string, unknown>)?.size ?? 1),
-          color: String((edge.properties as Record<string, unknown>)?.color ?? "#444C56"),
+          size: clamp(0.45, 0.5 + Math.sqrt(Math.max(Number(edge.weight) || 1, 1)) * 0.38, 1.8),
+          baseSize: clamp(0.45, 0.5 + Math.sqrt(Math.max(Number(edge.weight) || 1, 1)) * 0.38, 1.8),
+          color: GRAPH_THEME.palette.muted.edgeStructure,
+          baseColor: GRAPH_THEME.palette.muted.edgeStructure,
+          mutedColor: GRAPH_THEME.palette.muted.edgeOverview,
+          visualPriority: Math.max(
+            nodePriorityById.get(edge.source) ?? 0,
+            nodePriorityById.get(edge.target) ?? 0,
+          ),
+          isBidirectional: edgeKeys.has(`${edge.target}::${edge.source}`),
+          edgeFamily: edgeKeys.has(`${edge.target}::${edge.source}`) ? "bidirectional" : "line",
+          curveGroup: edgeKeys.has(`${edge.target}::${edge.source}`)
+            ? [edge.source, edge.target].sort().join("::")
+            : null,
+          type: "line",
         } as EdgeAttributes,
       }));
 
