@@ -195,6 +195,7 @@ class TestOntologyComprehensive(unittest.TestCase):
         owl_output = generator.generate_owl(ontology, format="turtle")
 
         self.assertIn("owl:DatatypeProperty", owl_output)
+        self.assertIn("@prefix : <http://example.org/ontology/> .", owl_output)
         self.assertIn("rdfs:subClassOf", owl_output)
         self.assertIn("birthDate", owl_output)
         self.assertIn("xsd:date", owl_output)
