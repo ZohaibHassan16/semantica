@@ -40,11 +40,9 @@ async def create_annotation(
     ann_data = body.model_dump()
     ann_id = await asyncio.to_thread(session.add_annotation, ann_data)
 
-
-    anns = await asyncio.to_thread(session.get_annotations)
-    for a in anns:
-        if a.get("annotation_id") == ann_id:
-            return AnnotationResponse(**a)
+    stored = await asyncio.to_thread(session.get_annotation, ann_id)
+    if stored is not None:
+        return AnnotationResponse(**stored)
 
     return AnnotationResponse(
         annotation_id=ann_id,
@@ -53,9 +51,6 @@ async def create_annotation(
         tags=body.tags,
         visibility=body.visibility,
     )
-    # add_annotation mutates ann_data in-place, adding annotation_id and created_at.
-    await asyncio.to_thread(session.add_annotation, ann_data)
-    return AnnotationResponse(**ann_data)
 
 
 @router.delete("/{annotation_id}", status_code=204)
