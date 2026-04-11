@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- **Fix: Blazegraph literal serialization and SPARQL injection hardening** (PR #448 by @KaifAhmad1):
+  - Fixed `_build_ntriples()`, `_build_insert_data()`, `find_triplets()`, and `delete_triplet()` in `BlazegraphStore` — all four methods previously unconditionally wrapped every triplet object in `<...>` as an IRI, causing Blazegraph to reject or misparse any triple whose object was a plain string, typed literal, or language-tagged literal.
+  - Added `_format_object_for_sparql(triplet)` — central formatter that selects the correct SPARQL/N-Triples token: IRI (`<uri>`), typed literal (`"value"^^<datatype>`), language-tagged literal (`"value"@lang`), or plain literal (`"value"`).
+  - Added `_resolve_datatype_iri(datatype)` — expands prefixed datatype names (`xsd:integer`, `rdf:langString`, `rdfs:Literal`, `owl:real`, `skos:notation`) to their full IRIs instead of producing invalid `<xsd:integer>` tokens. Accepts full `http/https/urn` IRIs and already-bracketed IRIs after whitespace validation. Rejects unknown prefixes and bare local names with a clear `ValueError`.
+  - Added language-tag validation against RFC 5646 (`^[a-zA-Z]{1,8}(-[a-zA-Z0-9]{1,8})*$`) — values containing whitespace, dots, or other punctuation (e.g. `"en . CLEAR ALL #"`) raise `ValueError` before interpolation, closing a SPARQL injection vector in `metadata["lang"]` / `metadata["language"]`.
+  - Added datatype-string validation — whitespace and SPARQL-delimiting characters inside `metadata["datatype"]` / `metadata["literal_datatype"]` raise `ValueError`, closing the parallel injection vector for typed literals.
+  - Added `_is_uri_value(value)` — URI detection using `urlparse`; rejects strings that only start with a URI scheme but contain whitespace (e.g. `"http not a uri"` is serialised as a literal, not an IRI).
+  - Added `_escape_literal(value)` — escapes `\`, `"`, `\n`, `\r`, `\t` inside literal strings before SPARQL interpolation.
+  - New test file `tests/triplet_store/test_blazegraph_store.py` — 15 offline unit tests covering URI serialization, plain/typed/language-tagged/escaped literals, prefix expansion, IRI passthrough, injection rejection, and `_build_insert_data` delegation; all run without a live Blazegraph instance.
+
 - **OWLGenerator user-facing schema compatibility fixes** (Issue #446):
   - Fixed OWL class/property IRI identifier fallback order to prefer `label` and then `name`.
   - Fixed datatype property handling to accept scalar and list `range` values in rdflib path (including `xsd:*`, full IRIs, and local names), preventing list-based `.startswith()` crashes.
