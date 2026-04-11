@@ -7,23 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-- **Security: CodeQL Alert Remediation** (PR by @KaifAhmad1, branch `security-enhancement`):
-  - **Clear-text logging of sensitive information** (#6, #7 — CWE-312/359/532): Removed debug `print` blocks in `semantica/semantic_extract/relation_extractor.py` and `semantica/semantic_extract/triplet_extractor.py` that accessed and logged `method_options["api_key"]` (even partially masked). No sensitive data is now written to stdout in verbose mode.
-  - **Incomplete URL substring sanitization** (#8 — CWE-20): Replaced `"http://a.com" in urls` in `tests/ingest/test_web_ingestor.py` with `any(url == "http://a.com" for url in urls)` — explicit exact equality per element, eliminating the ambiguous substring check that could match attacker-controlled URLs at arbitrary positions.
-  - **Missing workflow permissions** (#1, #3 — least-privilege): Added `permissions: contents: read` at the workflow level in `.github/workflows/benchmark.yml` and `.github/workflows/security.yml`. Both workflows previously inherited repository-default permissions (potentially read-write); they only require read access to checkout code.
+- **Fix: TripletStore.store() IRI resolution regressions** (PR #447 follow-up by @KaifAhmad1):
+  - Fixed `AttributeError` crash when entity or relationship IDs are non-string types (e.g. integers emitted by `GraphBuilder`). `_resolve_iri()` previously called `.startswith()` directly on the raw ID; it now coerces any value to `str()` at entry, restoring the implicit stringification that the old f-string URN minting provided.
+  - Fixed W3C vocabulary prefixes (`owl:Thing`, `xsd:date`, `rdfs:Literal`, `skos:Concept`, etc.) being incorrectly re-namespaced under the ontology `base_uri` (e.g. `https://example.com/owl:Thing`) when `base_uri` was present. `_resolve_iri()` now consults a known-prefix expansion table (`xsd`, `rdf`, `rdfs`, `owl`, `skos`, `semantica`) before applying `base_uri`, matching the same prefix map already used in `BlazegraphStore`. Standard vocabulary IRIs are always expanded to their canonical W3C forms regardless of what `base_uri` is set to.
+  - Added 5 regression tests: integer IDs with and without `base_uri`, `owl:Thing` domain/range, `xsd:date` range, and `skos:Concept` parent class expansion. Total tests in `TestTripletStoreOntologyNamespace`: 14.
 
-- **SKOS Vocabulary REST API & Hierarchy Engine** (PR #426 by @ZohaibHassan16):
-  - Added `semantica/explorer/routes/vocabulary.py` with three endpoints: `GET /api/vocabulary/schemes` returns all `skos:ConceptScheme` nodes as `VocabularyScheme` dicts; `GET /api/vocabulary/hierarchy?scheme=<uri>` returns the full broader/narrower concept tree for a scheme using an O(V+E) in-memory adjacency-list algorithm with cycle detection via a visited set; `POST /api/vocabulary/import` accepts `.ttl`, `.rdf`, and `.owl` uploads, delegates parsing to `rdf_parser.parse_skos_file`, and ingests results into the active `GraphSession` via `add_nodes`/`add_edges`. Invalid files return HTTP 422.
-  - Added `VocabularyScheme` and `ConceptNode` Pydantic models to `semantica/explorer/schemas.py`. `ConceptNode` is self-referential (`children: Optional[List['ConceptNode']]`) to support arbitrarily deep hierarchy trees.
-  - All session calls offloaded via `asyncio.to_thread` to keep the event loop unblocked.
-  - Added `tests/explorer/test_vocabulary.py` — 16 tests covering all three endpoints: scheme listing, metadata envelope fallback, empty graph, `broader`/`narrower`/`topConceptOf`/`hasTopConcept` edge directions, flat schemes, missing query params, cyclic edge safety, `.rdf`/`.owl` format paths, and invalid file 422 response. 99 total explorer tests passing, 0 regressions.
-  - Depends on `semantica/explorer/utils/rdf_parser.py` introduced in PR #425.
-- **Explorer Server Integration & RDF Parsing Utility** (PR #425 by @ZohaibHassan16):
-  - Added `semantica/explorer/utils/rdf_parser.py` — dedicated SKOS/RDF parsing utility using `rdflib`. Exposes `parse_skos_file(file_bytes, rdf_format)` which parses `.ttl` (Turtle) and `.rdf` (RDF/XML) files and returns a `(nodes, edges)` tuple of flat dicts compatible with `ContextGraph` ingestion. Extracts `skos:ConceptScheme` and `skos:Concept` nodes with a 3-priority label resolution strategy (exact `en` → `en-*` variants → untagged → any-language fallback → URI fragment). Collects all `skos:altLabel` values as a deduplicated list. Emits edges for all 6 SKOS structural predicates: `broader`, `narrower`, `inScheme`, `related`, `topConceptOf`, `hasTopConcept`. Edges pointing to external URIs not declared in the same file are silently dropped to avoid dangling references in the graph. Raises `ValueError` with a descriptive message on unparseable input.
-  - Added `semantica/explorer/utils/__init__.py` — package initialiser for the new `utils` sub-package.
-  - Updated `semantica/server.py` — mounts all Explorer API routers (`analytics`, `annotations`, `decisions`, `enrich`, `export_import`, `graph`, `temporal`) inside a graceful `try/except ImportError` block. The `vocabulary` router (pending #421) is guarded in its own isolated block so a missing module cannot prevent the existing routes from mounting. Both blocks log at `INFO`/`DEBUG` level rather than raising on absence.
-  - Added `tests/explorer/test_rdf_parser.py` — 32 tests across 9 classes covering node/edge extraction, label priority, `altLabel` deduplication, all 6 SKOS edge types, orphan-edge filtering, empty graph, error cases, and RDF/XML format. 32 passed, 0 failures, 0 regressions against `tests/explorer/test_explorer_api.py` (51 tests).
-  - Provides the necessary infrastructure for the upcoming `POST /api/vocabulary/import` endpoint tracked in #421.
+- **Fix: TripletStore.store() ignores ontology namespace base_uri** (PR #447 by @KaifAhmad1):
+  - `store(knowledge_graph, ontology)` was minting `urn:entity:{id}`, `urn:class:{type}`, and `urn:property:{name}` URIs for all bare local names, even when `ontology.namespace.base_uri` was present. This made instance data and ontology class data irreconcilable in SPARQL joins.
+  - Extracts `base_uri` once from `ontology["namespace"]["base_uri"]` (with `ontology["uri"]` as fallback) and ensures a trailing separator so concatenation is always a valid IRI path.
+  - Introduced `_resolve_iri(local, kind)` closure applied to all 7 IRI-minting sites: entity URIs, entity types, relationship predicates, ontology class URIs, parent class URIs, property URIs, and domain/range URIs. Explicit `entity["uri"]` values are never overridden. Falls back to `urn:` only when no `base_uri` is available.
+  - Added 9 tests in `TestTripletStoreOntologyNamespace` covering all expansion paths, `urn:` fallback, explicit URI passthrough, top-level `uri` key fallback, and trailing-slash safety.
+
+- **Fix: Blazegraph literal serialization and SPARQL injection hardening** (PR #448 by @KaifAhmad1):
+  - Fixed `_build_ntriples()`, `_build_insert_data()`, `find_triplets()`, and `delete_triplet()` in `BlazegraphStore` — all four methods previously unconditionally wrapped every triplet object in `<...>` as an IRI, causing Blazegraph to reject or misparse any triple whose object was a plain string, typed literal, or language-tagged literal.
+  - Added `_format_object_for_sparql(triplet)` — central formatter that selects the correct SPARQL/N-Triples token: IRI (`<uri>`), typed literal (`"value"^^<datatype>`), language-tagged literal (`"value"@lang`), or plain literal (`"value"`).
+  - Added `_resolve_datatype_iri(datatype)` — expands prefixed datatype names (`xsd:integer`, `rdf:langString`, `rdfs:Literal`, `owl:real`, `skos:notation`) to their full IRIs instead of producing invalid `<xsd:integer>` tokens. Accepts full `http/https/urn` IRIs and already-bracketed IRIs after whitespace validation. Rejects unknown prefixes and bare local names with a clear `ValueError`.
+  - Added language-tag validation against RFC 5646 (`^[a-zA-Z]{1,8}(-[a-zA-Z0-9]{1,8})*$`) — values containing whitespace, dots, or other punctuation (e.g. `"en . CLEAR ALL #"`) raise `ValueError` before interpolation, closing a SPARQL injection vector in `metadata["lang"]` / `metadata["language"]`.
+  - Added datatype-string validation — whitespace and SPARQL-delimiting characters inside `metadata["datatype"]` / `metadata["literal_datatype"]` raise `ValueError`, closing the parallel injection vector for typed literals.
+  - Added `_is_uri_value(value)` — URI detection using `urlparse`; rejects strings that only start with a URI scheme but contain whitespace (e.g. `"http not a uri"` is serialised as a literal, not an IRI).
+  - Added `_escape_literal(value)` — escapes `\`, `"`, `\n`, `\r`, `\t` inside literal strings before SPARQL interpolation.
+  - New test file `tests/triplet_store/test_blazegraph_store.py` — 15 offline unit tests covering URI serialization, plain/typed/language-tagged/escaped literals, prefix expansion, IRI passthrough, injection rejection, and `_build_insert_data` delegation; all run without a live Blazegraph instance.
+
+- **OWLGenerator user-facing schema compatibility fixes** (Issue #446):
+  - Fixed OWL class/property IRI identifier fallback order to prefer `label` and then `name`.
+  - Fixed datatype property handling to accept scalar and list `range` values in rdflib path (including `xsd:*`, full IRIs, and local names), preventing list-based `.startswith()` crashes.
+  - Fixed generated class/property/domain/range IRIs to use the current ontology dict `uri` namespace for each generation call (instead of drifting to default namespace manager base URI when per-entity `uri` is omitted).
+  - Fixed `subClassOf` / `subclassOf` parent resolution so local class names are expanded to ontology IRIs consistently with domain/range behavior.
+  - Added/expanded regression coverage in `tests/ontology/test_ontology_comprehensive.py` (`test_owl_generator_user_facing_schema_compatibility`) for label-first fallback, lowercase `subclassOf`, datatype range lists, and ontology namespace consistency.
 
 - **SKOS Vocabulary Module** (PR #319 by @KaifAhmad1):
   - **Namespace helpers** (`semantica/ontology/namespace_manager.py`): Added `get_skos_uri(local_name)` — returns the full `http://www.w3.org/2004/02/skos/core#<local_name>` URI for any SKOS term. Added `build_concept_scheme_uri(name)` — slugifies a human-readable vocabulary name (spaces/special chars → hyphens, lower-cased) and anchors the result at the configured base URI as `<base>/vocab/<slug>`.
@@ -1091,7 +1101,7 @@ When breaking changes are introduced, migration guides will be provided in the r
 
 For detailed release notes, see [GitHub Releases](https://github.com/Hawksight-AI/semantica/releases).
 
-# Changelog
+## Legacy Changelog Snapshot A (Preserved Merge Artifact)
 
 All notable changes to this project will be documented in this file.
 
@@ -1099,6 +1109,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+- **OWLGenerator user-facing schema compatibility fixes** (Issue #446):
+  - Fixed OWL class/property IRI identifier fallback order to prefer label and then name.
+  - Fixed datatype property handling to accept scalar and list range values in rdflib path (including xsd:*, full IRIs, and local names), preventing list-based .startswith() crashes.
+  - Fixed generated class/property/domain/range IRIs to use the current ontology dict uri namespace for each generation call (instead of drifting to default namespace manager base URI when per-entity uri is omitted).
+  - Fixed subClassOf / subclassOf parent resolution so local class names are expanded to ontology IRIs consistently with domain/range behavior.
+  - Added/expanded regression coverage in 	ests/ontology/test_ontology_comprehensive.py (	est_owl_generator_user_facing_schema_compatibility) for label-first fallback, lowercase subclassOf, datatype range lists, and ontology namespace consistency.
 
 - Fixed: PolicyEngine latest version selection on ContextGraph; AgentContext fallback robustness and secure logging (PR #TBD by @KaifAhmad1)
 - Tests: Added ContextGraph fallback and AgentContext smoke tests; full suite passing
@@ -1638,7 +1654,7 @@ When breaking changes are introduced, migration guides will be provided in the r
 
 For detailed release notes, see [GitHub Releases](https://github.com/Hawksight-AI/semantica/releases).
 
-# Changelog
+## Legacy Changelog Snapshot B (Preserved Merge Artifact)
 
 All notable changes to this project will be documented in this file.
 
@@ -1646,6 +1662,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+- **OWLGenerator user-facing schema compatibility fixes** (Issue #446):
+  - Fixed OWL class/property IRI identifier fallback order to prefer label and then name.
+  - Fixed datatype property handling to accept scalar and list range values in rdflib path (including xsd:*, full IRIs, and local names), preventing list-based .startswith() crashes.
+  - Fixed generated class/property/domain/range IRIs to use the current ontology dict uri namespace for each generation call (instead of drifting to default namespace manager base URI when per-entity uri is omitted).
+  - Fixed subClassOf / subclassOf parent resolution so local class names are expanded to ontology IRIs consistently with domain/range behavior.
+  - Added/expanded regression coverage in 	ests/ontology/test_ontology_comprehensive.py (	est_owl_generator_user_facing_schema_compatibility) for label-first fallback, lowercase subclassOf, datatype range lists, and ontology namespace consistency.
 
 - Fixed: PolicyEngine latest version selection on ContextGraph; AgentContext fallback robustness and secure logging (PR #TBD by @KaifAhmad1)
 - Tests: Added ContextGraph fallback and AgentContext smoke tests; full suite passing
@@ -2184,4 +2206,7 @@ When breaking changes are introduced, migration guides will be provided in the r
 ---
 
 For detailed release notes, see [GitHub Releases](https://github.com/Hawksight-AI/semantica/releases).
+
+
+
 

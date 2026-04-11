@@ -1056,11 +1056,11 @@ class ContextGraph:
             gen = (
                 {
                     "id": n.node_id,
-                    "type": n.node_type,
-                    "content": n.content,
+                    "type": n.node_type or "entity",
+                    "content": n.content or "",
                     "metadata": {**(getattr(n, "metadata", {}) or {}), **(getattr(n, "properties", {}) or {})},
                 }
-                for n in source
+                for n in source if n.node_id
             )
             stop = skip + limit if limit is not None else None
     
@@ -1087,11 +1087,11 @@ class ContextGraph:
 
             def _active(nodes_iter):
                 for n in nodes_iter:
-                    if n.is_active(now):
+                    if n.node_id and n.is_active(now):
                         yield {
                             "id": n.node_id,
-                            "type": n.node_type,
-                            "content": n.content,
+                            "type": n.node_type or "entity",
+                            "content": n.content or "",
                             "metadata": {
                                 **(getattr(n, "metadata", {}) or {}),
                                 **(getattr(n, "properties", {}) or {}),
@@ -1250,7 +1250,7 @@ class ContextGraph:
                     "valid_from": e.valid_from,
                     "valid_until": e.valid_until,
                 }
-                for e in source
+                for e in source if e.source_id and e.target_id
             )
             stop = skip + limit if limit is not None else None
             return list(itertools.islice(gen, skip, stop))
@@ -1258,11 +1258,26 @@ class ContextGraph:
     def stats(self) -> Dict[str, Any]:
         """Get graph statistics."""
         with self._lock:
+            # Count only items that find_nodes/find_edges can return, so pagination
+            # totals reported to callers match what the methods actually yield.
+            node_count = sum(1 for n in self.nodes.values() if n.node_id)
+            edge_count = sum(1 for e in self.edges if e.source_id and e.target_id)
+            node_types = {
+                k: sum(
+                    1 for nid in v
+                    if isinstance(nid, str) and nid in self.nodes and self.nodes[nid].node_id
+                )
+                for k, v in self.node_type_index.items()
+            }
+            edge_types = {
+                k: sum(1 for e in v if e.source_id and e.target_id)
+                for k, v in self.edge_type_index.items()
+            }
             return {
-                "node_count": len(self.nodes),
-                "edge_count": len(self.edges),
-                "node_types": {k: len(v) for k, v in self.node_type_index.items()},
-                "edge_types": {k: len(v) for k, v in self.edge_type_index.items()},
+                "node_count": node_count,
+                "edge_count": edge_count,
+                "node_types": node_types,
+                "edge_types": edge_types,
                 "density": self.density(),
             }
 
@@ -1746,25 +1761,85 @@ class ContextGraph:
         }
 
     # Decision Support Methods
-    def add_decision(self, decision: "Decision") -> None:
+    def add_decision(
+        self,
+        decision: "Decision" = None,
+        *,
+        category: str = None,
+        scenario: str = None,
+        reasoning: str = None,
+        outcome: str = None,
+        confidence: float = 0.5,
+        entities: Optional[List[str]] = None,
+        decision_maker: Optional[str] = "system",
+        valid_from=None,
+        valid_until=None,
+        **kwargs,
+    ) -> str:
         """
         Add decision node to graph.
-        
+
+        Accepts either a Decision object or keyword arguments:
+
+            # From a Decision object
+            graph.add_decision(Decision(category="x", scenario="y", ...))
+
+            # From keyword arguments (convenience form)
+            graph.add_decision(category="x", scenario="y", reasoning="z",
+                               outcome="o", confidence=0.9)
+
         Args:
-            decision: Decision object to add
+            decision: Decision object to add (mutually exclusive with kwargs)
+            category: Decision category
+            scenario: Decision scenario description
+            reasoning: Reasoning behind the decision
+            outcome: Decision outcome
+            confidence: Confidence score (0.0–1.0)
+            entities: Related entity labels
+            decision_maker: Who made the decision
+            valid_from: Start of validity window (ISO string or datetime)
+            valid_until: End of validity window (ISO string or datetime)
+            **kwargs: Extra metadata stored on the decision node
+
+        Returns:
+            Decision ID
         """
         from .decision_models import Decision
-        
+
+        if decision is not None and (
+            any(v is not None for v in (
+                category, scenario, reasoning, outcome, entities, valid_from, valid_until,
+            )) or kwargs
+        ):
+            raise ValueError(
+                "Pass either a Decision object or keyword arguments, not both."
+            )
+
+        if decision is None:
+            # Build from kwargs — delegate to record_decision which handles ID gen
+            return self.record_decision(
+                category=category,
+                scenario=scenario,
+                reasoning=reasoning,
+                outcome=outcome,
+                confidence=confidence,
+                entities=entities,
+                decision_maker=decision_maker,
+                valid_from=valid_from,
+                valid_until=valid_until,
+                metadata=kwargs,
+            )
+
         # Handle empty decision ID by generating UUID for both None and empty string
         # This ensures consistent behavior with Decision model's __post_init__ method
         node_id = decision.decision_id if decision.decision_id else str(uuid.uuid4())
-        
+
         # Handle None metadata
         metadata = decision.metadata or {}
-        
+
         # Normalize timestamp to ensure consistent storage format
         normalized_timestamp = self._normalize_timestamp(decision.timestamp)
-        
+
         node = ContextNode(
             node_id=node_id,
             node_type="Decision",
@@ -1784,6 +1859,7 @@ class ContextGraph:
             valid_until=decision.valid_until,
         )
         self._add_internal_node(node)
+        return node_id
 
     def add_causal_relationship(
         self,

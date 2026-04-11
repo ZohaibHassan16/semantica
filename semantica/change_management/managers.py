@@ -22,6 +22,7 @@ License: MIT
 from abc import ABC, abstractmethod
 from datetime import datetime
 from typing import Any, Dict, List, Optional
+from urllib.parse import quote
 
 from .change_log import ChangeLogEntry
 from .version_storage import (
@@ -388,7 +389,10 @@ class TemporalVersionManager(BaseVersionManager):
                 # Clean up the actual graph if provided
                 if triplet_store and graph_uri:
                     try:
-                        triplet_store.execute_query(f"DROP SILENT GRAPH {graph_uri}")
+                        safe_graph_uri = self._sanitize_graph_uri(graph_uri)
+                        triplet_store.execute_query(
+                            f"DROP SILENT GRAPH <{safe_graph_uri}>"
+                        )
                         self.logger.info(f"Dropped obsolete graph {graph_uri} from store")
                     except Exception as e:
                         self.logger.warning(f"Failed to drop graph {graph_uri} during pruning: {e}")
@@ -399,6 +403,11 @@ class TemporalVersionManager(BaseVersionManager):
             "pruned_versions": deleted_labels,
             "retained_count": len(all_versions) - len(deleted_labels)
         }
+
+    def _sanitize_graph_uri(self, graph_uri: Any) -> str:
+        """Percent-encode unsafe characters before embedding a graph URI in SPARQL."""
+        raw_uri = str(graph_uri).strip().strip("<>")
+        return quote(raw_uri, safe="/:?&=@[]!$'()*+,%-._~")
     
     # Git-like audit trails
 

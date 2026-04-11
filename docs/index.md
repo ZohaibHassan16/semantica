@@ -6,7 +6,7 @@
   <a href="https://www.python.org/downloads/"><img src="https://img.shields.io/badge/python-3.8+-blue.svg" alt="Python 3.8+"></a>
   <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"></a>
   <a href="https://pypi.org/project/semantica/"><img src="https://img.shields.io/pypi/v/semantica.svg" alt="PyPI"></a>
-  <a href="https://github.com/Hawksight-AI/semantica/releases/tag/v0.3.0"><img src="https://img.shields.io/badge/version-0.3.0-brightgreen.svg" alt="Version"></a>
+  <a href="https://github.com/Hawksight-AI/semantica/releases/tag/v0.4.0"><img src="https://img.shields.io/badge/version-0.4.0-brightgreen.svg" alt="Version"></a>
   <a href="https://pepy.tech/project/semantica"><img src="https://static.pepy.tech/badge/semantica" alt="Total Downloads"></a>
   <a href="https://github.com/Hawksight-AI/semantica/actions"><img src="https://github.com/Hawksight-AI/semantica/workflows/CI/badge.svg" alt="CI"></a>
   <a href="https://discord.gg/sV34vps5hH"><img src="https://img.shields.io/badge/Discord-Join-5865F2?logo=discord&logoColor=white" alt="Discord"></a>
