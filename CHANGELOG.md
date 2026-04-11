@@ -1079,7 +1079,7 @@ When breaking changes are introduced, migration guides will be provided in the r
 
 For detailed release notes, see [GitHub Releases](https://github.com/Hawksight-AI/semantica/releases).
 
-# Changelog
+## Legacy Changelog Snapshot A (Preserved Merge Artifact)
 
 All notable changes to this project will be documented in this file.
 
@@ -1088,10 +1088,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 - **OWLGenerator user-facing schema compatibility fixes** (Issue #446):
-  - Fixed OWL class/property IRI identifier fallback order to prefer label and then 
-ame.
-  - Fixed datatype property handling to accept scalar and list 
-ange values in rdflib path (including xsd:*, full IRIs, and local names), preventing list-based .startswith() crashes.
+  - Fixed OWL class/property IRI identifier fallback order to prefer label and then name.
+  - Fixed datatype property handling to accept scalar and list range values in rdflib path (including xsd:*, full IRIs, and local names), preventing list-based .startswith() crashes.
   - Fixed generated class/property/domain/range IRIs to use the current ontology dict uri namespace for each generation call (instead of drifting to default namespace manager base URI when per-entity uri is omitted).
   - Fixed subClassOf / subclassOf parent resolution so local class names are expanded to ontology IRIs consistently with domain/range behavior.
   - Added/expanded regression coverage in 	ests/ontology/test_ontology_comprehensive.py (	est_owl_generator_user_facing_schema_compatibility) for label-first fallback, lowercase subclassOf, datatype range lists, and ontology namespace consistency.
@@ -1634,7 +1632,7 @@ When breaking changes are introduced, migration guides will be provided in the r
 
 For detailed release notes, see [GitHub Releases](https://github.com/Hawksight-AI/semantica/releases).
 
-# Changelog
+## Legacy Changelog Snapshot B (Preserved Merge Artifact)
 
 All notable changes to this project will be documented in this file.
 
@@ -1643,10 +1641,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 - **OWLGenerator user-facing schema compatibility fixes** (Issue #446):
-  - Fixed OWL class/property IRI identifier fallback order to prefer label and then 
-ame.
-  - Fixed datatype property handling to accept scalar and list 
-ange values in rdflib path (including xsd:*, full IRIs, and local names), preventing list-based .startswith() crashes.
+  - Fixed OWL class/property IRI identifier fallback order to prefer label and then name.
+  - Fixed datatype property handling to accept scalar and list range values in rdflib path (including xsd:*, full IRIs, and local names), preventing list-based .startswith() crashes.
   - Fixed generated class/property/domain/range IRIs to use the current ontology dict uri namespace for each generation call (instead of drifting to default namespace manager base URI when per-entity uri is omitted).
   - Fixed subClassOf / subclassOf parent resolution so local class names are expanded to ontology IRIs consistently with domain/range behavior.
   - Added/expanded regression coverage in 	ests/ontology/test_ontology_comprehensive.py (	est_owl_generator_user_facing_schema_compatibility) for label-first fallback, lowercase subclassOf, datatype range lists, and ontology namespace consistency.
@@ -2188,6 +2184,7 @@ When breaking changes are introduced, migration guides will be provided in the r
 ---
 
 For detailed release notes, see [GitHub Releases](https://github.com/Hawksight-AI/semantica/releases).
+
 
 
 
