@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- **Fix: TripletStore.store() IRI resolution regressions** (PR #447 follow-up by @KaifAhmad1):
+  - Fixed `AttributeError` crash when entity or relationship IDs are non-string types (e.g. integers emitted by `GraphBuilder`). `_resolve_iri()` previously called `.startswith()` directly on the raw ID; it now coerces any value to `str()` at entry, restoring the implicit stringification that the old f-string URN minting provided.
+  - Fixed W3C vocabulary prefixes (`owl:Thing`, `xsd:date`, `rdfs:Literal`, `skos:Concept`, etc.) being incorrectly re-namespaced under the ontology `base_uri` (e.g. `https://example.com/owl:Thing`) when `base_uri` was present. `_resolve_iri()` now consults a known-prefix expansion table (`xsd`, `rdf`, `rdfs`, `owl`, `skos`, `semantica`) before applying `base_uri`, matching the same prefix map already used in `BlazegraphStore`. Standard vocabulary IRIs are always expanded to their canonical W3C forms regardless of what `base_uri` is set to.
+  - Added 5 regression tests: integer IDs with and without `base_uri`, `owl:Thing` domain/range, `xsd:date` range, and `skos:Concept` parent class expansion. Total tests in `TestTripletStoreOntologyNamespace`: 14.
+
+- **Fix: TripletStore.store() ignores ontology namespace base_uri** (PR #447 by @KaifAhmad1):
+  - `store(knowledge_graph, ontology)` was minting `urn:entity:{id}`, `urn:class:{type}`, and `urn:property:{name}` URIs for all bare local names, even when `ontology.namespace.base_uri` was present. This made instance data and ontology class data irreconcilable in SPARQL joins.
+  - Extracts `base_uri` once from `ontology["namespace"]["base_uri"]` (with `ontology["uri"]` as fallback) and ensures a trailing separator so concatenation is always a valid IRI path.
+  - Introduced `_resolve_iri(local, kind)` closure applied to all 7 IRI-minting sites: entity URIs, entity types, relationship predicates, ontology class URIs, parent class URIs, property URIs, and domain/range URIs. Explicit `entity["uri"]` values are never overridden. Falls back to `urn:` only when no `base_uri` is available.
+  - Added 9 tests in `TestTripletStoreOntologyNamespace` covering all expansion paths, `urn:` fallback, explicit URI passthrough, top-level `uri` key fallback, and trailing-slash safety.
+
 - **Fix: Blazegraph literal serialization and SPARQL injection hardening** (PR #448 by @KaifAhmad1):
   - Fixed `_build_ntriples()`, `_build_insert_data()`, `find_triplets()`, and `delete_triplet()` in `BlazegraphStore` — all four methods previously unconditionally wrapped every triplet object in `<...>` as an IRI, causing Blazegraph to reject or misparse any triple whose object was a plain string, typed literal, or language-tagged literal.
   - Added `_format_object_for_sparql(triplet)` — central formatter that selects the correct SPARQL/N-Triples token: IRI (`<uri>`), typed literal (`"value"^^<datatype>`), language-tagged literal (`"value"@lang`), or plain literal (`"value"`).
