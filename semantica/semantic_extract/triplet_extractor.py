@@ -494,11 +494,6 @@ class TripletExtractor:
                     if verbose_mode and method_name == "llm":
                         import sys
                         print(f"    [TripletExtractor] Processing with {method_name}...", flush=True, file=sys.stdout)
-                        if "api_key" in method_options:
-                             masked = method_options["api_key"][:4] + "..." if method_options["api_key"] else "None"
-                             print(f"    [TripletExtractor Debug] api_key present: {masked}", flush=True, file=sys.stdout)
-                        else:
-                             print(f"    [TripletExtractor Debug] api_key NOT present", flush=True, file=sys.stdout)
 
                     triplets = method_func(
                         text,

@@ -68,7 +68,7 @@ def test_sitemap_fallback_parsing() -> None:
     ):
         urls = crawler.parse_sitemap("http://s.xml")
 
-    assert "http://a.com" in urls
+    assert any(url == "http://a.com" for url in urls)
 
 
 def test_sitemap_invalid_xml() -> None:

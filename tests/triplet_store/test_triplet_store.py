@@ -163,6 +163,146 @@ class TestTripletStore(unittest.TestCase):
         self.assertIn("VALUES ?subject", sparql_query)
         mock_backend.execute_sparql.assert_called_once()
 
+    @patch('semantica.triplet_store.blazegraph_store.BlazegraphStore')
+    def test_execute_query_forwards_graph_options(self, mock_blazegraph_store):
+        mock_backend_instance = MagicMock()
+        mock_blazegraph_store.return_value = mock_backend_instance
+
+        store = TripletStore(backend="blazegraph")
+        store.query_engine = MagicMock()
+        store.query_engine.execute_query.return_value = QueryEngine()
+
+        query = "SELECT ?s WHERE { ?s ?p ?o }"
+        graphs = ["http://example.org/graph/a", "http://example.org/graph/b"]
+        store.execute_query(query, graph="http://example.org/graph/default", graphs=graphs)
+
+        store.query_engine.execute_query.assert_called_once_with(
+            query,
+            store._store_backend,
+            graph="http://example.org/graph/default",
+            graphs=graphs,
+            supports_named_graphs=True,
+        )
+
+    @patch('semantica.triplet_store.blazegraph_store.BlazegraphStore')
+    def test_execute_query_respects_enable_named_graphs_flag(self, mock_blazegraph_store):
+        mock_backend_instance = MagicMock()
+        mock_blazegraph_store.return_value = mock_backend_instance
+
+        store = TripletStore(backend="blazegraph", enable_named_graphs=False)
+        store.query_engine = MagicMock()
+        store.query_engine.execute_query.return_value = QueryEngine()
+
+        query = "SELECT ?s WHERE { ?s ?p ?o }"
+        store.execute_query(query, graph="http://example.org/graph/default")
+
+        store.query_engine.execute_query.assert_called_once_with(
+            query,
+            store._store_backend,
+            graph="http://example.org/graph/default",
+            supports_named_graphs=False,
+        )
+
+    def test_query_engine_injects_from_before_where(self):
+        engine = QueryEngine(enable_optimization=False, enable_caching=False)
+        query = "SELECT ?s ?p ?o WHERE { ?s ?p ?o }"
+
+        prepared = engine.prepare_query(query, graph="http://example.org/graph/default")
+
+        self.assertIn("FROM <http://example.org/graph/default>", prepared)
+        self.assertLess(
+            prepared.upper().find("FROM <HTTP://EXAMPLE.ORG/GRAPH/DEFAULT>"),
+            prepared.upper().find("WHERE"),
+        )
+
+    def test_query_engine_injects_multiple_named_graphs(self):
+        engine = QueryEngine(enable_optimization=False, enable_caching=False)
+        query = "SELECT ?s WHERE { GRAPH ?g { ?s ?p ?o } }"
+        graphs = ["http://example.org/graph/a", "http://example.org/graph/b"]
+
+        prepared = engine.prepare_query(query, graphs=graphs)
+
+        self.assertIn("FROM NAMED <http://example.org/graph/a>", prepared)
+        self.assertIn("FROM NAMED <http://example.org/graph/b>", prepared)
+        self.assertLess(
+            prepared.upper().find("FROM NAMED <HTTP://EXAMPLE.ORG/GRAPH/A>"),
+            prepared.upper().find("WHERE"),
+        )
+
+    def test_query_engine_graph_isolation_behavior(self):
+        engine = QueryEngine(enable_optimization=False, enable_caching=False)
+        mock_backend = MagicMock()
+
+        def _side_effect(query, **kwargs):
+            if "FROM <http://example.org/graph/a>" in query:
+                return {
+                    "bindings": [{"s": {"value": "http://entity/A"}}],
+                    "variables": ["s"],
+                    "metadata": {},
+                }
+            if "FROM <http://example.org/graph/b>" in query:
+                return {
+                    "bindings": [{"s": {"value": "http://entity/B"}}],
+                    "variables": ["s"],
+                    "metadata": {},
+                }
+            return {
+                "bindings": [
+                    {"s": {"value": "http://entity/A"}},
+                    {"s": {"value": "http://entity/B"}},
+                ],
+                "variables": ["s"],
+                "metadata": {},
+            }
+
+        mock_backend.execute_sparql.side_effect = _side_effect
+
+        base_query = "SELECT ?s WHERE { ?s ?p ?o }"
+        graph_a_result = engine.execute_query(base_query, mock_backend, graph="http://example.org/graph/a")
+        graph_b_result = engine.execute_query(base_query, mock_backend, graph="http://example.org/graph/b")
+        default_result = engine.execute_query(base_query, mock_backend)
+
+        self.assertNotEqual(graph_a_result.bindings, graph_b_result.bindings)
+        self.assertEqual(len(default_result.bindings), 2)
+
+    def test_query_engine_avoids_duplicate_dataset_clauses_for_same_graph(self):
+        engine = QueryEngine(enable_optimization=False, enable_caching=False)
+        query = "SELECT ?s WHERE { GRAPH ?g { ?s ?p ?o } }"
+
+        prepared = engine.prepare_query(
+            query,
+            graph="http://example.org/graph/a",
+            graphs=["http://example.org/graph/a", "http://example.org/graph/b"],
+        )
+
+        self.assertEqual(prepared.count("FROM <http://example.org/graph/a>"), 1)
+        self.assertEqual(prepared.count("FROM NAMED <http://example.org/graph/a>"), 0)
+        self.assertIn("FROM NAMED <http://example.org/graph/b>", prepared)
+
+    def test_query_engine_uses_default_graph_uri_alias(self):
+        engine = QueryEngine(
+            enable_optimization=False,
+            enable_caching=False,
+            default_graph_uri="http://example.org/graph/default",
+        )
+        query = "SELECT ?s WHERE { ?s ?p ?o }"
+
+        prepared = engine.prepare_query(query)
+
+        self.assertIn("FROM <http://example.org/graph/default>", prepared)
+
+    def test_query_engine_fallback_when_named_graphs_unsupported(self):
+        engine = QueryEngine(enable_optimization=False, enable_caching=False)
+        query = "SELECT ?s WHERE { ?s ?p ?o }"
+
+        prepared = engine.prepare_query(
+            query,
+            graph="http://example.org/graph/default",
+            supports_named_graphs=False,
+        )
+
+        self.assertEqual(prepared, query)
+
 
 class TestSKOSTripletStore(unittest.TestCase):
     """Tests for SKOS helper methods on TripletStore."""
