@@ -27,6 +27,7 @@ Author: Semantica Contributors
 License: MIT
 """
 
+import re
 from typing import Any, Dict, List, Optional
 from urllib.parse import urljoin, urlparse
 
@@ -254,6 +255,18 @@ class BlazegraphStore:
             )
         return " ".join(lines)
 
+    # Known prefix expansions for XSD and common RDF vocabularies
+    _KNOWN_PREFIXES: Dict[str, str] = {
+        "xsd": "http://www.w3.org/2001/XMLSchema#",
+        "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+        "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+        "owl": "http://www.w3.org/2002/07/owl#",
+        "skos": "http://www.w3.org/2004/02/skos/core#",
+    }
+
+    # RFC 5646 language tag: primary subtag optionally followed by '-' + subtags
+    _LANG_TAG_RE = re.compile(r"^[a-zA-Z]{1,8}(-[a-zA-Z0-9]{1,8})*$")
+
     def _format_object_for_sparql(self, triplet: Triplet) -> str:
         """Format triplet object as IRI or literal for SPARQL/N-Triples style syntax."""
         obj = triplet.object
@@ -261,6 +274,9 @@ class BlazegraphStore:
 
         if self._is_uri_value(obj):
             if obj.startswith("<") and obj.endswith(">"):
+                inner = obj[1:-1]
+                if " " in inner or ">" in inner:
+                    raise ValueError(f"IRI contains invalid characters: {obj!r}")
                 return obj
             return f"<{obj}>"
 
@@ -269,15 +285,53 @@ class BlazegraphStore:
         language = metadata.get("lang") or metadata.get("language")
 
         if datatype:
-            datatype_iri = datatype
-            if not datatype_iri.startswith("<"):
-                datatype_iri = f"<{datatype_iri}>"
+            datatype_iri = self._resolve_datatype_iri(datatype)
             return f"\"{escaped}\"^^{datatype_iri}"
 
         if language:
+            if not self._LANG_TAG_RE.match(str(language)):
+                raise ValueError(
+                    f"Invalid language tag {language!r}: must match RFC 5646 "
+                    f"(letters/digits and hyphens only, e.g. 'en', 'en-US')"
+                )
             return f"\"{escaped}\"@{language}"
 
         return f"\"{escaped}\""
+
+    def _resolve_datatype_iri(self, datatype: str) -> str:
+        """Expand a datatype string to a validated SPARQL IRI token.
+
+        Accepts:
+        - Already-wrapped IRIs: ``<http://...>``
+        - Full IRIs:            ``http://...`` / ``https://...`` / ``urn:...``
+        - Known prefixed names: ``xsd:integer``, ``rdf:langString``, etc.
+
+        Raises ValueError for anything else.
+        """
+        datatype = str(datatype)
+
+        # Already angle-bracketed — validate the inner IRI contains no whitespace
+        if datatype.startswith("<") and datatype.endswith(">"):
+            inner = datatype[1:-1]
+            if not inner or re.search(r"[\s<>\"{}|\\^`]", inner):
+                raise ValueError(f"Invalid datatype IRI: {datatype!r}")
+            return datatype
+
+        # Full absolute IRI without brackets
+        parsed = urlparse(datatype)
+        if parsed.scheme in {"http", "https", "urn"} and not re.search(r"[\s<>\"{}|\\^`]", datatype):
+            return f"<{datatype}>"
+
+        # Prefixed form — expand known prefixes only
+        if ":" in datatype:
+            prefix, local = datatype.split(":", 1)
+            if prefix in self._KNOWN_PREFIXES and re.match(r"^[A-Za-z0-9_\-\.]+$", local):
+                return f"<{self._KNOWN_PREFIXES[prefix]}{local}>"
+
+        raise ValueError(
+            f"Unsupported datatype {datatype!r}: use a full IRI (http/https/urn), "
+            f"an angle-bracketed IRI, or a known prefix (xsd/rdf/rdfs/owl/skos)."
+        )
 
     def _is_uri_value(self, value: str) -> bool:
         """Detect if a value should be serialized as an IRI."""
@@ -286,7 +340,10 @@ class BlazegraphStore:
         if value.startswith("<") and value.endswith(">"):
             return True
         parsed = urlparse(value)
-        return parsed.scheme in {"http", "https", "urn"}
+        if parsed.scheme not in {"http", "https", "urn"}:
+            return False
+        # Reject strings that only look like URIs (e.g. "http not a uri")
+        return not re.search(r"\s", value)
 
     def _escape_literal(self, value: str) -> str:
         """Escape string literal for SPARQL."""
