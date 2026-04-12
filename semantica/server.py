@@ -188,8 +188,12 @@ async def serve_spa(full_path: str):
     if full_path.startswith("api/"):
         raise HTTPException(status_code=404, detail="API route not found")
 
+    requested_rel_path = Path(full_path)
+    if requested_rel_path.is_absolute() or ".." in requested_rel_path.parts:
+        raise HTTPException(status_code=400, detail="Invalid path")
+
     static_dir_resolved = STATIC_DIR.resolve()
-    requested_file = (STATIC_DIR / full_path).resolve()
+    requested_file = (STATIC_DIR / requested_rel_path).resolve()
 
     # Prevent path traversal: reject any path that escapes STATIC_DIR
     try:
