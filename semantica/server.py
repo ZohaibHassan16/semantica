@@ -199,8 +199,12 @@ async def serve_spa(full_path: str):
 
     # Ensure join remains relative to STATIC_DIR even if input includes leading separators
     safe_rel_path = normalized_path.lstrip("/\\")
+    rel_parts = Path(safe_rel_path).parts
+    if any(part in ("", ".", "..") for part in rel_parts):
+        raise HTTPException(status_code=400, detail="Invalid path")
+
     static_dir_resolved = STATIC_DIR.resolve()
-    requested_file = (static_dir_resolved / safe_rel_path).resolve(strict=False)
+    requested_file = (static_dir_resolved / Path(*rel_parts)).resolve(strict=False)
 
     # Prevent path traversal: reject any path that escapes STATIC_DIR
     if not requested_file.is_relative_to(static_dir_resolved):
