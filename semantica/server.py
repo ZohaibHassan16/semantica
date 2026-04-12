@@ -193,12 +193,10 @@ async def serve_spa(full_path: str):
         raise HTTPException(status_code=400, detail="Invalid path")
 
     static_dir_resolved = STATIC_DIR.resolve()
-    requested_file = (STATIC_DIR / requested_rel_path).resolve()
+    requested_file = static_dir_resolved.joinpath(requested_rel_path).resolve(strict=False)
 
     # Prevent path traversal: reject any path that escapes STATIC_DIR
-    try:
-        requested_file.relative_to(static_dir_resolved)
-    except ValueError:
+    if not requested_file.is_relative_to(static_dir_resolved):
         raise HTTPException(status_code=400, detail="Invalid path")
 
     if requested_file.is_file():
