@@ -55,7 +55,7 @@ pip install semantica
 
 ## 🔌 Works With Every AI Tool
 
-Semantica ships **native plugin bundles** for Claude Code, Cursor, and Codex — and connects to any other tool via its **REST API** (FastAPI server, port 8000) or as an **MCP data source** you can pull from.
+Semantica ships **native plugin bundles** for Claude Code, Cursor, and Codex, an **MCP server** (`python -m semantica.mcp_server`) for Windsurf, Cline, Continue, VS Code, and Claude Desktop, and a **REST API** (FastAPI, port 8000) for any other tool.
 
 <table>
 <tr>
@@ -77,17 +77,17 @@ Semantica ships **native plugin bundles** for Claude Code, Cursor, and Codex —
 <td align="center" width="12.5%">
 <a href="https://windsurf.com"><img src="https://exafunction.github.io/public/brand/windsurf-black-symbol.svg" alt="Windsurf" width="48" height="48" /></a><br/>
 <strong>Windsurf</strong><br/>
-<sub>REST API</sub>
+<sub>MCP server + plugin</sub>
 </td>
 <td align="center" width="12.5%">
 <a href="https://claude.ai/download"><img src="https://github.com/anthropics.png?size=120" alt="Claude Desktop" width="48" height="48" /></a><br/>
 <strong>Claude Desktop</strong><br/>
-<sub>REST API</sub>
+<sub>MCP server</sub>
 </td>
 <td align="center" width="12.5%">
 <a href="https://github.com/microsoft/vscode"><img src="https://github.com/microsoft.png?size=120" alt="VS Code" width="48" height="48" /></a><br/>
 <strong>VS Code</strong><br/>
-<sub>REST API</sub>
+<sub>MCP server + plugin</sub>
 </td>
 <td align="center" width="12.5%">
 <a href="https://github.com/features/copilot"><img src="https://github.com/github.png?size=120" alt="GitHub Copilot" width="48" height="48" /></a><br/>
@@ -97,7 +97,7 @@ Semantica ships **native plugin bundles** for Claude Code, Cursor, and Codex —
 <td align="center" width="12.5%">
 <a href="https://github.com/cline/cline"><img src="https://github.com/cline.png?size=120" alt="Cline" width="48" height="48" /></a><br/>
 <strong>Cline</strong><br/>
-<sub>REST API</sub>
+<sub>MCP server + plugin</sub>
 </td>
 </tr>
 <tr>
@@ -109,7 +109,7 @@ Semantica ships **native plugin bundles** for Claude Code, Cursor, and Codex —
 <td align="center" width="12.5%">
 <a href="https://github.com/continuedev/continue"><img src="https://github.com/continuedev.png?size=120" alt="Continue" width="48" height="48" /></a><br/>
 <strong>Continue</strong><br/>
-<sub>REST API</sub>
+<sub>MCP server + plugin</sub>
 </td>
 <td align="center" width="12.5%">
 <a href="https://github.com/block/goose"><img src="https://github.com/block.png?size=120" alt="Goose" width="48" height="48" /></a><br/>
@@ -146,7 +146,17 @@ Semantica ships **native plugin bundles** for Claude Code, Cursor, and Codex —
 
 ### Plugin Bundles (Claude Code · Cursor · Codex)
 
-Native plugin bundles live under [`plugins/`](plugins/) — install once, works across all three tools.
+Native plugin bundles live under [`plugins/`](plugins/). Each directory contains a `plugin.json`, `marketplace.json`, and `README.md`.
+
+| Bundle | Directory | Tools |
+|---|---|---|
+| Claude Code | [`plugins/.claude-plugin/`](plugins/.claude-plugin/) | 17 skills · 3 agents · hooks |
+| Cursor | [`plugins/.cursor-plugin/`](plugins/.cursor-plugin/) | 17 skills · 3 agents · hooks |
+| Codex CLI | [`plugins/.codex-plugin/`](plugins/.codex-plugin/) | 17 skills · 3 agents |
+| Windsurf | [`plugins/.windsurf-plugin/`](plugins/.windsurf-plugin/) | 17 skills · 3 agents · MCP config |
+| Cline | [`plugins/.cline-plugin/`](plugins/.cline-plugin/) | 17 skills · 3 agents · MCP config |
+| Continue | [`plugins/.continue-plugin/`](plugins/.continue-plugin/) | 17 skills · 3 agents · MCP config |
+| VS Code | [`plugins/.vscode-plugin/`](plugins/.vscode-plugin/) | 17 skills · 3 agents · MCP config |
 
 **17 domain skills:**
 
@@ -182,9 +192,36 @@ Native plugin bundles live under [`plugins/`](plugins/) — install once, works 
 
 → [`plugins/.claude-plugin/README.md`](plugins/.claude-plugin/README.md)
 
+### MCP Server (expose Semantica to any MCP-aware tool)
+
+Semantica ships a full **MCP server** (`semantica/mcp_server.py`) — run it once and any MCP-compatible tool connects automatically:
+
+```bash
+python -m semantica.mcp_server
+```
+
+Add to your tool's config (Claude Desktop, Windsurf, Cline, Continue, VS Code, Roo Code):
+
+```json
+{
+  "mcpServers": {
+    "semantica": {
+      "command": "python",
+      "args": ["-m", "semantica.mcp_server"]
+    }
+  }
+}
+```
+
+**12 tools exposed:** `extract_entities`, `extract_relations`, `record_decision`, `query_decisions`, `find_precedents`, `get_causal_chain`, `add_entity`, `add_relationship`, `run_reasoning`, `get_graph_analytics`, `export_graph`, `get_graph_summary`
+
+**3 resources:** `semantica://graph/summary`, `semantica://decisions/list`, `semantica://schema/info`
+
+See [`plugins/.claude-plugin/README.md`](plugins/.claude-plugin/README.md) for per-tool config snippets.
+
 ### MCP Client (Ingest from MCP Servers)
 
-Semantica includes an **MCP client** (`semantica/ingest/mcp_client.py`) that lets you pull data from any Python/FastMCP server into a knowledge graph:
+Semantica also includes an **MCP client** (`semantica/ingest/mcp_client.py`) that lets you pull data from any Python/FastMCP server into a knowledge graph:
 
 ```python
 from semantica.ingest import MCPClient
@@ -825,13 +862,13 @@ Start the Semantica server (`python -m semantica.server`, port 8000) and point a
 | [Claude Code](https://claude.com/product/claude-code) | **Native plugin** | `plugins/.claude-plugin/` — 17 skills, 3 agents, `hooks.json` |
 | [Cursor](https://cursor.com) | **Native plugin** | `plugins/.cursor-plugin/` — same 17 skills + 3 agents |
 | [Codex CLI](https://github.com/openai/codex) | **Native plugin** | `plugins/.codex-plugin/` — same 17 skills + 3 agents |
-| [Windsurf](https://windsurf.com) | REST API | Point at `http://localhost:8000/api` |
-| [Claude Desktop](https://claude.ai/download) | REST API | Point at `http://localhost:8000/api` |
-| [VS Code](https://github.com/microsoft/vscode) | REST API | Use any REST client extension |
+| [Windsurf](https://windsurf.com) | **MCP server** + plugin | `plugins/.windsurf-plugin/` · add `python -m semantica.mcp_server` to `~/.codeium/windsurf/mcp_config.json` |
+| [Claude Desktop](https://claude.ai/download) | **MCP server** | Add `python -m semantica.mcp_server` to `claude_desktop_config.json` |
+| [VS Code](https://github.com/microsoft/vscode) | **MCP server** + plugin | `plugins/.vscode-plugin/` · add to `settings.json` under `mcp.servers` |
 | [GitHub Copilot](https://github.com/features/copilot) | REST API | Use via Copilot Chat custom tools |
-| [Cline](https://github.com/cline/cline) | REST API | Add as a custom tool endpoint |
-| [Roo Code](https://github.com/RooCodeInc/Roo-Code) | REST API | Add as a custom tool endpoint |
-| [Continue](https://github.com/continuedev/continue) | REST API | Add to `~/.continue/config.json` as context provider |
+| [Cline](https://github.com/cline/cline) | **MCP server** + plugin | `plugins/.cline-plugin/` · add server in Cline MCP settings panel |
+| [Roo Code](https://github.com/RooCodeInc/Roo-Code) | **MCP server** | Add `python -m semantica.mcp_server` in Roo Code MCP settings |
+| [Continue](https://github.com/continuedev/continue) | **MCP server** + plugin | `plugins/.continue-plugin/` · add to `~/.continue/config.json` under `mcpServers` |
 | [Goose](https://github.com/block/goose) | REST API | Add to Goose toolset config |
 | [Kilo Code](https://github.com/Kilo-Org/kilocode) | REST API | Add as custom REST tool |
 | [Aider](https://github.com/Aider-AI/aider) | REST API | Pass context from the API into prompts |
