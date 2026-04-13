@@ -104,7 +104,7 @@ def handle_get_provenance(args: dict) -> dict:
         # Try ProvenanceTracker first
         try:
             from semantica.kg import ProvenanceTracker
-            tracker = ProvenanceTracker(graph)
+            tracker = ProvenanceTracker()
             records = tracker.get_provenance(node_id)
             result = records if isinstance(records, list) else list(records)
         except (ImportError, AttributeError):
