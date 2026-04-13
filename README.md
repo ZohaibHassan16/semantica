@@ -55,66 +55,71 @@ pip install semantica
 
 ## 🔌 Works With Every AI Tool
 
-Semantica connects to the tools you already use — via MCP server, REST API, or native plugin bundles.
+Semantica ships **native plugin bundles** for Claude Code, Cursor, and Codex — and connects to any other tool via its **REST API** (FastAPI server, port 8000) or as an **MCP data source** you can pull from.
 
 <table>
 <tr>
 <td align="center" width="12.5%">
 <a href="https://claude.com/product/claude-code"><img src="https://github.com/anthropics.png?size=120" alt="Claude Code" width="48" height="48" /></a><br/>
 <strong>Claude Code</strong><br/>
-<sub>12 hooks + MCP + skills</sub>
+<sub>Native plugin · 17 skills · 3 agents · hooks</sub>
 </td>
 <td align="center" width="12.5%">
 <a href="https://cursor.com"><img src="https://www.freelogovectors.net/wp-content/uploads/2025/06/cursor-logo-freelogovectors.net_.png" alt="Cursor" width="48" height="48" /></a><br/>
 <strong>Cursor</strong><br/>
-<sub>MCP server</sub>
+<sub>Native plugin · 17 skills · 3 agents</sub>
+</td>
+<td align="center" width="12.5%">
+<a href="https://github.com/openai/codex"><img src="https://github.com/openai.png?size=120" alt="Codex CLI" width="48" height="48" /></a><br/>
+<strong>Codex CLI</strong><br/>
+<sub>Native plugin · 17 skills · 3 agents</sub>
 </td>
 <td align="center" width="12.5%">
 <a href="https://windsurf.com"><img src="https://exafunction.github.io/public/brand/windsurf-black-symbol.svg" alt="Windsurf" width="48" height="48" /></a><br/>
 <strong>Windsurf</strong><br/>
-<sub>MCP server</sub>
+<sub>REST API</sub>
 </td>
 <td align="center" width="12.5%">
 <a href="https://claude.ai/download"><img src="https://github.com/anthropics.png?size=120" alt="Claude Desktop" width="48" height="48" /></a><br/>
 <strong>Claude Desktop</strong><br/>
-<sub>MCP server</sub>
+<sub>REST API</sub>
 </td>
 <td align="center" width="12.5%">
 <a href="https://github.com/microsoft/vscode"><img src="https://github.com/microsoft.png?size=120" alt="VS Code" width="48" height="48" /></a><br/>
 <strong>VS Code</strong><br/>
-<sub>MCP server</sub>
+<sub>REST API</sub>
 </td>
 <td align="center" width="12.5%">
 <a href="https://github.com/features/copilot"><img src="https://github.com/github.png?size=120" alt="GitHub Copilot" width="48" height="48" /></a><br/>
 <strong>GitHub Copilot</strong><br/>
-<sub>MCP server</sub>
+<sub>REST API</sub>
 </td>
 <td align="center" width="12.5%">
 <a href="https://github.com/cline/cline"><img src="https://github.com/cline.png?size=120" alt="Cline" width="48" height="48" /></a><br/>
 <strong>Cline</strong><br/>
-<sub>MCP server</sub>
-</td>
-<td align="center" width="12.5%">
-<a href="https://github.com/RooCodeInc/Roo-Code"><img src="https://github.com/RooCodeInc.png?size=120" alt="Roo Code" width="48" height="48" /></a><br/>
-<strong>Roo Code</strong><br/>
-<sub>MCP server</sub>
+<sub>REST API</sub>
 </td>
 </tr>
 <tr>
 <td align="center" width="12.5%">
+<a href="https://github.com/RooCodeInc/Roo-Code"><img src="https://github.com/RooCodeInc.png?size=120" alt="Roo Code" width="48" height="48" /></a><br/>
+<strong>Roo Code</strong><br/>
+<sub>REST API</sub>
+</td>
+<td align="center" width="12.5%">
 <a href="https://github.com/continuedev/continue"><img src="https://github.com/continuedev.png?size=120" alt="Continue" width="48" height="48" /></a><br/>
 <strong>Continue</strong><br/>
-<sub>MCP server</sub>
+<sub>REST API</sub>
 </td>
 <td align="center" width="12.5%">
 <a href="https://github.com/block/goose"><img src="https://github.com/block.png?size=120" alt="Goose" width="48" height="48" /></a><br/>
 <strong>Goose</strong><br/>
-<sub>MCP server</sub>
+<sub>REST API</sub>
 </td>
 <td align="center" width="12.5%">
 <a href="https://github.com/Kilo-Org/kilocode"><img src="https://github.com/Kilo-Org.png?size=120" alt="Kilo Code" width="48" height="48" /></a><br/>
 <strong>Kilo Code</strong><br/>
-<sub>MCP server</sub>
+<sub>REST API</sub>
 </td>
 <td align="center" width="12.5%">
 <a href="https://github.com/Aider-AI/aider"><img src="https://github.com/Aider-AI.png?size=120" alt="Aider" width="48" height="48" /></a><br/>
@@ -124,17 +129,12 @@ Semantica connects to the tools you already use — via MCP server, REST API, or
 <td align="center" width="12.5%">
 <a href="https://github.com/aws/amazon-q-developer-cli"><img src="https://github.com/aws.png?size=120" alt="Amazon Q" width="48" height="48" /></a><br/>
 <strong>Amazon Q</strong><br/>
-<sub>MCP server</sub>
+<sub>REST API</sub>
 </td>
 <td align="center" width="12.5%">
 <a href="https://zed.dev"><img src="https://github.com/zed-industries.png?size=120" alt="Zed" width="48" height="48" /></a><br/>
 <strong>Zed</strong><br/>
-<sub>MCP server</sub>
-</td>
-<td align="center" width="12.5%">
-<a href="https://github.com/anthropics/claude-agent-sdk-typescript"><img src="https://github.com/anthropics.png?size=120" alt="Claude SDK" width="48" height="48" /></a><br/>
-<strong>Claude SDK</strong><br/>
-<sub>AgentSDKProvider</sub>
+<sub>REST API</sub>
 </td>
 <td align="center" width="12.5%">
 <img src="https://img.shields.io/badge/109-endpoints-1f6feb?style=flat-square" alt="REST API" width="48" /><br/>
@@ -144,15 +144,57 @@ Semantica connects to the tools you already use — via MCP server, REST API, or
 </tr>
 </table>
 
-### Plugin Bundles
+### Plugin Bundles (Claude Code · Cursor · Codex)
 
-Semantica ships a cross-platform plugin bundle under `plugins/` with deep integrations for agentic coding tools:
+Native plugin bundles live under [`plugins/`](plugins/) — install once, works across all three tools.
 
-- **17 domain skills** — context graphs, decision intelligence, explainability, reasoning, provenance, ontology, temporal, visualization
-- **Specialized agents** — `decision-advisor`, `explainability`, `kg-assistant`
-- **Hook configuration** and platform-specific manifests for Claude Code, Cursor, and Codex
+**17 domain skills:**
+
+| Skill | What it does |
+|---|---|
+| `extract` | Full semantic extraction pipeline: NER, relations, events, coreference, triplets |
+| `ingest` | Data ingestion from files, databases, APIs, streams, and MCP servers |
+| `query` | SPARQL, Cypher, keyword search, structured graph patterns |
+| `ontology` | Schema management, concepts, relationships, alignments |
+| `validate` | Pipeline, extraction, schema, and ontology validation |
+| `deduplicate` | Duplicate detection and entity merging with fuzzy matching |
+| `embed` | Node2Vec embeddings, similarity scoring, link prediction |
+| `reason` | Deductive, abductive, Datalog, SPARQL, and Rete reasoning engines |
+| `decision` | Record, query, and analyze decisions; find precedents; causal analysis |
+| `causal` | Cause-effect chains, interventions, counterfactuals, causal influence |
+| `temporal` | Point-in-time queries, snapshots, timelines, temporal causal analysis |
+| `provenance` | Data lineage, source attribution, audit trails |
+| `policy` | Policy definition, enforcement, compliance checks, access control |
+| `explain` | Decision logic transparency, causal context, audit-ready explanations |
+| `export` | Multi-format export: JSON, RDF, Parquet, CSV, GraphML |
+| `change` | Graph change tracking, diffs, temporal updates, impact analysis |
+| `visualize` | Topology, centrality, communities, paths, embeddings, decision graphs |
+
+**3 specialized agents:**
+
+| Agent | Role |
+|---|---|
+| `kg-assistant` | General-purpose KG-aware assistant — knows all APIs and method signatures |
+| `decision-advisor` | Decision intelligence specialist: causal reasoning, precedents, policy violations |
+| `explainability` | Reasoning transparency specialist — generates audit-ready explanation reports |
+
+**Hooks** (`plugins/hooks/hooks.json`) — `PreToolUse` / `PostToolUse` matchers for syntax validation and automated warnings.
 
 → [`plugins/.claude-plugin/README.md`](plugins/.claude-plugin/README.md)
+
+### MCP Client (Ingest from MCP Servers)
+
+Semantica includes an **MCP client** (`semantica/ingest/mcp_client.py`) that lets you pull data from any Python/FastMCP server into a knowledge graph:
+
+```python
+from semantica.ingest import MCPClient
+
+client = MCPClient("http://your-mcp-server:8080")
+resources = client.list_resources()   # discover available resources
+data      = client.read_resource("resource://your-data")
+```
+
+Supported connection schemes: `http://`, `https://`, `mcp://`, `sse://` · JSON-RPC · auth support · dynamic capability discovery.
 
 ---
 
@@ -776,26 +818,45 @@ if result.valid:
 
 ### AI Coding Tools & IDEs
 
-All tools connect via **MCP server** unless noted otherwise. Configure Semantica as an MCP server once — every tool below picks it up automatically.
+Start the Semantica server (`python -m semantica.server`, port 8000) and point any tool at `http://localhost:8000`. Tools marked **Native plugin** also get 17 skills, 3 agents, and hook config out of the box.
 
 | Tool | Connection | Notes |
 |---|---|---|
-| [Claude Code](https://claude.com/product/claude-code) | MCP + 12 hooks + skills | Native plugin bundle — 17 skills, 3 agents, hook config |
-| [Cursor](https://cursor.com) | MCP server | Add Semantica MCP in Cursor settings |
-| [Windsurf](https://windsurf.com) | MCP server | Add via Windsurf MCP config |
-| [Claude Desktop](https://claude.ai/download) | MCP server | Add to `claude_desktop_config.json` |
-| [VS Code](https://github.com/microsoft/vscode) | MCP server | Works with GitHub Copilot Chat MCP support |
-| [GitHub Copilot](https://github.com/features/copilot) | MCP server | VS Code + JetBrains agent mode |
-| [Cline](https://github.com/cline/cline) | MCP server | Add Semantica server in Cline MCP settings |
-| [Roo Code](https://github.com/RooCodeInc/Roo-Code) | MCP server | Configure via Roo Code MCP panel |
-| [Continue](https://github.com/continuedev/continue) | MCP server | Add to `~/.continue/config.json` |
-| [Goose](https://github.com/block/goose) | MCP server | Add to Goose toolset config |
-| [Kilo Code](https://github.com/Kilo-Org/kilocode) | MCP server | Configure in Kilo Code settings |
-| [Aider](https://github.com/Aider-AI/aider) | REST API | Point Aider at the Semantica REST API |
-| [Amazon Q Developer](https://github.com/aws/amazon-q-developer-cli) | MCP server | Add via Q Developer MCP config |
-| [Zed](https://zed.dev) | MCP server | Configure in Zed settings |
-| [Claude SDK](https://github.com/anthropics/claude-agent-sdk-typescript) | AgentSDKProvider | `AgentSDKProvider` wraps the full Semantica API |
-| Any agent | REST API | 109 REST endpoints — drop-in with any HTTP client |
+| [Claude Code](https://claude.com/product/claude-code) | **Native plugin** | `plugins/.claude-plugin/` — 17 skills, 3 agents, `hooks.json` |
+| [Cursor](https://cursor.com) | **Native plugin** | `plugins/.cursor-plugin/` — same 17 skills + 3 agents |
+| [Codex CLI](https://github.com/openai/codex) | **Native plugin** | `plugins/.codex-plugin/` — same 17 skills + 3 agents |
+| [Windsurf](https://windsurf.com) | REST API | Point at `http://localhost:8000/api` |
+| [Claude Desktop](https://claude.ai/download) | REST API | Point at `http://localhost:8000/api` |
+| [VS Code](https://github.com/microsoft/vscode) | REST API | Use any REST client extension |
+| [GitHub Copilot](https://github.com/features/copilot) | REST API | Use via Copilot Chat custom tools |
+| [Cline](https://github.com/cline/cline) | REST API | Add as a custom tool endpoint |
+| [Roo Code](https://github.com/RooCodeInc/Roo-Code) | REST API | Add as a custom tool endpoint |
+| [Continue](https://github.com/continuedev/continue) | REST API | Add to `~/.continue/config.json` as context provider |
+| [Goose](https://github.com/block/goose) | REST API | Add to Goose toolset config |
+| [Kilo Code](https://github.com/Kilo-Org/kilocode) | REST API | Add as custom REST tool |
+| [Aider](https://github.com/Aider-AI/aider) | REST API | Pass context from the API into prompts |
+| [Amazon Q Developer](https://github.com/aws/amazon-q-developer-cli) | REST API | Use via Q Developer custom tools |
+| [Zed](https://zed.dev) | REST API | Integrate via Zed assistant context |
+| Any agent | REST API | 109 endpoints — drop-in with any HTTP client |
+
+### REST API Server
+
+Run `python -m semantica.server` (or `python -m semantica`) — FastAPI on port 8000 with the following route groups:
+
+| Route group | Module | Endpoints |
+|---|---|---|
+| `/api/graph` | `routes/graph.py` | Nodes, edges, traversal, graph topology |
+| `/api/analytics` | `routes/analytics.py` | Centrality, communities, metrics |
+| `/api/decisions` | `routes/decisions.py` | Decision CRUD, precedent search, causal chains |
+| `/api/temporal` | `routes/temporal.py` | Point-in-time queries, snapshots, timelines |
+| `/api/export` | `routes/export_import.py` | Import/export in RDF, Parquet, JSON, CSV, GraphML |
+| `/api/annotations` | `routes/annotations.py` | Entity and edge annotation |
+| `/api/enrich` | `routes/enrich.py` | Graph enrichment — embeddings, vectors, metadata |
+| `/api/sparql` | `routes/sparql.py` | SPARQL query execution |
+| `/api/provenance` | `routes/provenance.py` | Data lineage and audit trails |
+| `/api/vocabulary` | `routes/vocabulary.py` | Ontology, SKOS concepts, schema definitions |
+| `/ws` | `ws.py` | WebSocket — real-time graph mutation events |
+| `/health` | `server.py` | Health check |
 
 ### Graph Databases
 - **Neo4j** — Cypher queries via `semantica.graph_store`
@@ -878,12 +939,15 @@ Semantica complements — not replaces — every major agentic framework. Use it
 
 > **Agno — First-Class Integration** · `pip install semantica[agno]`
 >
-> Five ready-to-use Agno components:
-> - `AgnoContextStore` — graph-backed agent memory
-> - `AgnoKnowledgeGraph` — multi-hop GraphRAG knowledge base
-> - `AgnoDecisionKit` — 6 decision-intelligence tools
-> - `AgnoKGToolkit` — 7 KG pipeline tools
-> - `AgnoSharedContext` — shared context graph for multi-agent teams
+> Five integration modules live in [`integrations/agno/`](integrations/agno/):
+>
+> | Module | Class | What it does |
+> |---|---|---|
+> | `context_store.py` | `AgnoContextStore` | Graph-backed agent memory — store and retrieve structured context |
+> | `knowledge_graph.py` | `AgnoKnowledgeGraph` | Implements Agno's `AgentKnowledge` protocol; full extraction pipeline |
+> | `decision_kit.py` | `AgnoDecisionKit` | 6 decision-intelligence tools for Agno agents |
+> | `kg_toolkit.py` | `AgnoKGToolkit` | 7 KG pipeline tools (build, query, enrich, export) |
+> | `shared_context.py` | `AgnoSharedContext` | Shared context graph for multi-agent team coordination |
 
 ---
 
