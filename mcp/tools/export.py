@@ -70,7 +70,7 @@ def handle_export_graph(args: dict) -> dict:
             try:
                 from semantica.export import ParquetExporter
                 exporter = ParquetExporter()
-                data = exporter.export(graph)
+                data = exporter.export(graph, include_metadata)
                 return {"format": "parquet", "data": str(data)}
             except Exception as exc:
                 return {"error": f"Parquet export failed: {exc}"}
