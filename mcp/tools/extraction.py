@@ -17,7 +17,7 @@ def _clear_cache() -> None:
         from semantica.semantic_extract.cache import _result_cache
         _result_cache.clear()
     except Exception:
-        pass
+        log.debug("Could not clear semantic_extract cache; continuing", exc_info=True)
 
 
 def handle_extract_entities(args: dict) -> dict:
