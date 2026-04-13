@@ -53,17 +53,106 @@ pip install semantica
 
 ---
 
-## Plugins (Claude, Cursor, Codex)
+## 🔌 Works With Every AI Tool
 
-Semantica includes a cross-platform plugin bundle under `plugins/` for community use:
+Semantica connects to the tools you already use — via MCP server, REST API, or native plugin bundles.
 
-- 17 domain skills (context graphs, decision intelligence, explainability, reasoning, provenance, ontology, temporal, visualization)
-- Specialized agents (`decision-advisor`, `explainability`, `kg-assistant`)
-- Hook configuration and platform-specific manifests for Claude, Cursor, and Codex
+<table>
+<tr>
+<td align="center" width="12.5%">
+<a href="https://claude.com/product/claude-code"><img src="https://github.com/anthropics.png?size=120" alt="Claude Code" width="48" height="48" /></a><br/>
+<strong>Claude Code</strong><br/>
+<sub>12 hooks + MCP + skills</sub>
+</td>
+<td align="center" width="12.5%">
+<a href="https://cursor.com"><img src="https://www.freelogovectors.net/wp-content/uploads/2025/06/cursor-logo-freelogovectors.net_.png" alt="Cursor" width="48" height="48" /></a><br/>
+<strong>Cursor</strong><br/>
+<sub>MCP server</sub>
+</td>
+<td align="center" width="12.5%">
+<a href="https://windsurf.com"><img src="https://exafunction.github.io/public/brand/windsurf-black-symbol.svg" alt="Windsurf" width="48" height="48" /></a><br/>
+<strong>Windsurf</strong><br/>
+<sub>MCP server</sub>
+</td>
+<td align="center" width="12.5%">
+<a href="https://claude.ai/download"><img src="https://github.com/anthropics.png?size=120" alt="Claude Desktop" width="48" height="48" /></a><br/>
+<strong>Claude Desktop</strong><br/>
+<sub>MCP server</sub>
+</td>
+<td align="center" width="12.5%">
+<a href="https://github.com/microsoft/vscode"><img src="https://github.com/microsoft.png?size=120" alt="VS Code" width="48" height="48" /></a><br/>
+<strong>VS Code</strong><br/>
+<sub>MCP server</sub>
+</td>
+<td align="center" width="12.5%">
+<a href="https://github.com/features/copilot"><img src="https://github.com/github.png?size=120" alt="GitHub Copilot" width="48" height="48" /></a><br/>
+<strong>GitHub Copilot</strong><br/>
+<sub>MCP server</sub>
+</td>
+<td align="center" width="12.5%">
+<a href="https://github.com/cline/cline"><img src="https://github.com/cline.png?size=120" alt="Cline" width="48" height="48" /></a><br/>
+<strong>Cline</strong><br/>
+<sub>MCP server</sub>
+</td>
+<td align="center" width="12.5%">
+<a href="https://github.com/RooCodeInc/Roo-Code"><img src="https://github.com/RooCodeInc.png?size=120" alt="Roo Code" width="48" height="48" /></a><br/>
+<strong>Roo Code</strong><br/>
+<sub>MCP server</sub>
+</td>
+</tr>
+<tr>
+<td align="center" width="12.5%">
+<a href="https://github.com/continuedev/continue"><img src="https://github.com/continuedev.png?size=120" alt="Continue" width="48" height="48" /></a><br/>
+<strong>Continue</strong><br/>
+<sub>MCP server</sub>
+</td>
+<td align="center" width="12.5%">
+<a href="https://github.com/block/goose"><img src="https://github.com/block.png?size=120" alt="Goose" width="48" height="48" /></a><br/>
+<strong>Goose</strong><br/>
+<sub>MCP server</sub>
+</td>
+<td align="center" width="12.5%">
+<a href="https://github.com/Kilo-Org/kilocode"><img src="https://github.com/Kilo-Org.png?size=120" alt="Kilo Code" width="48" height="48" /></a><br/>
+<strong>Kilo Code</strong><br/>
+<sub>MCP server</sub>
+</td>
+<td align="center" width="12.5%">
+<a href="https://github.com/Aider-AI/aider"><img src="https://github.com/Aider-AI.png?size=120" alt="Aider" width="48" height="48" /></a><br/>
+<strong>Aider</strong><br/>
+<sub>REST API</sub>
+</td>
+<td align="center" width="12.5%">
+<a href="https://github.com/aws/amazon-q-developer-cli"><img src="https://github.com/aws.png?size=120" alt="Amazon Q" width="48" height="48" /></a><br/>
+<strong>Amazon Q</strong><br/>
+<sub>MCP server</sub>
+</td>
+<td align="center" width="12.5%">
+<a href="https://zed.dev"><img src="https://github.com/zed-industries.png?size=120" alt="Zed" width="48" height="48" /></a><br/>
+<strong>Zed</strong><br/>
+<sub>MCP server</sub>
+</td>
+<td align="center" width="12.5%">
+<a href="https://github.com/anthropics/claude-agent-sdk-typescript"><img src="https://github.com/anthropics.png?size=120" alt="Claude SDK" width="48" height="48" /></a><br/>
+<strong>Claude SDK</strong><br/>
+<sub>AgentSDKProvider</sub>
+</td>
+<td align="center" width="12.5%">
+<img src="https://img.shields.io/badge/109-endpoints-1f6feb?style=flat-square" alt="REST API" width="48" /><br/>
+<strong>Any agent</strong><br/>
+<sub>REST API</sub>
+</td>
+</tr>
+</table>
 
-See the community setup guide:
+### Plugin Bundles
 
-- [`plugins/.claude-plugin/README.md`](plugins/.claude-plugin/README.md)
+Semantica ships a cross-platform plugin bundle under `plugins/` with deep integrations for agentic coding tools:
+
+- **17 domain skills** — context graphs, decision intelligence, explainability, reasoning, provenance, ontology, temporal, visualization
+- **Specialized agents** — `decision-advisor`, `explainability`, `kg-assistant`
+- **Hook configuration** and platform-specific manifests for Claude Code, Cursor, and Codex
+
+→ [`plugins/.claude-plugin/README.md`](plugins/.claude-plugin/README.md)
 
 ---
 
@@ -710,7 +799,53 @@ if result.valid:
 - **Novita AI** — OpenAI-compatible (`deepseek/deepseek-v3.2` and more) · set `NOVITA_API_KEY`
 
 ### Agentic Frameworks
-Semantica complements — not replaces — LangChain, LlamaIndex, AutoGen, CrewAI, Google ADK, and more.
+
+Semantica complements — not replaces — every major agentic framework. Use it as the accountability layer on top.
+
+<table>
+<tr>
+<td align="center" width="12.5%">
+<a href="https://github.com/agno-agi/agno"><img src="https://github.com/agno-agi.png?size=120" alt="Agno" width="40" height="40" /></a><br/>
+<strong>Agno</strong><br/>
+<sub>First-class · <code>pip install semantica[agno]</code></sub>
+</td>
+<td align="center" width="12.5%">
+<a href="https://github.com/langchain-ai/langchain"><img src="https://github.com/langchain-ai.png?size=120" alt="LangChain" width="40" height="40" /></a><br/>
+<strong>LangChain</strong><br/>
+<sub>Context layer</sub>
+</td>
+<td align="center" width="12.5%">
+<a href="https://github.com/langchain-ai/langgraph"><img src="https://github.com/langchain-ai.png?size=120" alt="LangGraph" width="40" height="40" /></a><br/>
+<strong>LangGraph</strong><br/>
+<sub>Stateful agent graph</sub>
+</td>
+<td align="center" width="12.5%">
+<a href="https://github.com/run-llama/llama_index"><img src="https://github.com/run-llama.png?size=120" alt="LlamaIndex" width="40" height="40" /></a><br/>
+<strong>LlamaIndex</strong><br/>
+<sub>GraphRAG retriever</sub>
+</td>
+<td align="center" width="12.5%">
+<a href="https://github.com/microsoft/autogen"><img src="https://github.com/microsoft.png?size=120" alt="AutoGen" width="40" height="40" /></a><br/>
+<strong>AutoGen</strong><br/>
+<sub>Shared context graph</sub>
+</td>
+<td align="center" width="12.5%">
+<a href="https://github.com/crewAIInc/crewAI"><img src="https://github.com/crewAIInc.png?size=120" alt="CrewAI" width="40" height="40" /></a><br/>
+<strong>CrewAI</strong><br/>
+<sub>Decision + provenance</sub>
+</td>
+<td align="center" width="12.5%">
+<a href="https://github.com/openai/openai-agents-python"><img src="https://github.com/openai.png?size=120" alt="OpenAI Agents SDK" width="40" height="40" /></a><br/>
+<strong>OpenAI Agents</strong><br/>
+<sub>Context + KG tools</sub>
+</td>
+<td align="center" width="12.5%">
+<a href="https://github.com/google/adk-python"><img src="https://github.com/google.png?size=120" alt="Google ADK" width="40" height="40" /></a><br/>
+<strong>Google ADK</strong><br/>
+<sub>Context layer</sub>
+</td>
+</tr>
+</table>
 
 > **Agno — First-Class Integration** · `pip install semantica[agno]`
 >
