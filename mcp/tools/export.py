@@ -34,8 +34,8 @@ def handle_export_graph(args: dict) -> dict:
             if hasattr(graph, "find_edges"):
                 try:
                     edges = list(graph.find_edges())
-                except Exception:
-                    pass
+                except Exception as exc:
+                    log.debug("Failed to collect edges during JSON export; continuing with empty edges: %s", exc)
             payload: dict = {"nodes": nodes, "edges": edges}
             if include_metadata:
                 payload["meta"] = {
