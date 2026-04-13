@@ -774,10 +774,34 @@ if result.valid:
 
 ## 🔌 Integrations
 
+### AI Coding Tools & IDEs
+
+All tools connect via **MCP server** unless noted otherwise. Configure Semantica as an MCP server once — every tool below picks it up automatically.
+
+| Tool | Connection | Notes |
+|---|---|---|
+| [Claude Code](https://claude.com/product/claude-code) | MCP + 12 hooks + skills | Native plugin bundle — 17 skills, 3 agents, hook config |
+| [Cursor](https://cursor.com) | MCP server | Add Semantica MCP in Cursor settings |
+| [Windsurf](https://windsurf.com) | MCP server | Add via Windsurf MCP config |
+| [Claude Desktop](https://claude.ai/download) | MCP server | Add to `claude_desktop_config.json` |
+| [VS Code](https://github.com/microsoft/vscode) | MCP server | Works with GitHub Copilot Chat MCP support |
+| [GitHub Copilot](https://github.com/features/copilot) | MCP server | VS Code + JetBrains agent mode |
+| [Cline](https://github.com/cline/cline) | MCP server | Add Semantica server in Cline MCP settings |
+| [Roo Code](https://github.com/RooCodeInc/Roo-Code) | MCP server | Configure via Roo Code MCP panel |
+| [Continue](https://github.com/continuedev/continue) | MCP server | Add to `~/.continue/config.json` |
+| [Goose](https://github.com/block/goose) | MCP server | Add to Goose toolset config |
+| [Kilo Code](https://github.com/Kilo-Org/kilocode) | MCP server | Configure in Kilo Code settings |
+| [Aider](https://github.com/Aider-AI/aider) | REST API | Point Aider at the Semantica REST API |
+| [Amazon Q Developer](https://github.com/aws/amazon-q-developer-cli) | MCP server | Add via Q Developer MCP config |
+| [Zed](https://zed.dev) | MCP server | Configure in Zed settings |
+| [Claude SDK](https://github.com/anthropics/claude-agent-sdk-typescript) | AgentSDKProvider | `AgentSDKProvider` wraps the full Semantica API |
+| Any agent | REST API | 109 REST endpoints — drop-in with any HTTP client |
+
 ### Graph Databases
-- **AWS Neptune** — Amazon Neptune with IAM authentication
+- **Neo4j** — Cypher queries via `semantica.graph_store`
+- **FalkorDB** — native support; `DecisionQuery` and `CausalChainAnalyzer` work directly with FalkorDB row/header shapes
 - **Apache AGE** — PostgreSQL + openCypher via SQL
-- **FalkorDB** — native support for decision queries and causal analysis
+- **AWS Neptune** — Amazon Neptune with IAM authentication
 
 ### Vector Databases
 - **FAISS** — built-in, zero extra dependencies
@@ -793,10 +817,15 @@ if result.valid:
 - **Databases** — SQL via `DBIngestor`
 - **Snowflake** — table/query ingestion, pagination, password/key-pair/OAuth/SSO auth · `pip install semantica[db-snowflake]`
 - **Docling** — advanced table and layout extraction (PDF, DOCX, PPTX, XLSX)
+- **Email** — inbox ingestion via `EmailIngestor`
+- **Repositories** — Git repo ingestion for code graph construction
 
 ### LLM Providers
 - **LiteLLM** — 100+ models: OpenAI, Anthropic, Cohere, Mistral, Ollama, Azure, AWS Bedrock, and more
 - **Novita AI** — OpenAI-compatible (`deepseek/deepseek-v3.2` and more) · set `NOVITA_API_KEY`
+- **Groq** — ultra-low latency inference · set `GROQ_API_KEY`
+- **HuggingFace** — local and hosted models via `HuggingFaceProvider`
+- **Ollama** — local models including remote server support
 
 ### Agentic Frameworks
 
