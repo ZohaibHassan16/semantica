@@ -786,6 +786,11 @@ export function GraphWorkspace() {
     }
   }, []);
 
+  const handleSearchResultSelect = useCallback((nodeId: string) => {
+    setViewMode("full");
+    focusNode(nodeId);
+  }, [focusNode]);
+
   const handleEdgeSelect = useCallback((edgeId: string) => {
     setSelectedEdgeId(edgeId);
   }, []);
@@ -881,6 +886,12 @@ export function GraphWorkspace() {
     const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
     const socket = new WebSocket(`${protocol}//${window.location.host}/ws/graph-updates`);
 
+    socket.onopen = () => {
+      if (import.meta.env.DEV) {
+        console.info("[GraphWorkspace] websocket connected");
+      }
+    };
+
     socket.onmessage = (event) => {
       try {
         const message = JSON.parse(event.data);
@@ -915,6 +926,22 @@ export function GraphWorkspace() {
         }
       } catch (socketError) {
         console.error("[GraphWorkspace] websocket update failed", socketError);
+      }
+    };
+
+    socket.onerror = (event) => {
+      if (import.meta.env.DEV) {
+        console.error("[GraphWorkspace] websocket error", event);
+      }
+    };
+
+    socket.onclose = (event) => {
+      if (import.meta.env.DEV) {
+        console.info("[GraphWorkspace] websocket closed", {
+          code: event.code,
+          reason: event.reason || "no reason provided",
+          wasClean: event.wasClean,
+        });
       }
     };
 
@@ -1427,7 +1454,7 @@ export function GraphWorkspace() {
               {searchResults.length ? (
                 <div className="explore-search-results hud-scrollbar" style={searchResultsStripStyle}>
                   {searchResults.map((result) => (
-                    <button key={result.node.id} style={predictionCardStyle} onClick={() => focusNode(result.node.id)}>
+                    <button key={result.node.id} style={predictionCardStyle} onClick={() => handleSearchResultSelect(result.node.id)}>
                       <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
                         <div style={{ minWidth: 0 }}>
                           <div style={{ color: "#fff", fontWeight: 600 }}>{result.node.content || result.node.id}</div>
