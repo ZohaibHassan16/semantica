@@ -14,6 +14,8 @@ export type PathResponse = {
   path: string[];
   edge_ids?: string[];
   total_weight: number;
+  hop_count: number;
+  distance_band: "direct" | "near" | "mid-range" | "distant";
 };
 
 export interface GraphInspectorPanelProps {

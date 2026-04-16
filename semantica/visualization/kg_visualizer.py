@@ -61,6 +61,7 @@ try:
 except Exception:  # pragma: no cover
     _KnowledgeGraph = None  # type: ignore[assignment,misc]
 
+from ..utils.helpers import classify_path_distance
 from ..utils.progress_tracker import get_progress_tracker
 from .utils.color_schemes import ColorPalette, ColorScheme
 from .utils.export_formats import (
@@ -191,6 +192,7 @@ class KGVisualizer:
         node_color_by: str = "type",
         node_size_by: Optional[str] = None,
         hover_data: Optional[List[str]] = None,
+        highlight_path: Optional[List[str]] = None,
         **options,
     ) -> Optional[Any]:
         """
@@ -212,6 +214,9 @@ class KGVisualizer:
             node_color_by: Property to map to node color (default: "type")
             node_size_by: Property to map to node size (default: fixed)
             hover_data: List of properties to show in hover tooltip
+            highlight_path: Optional ordered list of node IDs forming a path to
+                highlight with distance-aware edge styling (opacity and stroke
+                weight reflect hop count along the path).
             **options: Additional visualization options
 
         Returns:
@@ -261,13 +266,14 @@ class KGVisualizer:
                 tracking_id, message="Generating visualization..."
             )
             result = self._visualize_network_plotly(
-                nodes, 
-                edges, 
-                output, 
-                file_path, 
+                nodes,
+                edges,
+                output,
+                file_path,
                 node_color_by=node_color_by,
                 node_size_by=node_size_by,
                 hover_data=hover_data,
+                highlight_path=highlight_path,
                 **options
             )
 
@@ -564,6 +570,21 @@ class KGVisualizer:
 
         return edges
 
+    @staticmethod
+    def _path_edge_style(distance_band: str) -> Tuple[float, float]:
+        """Return (opacity, width) for a path edge based on its distance band.
+
+        Bands come from ``classify_path_distance`` in ``utils.helpers`` — the
+        single source of truth for hop-count thresholds.
+        """
+        if distance_band == "direct":
+            return (1.0, 4.0)
+        if distance_band == "near":
+            return (0.85, 3.0)
+        if distance_band == "mid-range":
+            return (0.6, 2.0)
+        return (0.35, 1.5)  # "distant"
+
     def _visualize_network_plotly(
         self,
         nodes: List[Dict[str, Any]],
@@ -573,6 +594,7 @@ class KGVisualizer:
         node_color_by: str = "type",
         node_size_by: Optional[str] = None,
         hover_data: Optional[List[str]] = None,
+        highlight_path: Optional[List[str]] = None,
         **options,
     ) -> Optional[Any]:
         """Create Plotly network visualization."""
@@ -675,47 +697,73 @@ class KGVisualizer:
                 
             node_text.append(text)
 
-        # Prepare edge traces
-        edge_x = []
-        edge_y = []
-        
+        # Build path edge lookup for highlight_path support
+        path_edge_set: set = set()
+        path_distance_band = "direct"
+        if highlight_path and len(highlight_path) >= 2:
+            path_hop_count = len(highlight_path) - 1
+            path_distance_band = classify_path_distance(path_hop_count)
+            # Only add the directed edges that actually form the path (A→B, not B→A).
+            # Adding the reverse would incorrectly highlight unrelated back-edges.
+            for i in range(path_hop_count):
+                path_edge_set.add((highlight_path[i], highlight_path[i + 1]))
+            # Warn if any path node has no layout position (silent highlight failure).
+            missing = [n for n in highlight_path if n not in pos]
+            if missing:
+                self.logger.warning(
+                    "highlight_path contains node IDs not found in the graph: %s",
+                    missing,
+                )
+
+        path_opacity, path_width = self._path_edge_style(path_distance_band)
+
+        # Prepare edge traces — split into background (non-path) and path edges
+        edge_x: List = []
+        edge_y: List = []
+        path_edge_x: List = []
+        path_edge_y: List = []
+
         # Prepare edge label traces and annotations (for arrows)
         edge_label_x = []
         edge_label_y = []
         edge_label_text = []
         annotations = []
-        
+
         # Limit detailed edge rendering for performance if graph is too large
         show_detailed_edges = len(edges) < 500
-        
+
         for edge in edges:
             source_pos = pos.get(edge["source"])
             target_pos = pos.get(edge["target"])
             if source_pos and target_pos:
                 x0, y0 = source_pos
                 x1, y1 = target_pos
-                edge_x.extend([x0, x1, None])
-                edge_y.extend([y0, y1, None])
-                
+
+                is_path_edge = (edge["source"], edge["target"]) in path_edge_set
+                if is_path_edge:
+                    path_edge_x.extend([x0, x1, None])
+                    path_edge_y.extend([y0, y1, None])
+                else:
+                    edge_x.extend([x0, x1, None])
+                    edge_y.extend([y0, y1, None])
+
                 if show_detailed_edges:
                     # Calculate midpoint for label
                     mx, my = (x0 + x1) / 2, (y0 + y1) / 2
-                    
+
                     if edge.get("label"):
                         edge_label_x.append(mx)
                         edge_label_y.append(my)
                         edge_label_text.append(edge["label"])
-                    
+
                     # Add arrow annotation
-                    # Adjust arrow to point slightly before the node to avoid overlap with node marker
-                    # This is approximate; precise calculation requires node size
                     annotations.append(
                         dict(
                             ax=x0, ay=y0, axref='x', ayref='y',
                             x=x1, y=y1, xref='x', yref='y',
                             arrowhead=2, arrowsize=1, arrowwidth=1,
                             arrowcolor="#888", opacity=0.6,
-                            standoff=15 # Distance from target node
+                            standoff=15
                         )
                     )
 
@@ -728,9 +776,22 @@ class KGVisualizer:
             showlegend=False,
             opacity=0.5
         )
-        
+
         traces = [edge_trace]
-        
+
+        # Overlay highlighted path edges with distance-aware styling
+        if path_edge_x:
+            path_trace = go.Scatter(
+                x=path_edge_x,
+                y=path_edge_y,
+                line=dict(width=path_width, color="#e05c00"),
+                hoverinfo="none",
+                mode="lines",
+                showlegend=False,
+                opacity=path_opacity,
+            )
+            traces.append(path_trace)
+
         if show_detailed_edges and edge_label_text:
             edge_label_trace = go.Scatter(
                 x=edge_label_x,
