@@ -33,6 +33,8 @@ type LinkPrediction = {
 type PathResponse = {
   path: GraphPath;
   total_weight: number;
+  hop_count: number;
+  distance_band: "direct" | "near" | "mid-range" | "distant";
 };
 
 type TemporalBounds = {

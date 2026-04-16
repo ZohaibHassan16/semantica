@@ -68,6 +68,8 @@ class PathResponse(BaseModel):
     edge_ids: List[str] = Field(default_factory=list)
     total_weight: float = 0.0
     directed: bool = True
+    hop_count: int = 0
+    distance_band: str = "direct"
 
 
 class GraphStatsResponse(BaseModel):

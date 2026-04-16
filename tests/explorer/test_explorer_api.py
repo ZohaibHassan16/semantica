@@ -758,3 +758,58 @@ class TestBidirectionalPathRoute:
         resp_false = path_client.get("/api/graph/node/A/path?target=B&directed=false")
         assert resp_true.json()["directed"] is True
         assert resp_false.json()["directed"] is False
+
+    # ------------------------------------------------------------------
+    # hop_count and distance_band — issue #472
+    # ------------------------------------------------------------------
+
+    def test_response_includes_hop_count_and_distance_band(self, path_client):
+        """PathResponse must include hop_count and distance_band fields."""
+        resp = path_client.get("/api/graph/node/A/path?target=B")
+        assert resp.status_code == 200
+        body = resp.json()
+        assert "hop_count" in body
+        assert "distance_band" in body
+
+    def test_one_hop_path_is_direct(self, path_client):
+        """A single-edge path (1 hop) must return distance_band='direct'."""
+        resp = path_client.get("/api/graph/node/A/path?target=B")
+        assert resp.status_code == 200
+        body = resp.json()
+        assert body["hop_count"] == 1
+        assert body["distance_band"] == "direct"
+
+
+# ---------------------------------------------------------------------------
+# _classify_distance unit tests — issue #472
+# ---------------------------------------------------------------------------
+
+from semantica.utils.helpers import classify_path_distance
+
+
+class TestClassifyDistance:
+    """Unit tests covering all four band boundaries."""
+
+    def test_zero_hops_is_direct(self):
+        assert classify_path_distance(0) == "direct"
+
+    def test_one_hop_is_direct(self):
+        assert classify_path_distance(1) == "direct"
+
+    def test_two_hops_is_near(self):
+        assert classify_path_distance(2) == "near"
+
+    def test_three_hops_is_near(self):
+        assert classify_path_distance(3) == "near"
+
+    def test_four_hops_is_mid_range(self):
+        assert classify_path_distance(4) == "mid-range"
+
+    def test_six_hops_is_mid_range(self):
+        assert classify_path_distance(6) == "mid-range"
+
+    def test_seven_hops_is_distant(self):
+        assert classify_path_distance(7) == "distant"
+
+    def test_large_hop_count_is_distant(self):
+        assert classify_path_distance(20) == "distant"

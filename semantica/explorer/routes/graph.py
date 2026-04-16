@@ -8,6 +8,7 @@ from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 
+from ...utils.helpers import classify_path_distance
 from ..dependencies import get_session
 from ..schemas import (
     EdgeListResponse,
@@ -141,6 +142,8 @@ class _PathAlgorithm(str, Enum):
     dijkstra = "dijkstra"
 
 
+
+
 @router.get("/node/{node_id}/path", response_model=PathResponse)
 async def find_path(
     node_id: str,
@@ -171,6 +174,7 @@ async def find_path(
     total_weight = result.get("total_weight", 0.0) if isinstance(result, dict) else 0.0
     edge_ids = await asyncio.to_thread(session.resolve_path_edge_ids, path_nodes)
 
+    hop_count = len(path_nodes) - 1 if path_nodes else 0
     return PathResponse(
         source=node_id,
         target=target,
@@ -179,6 +183,8 @@ async def find_path(
         edge_ids=edge_ids,
         total_weight=total_weight,
         directed=directed,
+        hop_count=hop_count,
+        distance_band=classify_path_distance(hop_count),
     )
 
 
