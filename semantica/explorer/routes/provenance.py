@@ -130,7 +130,7 @@ def _build_report(session: GraphSession, node_id: str) -> Dict[str, Any]:
         "node_id": node_id,
         "label": node.get("content", node_id) if node else node_id,
         "type": node.get("type", "entity") if node else "entity",
-        "properties": node.get("properties", {}) if node else {},
+        "properties": node.get("metadata", node.get("properties", {})) if node else {},
         "lineage": provenance,
     }
 
