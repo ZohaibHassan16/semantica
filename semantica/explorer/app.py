@@ -19,7 +19,12 @@ from .ws import ConnectionManager
 
 
 def _install_mutation_bridge(app: FastAPI, session: GraphSession) -> None:
+    previous_callback = getattr(session.graph, "mutation_callback", None)
+
     def on_mutation(event_type: str, entity_id: str, payload: dict) -> None:
+        session.handle_graph_mutation(event_type, entity_id, payload)
+        if callable(previous_callback):
+            previous_callback(event_type, entity_id, payload)
         loop = getattr(app.state, "event_loop", None)
         manager = getattr(app.state, "ws_manager", None)
         if loop is None or manager is None or loop.is_closed():
