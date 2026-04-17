@@ -168,7 +168,9 @@ def _render_markdown(report: Dict[str, Any]) -> str:
     }
     for edge in edges:
         direction = edge.get("direction", "lateral")
-        grouped_edges.setdefault(direction, []).append(edge)
+        if direction not in grouped_edges:
+            direction = "lateral"
+        grouped_edges[direction].append(edge)
 
     if grouped_edges.get("upstream"):
         lines.extend(["", "## Upstream"])
