@@ -110,3 +110,7 @@ sample_data/
 
 # Test Results
 test_results.txt
+
+# Frontend workspace artifacts
+semantica-explorer/
+node_modules/

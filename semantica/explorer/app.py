@@ -85,6 +85,7 @@ def create_app(session: Optional[GraphSession] = None) -> FastAPI:
     from .routes.enrich import router as enrich_router
     from .routes.export_import import router as export_import_router
     from .routes.annotations import router as annotations_router
+    from .routes.provenance import router as provenance_router
 
     app.include_router(graph_router)
     app.include_router(analytics_router)
@@ -93,6 +94,7 @@ def create_app(session: Optional[GraphSession] = None) -> FastAPI:
     app.include_router(enrich_router)
     app.include_router(export_import_router)
     app.include_router(annotations_router)
+    app.include_router(provenance_router)
 
     from fastapi import WebSocket, WebSocketDisconnect
 
