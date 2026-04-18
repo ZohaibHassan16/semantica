@@ -1,4 +1,4 @@
-export type GraphViewMode = "focused" | "full";
+export type GraphViewMode = "focused" | "full" | "grouped";
 export type GraphLayoutSource = "provided" | "carried" | "runtime";
 export type GraphLayoutState = "idle" | "bootstrapping" | "running" | "stabilized" | "interactive" | "failed";
 export type GraphLoadPhase =
@@ -29,6 +29,14 @@ export interface GraphInteractionState {
   viewMode: GraphViewMode;
   zoomTier: "overview" | "structure" | "inspection";
   isLayoutRunning: boolean;
+}
+
+export interface GraphDisplayStateSnapshot {
+  aggregationEnabled: boolean;
+  groupedViewAvailable: boolean;
+  selectedRootNodeId: string | null;
+  selectedVisibleNeighborIds: string[];
+  selectedCollapsedNeighborIds: string[];
 }
 
 export type GraphEffectToggle =
@@ -245,6 +253,10 @@ export interface GraphSelectedNodeState {
   valid_until?: string | null;
   properties: Record<string, unknown>;
   neighborCount: number;
+  visibleNeighborCount: number;
+  collapsedNeighborCount: number;
+  isNeighborhoodCollapsed: boolean;
+  canCollapseNeighborhood: boolean;
 }
 
 export interface GraphSelectedEdgeState {
@@ -260,6 +272,12 @@ export interface GraphSelectedEdgeState {
   provenanceCount: number;
   familySize: number;
   siblingCount: number;
+  isAggregated: boolean;
+  aggregateCount: number;
+  rawEdgeIds: string[];
+  bundleKind: "parallel" | "bidirectional" | "community" | null;
+  dominantEdgeType: string | null;
+  representativeWeight: number;
 }
 
 export interface GraphStageHandle {

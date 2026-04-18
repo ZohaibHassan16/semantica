@@ -67,6 +67,10 @@ function buildSelectedNodeState(nodeId: string): GraphSelectedNodeState | null {
     valid_until: attributes.valid_until ?? null,
     properties: attributes.properties ?? {},
     neighborCount: graph.neighbors(nodeId).length,
+    visibleNeighborCount: graph.neighbors(nodeId).length,
+    collapsedNeighborCount: 0,
+    isNeighborhoodCollapsed: false,
+    canCollapseNeighborhood: graph.neighbors(nodeId).length > 8,
   };
 }
 

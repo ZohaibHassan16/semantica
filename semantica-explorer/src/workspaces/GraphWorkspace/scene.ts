@@ -48,6 +48,8 @@ export interface GraphSceneProps extends GraphSceneEventMap {
   layoutSource?: GraphLayoutSource;
   onLayoutStatusChange?: (status: GraphLayoutStatus) => void;
   viewMode: GraphViewMode;
+  aggregationEnabled?: boolean;
+  collapsedNeighborhoodNodeIds?: string[];
   className?: string;
   showFitViewButton?: boolean;
   pluginOverlays?: ReactNode[];

@@ -42,6 +42,7 @@ export const neighborhoodPanelPlugin: GraphPlugin = {
     }
 
     const selected = context.getSelectedNodeState();
+    const displayState = context.getDisplayState();
     if (!selected) {
       return {
         id: NEIGHBORHOOD_PANEL_ID,
@@ -82,6 +83,11 @@ export const neighborhoodPanelPlugin: GraphPlugin = {
         return left.label.localeCompare(right.label);
       })
       .slice(0, MAX_NEIGHBORS);
+    const hiddenNeighborCount = displayState.selectedCollapsedNeighborIds.length;
+    const aggregatedEdgeCount = context.displayGraph
+      .edges()
+      .map((edgeId) => context.displayGraph.getEdgeAttributes(edgeId) as { isAggregated?: boolean })
+      .filter((attrs) => attrs.isAggregated).length;
 
     return {
       id: NEIGHBORHOOD_PANEL_ID,
@@ -97,6 +103,34 @@ export const neighborhoodPanelPlugin: GraphPlugin = {
           <div style={summaryStyle}>
             {selected.neighborCount.toLocaleString()} direct neighbors in the full graph
           </div>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            <button
+              type="button"
+              onClick={() => context.dispatchAction({ type: "collapseNeighborhood" })}
+              disabled={!selected.canCollapseNeighborhood || selected.isNeighborhoodCollapsed}
+              style={controlButtonStyle}
+            >
+              Collapse Neighborhood
+            </button>
+            <button
+              type="button"
+              onClick={() => context.dispatchAction({ type: "expandNeighborhood" })}
+              disabled={!selected.isNeighborhoodCollapsed}
+              style={controlButtonStyle}
+            >
+              Expand Neighborhood
+            </button>
+          </div>
+          {hiddenNeighborCount > 0 ? (
+            <div style={summaryStyle}>
+              {hiddenNeighborCount.toLocaleString()} lower-priority neighbors are collapsed in the current view.
+            </div>
+          ) : null}
+          {aggregatedEdgeCount > 0 ? (
+            <div style={summaryStyle}>
+              {aggregatedEdgeCount.toLocaleString()} aggregated structural bundle{aggregatedEdgeCount === 1 ? "" : "s"} visible.
+            </div>
+          ) : null}
           {neighbors.length ? (
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {neighbors.map((neighbor) => (
@@ -157,6 +191,16 @@ const neighborButtonStyle: CSSProperties = {
   border: "1px solid rgba(255,255,255,0.06)",
   borderRadius: 12,
   cursor: "pointer",
+};
+
+const controlButtonStyle: CSSProperties = {
+  padding: "7px 10px",
+  background: "rgba(255,255,255,0.03)",
+  border: "1px solid rgba(255,255,255,0.08)",
+  borderRadius: 10,
+  color: "#dce7f4",
+  cursor: "pointer",
+  fontSize: 12,
 };
 
 const swatchStyle: CSSProperties = {

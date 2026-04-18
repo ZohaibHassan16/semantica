@@ -42,6 +42,10 @@ export interface NodeAttributes {
   haloColor?: string;
   labelVisibilityPolicy?: GraphLabelVisibilityPolicy;
   highlighted?: boolean;
+  communityId?: string;
+  isCommunityGroup?: boolean;
+  memberCount?: number;
+  anchorNodeId?: string | null;
 
   nodeType: string;
   content: string;
@@ -74,6 +78,12 @@ export interface EdgeAttributes {
   parallelIndex?: number;
   parallelCount?: number;
   familySize?: number;
+  rawEdgeIds?: string[];
+  isAggregated?: boolean;
+  aggregateCount?: number;
+  dominantEdgeType?: string;
+  representativeWeight?: number;
+  bundleKind?: "parallel" | "bidirectional" | "community";
   
  
   edgeType: string;

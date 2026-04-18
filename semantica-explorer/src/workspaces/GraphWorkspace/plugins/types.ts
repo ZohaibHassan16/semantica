@@ -6,6 +6,7 @@ import type { GraphTheme } from "../graphTheme";
 import type { GraphSceneRuntime } from "../scene";
 import type {
   GraphAnalyticsSnapshot,
+  GraphDisplayStateSnapshot,
   GraphDiagnosticsSnapshot,
   GraphEffectsState,
   GraphEffectToggle,
@@ -31,6 +32,8 @@ export type GraphPluginActionRequest =
   | { type: "focusNode"; nodeId: string }
   | { type: "selectNode"; nodeId: string }
   | { type: "setViewMode"; viewMode: GraphViewMode }
+  | { type: "collapseNeighborhood" }
+  | { type: "expandNeighborhood" }
   | { type: "toggleEffect"; effect: GraphEffectToggle }
   | { type: "setEffect"; effect: GraphEffectToggle; enabled: boolean }
   | { type: "togglePanel"; panelId: string }
@@ -77,6 +80,7 @@ export interface GraphPluginContext {
   getEffectsState: () => GraphEffectsState;
   getDiagnosticsSnapshot: () => GraphDiagnosticsSnapshot | null;
   getAnalyticsSnapshot: () => GraphAnalyticsSnapshot | null;
+  getDisplayState: () => GraphDisplayStateSnapshot;
   isPanelOpen: (panelId: string) => boolean;
   dispatchAction: (action: GraphPluginActionRequest) => void;
 }

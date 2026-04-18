@@ -84,6 +84,8 @@ export interface GraphCanvasProps {
   layoutSource?: string;
   onLayoutStatusChange?: (status: GraphLayoutStatus) => void;
   viewMode: GraphViewMode;
+  aggregationEnabled?: boolean;
+  collapsedNeighborhoodNodeIds?: string[];
   className?: string;
   showFitViewButton?: boolean;
   pluginOverlays?: ReactNode[];
@@ -111,15 +113,15 @@ const FA2_SETTINGS = {
 
 const SIGMA_SETTINGS = {
   allowInvalidContainer: true,
-  labelRenderedSizeThreshold: 4,
+  labelRenderedSizeThreshold: 6,
   defaultNodeType: "circle",
   defaultEdgeType: "line",
   hideLabelsOnMove: true,
   hideEdgesOnMove: true,
   enableEdgeEvents: true,
   renderEdgeLabels: false,
-  labelDensity: 0.86,
-  labelGridCellSize: 100,
+  labelDensity: 0.7,
+  labelGridCellSize: 140,
   zIndex: true,
   webGLTarget: "webgl2" as const,
   nodeProgramClasses: SEMANTICA_NODE_PROGRAM_CLASSES,
@@ -577,6 +579,8 @@ export const GraphCanvas = forwardRef<GraphCanvasHandle, GraphCanvasProps>(
       temporalState,
       isLayoutRunning,
       viewMode,
+      aggregationEnabled = true,
+      collapsedNeighborhoodNodeIds = [],
       className,
       showFitViewButton = true,
       pluginOverlays = [],
@@ -612,8 +616,11 @@ export const GraphCanvas = forwardRef<GraphCanvasHandle, GraphCanvasProps>(
 
     const isFocusedView = viewMode === "focused" && Boolean(selectedNodeId) && graph.hasNode(selectedNodeId);
     const displayGraph = useMemo(
-      () => resolveDisplayGraph(selectedNodeId, activePath, activePathEdgeIds, viewMode),
-      [activePath, activePathEdgeIds, selectedNodeId, viewMode],
+      () => resolveDisplayGraph(selectedNodeId, activePath, activePathEdgeIds, viewMode, {
+        aggregationEnabled,
+        collapsedNeighborhoodNodeIds,
+      }).graph,
+      [activePath, activePathEdgeIds, aggregationEnabled, collapsedNeighborhoodNodeIds, selectedNodeId, viewMode],
     );
 
     const interactionState = useMemo(
