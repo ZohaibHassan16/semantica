@@ -397,6 +397,7 @@ class BaseProvider:
                         create_kwargs["response_format"] = {"type": "json_object"}
                     
                     response = client.chat.completions.create(**create_kwargs)
+                    verbose_mode = kwargs.get("verbose", False) or self.config.get("verbose", False)
                     if verbose_mode:
                         import sys
                         print(f"    [BaseProvider.generate_typed] Typed response received via instructor ({provider_name}).", flush=True, file=sys.stdout)
