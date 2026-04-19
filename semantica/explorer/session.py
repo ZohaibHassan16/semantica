@@ -411,9 +411,11 @@ class GraphSession:
         if normalized_event in {"ADD_NODE", "UPDATE_NODE"}:
             normalized_node = self.normalize_node(payload or {})
             if normalized_node.get("id"):
-                self._search_index.upsert(normalized_node)
+                with self._lock:
+                    self._search_index.upsert(normalized_node)
         elif normalized_event in {"REMOVE_NODE", "DELETE_NODE"}:
-            self._search_index.remove(str(entity_id))
+            with self._lock:
+                self._search_index.remove(str(entity_id))
         elif normalized_event in {"RELOAD_GRAPH", "RESET_GRAPH"}:
             self.rebuild_search_index()
 
@@ -638,11 +640,4 @@ class GraphSession:
                 **properties,
             )
             has_mutation_callback = callable(getattr(self.graph, "mutation_callback", None))
-        if added and not has_mutation_callback:
-            source = self.get_node(source_id)
-            if source is not None:
-                self._search_index.upsert(source)
-            target = self.get_node(target_id)
-            if target is not None:
-                self._search_index.upsert(target)
         return added

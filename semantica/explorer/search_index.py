@@ -4,6 +4,7 @@ Explorer-local in-memory node search index.
 
 from __future__ import annotations
 
+import bisect
 import heapq
 import re
 from collections import OrderedDict, defaultdict
@@ -155,10 +156,9 @@ class GraphSearchIndex:
                 if not prefix_bucket:
                     self._prefix_index.pop(prefix, None)
 
-        try:
-            self._ordered_node_ids.remove(node_id)
-        except ValueError:
-            pass
+        pos = bisect.bisect_left(self._ordered_node_ids, node_id)
+        if pos < len(self._ordered_node_ids) and self._ordered_node_ids[pos] == node_id:
+            self._ordered_node_ids.pop(pos)
 
         if clear_cache:
             self.clear_cache()
@@ -180,9 +180,8 @@ class GraphSearchIndex:
             for length in range(self.prefix_min_length, min(len(token), self.prefix_max_length) + 1):
                 self._prefix_index[token[:length]].add(node_id)
 
-        if node_id not in self._ordered_node_ids:
-            self._ordered_node_ids.append(node_id)
-            self._ordered_node_ids.sort()
+        if node_id not in self._documents:
+            bisect.insort(self._ordered_node_ids, node_id)
 
         if clear_cache:
             self.clear_cache()
@@ -338,7 +337,7 @@ class GraphSearchIndex:
         for key in sorted(filters.keys()):
             value = filters[key]
             if isinstance(value, (list, tuple, set)):
-                serialized_filters.append((key, tuple(str(item) for item in value)))
+                serialized_filters.append((key, tuple(sorted(str(item) for item in value))))
             else:
                 serialized_filters.append((key, str(value)))
         return normalized_query, limit, tuple(serialized_filters)
