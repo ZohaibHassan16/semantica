@@ -942,6 +942,7 @@ class DeepSeekProvider(BaseProvider):
         self.api_key = api_key or config.get_api_key("deepseek")
         self.base_url = "https://api.deepseek.com/v1"
         self.model = model
+        self.base_url = "https://api.deepseek.com/v1"
         self.client = None
         self._init_client()
 
@@ -954,7 +955,7 @@ class DeepSeekProvider(BaseProvider):
         except (ImportError, OSError):
             self.client = None
             self.logger.warning(
-                "deepseek library not installed. Install with: pip install semantica[llm-deepseek]"
+                "openai library not installed. Install with: pip install semantica[llm-openai]"
             )
 
     def is_available(self) -> bool:
