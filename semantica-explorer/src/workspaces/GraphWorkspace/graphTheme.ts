@@ -9,6 +9,7 @@ export type GraphBadgeKind = "inferred" | "temporal" | "provenance";
 
 type GraphNodeColorMode = "base" | "selected" | "hovered" | "path" | "muted";
 type GraphEdgeColorMode = "overview" | "backbone" | "structure" | "inspection" | "hover" | "path" | "focus" | "muted";
+const IS_DEV = Boolean((import.meta as { env?: { DEV?: boolean } }).env?.DEV);
 
 export interface GraphTheme {
   palette: {
@@ -530,7 +531,7 @@ export const GRAPH_THEME: GraphTheme = {
       maxGroups: 8,
     },
     diagnostics: {
-      enabledInDev: import.meta.env.DEV,
+      enabledInDev: IS_DEV,
     },
   },
 };
