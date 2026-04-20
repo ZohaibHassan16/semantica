@@ -9,6 +9,7 @@ export type GraphBadgeKind = "inferred" | "temporal" | "provenance";
 
 type GraphNodeColorMode = "base" | "selected" | "hovered" | "path" | "muted";
 type GraphEdgeColorMode = "overview" | "backbone" | "structure" | "inspection" | "hover" | "path" | "focus" | "muted";
+const IS_DEV = Boolean((import.meta as { env?: { DEV?: boolean } }).env?.DEV);
 
 export interface GraphTheme {
   palette: {
@@ -305,10 +306,10 @@ export const GRAPH_THEME: GraphTheme = {
   zoomTiers: {
     overview: {
       maxRatio: Number.POSITIVE_INFINITY,
-      nodeScale: 0.88,
-      labelThreshold: 0.92,
-      labelBudget: 28,
-      edgePriorityThreshold: 0.55,
+      nodeScale: 0.72,
+      labelThreshold: 0.995,
+      labelBudget: 4,
+      edgePriorityThreshold: 0.72,
       arrowPriorityThreshold: Number.POSITIVE_INFINITY,
       edgeSizeScale: 0.62,
       showBadges: false,
@@ -317,21 +318,21 @@ export const GRAPH_THEME: GraphTheme = {
     },
     structure: {
       maxRatio: 1.2,
-      nodeScale: 1.02,
-      labelThreshold: 0.82,
-      labelBudget: 60,
-      edgePriorityThreshold: 0.3,
-      arrowPriorityThreshold: 0.65,
-      edgeSizeScale: 1.05,
-      showBadges: true,
-      showCurves: true,
-      showContextualArrows: true,
+      nodeScale: 0.94,
+      labelThreshold: 0.93,
+      labelBudget: 18,
+      edgePriorityThreshold: 0.4,
+      arrowPriorityThreshold: 0.75,
+      edgeSizeScale: 0.92,
+      showBadges: false,
+      showCurves: false,
+      showContextualArrows: false,
     },
     inspection: {
       maxRatio: 0.5,
-      nodeScale: 1.08,
-      labelThreshold: 0.6,
-      labelBudget: 120,
+      nodeScale: 1,
+      labelThreshold: 0.8,
+      labelBudget: 40,
       edgePriorityThreshold: 0,
       arrowPriorityThreshold: 0.45,
       edgeSizeScale: 1.18,
@@ -341,7 +342,7 @@ export const GRAPH_THEME: GraphTheme = {
     },
   },
   labels: {
-    forceVisibleStates: ["hovered", "selected", "neighbor", "path"],
+    forceVisibleStates: ["hovered", "selected", "path"],
     policies: {
       none: { minZoomTier: "inspection" },
       priority: { minZoomTier: "overview" },
@@ -391,26 +392,26 @@ export const GRAPH_THEME: GraphTheme = {
   },
   nodes: {
     backgroundScale: 0.52,
-    mutedAlpha: 0.08,
+    mutedAlpha: 0.16,
     strokeHierarchy: {
       overview: { base: 0.05, emphasis: 0.34, muted: 0.02 },
       structure: { base: 1.05, emphasis: 1.45, muted: 0.55 },
       inspection: { base: 1.2, emphasis: 1.7, muted: 0.6 },
     },
     states: {
-      default: { color: "base", sizeMultiplier: 0.92, minSize: 3.5, forceLabel: false, zIndex: 0, borderBoost: -0.18 },
-      hovered: { color: "hovered", sizeMultiplier: 1.28, minSize: 13.5, forceLabel: true, zIndex: 4, borderBoost: 0.28 },
-      selected: { color: "selected", sizeMultiplier: 1.14, minSize: 11.5, forceLabel: true, zIndex: 3, borderBoost: 0.24 },
-      neighbor: { color: "base", sizeMultiplier: 0.96, minSize: 5.5, forceLabel: true, zIndex: 2, borderBoost: 0.04 },
-      path: { color: "path", sizeMultiplier: 1.08, minSize: 7.0, forceLabel: true, zIndex: 2, borderBoost: 0.12 },
-      inactive: { color: "muted", sizeMultiplier: 0.48, minSize: 1.8, forceLabel: false, zIndex: 0, borderBoost: -0.28 },
-      muted: { color: "muted", sizeMultiplier: 0.48, minSize: 1.8, forceLabel: false, zIndex: 0, borderBoost: -0.28 },
+      default: { color: "base", sizeMultiplier: 0.72, minSize: 0.68, forceLabel: false, zIndex: 0, borderBoost: -0.42 },
+      hovered: { color: "hovered", sizeMultiplier: 1.1, minSize: 10.8, forceLabel: true, zIndex: 4, borderBoost: 0.18 },
+      selected: { color: "selected", sizeMultiplier: 1.02, minSize: 9.4, forceLabel: true, zIndex: 3, borderBoost: 0.18 },
+      neighbor: { color: "base", sizeMultiplier: 0.78, minSize: 4.2, forceLabel: false, zIndex: 2, borderBoost: -0.12 },
+      path: { color: "path", sizeMultiplier: 0.97, minSize: 5.8, forceLabel: true, zIndex: 2, borderBoost: 0.06 },
+      inactive: { color: "muted", sizeMultiplier: 0.52, minSize: 0.58, forceLabel: false, zIndex: 0, borderBoost: -0.42 },
+      muted: { color: "muted", sizeMultiplier: 0.52, minSize: 0.58, forceLabel: false, zIndex: 0, borderBoost: -0.42 },
     },
     variants: {
       default: { sizeMultiplier: 1, borderBoost: 0, haloBoost: 0, badgeVisibleFrom: "inspection" },
-      temporal: { sizeMultiplier: 1.02, borderBoost: 0.12, haloBoost: 0.1, badgeKind: "temporal", badgeVisibleFrom: "structure" },
-      inferred: { sizeMultiplier: 1.05, borderBoost: 0.16, haloBoost: 0.14, badgeKind: "inferred", badgeVisibleFrom: "structure" },
-      provenance: { sizeMultiplier: 1.03, borderBoost: 0.14, haloBoost: 0.12, badgeKind: "provenance", badgeVisibleFrom: "structure" },
+      temporal: { sizeMultiplier: 1.02, borderBoost: 0.12, haloBoost: 0.1, badgeKind: "temporal", badgeVisibleFrom: "inspection" },
+      inferred: { sizeMultiplier: 1.05, borderBoost: 0.16, haloBoost: 0.14, badgeKind: "inferred", badgeVisibleFrom: "inspection" },
+      provenance: { sizeMultiplier: 1.03, borderBoost: 0.14, haloBoost: 0.12, badgeKind: "provenance", badgeVisibleFrom: "inspection" },
       selected: { sizeMultiplier: 1.06, borderBoost: 0.22, haloBoost: 0.16, badgeVisibleFrom: "overview" },
     },
     selectedRing: {
@@ -530,7 +531,7 @@ export const GRAPH_THEME: GraphTheme = {
       maxGroups: 8,
     },
     diagnostics: {
-      enabledInDev: import.meta.env.DEV,
+      enabledInDev: IS_DEV,
     },
   },
 };

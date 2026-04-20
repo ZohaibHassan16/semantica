@@ -139,6 +139,10 @@ function toSelectedNodeState(node: ApiNode, neighborCount: number, fallbackColor
     valid_until: node.valid_until ?? null,
     properties: node.properties ?? {},
     neighborCount,
+    visibleNeighborCount: neighborCount,
+    collapsedNeighborCount: 0,
+    isNeighborhoodCollapsed: false,
+    canCollapseNeighborhood: neighborCount > 8,
   };
 }
 
@@ -427,6 +431,10 @@ export function GraphWorkspaceShell() {
           valid_until: null,
           properties: searchNode.properties ?? {},
           neighborCount: 0,
+          visibleNeighborCount: 0,
+          collapsedNeighborCount: 0,
+          isNeighborhoodCollapsed: false,
+          canCollapseNeighborhood: false,
         }
       : null;
   }, [neighborCountMap, searchResults, selectedNodeId, selectedNodeState, snapshot]);

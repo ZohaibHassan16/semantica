@@ -1,7 +1,8 @@
 import type { GraphBehavior } from "./types";
+import type { GraphViewMode } from "../types";
 
 export function createViewModeSwitchBehavior(): GraphBehavior {
-  let lastViewMode: "focused" | "full" | null = null;
+  let lastViewMode: GraphViewMode | null = null;
 
   return {
     id: "view-mode-switch",

@@ -84,6 +84,8 @@ export interface GraphCanvasProps {
   layoutSource?: string;
   onLayoutStatusChange?: (status: GraphLayoutStatus) => void;
   viewMode: GraphViewMode;
+  aggregationEnabled?: boolean;
+  collapsedNeighborhoodNodeIds?: string[];
   className?: string;
   showFitViewButton?: boolean;
   pluginOverlays?: ReactNode[];
@@ -111,17 +113,15 @@ const FA2_SETTINGS = {
 
 const SIGMA_SETTINGS = {
   allowInvalidContainer: true,
-  labelRenderedSizeThreshold: 2,
+  labelRenderedSizeThreshold: 6,
   defaultNodeType: "circle",
   defaultEdgeType: "line",
   hideLabelsOnMove: false,
   hideEdgesOnMove: false,
   enableEdgeEvents: true,
-  renderEdgeLabels: true,
-  edgeLabelSize: 10,
-  edgeLabelColor: { color: "rgba(180, 210, 255, 0.72)" },
-  labelDensity: 1.1,
-  labelGridCellSize: 80,
+  renderEdgeLabels: false,
+  labelDensity: 0.7,
+  labelGridCellSize: 140,
   zIndex: true,
   minCameraRatio: 0.04,
   maxCameraRatio: 8,
@@ -581,6 +581,8 @@ export const GraphCanvas = forwardRef<GraphCanvasHandle, GraphCanvasProps>(
       temporalState,
       isLayoutRunning,
       viewMode,
+      aggregationEnabled = true,
+      collapsedNeighborhoodNodeIds = [],
       className,
       showFitViewButton = true,
       pluginOverlays = [],
@@ -616,8 +618,11 @@ export const GraphCanvas = forwardRef<GraphCanvasHandle, GraphCanvasProps>(
 
     const isFocusedView = viewMode === "focused" && Boolean(selectedNodeId) && graph.hasNode(selectedNodeId);
     const displayGraph = useMemo(
-      () => resolveDisplayGraph(selectedNodeId, activePath, activePathEdgeIds, viewMode),
-      [activePath, activePathEdgeIds, selectedNodeId, viewMode],
+      () => resolveDisplayGraph(selectedNodeId, activePath, activePathEdgeIds, viewMode, {
+        aggregationEnabled,
+        collapsedNeighborhoodNodeIds,
+      }).graph,
+      [activePath, activePathEdgeIds, aggregationEnabled, collapsedNeighborhoodNodeIds, selectedNodeId, viewMode],
     );
 
     const interactionState = useMemo(

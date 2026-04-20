@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
+import type Graph from "graphology";
 import { batchMergeEdges, batchMergeNodes, graph } from "../../store/graphStore";
 import { logEvent } from "../../store/registryStore";
 import type { EdgeAttributes, NodeAttributes } from "../../store/graphStore";
@@ -11,6 +12,7 @@ import { useLoadGraph, useReloadGraph } from "./useLoadGraph";
 import { GraphLoadingOverlay } from "./GraphLoadingOverlay";
 import { createGraphLoadProgress, getGraphLoadTitle } from "./graphLoading";
 import { GRAPH_THEME, withAlpha } from "./graphTheme";
+import { resolveDisplayGraph } from "./graphSceneState";
 import {
   type GraphPlugin,
   type GraphPluginActionRequest,
@@ -23,6 +25,7 @@ import type { LinkPrediction, PathResponse } from "./GraphInspectorPanel";
 import type { GraphSceneHandle, GraphSceneRuntime } from "./scene";
 import type {
   GraphAnalyticsSnapshot,
+  GraphDisplayStateSnapshot,
   GraphDiagnosticsSnapshot,
   GraphEffectToggle,
   GraphEffectsState,
@@ -89,7 +92,7 @@ const DEFAULT_EFFECTS_STATE: GraphEffectsState = {
   pathFlowEnabled: false,
   lensEnabled: false,
   temporalEmphasisEnabled: false,
-  semanticRegionsEnabled: true,
+  semanticRegionsEnabled: false,
   contoursEnabled: false,
   pathfindingEnabled: false,
   communitiesEnabled: false,
@@ -494,7 +497,10 @@ function buildRealtimeEdgeAttributes(payload: {
   };
 }
 
-function buildSelectedNodeState(nodeId: string): GraphSelectedNodeState | null {
+function buildSelectedNodeState(
+  nodeId: string,
+  displayState: GraphDisplayStateSnapshot,
+): GraphSelectedNodeState | null {
   if (!nodeId || !graph.hasNode(nodeId)) {
     return null;
   }
@@ -519,37 +525,69 @@ function buildSelectedNodeState(nodeId: string): GraphSelectedNodeState | null {
     valid_until: attributes.valid_until ?? null,
     properties: attributes.properties ?? {},
     neighborCount: graph.neighbors(nodeId).length,
+    visibleNeighborCount: displayState.selectedVisibleNeighborIds.length,
+    collapsedNeighborCount: displayState.selectedCollapsedNeighborIds.length,
+    isNeighborhoodCollapsed: displayState.selectedCollapsedNeighborIds.length > 0,
+    canCollapseNeighborhood: graph.neighbors(nodeId).length > 8,
   };
 }
 
-function buildSelectedEdgeState(edgeId: string): GraphSelectedEdgeState | null {
-  if (!edgeId || !graph.hasEdge(edgeId)) {
+function buildSelectedEdgeState(
+  edgeId: string,
+  displayGraph: typeof graph | Graph<NodeAttributes, EdgeAttributes>,
+): GraphSelectedEdgeState | null {
+  if (!edgeId || !displayGraph.hasEdge(edgeId)) {
     return null;
   }
 
-  const [sourceId, targetId] = graph.extremities(edgeId);
-  const attributes = graph.getEdgeAttributes(edgeId) as {
+  const [displaySourceId, displayTargetId] = displayGraph.extremities(edgeId);
+  const attributes = displayGraph.getEdgeAttributes(edgeId) as {
     edgeType?: string;
     weight?: number;
     properties?: Record<string, unknown>;
     familyId?: string;
+    rawEdgeIds?: string[];
+    isAggregated?: boolean;
+    aggregateCount?: number;
+    bundleKind?: "parallel" | "bidirectional" | "community";
+    dominantEdgeType?: string;
+    representativeWeight?: number;
   };
-  const sourceAttributes = graph.getNodeAttributes(sourceId) as { label?: string; content?: string };
-  const targetAttributes = graph.getNodeAttributes(targetId) as { label?: string; content?: string };
+  const rawEdgeIds = attributes.rawEdgeIds?.length ? attributes.rawEdgeIds.map((rawEdgeId) => String(rawEdgeId)) : [edgeId];
+  const primaryRawEdgeId = rawEdgeIds.find((rawEdgeId) => graph.hasEdge(rawEdgeId)) ?? rawEdgeIds[0];
+  let sourceId = displaySourceId;
+  let targetId = displayTargetId;
+  if (primaryRawEdgeId && graph.hasEdge(primaryRawEdgeId)) {
+    [sourceId, targetId] = graph.extremities(primaryRawEdgeId);
+  }
+  const sourceAttributes = graph.hasNode(sourceId)
+    ? (graph.getNodeAttributes(sourceId) as { label?: string; content?: string })
+    : ({ label: displaySourceId } as { label?: string; content?: string });
+  const targetAttributes = graph.hasNode(targetId)
+    ? (graph.getNodeAttributes(targetId) as { label?: string; content?: string })
+    : ({ label: displayTargetId } as { label?: string; content?: string });
   const properties = attributes.properties ?? {};
   const familyId = String(attributes.familyId || edgeId);
   let familySize = 0;
   let siblingCount = 0;
-  graph.forEachEdge((candidateEdgeId, candidateAttrs) => {
-    const edgeAttrs = candidateAttrs as { familyId?: string };
-    const [candidateSource, candidateTarget] = graph.extremities(candidateEdgeId);
-    if (String(edgeAttrs.familyId || candidateEdgeId) === familyId) {
+  rawEdgeIds.forEach((rawEdgeId) => {
+    if (!graph.hasEdge(rawEdgeId)) {
+      return;
+    }
+    const candidateAttrs = graph.getEdgeAttributes(rawEdgeId) as { familyId?: string };
+    const [candidateSource, candidateTarget] = graph.extremities(rawEdgeId);
+    if (String(candidateAttrs.familyId || rawEdgeId) === familyId) {
       familySize += 1;
     }
     if (candidateSource === sourceId && candidateTarget === targetId) {
       siblingCount += 1;
     }
   });
+
+  if (attributes.isAggregated) {
+    siblingCount = rawEdgeIds.filter((rawEdgeId) => graph.hasEdge(rawEdgeId)).length;
+    familySize = Math.max(familySize, siblingCount);
+  }
 
   return {
     id: edgeId,
@@ -564,6 +602,12 @@ function buildSelectedEdgeState(edgeId: string): GraphSelectedEdgeState | null {
     provenanceCount: getProvenanceCount(properties),
     familySize,
     siblingCount,
+    isAggregated: Boolean(attributes.isAggregated),
+    aggregateCount: Number(attributes.aggregateCount ?? rawEdgeIds.length),
+    rawEdgeIds,
+    bundleKind: attributes.bundleKind ?? null,
+    dominantEdgeType: attributes.dominantEdgeType ?? null,
+    representativeWeight: Number(attributes.representativeWeight ?? attributes.weight ?? 1),
   };
 }
 
@@ -626,7 +670,9 @@ export function GraphWorkspace() {
   const [selectedNodeId, setSelectedNodeId] = useState("");
   const [selectedEdgeId, setSelectedEdgeId] = useState("");
   const [isLayoutRunning, setIsLayoutRunning] = useState(false);
-  const [viewMode, setViewMode] = useState<GraphViewMode>("focused");
+  const [viewMode, setViewMode] = useState<GraphViewMode>("full");
+  const [aggregationEnabled] = useState(true);
+  const [collapsedNeighborhoodNodeIds, setCollapsedNeighborhoodNodeIds] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [searchError, setSearchError] = useState("");
@@ -663,7 +709,7 @@ export function GraphWorkspace() {
     focusedNodeId: "",
     activePath: [],
     activePathEdgeIds: [],
-    viewMode: "focused",
+    viewMode: "full",
     zoomTier: "overview",
     isLayoutRunning: false,
   });
@@ -778,6 +824,28 @@ export function GraphWorkspace() {
   }, [debouncedTime, isLoading]);
 
   const focusNode = useCallback((nodeId: string) => {
+    const currentDisplayGraph = pluginRuntimeRef.current?.displayGraph ?? graph;
+    if (viewMode === "grouped" && currentDisplayGraph.hasNode(nodeId)) {
+      const displayAttrs = currentDisplayGraph.getNodeAttributes(nodeId) as NodeAttributes;
+      const communityGroup = displayAttrs.properties?.__communityGroup as
+        | {
+            anchorNodeId?: string | null;
+            sampleNodeIds?: string[];
+          }
+        | undefined;
+      const anchorNodeId = communityGroup?.anchorNodeId || communityGroup?.sampleNodeIds?.[0] || "";
+      if (anchorNodeId && graph.hasNode(anchorNodeId)) {
+        setViewMode("focused");
+        setSelectedNodeId(anchorNodeId);
+        setSelectedEdgeId("");
+        setPathResult(null);
+        setSearchResults([]);
+        setSearchError("");
+        setIsLayoutRunning(false);
+        return;
+      }
+    }
+
     setSelectedNodeId(nodeId);
     setSelectedEdgeId("");
     setPathResult(null);
@@ -786,7 +854,7 @@ export function GraphWorkspace() {
     if (nodeId) {
       setIsLayoutRunning(false);
     }
-  }, []);
+  }, [viewMode]);
 
   const handleEdgeSelect = useCallback((edgeId: string) => {
     setSelectedEdgeId(edgeId);
@@ -930,32 +998,56 @@ export function GraphWorkspace() {
     };
   }, []);
 
-  const focusedSummary = useMemo(() => {
-    if (!selectedNodeId || !graph.hasNode(selectedNodeId)) {
-      return null;
-    }
-
-    const localNeighborCount = graph.neighbors(selectedNodeId).length;
-    if (viewMode === "focused") {
-      const visibleNeighbors = Math.min(localNeighborCount, 16);
-      return `${visibleNeighbors + 1} nodes in focused view`;
-    }
-
-    return `${localNeighborCount} direct neighbors highlighted`;
-  }, [selectedNodeId, viewMode]);
+  useEffect(() => {
+    setCollapsedNeighborhoodNodeIds([]);
+  }, [summary?.edgeCount, summary?.nodeCount]);
 
   const showLoadingOverlay = isLoading || isFetching || loadingProgress?.phase === "stabilizing_layout";
   const hasGraphContent = Boolean(summary?.nodeCount);
   const activePath = pathResult?.path ?? [];
   const activePathEdgeIds = pathResult?.edge_ids ?? [];
+  const displayResult = useMemo(
+    () => resolveDisplayGraph(selectedNodeId, activePath, activePathEdgeIds, viewMode, {
+      aggregationEnabled,
+      collapsedNeighborhoodNodeIds,
+    }),
+    [activePath, activePathEdgeIds, aggregationEnabled, collapsedNeighborhoodNodeIds, selectedNodeId, viewMode],
+  );
+  const displayState = displayResult.state;
+  const focusedSummary = useMemo(() => {
+    if (!selectedNodeId || !graph.hasNode(selectedNodeId)) {
+      if (viewMode === "grouped") {
+        return displayState.groupedViewAvailable
+          ? "Communities compressed into grouped structure view"
+          : "Grouped view is unavailable for the current graph";
+      }
+      return null;
+    }
+
+    const localNeighborCount = graph.neighbors(selectedNodeId).length;
+    if (viewMode === "focused") {
+      const visibleNeighbors = displayState.selectedVisibleNeighborIds.length || Math.min(localNeighborCount, 16);
+      return `${visibleNeighbors + 1} nodes in focused view`;
+    }
+
+    if (viewMode === "grouped") {
+      return "Grouped structure view with direct community drill-in";
+    }
+
+    if (displayState.selectedCollapsedNeighborIds.length > 0) {
+      return `${displayState.selectedVisibleNeighborIds.length} visible neighbors, ${displayState.selectedCollapsedNeighborIds.length} collapsed`;
+    }
+
+    return `${localNeighborCount} direct neighbors highlighted`;
+  }, [displayState, selectedNodeId, viewMode]);
   const graphSummary = summary as GraphLoadSummary | null;
   const selectedNodeState = useMemo(
-    () => buildSelectedNodeState(selectedNodeId),
-    [selectedNodeId, summary?.nodeCount, summary?.edgeCount],
+    () => buildSelectedNodeState(selectedNodeId, displayState),
+    [displayState, selectedNodeId, summary?.nodeCount, summary?.edgeCount],
   );
   const selectedEdgeState = useMemo(
-    () => buildSelectedEdgeState(selectedEdgeId),
-    [selectedEdgeId, summary?.nodeCount, summary?.edgeCount],
+    () => buildSelectedEdgeState(selectedEdgeId, displayResult.graph),
+    [displayResult.graph, selectedEdgeId, summary?.nodeCount, summary?.edgeCount],
   );
   const temporalState = useMemo(
     () => ({
@@ -1063,6 +1155,20 @@ export function GraphWorkspace() {
       case "setViewMode":
         setViewMode(action.viewMode);
         return;
+      case "collapseNeighborhood":
+        if (!selectedNodeId) {
+          return;
+        }
+        setCollapsedNeighborhoodNodeIds((current) => (
+          current.includes(selectedNodeId) ? current : [...current, selectedNodeId]
+        ));
+        return;
+      case "expandNeighborhood":
+        if (!selectedNodeId) {
+          return;
+        }
+        setCollapsedNeighborhoodNodeIds((current) => current.filter((nodeId) => nodeId !== selectedNodeId));
+        return;
       case "toggleEffect":
         setEffectToggle(action.effect, (current) => !current);
         return;
@@ -1099,7 +1205,7 @@ export function GraphWorkspace() {
         setActiveDockPanelId((previous) => (previous === action.panelId ? null : previous));
         return;
     }
-  }, [focusNode, setEffectToggle]);
+  }, [focusNode, selectedNodeId, setEffectToggle]);
 
   const diagnosticsSnapshot = useMemo<GraphDiagnosticsSnapshot | null>(() => {
     if (!GRAPH_THEME.effects.diagnostics.enabledInDev || !graphDiagnosticsState) {
@@ -1139,9 +1245,11 @@ export function GraphWorkspace() {
     getEffectsState: () => effectsState,
     getDiagnosticsSnapshot: () => diagnosticsSnapshot,
     getAnalyticsSnapshot: () => graphAnalyticsState,
+    getDisplayState: () => displayState,
     isPanelOpen: (panelId: string) => Boolean(pluginPanelState[panelId]),
     dispatchAction: handlePluginAction,
   }), [
+    displayState,
     graphAnalyticsState,
     diagnosticsSnapshot,
     effectsState,
@@ -1267,23 +1375,56 @@ export function GraphWorkspace() {
   const coreToolbarGroups = useMemo<GraphToolbarGroup[]>(() => {
     const groups: GraphToolbarGroup[] = [];
 
-    if (selectedNodeId) {
+    if (hasGraphContent) {
       groups.push({
         id: "view-mode",
         items: [
-          {
-            id: "view-focused",
-            label: "Focused",
-            title: "Inspect the selected node in a focused local graph",
-            active: viewMode === "focused",
-            onClick: () => setViewMode("focused"),
-          },
           {
             id: "view-full",
             label: "Full Graph",
             title: "Return to the full graph context",
             active: viewMode === "full",
             onClick: () => setViewMode("full"),
+          },
+          {
+            id: "view-grouped",
+            label: "Grouped View",
+            title: displayState.groupedViewAvailable
+              ? "Compress dense structure into detected communities"
+              : "Grouped view is unavailable until communities can be detected",
+            active: viewMode === "grouped",
+            disabled: !displayState.groupedViewAvailable,
+            onClick: () => setViewMode("grouped"),
+          },
+          {
+            id: "view-focused",
+            label: "Focused",
+            title: "Inspect the selected node in a focused local graph",
+            active: viewMode === "focused",
+            disabled: !selectedNodeId,
+            onClick: () => setViewMode("focused"),
+          },
+        ],
+      });
+    }
+
+    if (selectedNodeState) {
+      groups.push({
+        id: "local-structure",
+        items: [
+          {
+            id: "collapse-neighborhood",
+            label: "Collapse Neighborhood",
+            title: "Hide lower-priority fanout around the selected node",
+            disabled: !selectedNodeState.canCollapseNeighborhood || selectedNodeState.isNeighborhoodCollapsed,
+            onClick: () => handlePluginAction({ type: "collapseNeighborhood" }),
+          },
+          {
+            id: "expand-neighborhood",
+            label: "Expand Neighborhood",
+            title: "Restore the collapsed local neighborhood",
+            disabled: !selectedNodeState.isNeighborhoodCollapsed,
+            onClick: () => handlePluginAction({ type: "expandNeighborhood" }),
           },
         ],
       });
@@ -1362,7 +1503,19 @@ export function GraphWorkspace() {
     }
 
     return groups;
-  }, [isLayoutRunning, pluginToolbarItems, reload, searchQuery, selectedNodeId, showLoadingOverlay, viewMode]);
+  }, [
+    displayState.groupedViewAvailable,
+    handlePluginAction,
+    hasGraphContent,
+    isLayoutRunning,
+    pluginToolbarItems,
+    reload,
+    searchQuery,
+    selectedNodeId,
+    selectedNodeState,
+    showLoadingOverlay,
+    viewMode,
+  ]);
 
   const sceneAdapterProps = {
     onNodeSelect: focusNode,
@@ -1375,6 +1528,8 @@ export function GraphWorkspace() {
     temporalState,
     isLayoutRunning,
     viewMode,
+    aggregationEnabled,
+    collapsedNeighborhoodNodeIds,
     showFitViewButton: false,
     pluginOverlays: pluginOverlays.map((overlay) => overlay.element),
     onRuntimeChange: handleSceneRuntimeChange,
@@ -1504,8 +1659,20 @@ export function GraphWorkspace() {
 
                   <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                     <MetricChip tone="warm">weight {selectedEdgeState.weight.toFixed(2)}</MetricChip>
-                    <MetricChip>{selectedEdgeState.siblingCount} parallel lane{selectedEdgeState.siblingCount === 1 ? "" : "s"}</MetricChip>
+                    {selectedEdgeState.isAggregated ? (
+                      <MetricChip tone="success">
+                        {selectedEdgeState.aggregateCount} bundled edge{selectedEdgeState.aggregateCount === 1 ? "" : "s"}
+                      </MetricChip>
+                    ) : (
+                      <MetricChip>{selectedEdgeState.siblingCount} parallel lane{selectedEdgeState.siblingCount === 1 ? "" : "s"}</MetricChip>
+                    )}
                     <MetricChip>{selectedEdgeState.familySize} family member{selectedEdgeState.familySize === 1 ? "" : "s"}</MetricChip>
+                    {selectedEdgeState.bundleKind ? (
+                      <MetricChip>{selectedEdgeState.bundleKind} bundle</MetricChip>
+                    ) : null}
+                    {selectedEdgeState.dominantEdgeType ? (
+                      <MetricChip>{selectedEdgeState.dominantEdgeType}</MetricChip>
+                    ) : null}
                     {selectedEdgeState.provenanceCount > 0 ? (
                       <MetricChip>{selectedEdgeState.provenanceCount} provenance fields</MetricChip>
                     ) : null}

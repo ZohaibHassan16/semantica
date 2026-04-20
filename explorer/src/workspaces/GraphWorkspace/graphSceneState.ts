@@ -17,12 +17,24 @@ import {
   withAlpha,
   zoomTierAtLeast,
 } from "./graphTheme";
-import type { GraphInteractionState, GraphViewMode } from "./types";
+import { computeGraphAnalyticsBase } from "./graphAnalytics";
+import type { GraphDisplayStateSnapshot, GraphInteractionState, GraphViewMode } from "./types";
 
 const MAX_FOCUS_NEIGHBORS = GRAPH_THEME.focus.maxNeighbors;
 const FOCUS_RING_CAPACITY = GRAPH_THEME.focus.ringCapacity;
 const FOCUS_RING_GAP = GRAPH_THEME.focus.ringGap;
 const FOCUS_PRIMARY_LABELS = GRAPH_THEME.focus.primaryLabels;
+const COLLAPSE_VISIBLE_NEIGHBORS = 8;
+const GROUP_SAMPLE_MEMBERS = 8;
+const AGGREGATED_EDGE_PREFIX = "__agg__:";
+const COMMUNITY_NODE_PREFIX = "__community__:";
+
+type GraphRef = typeof graph | Graph<NodeAttributes, EdgeAttributes>;
+
+export type GraphDisplayResult = {
+  graph: GraphRef;
+  state: GraphDisplayStateSnapshot;
+};
 
 function getOverviewPresenceBoost(cameraRatio: number) {
   return clamp(0, Math.log2(Math.max(cameraRatio, 1)) / 1.85, 1);
@@ -65,7 +77,7 @@ export type ResolvedEdgeStyle = {
 };
 
 function forEachDirectedEdgeBetween(
-  graphRef: typeof graph | Graph<NodeAttributes, EdgeAttributes>,
+  graphRef: GraphRef,
   source: string,
   target: string,
   callback: (edgeId: string, attrs: EdgeAttributes) => void,
@@ -76,7 +88,7 @@ function forEachDirectedEdgeBetween(
 }
 
 function collectDirectedEdgeIdsBetween(
-  graphRef: typeof graph | Graph<NodeAttributes, EdgeAttributes>,
+  graphRef: GraphRef,
   source: string,
   target: string,
 ): string[] {
@@ -87,13 +99,52 @@ function collectDirectedEdgeIdsBetween(
   return edgeIds;
 }
 
+function isAggregatedEdgeAttributes(attrs: EdgeAttributes | undefined): boolean {
+  return Boolean(attrs?.isAggregated || (attrs?.rawEdgeIds?.length ?? 0) > 1);
+}
+
+function collectRawEdgeIds(attrs: EdgeAttributes | undefined, fallbackEdgeId?: string): string[] {
+  const rawEdgeIds = attrs?.rawEdgeIds?.map((edgeId) => String(edgeId)).filter(Boolean) ?? [];
+  if (rawEdgeIds.length > 0) {
+    return rawEdgeIds;
+  }
+  return fallbackEdgeId ? [String(fallbackEdgeId)] : [];
+}
+
+function createEmptyDisplayState(
+  selectedNodeId: string,
+  aggregationEnabled: boolean,
+): GraphDisplayStateSnapshot {
+  return {
+    aggregationEnabled,
+    groupedViewAvailable: false,
+    selectedRootNodeId: selectedNodeId || null,
+    selectedVisibleNeighborIds: [],
+    selectedCollapsedNeighborIds: [],
+  };
+}
+
 export function buildPathEdgeSet(
-  graphRef: typeof graph | Graph<NodeAttributes, EdgeAttributes>,
+  graphRef: GraphRef,
   path: string[],
   pathEdgeIds: string[] = [],
 ): Set<string> {
   if (pathEdgeIds.length > 0) {
-    return new Set<string>(pathEdgeIds.filter((edgeId) => graphRef.hasEdge(edgeId)));
+    const requested = new Set(pathEdgeIds.map((edgeId) => String(edgeId)));
+    const matched = new Set<string>();
+    graphRef.forEachEdge((edgeId, attrs) => {
+      const stableEdgeId = String(edgeId);
+      if (requested.has(stableEdgeId)) {
+        matched.add(stableEdgeId);
+        return;
+      }
+
+      const rawEdgeIds = collectRawEdgeIds(attrs as EdgeAttributes, stableEdgeId);
+      if (rawEdgeIds.some((rawEdgeId) => requested.has(rawEdgeId))) {
+        matched.add(stableEdgeId);
+      }
+    });
+    return matched;
   }
 
   const edgeIds = new Set<string>();
@@ -104,7 +155,7 @@ export function buildPathEdgeSet(
 }
 
 export function buildEdgeEndpointSet(
-  graphRef: typeof graph | Graph<NodeAttributes, EdgeAttributes>,
+  graphRef: GraphRef,
   ...edgeIds: Array<string | null | undefined>
 ): Set<string> {
   const nodeIds = new Set<string>();
@@ -123,7 +174,7 @@ export function buildEdgeEndpointSet(
 }
 
 function collectFocusEdgeIds(
-  graphRef: typeof graph | Graph<NodeAttributes, EdgeAttributes>,
+  graphRef: GraphRef,
   nodeIds: Set<string>,
 ): Set<string> {
   const edgeIds = new Set<string>();
@@ -187,10 +238,24 @@ function collectImpactedEdgeKeys(
 }
 
 function resolveDisplayEdgeIds(
-  graphRef: typeof graph | Graph<NodeAttributes, EdgeAttributes>,
+  graphRef: GraphRef,
   stableEdgeIds: Set<string>,
 ): string[] {
-  return Array.from(stableEdgeIds).filter((edgeId) => graphRef.hasEdge(edgeId));
+  const displayEdgeIds = new Set<string>();
+  graphRef.forEachEdge((edgeId, attrs) => {
+    const stableEdgeId = String(edgeId);
+    if (stableEdgeIds.has(stableEdgeId)) {
+      displayEdgeIds.add(stableEdgeId);
+      return;
+    }
+
+    const rawEdgeIds = collectRawEdgeIds(attrs as EdgeAttributes, stableEdgeId);
+    if (rawEdgeIds.some((rawEdgeId) => stableEdgeIds.has(rawEdgeId))) {
+      displayEdgeIds.add(stableEdgeId);
+    }
+  });
+
+  return Array.from(displayEdgeIds);
 }
 
 export function collectInteractionRefreshTargets(
@@ -252,7 +317,7 @@ export function buildFocusSet(nodeId: string): Set<string> {
 }
 
 export function isEdgeInteractable(
-  graphRef: typeof graph | Graph<NodeAttributes, EdgeAttributes>,
+  graphRef: GraphRef,
   interactionState: GraphInteractionState,
   edgeId: string,
   source: string,
@@ -261,6 +326,10 @@ export function isEdgeInteractable(
 ): boolean {
   const pathEdgeIds = buildPathEdgeSet(graphRef, interactionState.activePath, interactionState.activePathEdgeIds);
   if (pathEdgeIds.has(edgeId) || interactionState.selectedEdgeId === edgeId) {
+    return true;
+  }
+
+  if (attrs.isAggregated && (interactionState.viewMode === "grouped" || interactionState.zoomTier === "inspection")) {
     return true;
   }
 
@@ -507,7 +576,7 @@ export function resolveNodeVisualState(
     return "neighbor";
   }
   if (hoveredNodeId || selectedNodeId || selectedEdgeId || pathNodeIds.size > 0) {
-    if (zoomTier === "overview") {
+    if (zoomTier !== "inspection") {
       return "default";
     }
     return "muted";
@@ -839,10 +908,315 @@ export function resolveEdgeElementStyle(
   };
 }
 
+function addNodeIfMissing(targetGraph: GraphRef, nodeId: string, attrs: NodeAttributes) {
+  if (!targetGraph.hasNode(nodeId)) {
+    targetGraph.addNode(nodeId, attrs);
+  }
+}
+
+function buildCollapsedNeighborhoodState(
+  nodeId: string,
+  activePath: string[],
+): Pick<GraphDisplayStateSnapshot, "selectedVisibleNeighborIds" | "selectedCollapsedNeighborIds"> {
+  if (!nodeId || !graph.hasNode(nodeId)) {
+    return {
+      selectedVisibleNeighborIds: [],
+      selectedCollapsedNeighborIds: [],
+    };
+  }
+
+  const rankedNeighbors = rankNeighbors(nodeId);
+  const forcedVisible = new Set(activePath.filter((candidateId) => candidateId !== nodeId && graph.hasNode(candidateId)));
+  const visible = new Set<string>();
+  rankedNeighbors.forEach((neighborId, index) => {
+    if (index < COLLAPSE_VISIBLE_NEIGHBORS || forcedVisible.has(neighborId)) {
+      visible.add(neighborId);
+    }
+  });
+
+  return {
+    selectedVisibleNeighborIds: Array.from(visible),
+    selectedCollapsedNeighborIds: rankedNeighbors.filter((neighborId) => !visible.has(neighborId)),
+  };
+}
+
+function createCollapsedNeighborhoodGraph(
+  nodeId: string,
+  activePath: string[],
+): Graph<NodeAttributes, EdgeAttributes> {
+  const collapsedState = buildCollapsedNeighborhoodState(nodeId, activePath);
+  const hiddenNeighbors = new Set(collapsedState.selectedCollapsedNeighborIds);
+  if (hiddenNeighbors.size === 0) {
+    return graph.copy() as Graph<NodeAttributes, EdgeAttributes>;
+  }
+
+  const collapsedGraph = graph.copy() as Graph<NodeAttributes, EdgeAttributes>;
+  hiddenNeighbors.forEach((neighborId) => {
+    if (!collapsedGraph.hasNode(neighborId)) {
+      return;
+    }
+
+    const incidentEdges = collapsedGraph.edges(neighborId).map((edgeId) => String(edgeId));
+    incidentEdges.forEach((edgeId) => {
+      if (!collapsedGraph.hasEdge(edgeId)) {
+        return;
+      }
+      const [sourceId, targetId] = collapsedGraph.extremities(edgeId);
+      const touchesSelectedPair =
+        (sourceId === nodeId && targetId === neighborId)
+        || (sourceId === neighborId && targetId === nodeId);
+      if (touchesSelectedPair) {
+        collapsedGraph.dropEdge(edgeId);
+      }
+    });
+
+    if (collapsedGraph.hasNode(neighborId) && collapsedGraph.degree(neighborId) === 0) {
+      collapsedGraph.dropNode(neighborId);
+    }
+  });
+
+  return collapsedGraph;
+}
+
+function aggregateDisplayGraph(graphRef: GraphRef): Graph<NodeAttributes, EdgeAttributes> {
+  const aggregated = new Graph<NodeAttributes, EdgeAttributes>({
+    type: "directed",
+    multi: true,
+    allowSelfLoops: false,
+  });
+
+  graphRef.forEachNode((nodeId, attrs) => {
+    aggregated.addNode(nodeId, { ...(attrs as NodeAttributes) });
+  });
+
+  const groupedEdges = new Map<string, Array<{ edgeId: string; attrs: EdgeAttributes }>>();
+  graphRef.forEachEdge((edgeId, attrs, sourceId, targetId) => {
+    const key = `${sourceId}→${targetId}`;
+    const bucket = groupedEdges.get(key) ?? [];
+    bucket.push({ edgeId: String(edgeId), attrs: attrs as EdgeAttributes });
+    groupedEdges.set(key, bucket);
+  });
+
+  groupedEdges.forEach((entries, key) => {
+    const [sourceId, targetId] = key.split("→");
+    if (entries.length === 1) {
+      const [{ edgeId, attrs }] = entries;
+      aggregated.mergeDirectedEdgeWithKey(edgeId, sourceId, targetId, {
+        ...attrs,
+        rawEdgeIds: collectRawEdgeIds(attrs, edgeId),
+        isAggregated: isAggregatedEdgeAttributes(attrs),
+        aggregateCount: attrs.aggregateCount ?? collectRawEdgeIds(attrs, edgeId).length,
+        dominantEdgeType: attrs.dominantEdgeType ?? attrs.edgeType,
+        representativeWeight: attrs.representativeWeight ?? Number(attrs.weight ?? 1),
+      });
+      return;
+    }
+
+    const sorted = entries
+      .slice()
+      .sort((left, right) => {
+        const weightDelta = Number(right.attrs.weight ?? 0) - Number(left.attrs.weight ?? 0);
+        if (weightDelta !== 0) {
+          return weightDelta;
+        }
+        const priorityDelta = Number(right.attrs.visualPriority ?? 0) - Number(left.attrs.visualPriority ?? 0);
+        if (priorityDelta !== 0) {
+          return priorityDelta;
+        }
+        return left.edgeId.localeCompare(right.edgeId);
+      });
+    const representative = sorted[0];
+    const rawEdgeIds = entries.flatMap(({ edgeId, attrs }) => collectRawEdgeIds(attrs, edgeId));
+    const typeCounts = new Map<string, number>();
+    entries.forEach(({ attrs }) => {
+      const edgeType = String(attrs.edgeType ?? "related_to");
+      typeCounts.set(edgeType, (typeCounts.get(edgeType) ?? 0) + 1);
+    });
+    const dominantEdgeType = [...typeCounts.entries()].sort((left, right) => right[1] - left[1])[0]?.[0] ?? representative.attrs.edgeType ?? "related_to";
+    const reverseKey = `${targetId}→${sourceId}`;
+    const isBidirectionalBundle = groupedEdges.has(reverseKey);
+    const syntheticEdgeId = `${AGGREGATED_EDGE_PREFIX}${sourceId}::${targetId}`;
+
+    aggregated.mergeDirectedEdgeWithKey(syntheticEdgeId, sourceId, targetId, {
+      ...representative.attrs,
+      edgeId: syntheticEdgeId,
+      familyId: syntheticEdgeId,
+      sourceId,
+      targetId,
+      rawEdgeIds,
+      isAggregated: true,
+      aggregateCount: rawEdgeIds.length,
+      dominantEdgeType: String(dominantEdgeType),
+      representativeWeight: Number(representative.attrs.weight ?? 1),
+      weight: Number(representative.attrs.weight ?? 1),
+      edgeType: String(representative.attrs.edgeType ?? dominantEdgeType ?? "related_to"),
+      parallelCount: rawEdgeIds.length,
+      familySize: rawEdgeIds.length,
+      bundleKind: isBidirectionalBundle ? "bidirectional" : "parallel",
+      isBidirectional: isBidirectionalBundle,
+    });
+  });
+
+  return aggregated;
+}
+
+function buildCommunityGroupedGraph(): GraphDisplayResult {
+  const base = computeGraphAnalyticsBase(graph, {
+    computeCommunities: true,
+    computeCentrality: true,
+  });
+  const state = createEmptyDisplayState("", true);
+  state.groupedViewAvailable = base.communitiesByNode.size > 0;
+  if (base.communitiesByNode.size === 0) {
+    return { graph: aggregateDisplayGraph(graph), state };
+  }
+
+  const grouped = new Graph<NodeAttributes, EdgeAttributes>({
+    type: "directed",
+    multi: true,
+    allowSelfLoops: false,
+  });
+  const communityMembers = new Map<number, string[]>();
+  graph.forEachNode((nodeId) => {
+    const communityId = base.communitiesByNode.get(nodeId);
+    if (communityId === undefined) {
+      return;
+    }
+    const bucket = communityMembers.get(communityId) ?? [];
+    bucket.push(nodeId);
+    communityMembers.set(communityId, bucket);
+  });
+
+  communityMembers.forEach((memberIds, communityId) => {
+    const rankedMembers = memberIds
+      .slice()
+      .sort((left, right) => {
+        const leftScore = base.centralityByNode.get(left)?.score ?? 0;
+        const rightScore = base.centralityByNode.get(right)?.score ?? 0;
+        if (rightScore !== leftScore) {
+          return rightScore - leftScore;
+        }
+        return left.localeCompare(right);
+      });
+    const anchorNodeId = rankedMembers[0] ?? null;
+    const anchorAttrs = anchorNodeId ? (graph.getNodeAttributes(anchorNodeId) as NodeAttributes) : null;
+    const semanticCounts = new Map<string, number>();
+    memberIds.forEach((memberId) => {
+      const memberAttrs = graph.getNodeAttributes(memberId) as NodeAttributes;
+      const semanticGroup = String(memberAttrs.semanticGroup || memberAttrs.nodeType || "entity");
+      semanticCounts.set(semanticGroup, (semanticCounts.get(semanticGroup) ?? 0) + 1);
+    });
+    const dominantSemanticGroup = [...semanticCounts.entries()].sort((left, right) => right[1] - left[1])[0]?.[0] ?? "entity";
+    const color = anchorAttrs?.baseColor || anchorAttrs?.color || GRAPH_THEME.palette.semantic[communityId % GRAPH_THEME.palette.semantic.length];
+    const communityNodeId = `${COMMUNITY_NODE_PREFIX}${communityId}`;
+    addNodeIfMissing(grouped, communityNodeId, {
+      label: anchorAttrs?.label || `Community ${communityId}`,
+      content: anchorAttrs?.content || anchorAttrs?.label || `Community ${communityId}`,
+      x: anchorAttrs?.x ?? 0,
+      y: anchorAttrs?.y ?? 0,
+      size: Math.max(14, 8 + Math.log2(memberIds.length + 1) * 5),
+      baseSize: Math.max(14, 8 + Math.log2(memberIds.length + 1) * 5),
+      color,
+      baseColor: color,
+      mutedColor: withAlpha(color, 0.32),
+      glowColor: withAlpha(color, 0.22),
+      nodeType: "community",
+      semanticGroup: dominantSemanticGroup,
+      properties: {
+        __communityGroup: {
+          communityId: String(communityId),
+          memberCount: memberIds.length,
+          memberNodeIds: memberIds,
+          sampleNodeIds: rankedMembers.slice(0, GROUP_SAMPLE_MEMBERS),
+          anchorNodeId,
+          anchorLabel: anchorAttrs?.label || anchorNodeId || `Community ${communityId}`,
+          dominantSemanticGroup,
+          color,
+        },
+      },
+      isCommunityGroup: true,
+      communityId: String(communityId),
+      memberCount: memberIds.length,
+      anchorNodeId,
+      labelPriority: Math.max(2, Math.log2(memberIds.length + 1)),
+      visualPriority: Math.max(1, Math.log2(memberIds.length + 1)),
+    });
+  });
+
+  const groupedEdges = new Map<string, {
+    sourceId: string;
+    targetId: string;
+    rawEdgeIds: string[];
+    weight: number;
+    typeCounts: Map<string, number>;
+  }>();
+
+  graph.forEachEdge((edgeId, attrs, sourceId, targetId) => {
+    const sourceCommunity = base.communitiesByNode.get(sourceId);
+    const targetCommunity = base.communitiesByNode.get(targetId);
+    if (sourceCommunity === undefined || targetCommunity === undefined || sourceCommunity === targetCommunity) {
+      return;
+    }
+
+    const groupedSourceId = `${COMMUNITY_NODE_PREFIX}${sourceCommunity}`;
+    const groupedTargetId = `${COMMUNITY_NODE_PREFIX}${targetCommunity}`;
+    const key = `${groupedSourceId}→${groupedTargetId}`;
+    const bucket = groupedEdges.get(key) ?? {
+      sourceId: groupedSourceId,
+      targetId: groupedTargetId,
+      rawEdgeIds: [],
+      weight: 0,
+      typeCounts: new Map<string, number>(),
+    };
+    bucket.rawEdgeIds.push(String(edgeId));
+    bucket.weight = Math.max(bucket.weight, Number((attrs as EdgeAttributes).weight ?? 1));
+    const edgeType = String((attrs as EdgeAttributes).edgeType ?? "related_to");
+    bucket.typeCounts.set(edgeType, (bucket.typeCounts.get(edgeType) ?? 0) + 1);
+    groupedEdges.set(key, bucket);
+  });
+
+  groupedEdges.forEach((bundle, key) => {
+    const dominantEdgeType = [...bundle.typeCounts.entries()].sort((left, right) => right[1] - left[1])[0]?.[0] ?? "related_to";
+    const reverseKey = `${bundle.targetId}→${bundle.sourceId}`;
+    const syntheticEdgeId = `${AGGREGATED_EDGE_PREFIX}${key}`;
+    grouped.mergeDirectedEdgeWithKey(syntheticEdgeId, bundle.sourceId, bundle.targetId, {
+      edgeId: syntheticEdgeId,
+      familyId: syntheticEdgeId,
+      sourceId: bundle.sourceId,
+      targetId: bundle.targetId,
+      edgeType: dominantEdgeType,
+      dominantEdgeType,
+      weight: bundle.weight,
+      representativeWeight: bundle.weight,
+      properties: {},
+      rawEdgeIds: bundle.rawEdgeIds,
+      isAggregated: true,
+      aggregateCount: bundle.rawEdgeIds.length,
+      familySize: bundle.rawEdgeIds.length,
+      parallelCount: bundle.rawEdgeIds.length,
+      isBidirectional: groupedEdges.has(reverseKey),
+      bundleKind: "community",
+      visualPriority: 2,
+    });
+  });
+
+  return {
+    graph: grouped,
+    state: {
+      aggregationEnabled: true,
+      groupedViewAvailable: true,
+      selectedRootNodeId: null,
+      selectedVisibleNeighborIds: [],
+      selectedCollapsedNeighborIds: [],
+    },
+  };
+}
+
 export function createFocusedGraph(
   nodeId: string,
   activePath: string[],
   activePathEdgeIds: string[] = [],
+  collapseNeighborhood = false,
 ): Graph<NodeAttributes, EdgeAttributes> {
   const focused = new Graph<NodeAttributes, EdgeAttributes>({
     type: "directed",
@@ -851,8 +1225,15 @@ export function createFocusedGraph(
   });
 
   const rankedNeighbors = rankNeighbors(nodeId).slice(0, MAX_FOCUS_NEIGHBORS);
-  const focusIds = new Set<string>([nodeId, ...rankedNeighbors]);
-  const labelledNeighborIds = new Set(rankedNeighbors.slice(0, FOCUS_PRIMARY_LABELS));
+  const collapsedState = collapseNeighborhood
+    ? buildCollapsedNeighborhoodState(nodeId, activePath)
+    : {
+        selectedVisibleNeighborIds: rankedNeighbors,
+        selectedCollapsedNeighborIds: [],
+      };
+  const visibleNeighborIds = rankedNeighbors.filter((neighborId) => collapsedState.selectedVisibleNeighborIds.includes(neighborId));
+  const focusIds = new Set<string>([nodeId, ...visibleNeighborIds]);
+  const labelledNeighborIds = new Set(visibleNeighborIds.slice(0, FOCUS_PRIMARY_LABELS));
   const pathNodeIds = new Set(activePath);
   const pathEdgeIds = buildPathEdgeSet(graph, activePath, activePathEdgeIds);
 
@@ -875,7 +1256,7 @@ export function createFocusedGraph(
     label: selectedState.label,
   });
 
-  rankedNeighbors.forEach((neighborId, index) => {
+  visibleNeighborIds.forEach((neighborId, index) => {
     const baseAttrs = graph.getNodeAttributes(neighborId) as NodeAttributes;
     const ring = Math.floor(index / FOCUS_RING_CAPACITY);
     const ringIndex = index % FOCUS_RING_CAPACITY;
@@ -940,7 +1321,7 @@ export function createFocusedGraph(
     }
   }
 
-  return focused;
+  return aggregateDisplayGraph(focused);
 }
 
 export function resolveDisplayGraph(
@@ -948,9 +1329,64 @@ export function resolveDisplayGraph(
   activePath: string[],
   activePathEdgeIds: string[],
   viewMode: GraphViewMode,
-) {
+  options?: {
+    aggregationEnabled?: boolean;
+    collapsedNeighborhoodNodeIds?: Iterable<string>;
+  },
+): GraphDisplayResult {
+  const aggregationEnabled = options?.aggregationEnabled ?? true;
+  const collapsedNeighborhoodNodeIds = new Set(
+    Array.from(options?.collapsedNeighborhoodNodeIds ?? []).filter((nodeId) => typeof nodeId === "string"),
+  );
+  const displayState = createEmptyDisplayState(selectedNodeId, aggregationEnabled);
+  displayState.groupedViewAvailable = computeGraphAnalyticsBase(graph, {
+    computeCommunities: true,
+    computeCentrality: false,
+  }).communitiesByNode.size > 0;
   const isFocusedView = viewMode === "focused" && Boolean(selectedNodeId) && graph.hasNode(selectedNodeId);
-  return isFocusedView && selectedNodeId ? createFocusedGraph(selectedNodeId, activePath, activePathEdgeIds) : graph;
+  const isGroupedView = viewMode === "grouped";
+  const shouldCollapseNeighborhood = Boolean(selectedNodeId && collapsedNeighborhoodNodeIds.has(selectedNodeId));
+
+  if (selectedNodeId && graph.hasNode(selectedNodeId)) {
+    const collapsedState = shouldCollapseNeighborhood
+      ? buildCollapsedNeighborhoodState(selectedNodeId, activePath)
+      : {
+          selectedVisibleNeighborIds: rankNeighbors(selectedNodeId),
+          selectedCollapsedNeighborIds: [],
+        };
+    displayState.selectedRootNodeId = selectedNodeId;
+    displayState.selectedVisibleNeighborIds = collapsedState.selectedVisibleNeighborIds;
+    displayState.selectedCollapsedNeighborIds = collapsedState.selectedCollapsedNeighborIds;
+  }
+
+  if (isGroupedView) {
+    const grouped = buildCommunityGroupedGraph();
+    return {
+      graph: grouped.graph,
+      state: {
+        ...grouped.state,
+        selectedRootNodeId: displayState.selectedRootNodeId,
+        selectedVisibleNeighborIds: displayState.selectedVisibleNeighborIds,
+        selectedCollapsedNeighborIds: displayState.selectedCollapsedNeighborIds,
+      },
+    };
+  }
+
+  if (isFocusedView && selectedNodeId) {
+    return {
+      graph: createFocusedGraph(selectedNodeId, activePath, activePathEdgeIds, shouldCollapseNeighborhood),
+      state: displayState,
+    };
+  }
+
+  const baseGraph = shouldCollapseNeighborhood && selectedNodeId
+    ? createCollapsedNeighborhoodGraph(selectedNodeId, activePath)
+    : graph;
+
+  return {
+    graph: aggregationEnabled ? aggregateDisplayGraph(baseGraph) : baseGraph,
+    state: displayState,
+  };
 }
 
 export function createInteractionState(
