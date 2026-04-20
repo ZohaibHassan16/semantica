@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- **Feature: Graph Workspace declutter + calmer structural exploration** (PR #483 by @ZohaibHassan16, follow-up by @KaifAhmad1):
+  - Added a calmer default presentation for dense graphs: reduced label pressure, stronger inactive-state muting, and tuned zoom-tier visibility to improve readability during overview and structure navigation.
+  - Added display-edge aggregation with raw-edge bundle metadata retention, enabling cleaner visuals while preserving drill-down context for selected edges.
+  - Added grouped community view and neighborhood collapse/expand controls for high-degree local structures in Graph Workspace and Neighborhood panel flows.
+  - Extended graph selection/runtime state with display-state metadata (`groupedViewAvailable`, visible/collapsed neighbor counts, aggregated edge descriptors) for plugin and panel introspection.
+  - Added regression coverage for `resolveDisplayGraph` behavior in `explorer/tests/graphSceneState.display.test.ts`:
+    - parallel-edge aggregation in full view
+    - collapse behavior preserving active-path neighbors
+    - grouped community-node/community-edge projection behavior
+  - Follow-up merge resolution synced the PR branch with `main` after Explorer path migration (`semantica-explorer` -> `explorer`) and preserved PR #483 behavior in conflicted Graph Workspace files.
+
 - **Fix: DeepSeekProvider now uses OpenAI SDK instead of unmaintained deepseek SDK** (closes #482, PR #482 by @liling, review fixes by @KaifAhmad1):
   - **Root cause**: The `deepseek` PyPI package has no `deepseek.Client`, causing `AttributeError` on every `DeepSeekProvider` instantiation. The DeepSeek API is OpenAI-compatible, so the `openai` SDK is the correct client.
   - **`_init_client` rewritten**: Replaced `import deepseek; deepseek.Client(api_key=...)` with `from openai import OpenAI; OpenAI(api_key=..., base_url=self.base_url)`, matching the pattern already used by `NovitaProvider`.
